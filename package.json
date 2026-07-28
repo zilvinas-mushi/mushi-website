@@ -22,5 +22,10 @@
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "_comment_overrides": "postcss/sharp are pinned to patched releases. brace-expansion is NOT overridden: v5 changed to a named `expand` export and eslint's minimatch@3 chain calls it as a function, which breaks linting. eslint-plugin-{import,react,jsx-a11y} all still require minimatch@^3 at their latest versions, so there is no upstream fix. That advisory is dev-only (DoS via attacker-controlled glob patterns, which this repo does not have) and never reaches the static output.",
+  "overrides": {
+    "postcss": "^8.5.24",
+    "sharp": "^0.35.3"
   }
 }
