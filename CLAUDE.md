@@ -12,6 +12,16 @@ Static marketing site for mushi.agency. Deployed to Cloudflare Pages.
 - next/image optimization is off. Use explicit width/height, WebP sources,
   lazy-load below the fold, eager-load the hero.
 
+## Interaction rules
+- **Buttons invert their own colours on hover.** Foreground and background
+  trade places — they do NOT swap schemes with a neighbouring button, and they
+  do not merely lighten or darken.
+  - purple background + white text → white background + purple text
+  - white background + black text → black background + white text
+  Applies to every button on the site, including the header CTA. Always
+  transition the change so it cross-fades rather than snapping; keep a
+  gradient background layer on both states so the fill can animate.
+
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.
 - `metadata` export with absolute OG image URLs.

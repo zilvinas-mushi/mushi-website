@@ -17,25 +17,29 @@ import { BOOKING_URL, SITE_NAME } from "@/lib/site";
  */
 export function SiteHeader() {
   return (
-    <header className="sticky top-4 z-50 mx-4 rounded-2xl bg-[#181818] px-5 py-[9px] md:top-[30px] md:mx-6 md:px-6">
+    // Figma node 3803:1568: bg #181818, 100px tall, 15px radius, 30px from the
+    // top, and 1386px wide inside a 1921px frame — so it is a genuinely
+    // floating bar with ~14% clear on each side, not a near-full-width strip.
+    // Scaled ~0.75 for a 1440 viewport: max-width 1040, 15px inner padding.
+    <header className="sticky top-4 z-50 px-4 md:top-[22px]">
       <nav
         aria-label="Primary"
-        className="grid grid-cols-[1fr_auto] items-center gap-4 md:grid-cols-[1fr_auto_1fr]"
+        className="mx-auto grid max-w-[1040px] grid-cols-[1fr_auto] items-center gap-4 rounded-[15px] bg-[#181818] p-[11px] pl-5 md:grid-cols-[1fr_auto_1fr]"
       >
         <Link
           href="/"
           aria-label={`${SITE_NAME} home`}
           className="justify-self-start"
         >
-          <Logo className="text-[28px] md:text-[34px]" />
+          <Logo className="text-[26px] md:text-[32px]" />
         </Link>
 
-        <ul className="hidden items-center gap-9 justify-self-center md:flex">
+        <ul className="hidden items-center gap-10 justify-self-center md:flex lg:gap-14">
           {NAV.map((item) => (
             <li key={item.label}>
               <a
                 href={item.href}
-                className="text-[15px] font-semibold uppercase tracking-[0.02em] text-white/85 transition-colors hover:text-white lg:text-[17px]"
+                className="text-[14px] font-semibold uppercase tracking-[0.02em] text-white/85 transition-colors hover:text-white lg:text-[15px]"
               >
                 {item.label}
               </a>
@@ -44,10 +48,13 @@ export function SiteHeader() {
         </ul>
 
         <div className="flex items-center gap-3 justify-self-end">
-          {/* Same gradient and 15px radius as the hero primary CTA. */}
+          {/* Same gradient, 15px radius and hover inversion as the hero
+              primary CTA — see the hover rule in CLAUDE.md. */}
           <a
             href={BOOKING_URL}
-            className="inline-flex h-[42px] items-center rounded-[15px] bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-5 text-[15px] font-semibold leading-none text-white shadow-[0_6px_18px_-8px_rgba(110,84,181,0.9)] transition-all hover:brightness-110"
+            // Figma 3803:1569: 70x242 at 1921 -> 52x182 at 1440, 15px radius,
+            // gradient at 139.98deg. Inverts on hover like every other button.
+            className="inline-flex h-[52px] min-w-[182px] items-center justify-center rounded-[15px] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-6 text-[15px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
           >
             Book a Call
           </a>

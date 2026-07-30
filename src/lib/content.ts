@@ -39,17 +39,29 @@ export const SOCIAL_PROOF = {
    * supplied — see design/TOKENS.md "Client logotypes". Replace with the
    * clients' own assets when available.
    */
+  /**
+   * Client wordmarks in the order the design lays them out.
+   *
+   * Official logo SVGs supplied by Žilvinas on 2026-07-28, in /public/logos.
+   * Widths are the artwork's own viewBox width so each mark keeps its true
+   * proportions; they are NOT normalised to a common width, which would
+   * distort the relative sizing the design intends.
+   *
+   * TODO(we-interiors): the only brand with no supplied logo. Falls back to
+   * Poppins text until its SVG arrives.
+   */
   brands: [
-    "Sintra",
-    "Holo",
-    "we interiors",
-    "Breezit",
-    "Unive",
-    "SE Ranking",
-    "self.co",
-    "eany.io",
-    "Kiloverse",
-  ],
+    { name: "Sintra", logo: "sintra.svg", w: 80, h: 25 },
+    { name: "superior care.pet", logo: "superior-care.svg", w: 73, h: 25 },
+    { name: "Holo", logo: "holo.svg", w: 62, h: 25 },
+    { name: "we interiors", logo: null, w: 0, h: 0 },
+    { name: "Breezit", logo: "breezit.svg", w: 98, h: 25 },
+    { name: "Unive", logo: "unive.svg", w: 95, h: 26 },
+    { name: "SE Ranking", logo: "se-ranking.svg", w: 101, h: 25 },
+    { name: "self.co", logo: "selfco.svg", w: 96, h: 25 },
+    { name: "eany.io", logo: "eany.svg", w: 96, h: 25 },
+    { name: "Kiloverse", logo: "kiloverse.svg", w: 127, h: 25 },
+  ] as { name: string; logo: string | null; w: number; h: number }[],
   awards: [
     { name: "Foreplay Best Ad Award", detail: "Winner 2025", logo: "image271.webp" },
     { name: "Trustpilot Reviews", detail: "Rated 4.9", logo: "image272.webp" },

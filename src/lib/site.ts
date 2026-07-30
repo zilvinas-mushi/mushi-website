@@ -27,6 +27,13 @@ export const abs = (path: string) =>
  */
 export const BOOKING_URL = "#book-a-call";
 
+/**
+ * Anchor the booking CTAs land on until BOOKING_URL points at a real
+ * scheduler. Without this they target a non-existent #book-a-call and clicking
+ * them does nothing.
+ */
+export const BOOKING_ANCHOR = "book-a-call";
+
 export const SOCIALS = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/mushi-agency" },
   { label: "TikTok", href: "https://www.tiktok.com/@mushi.agency" },

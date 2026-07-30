@@ -79,6 +79,27 @@ Preferred: obtain the client's official SVG logo.
 Interim: set "Holo" in Poppins SemiBold and treat it as a known visual
 deviation. Same rule for Sintra, Unive, Breezit, eany, we interiors, Xaviera.
 
+## Interaction — hover inversion
+
+Every button **inverts its own two colours** on hover: foreground and
+background trade places.
+
+| Resting | Hover |
+| --- | --- |
+| purple background, white text | white background, purple text (`#6e54b5`) |
+| white background (`#ECECEC`), black text | black background, white text |
+
+This is an inversion, not a swap between two buttons, and not a
+lighten/darken. Two rules follow from it:
+
+1. **Always transition it.** A snap between inverted schemes is jarring at
+   this contrast; `transition-all duration-150` is the house setting.
+2. **Keep a gradient background layer in both states.** The primary CTA rests
+   on a gradient, so its hover state must also be a gradient (a flat white
+   expressed as `linear-gradient(147deg,#fff,#fff)`) — otherwise the browser
+   cannot interpolate between a gradient and a solid colour and the fill
+   jumps while the text fades.
+
 ## Radius
 
 | px | Count | Use |

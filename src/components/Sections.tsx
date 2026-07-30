@@ -8,7 +8,7 @@ import {
   TESTIMONIALS,
   FINAL_CTA,
 } from "@/lib/content";
-import { BOOKING_URL } from "@/lib/site";
+import { BOOKING_ANCHOR, BOOKING_URL } from "@/lib/site";
 
 const SHELL = "mx-auto w-full max-w-[1200px] px-5";
 
@@ -30,13 +30,16 @@ function Pill({
   // 1921px wide, so values are scaled ~0.75 for a 1440 viewport.
   const base =
     "inline-flex h-[50px] items-center justify-center rounded-[15px] px-7 text-[18px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px]";
-  // On hover the two CTAs swap colour schemes outright: the violet one turns
-  // light, the light one turns violet. Both keep a gradient background layer
-  // so the swap cross-fades instead of snapping.
+  // Each CTA inverts its own two colours on hover — foreground and background
+  // trade places. Purple-on-white becomes white-on-purple; white-on-black
+  // becomes black-on-white. Both keep a gradient background layer throughout
+  // so the change cross-fades rather than snapping.
   const style =
     variant === "primary"
-      ? "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)] hover:bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] hover:text-black hover:shadow-[0_8px_26px_-12px_rgba(0,0,0,0.6)]"
-      : "bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] text-black hover:bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] hover:text-white hover:shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)]";
+      ? // purple bg / white text  ->  white bg / purple text
+        "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)] hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] hover:shadow-[0_8px_26px_-12px_rgba(255,255,255,0.45)]"
+      : // white bg / black text  ->  black bg / white text
+        "bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] text-black hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white";
   return (
     <a href={href} className={`${base} ${style}`}>
       {children}
@@ -146,15 +149,28 @@ export function SocialProof() {
           <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/10" />
         </div>
 
-        {/* Wordmarks are set in Poppins, not client logo files — none were
-            supplied. See design/TOKENS.md "Client logotypes". */}
-        <ul className="mx-auto mt-9 flex max-w-3xl flex-wrap items-center justify-center gap-x-11 gap-y-5">
+        {/* Official client logotypes from /public/logos. Each keeps its own
+            viewBox width so relative sizing matches the design; only
+            "we interiors" has no supplied SVG and falls back to text. */}
+        <ul className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-x-12 gap-y-7">
           {SOCIAL_PROOF.brands.map((brand) => (
-            <li
-              key={brand}
-              className="text-xl font-medium tracking-tight text-white/90 sm:text-2xl"
-            >
-              {brand}
+            <li key={brand.name} className="flex items-center">
+              {brand.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={`/logos/${brand.logo}`}
+                  alt={brand.name}
+                  width={brand.w}
+                  height={brand.h}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-[25px] w-auto opacity-90 transition-opacity hover:opacity-100"
+                />
+              ) : (
+                <span className="text-[22px] font-medium tracking-tight text-white/90">
+                  {brand.name}
+                </span>
+              )}
             </li>
           ))}
         </ul>
@@ -339,7 +355,13 @@ export function Testimonials() {
 
 export function FinalCta() {
   return (
-    <section aria-labelledby="cta-heading" className="px-5 pb-24 pt-8">
+    // Carries the booking anchor so every "Book a Call" / fit-check CTA lands
+    // somewhere real until BOOKING_URL points at an external scheduler.
+    <section
+      id={BOOKING_ANCHOR}
+      aria-labelledby="cta-heading"
+      className="scroll-mt-28 px-5 pb-24 pt-8"
+    >
       <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[20px] border border-white/10 bg-bg-alt px-6 py-20 text-center">
         <div
           aria-hidden="true"

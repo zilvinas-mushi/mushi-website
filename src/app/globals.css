@@ -43,6 +43,16 @@
   --radius-pill: 100px;
 }
 
+/* Clicking a nav item eases to the section instead of jumping. `scroll-padding`
+   offsets the landing point by the floating header's height plus its top gap,
+   so the section heading is not left hidden underneath the bar. Honoured only
+   when the visitor has not asked for reduced motion (see the media query at
+   the end of this file, which resets scroll-behavior to auto). */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 110px;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
