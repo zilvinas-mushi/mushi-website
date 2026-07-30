@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Img } from "./Img";
 import { NAV } from "@/lib/content";
 import { BOOKING_URL, SITE_NAME } from "@/lib/site";
 
@@ -16,16 +17,24 @@ export function SiteHeader() {
         aria-label="Primary"
         className="mx-auto flex max-w-[1200px] items-center justify-between gap-6 px-5 py-4"
       >
-        <Link href="/" className="text-xl font-semibold tracking-tight">
-          {SITE_NAME}
+        {/* The Mushi wordmark is a serif logotype, not Poppins — rendering it
+            as text got the typeface wrong, so the real asset is used. */}
+        <Link href="/" className="shrink-0" aria-label={`${SITE_NAME} — home`}>
+          <Img
+            src="logo-without-bg-white102.webp"
+            alt={SITE_NAME}
+            width={92}
+            priority
+            className="h-auto w-[92px]"
+          />
         </Link>
 
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-9 md:flex">
           {NAV.map((item) => (
             <li key={item.label}>
               <a
                 href={item.href}
-                className="text-sm text-white/70 transition-colors hover:text-white"
+                className="text-[12px] font-medium uppercase tracking-[0.08em] text-white/65 transition-colors hover:text-white"
               >
                 {item.label}
               </a>
@@ -37,7 +46,7 @@ export function SiteHeader() {
           {/* Matches the hero's primary CTA, one step smaller. */}
           <a
             href={BOOKING_URL}
-            className="rounded-[var(--radius-pill)] bg-[#7857d8] px-5 py-2.5 text-[13px] font-semibold leading-none text-white ring-1 ring-inset ring-[#a78bfa]/60 shadow-[0_6px_18px_-8px_rgba(120,87,216,0.9)] transition-all hover:bg-[#8968e3]"
+            className="rounded-[var(--radius-pill)] bg-[#7857d8] px-5 py-2.5 text-[12px] font-semibold uppercase leading-none tracking-[0.03em] text-white ring-1 ring-inset ring-[#a78bfa]/60 shadow-[0_6px_18px_-8px_rgba(120,87,216,0.9)] transition-all hover:bg-[#8968e3]"
           >
             Book a Call
           </a>
