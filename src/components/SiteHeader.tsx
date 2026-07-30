@@ -34,7 +34,8 @@ export function SiteHeader() {
             <li key={item.label}>
               <a
                 href={item.href}
-                className="text-[12px] font-medium uppercase tracking-[0.08em] text-white/65 transition-colors hover:text-white"
+                // Figma: Poppins SemiBold 28px at 1921 wide -> ~21px at 1440.
+                className="text-[15px] font-semibold uppercase tracking-[0.02em] text-white/80 transition-colors hover:text-white lg:text-[17px]"
               >
                 {item.label}
               </a>
@@ -46,7 +47,8 @@ export function SiteHeader() {
           {/* Matches the hero's primary CTA, one step smaller. */}
           <a
             href={BOOKING_URL}
-            className="rounded-[var(--radius-pill)] bg-[#7857d8] px-5 py-2.5 text-[12px] font-semibold uppercase leading-none tracking-[0.03em] text-white ring-1 ring-inset ring-[#a78bfa]/60 shadow-[0_6px_18px_-8px_rgba(120,87,216,0.9)] transition-all hover:bg-[#8968e3]"
+            // Same gradient and 15px radius as the hero primary, one size down.
+            className="inline-flex h-[42px] items-center rounded-[15px] bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-5 text-[15px] font-semibold leading-none text-white shadow-[0_6px_18px_-8px_rgba(110,84,181,0.9)] transition-all hover:brightness-110"
           >
             Book a Call
           </a>

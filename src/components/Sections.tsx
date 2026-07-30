@@ -24,15 +24,18 @@ function Pill({
   children: React.ReactNode;
   variant?: "primary" | "dark";
 }) {
+  // Measured from Figma nodes 3803:1672/1673 (primary) and 3803:1583/1584
+  // (secondary): 67px tall, 15px radius, Poppins SemiBold 24px. The frame is
+  // 1921px wide, so values are scaled ~0.75 for a 1440 viewport.
   const base =
-    "inline-flex items-center justify-center rounded-[var(--radius-pill)] px-8 py-4 text-[13px] font-semibold uppercase leading-none tracking-[0.03em] transition-all duration-150 hover:-translate-y-[1px]";
+    "inline-flex h-[50px] items-center justify-center rounded-[15px] px-7 text-[18px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px]";
   const style =
     variant === "primary"
-      ? // Brighter violet than the raw token with a visible lavender ring —
-        // in the design the primary CTA reads as lit from within, which a
-        // flat fill does not reproduce.
-        "bg-[#7857d8] text-white ring-1 ring-inset ring-[#a78bfa]/60 shadow-[0_6px_20px_-6px_rgba(120,87,216,0.85)] hover:bg-[#8968e3]"
-      : "bg-[#0a0a0c] text-white ring-1 ring-inset ring-white/15 hover:bg-[#141418]";
+      ? // Diagonal violet gradient, not a flat fill.
+        "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)] hover:brightness-110"
+      : // Light panel with black text — the design's secondary is the bright
+        // one, not a dark ghost button.
+        "bg-[#ececec] text-black hover:bg-white";
   return (
     <a href={href} className={`${base} ${style}`}>
       {children}
