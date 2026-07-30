@@ -12,10 +12,14 @@ import { BOOKING_URL, SITE_NAME } from "@/lib/site";
  */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-white/5 bg-bg/80 backdrop-blur">
+    // A floating rounded bar, not a full-width strip: in the design the nav
+    // sits as an inset dark panel over the hero gradient. Making it full-width
+    // with its own background is what made the top of the page look like a
+    // separate band from the hero.
+    <header className="sticky top-0 z-50 px-4 pt-4 sm:px-6">
       <nav
         aria-label="Primary"
-        className="mx-auto flex max-w-[1200px] items-center justify-between gap-6 px-5 py-4"
+        className="mx-auto flex max-w-[1080px] items-center justify-between gap-6 rounded-[15px] border border-white/10 bg-[#131118]/90 px-5 py-3 backdrop-blur-md"
       >
         {/* The Mushi wordmark is a serif logotype, not Poppins — rendering it
             as text got the typeface wrong, so the real asset is used. */}

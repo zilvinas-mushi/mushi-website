@@ -21,8 +21,24 @@ export default function Home() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <Hero />
-        <SocialProof />
+        {/*
+          One violet field covering the hero and brand strip, pulled up behind
+          the sticky header so the page reads as a single surface. The header
+          is a floating bar with no background of its own; previously each
+          section declared its own gradient and the mismatches showed as seams.
+
+          The negative margin equals the header's height, and the matching
+          padding puts the content back where it belongs.
+        */}
+        <div className="hero-bg relative -mt-[82px] overflow-hidden pt-[82px]">
+          <div
+            aria-hidden="true"
+            className="hero-grid pointer-events-none absolute inset-0"
+          />
+          <Hero />
+          <SocialProof />
+        </div>
+
         <Creatives />
         <CaseStudies />
         <Testimonials />

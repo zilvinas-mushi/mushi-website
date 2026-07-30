@@ -29,13 +29,13 @@ function Pill({
   // 1921px wide, so values are scaled ~0.75 for a 1440 viewport.
   const base =
     "inline-flex h-[50px] items-center justify-center rounded-[15px] px-7 text-[18px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px]";
+  // On hover the two CTAs swap colour schemes outright: the violet one turns
+  // light, the light one turns violet. Both keep a gradient background layer
+  // so the swap cross-fades instead of snapping.
   const style =
     variant === "primary"
-      ? // Diagonal violet gradient, not a flat fill.
-        "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)] hover:brightness-110"
-      : // Light panel with black text — the design's secondary is the bright
-        // one, not a dark ghost button.
-        "bg-[#ececec] text-black hover:bg-white";
+      ? "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)] hover:bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] hover:text-black hover:shadow-[0_8px_26px_-12px_rgba(0,0,0,0.6)]"
+      : "bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] text-black hover:bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] hover:text-white hover:shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)]";
   return (
     <a href={href} className={`${base} ${style}`}>
       {children}
@@ -61,19 +61,15 @@ function Stars({ count = 5 }: { count?: number }) {
 
 /* ---------------------------------------------------------------- hero --- */
 
+/**
+ * Hero content only — the violet field and grid live on the wrapper in
+ * page.tsx so they run continuously behind the floating header. Giving this
+ * section its own background made the top of the page read as a separate band.
+ */
 export function Hero() {
   return (
-    <section
-      aria-labelledby="hero-heading"
-      className="hero-bg relative overflow-hidden"
-    >
-      {/* Faint square grid behind the hero, fading out at the edges. */}
-      <div
-        aria-hidden="true"
-        className="hero-grid pointer-events-none absolute inset-0"
-      />
-
-      <div className={`${SHELL} relative pb-14 pt-20 text-center md:pt-28`}>
+    <section aria-labelledby="hero-heading" className="relative">
+      <div className={`${SHELL} relative pb-14 pt-14 text-center md:pt-20`}>
         <p className="mb-7 inline-block rounded-[var(--radius-pill)] border border-white/15 bg-white/10 px-5 py-2 text-[13px] text-white/85 backdrop-blur">
           {HERO.eyebrow}
         </p>
@@ -143,12 +139,10 @@ export function Hero() {
 
 export function SocialProof() {
   return (
-    // Continues the hero gradient rather than sitting in its own band — in the
-    // design the brand strip is part of the same violet field.
-    <section
-      aria-labelledby="proof-heading"
-      className="relative bg-gradient-to-b from-[#181818] via-[#1a1526] to-[#181818] pb-20 pt-4"
-    >
+    // Sits inside the same violet wrapper as the hero, so no background of its
+    // own — it previously re-declared a gradient that did not line up with the
+    // hero's, which showed as a visible seam.
+    <section aria-labelledby="proof-heading" className="relative pb-24 pt-2">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         <div className="flex items-center justify-center gap-4">
