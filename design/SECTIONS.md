@@ -67,9 +67,18 @@ the DOM so they are crawlable, and toggle with CSS/details rather than fetching.
 **Final CTA** — full-width panel with purple gradient. Repeats the fit-check
 CTA and the scarcity line.
 
-**Footer** — email capture posts to a **third-party email provider**. There is
-no server and no API route. Until the provider is chosen, render the form
-disabled or link out; never point it at a local endpoint.
+**Footer** — the design shows a "Want a welcome gift?" email capture. **No email
+provider has been chosen yet** (confirmed 2026-07-28), and there is no server to
+post to.
+
+A form that silently discards submissions is worse than no form: visitors
+believe they subscribed and never hear back. So the input is **not** rendered
+until a provider exists. The block keeps its layout and copy, with the CTA
+pointing at the fit-check booking instead.
+
+When a provider is picked (Mailchimp / ConvertKit / Beehiiv / Resend…), swap in
+its hosted form action — a single `action=` URL on the form element. Everything
+else is already in place. Never point it at a local endpoint.
 
 ## Non-negotiables from CLAUDE.md
 

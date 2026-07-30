@@ -51,15 +51,22 @@ Cards:
 
 **Not Just Pretty, but Profitable.**
 
+Confirmed against the design by Žilvinas on 2026-07-28. Layout is two columns,
+staggered — left column Breezit then eany, right column Holo then we interiors.
+
 | Brand | Result | Tags |
 | --- | --- | --- |
-| Holo | Generated 700 sales calls & 1500 leads in 8 months. | AI, SALES, VENUES |
-| *(unnamed)* | From $0k/month to $117k/month in 7 months | AI, MARKETING, GENERATOR |
-| *(unnamed)* | Helped find 3 evergreen ads for an 8 figure company. | B2B, MARKETPLACE, RESELLERS |
-| *(unnamed)* | From $13k/month to $75k/month in 3 months. | ECOM, FURNITURE, HOME |
+| Breezit | Generated 700 sales calls & 1500 leads in 8 months. | AI, SALES, VENUES |
+| Holo | From $0k/month to $117k/month in 7 months | AI, MARKETING, GENERATOR |
+| eany.io | Helped find 3 evergreen ads for an 8 figure company. | B2B, MARKETPLACE, RESELLERS |
+| we interiors | From $13k/month to $75k/month in 3 months. | ECOM, FURNITURE, HOME |
 
-> Three case studies have no brand name in the supplied copy. From the design,
-> they appear to be Breezit, eany, and we interiors — **confirm before publishing.**
+> **Do not reorder these pairings.** The first copy deck supplied for this page
+> attached "Generated 700 sales calls & 1500 leads in 8 months." to Holo; the
+> design shows that result belongs to **Breezit**, and Holo's result is the
+> $0k → $117k figure. Attributing one client's numbers to another is a real
+> reputational and legal problem, so this table — verified against the design —
+> is authoritative over any loose copy.
 
 ## Section — Testimonials
 
