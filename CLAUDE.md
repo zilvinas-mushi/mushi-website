@@ -19,6 +19,14 @@ Static marketing site for mushi.agency. Deployed to Cloudflare Pages.
 - app/sitemap.ts and app/robots.ts.
 
 ## Design
+**The design system already exists in `~/Projects/mushi-app`.** Check there
+before writing any component. It has the real fonts (Dutch801 wordmark),
+brand tokens, the floating header recipe, `TrustBadges`, `Logo`, and the
+`animated-gradient-border` utility. Port from it rather than reimplementing
+by eye — several things here were rebuilt wrong before that repo was checked.
+Anything with a `<form action={...}>` or a `lib/supabase` import cannot come
+across: no server here.
+
 Read `design/README.md` before building any UI. It holds the measured tokens,
 the semantic page outline, the authoritative copy deck, and the asset
 inventory — everything the Figma file would tell you.
