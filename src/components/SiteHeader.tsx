@@ -52,9 +52,11 @@ export function SiteHeader() {
               primary CTA — see the hover rule in CLAUDE.md. */}
           <a
             href={BOOKING_URL}
-            // Figma 3803:1569: 70x242 at 1921 -> 52x182 at 1440, 15px radius,
-            // gradient at 139.98deg. Inverts on hover like every other button.
-            className="inline-flex h-[52px] min-w-[182px] items-center justify-center rounded-[15px] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-6 text-[15px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
+            // Figma 3803:1569 (box) + 3803:1574 (label): 70x242 with 30px
+            // Poppins SemiBold at 1921 wide -> 52x182 with 22px text at 1440.
+            // The label was previously 15px, which left the button looking
+            // empty — the type has to scale with the box, not stay small.
+            className="inline-flex h-[52px] min-w-[182px] items-center justify-center rounded-[15px] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-6 text-[18px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] lg:text-[20px]"
           >
             Book a Call
           </a>

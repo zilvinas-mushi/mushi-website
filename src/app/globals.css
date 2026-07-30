@@ -72,16 +72,18 @@ body {
     linear-gradient(180deg, #1a1526 0%, #181818 100%);
 }
 
-/* Larger, more visible cells than a hairline grid — in the design the squares
-   read clearly across the whole hero rather than fading almost immediately.
-   The mask keeps them off the very edges without hiding the bulk of them. */
+/* The hero grid is NOT hairlines. It is a field of filled, rounded tiles with
+   gaps between them, each only a touch lighter than the background — that is
+   why every line-based version read wrong.
+
+   Drawn as a tiled SVG rather than as hundreds of divs: one repeating
+   background paints the whole field, costs no DOM, and scales cleanly.
+   104px cell = 94px tile + 10px gutter, 12px corner radius. */
 .hero-grid {
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.075) 1px, transparent 1px);
-  background-size: 96px 96px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='104' height='104'><rect x='0' y='0' width='94' height='94' rx='12' fill='rgba(255,255,255,0.028)'/></svg>");
+  background-size: 104px 104px;
   background-position: center top;
-  mask-image: radial-gradient(ellipse 95% 85% at 50% 35%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 100% 90% at 50% 30%, #000 60%, transparent 100%);
 }
 
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a

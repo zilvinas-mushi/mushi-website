@@ -154,6 +154,59 @@ export const CREATIVES = {
       h: 1127,
       avatar: "avatar-4.svg",
     },
+
+    // Exported from Figma at 1320x2340 and converted to WebP (12.9MB -> 0.52MB).
+    // Handles are taken from the brand visible inside each ad, so nothing is
+    // invented. The last two carry no visible brand — see TODO below.
+    {
+      handle: "sintra.ai",
+      caption: "3D Character Hook Video Ad",
+      image: "sintra-soshie.webp",
+      w: 1080,
+      h: 1915,
+      avatar: "avatar-1.svg",
+      verified: true,
+    },
+    {
+      handle: "bluechew",
+      caption: "Benefit Breakdown Static Ad",
+      image: "bluechew.webp",
+      w: 1080,
+      h: 1915,
+    },
+    {
+      handle: "unive",
+      caption: "Dream College Tool Static Ad",
+      image: "unive-dream-college.webp",
+      w: 1080,
+      h: 1915,
+    },
+    {
+      handle: "celemi",
+      caption: "Serum Product Video Ad",
+      image: "celemi-serum.webp",
+      w: 1080,
+      h: 1915,
+      avatar: "avatar-2.svg",
+    },
+    // TODO(handles): these two ads carry no visible brand mark. Confirm the
+    // account each ran under before publishing — do not guess a client name.
+    {
+      handle: "mushi.agency",
+      caption: "Review Wall UGC Video Ad",
+      image: "dogfood-real-results.webp",
+      w: 1080,
+      h: 1915,
+      verified: true,
+    },
+    {
+      handle: "mushi.agency",
+      caption: "Social Proof Collage Video Ad",
+      image: "used-by-10000.webp",
+      w: 1080,
+      h: 1915,
+      verified: true,
+    },
   ] satisfies Creative[],
 } as const;
 
