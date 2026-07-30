@@ -121,7 +121,9 @@ export function CreativeCard({ item }: { item: Creative }) {
         height={item.h}
         loading="lazy"
         decoding="async"
-        className="aspect-[4/5] w-full bg-zinc-100 object-cover"
+        // Creatives are portrait ads; a 4:5 crop cut the tops and bottoms off.
+        // 9:16 matches the source material, so the whole ad stays visible.
+        className="aspect-[9/16] w-full bg-zinc-100 object-cover"
       />
 
       <footer className="flex items-center justify-between px-3 py-2.5">

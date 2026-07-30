@@ -72,12 +72,16 @@ body {
     linear-gradient(180deg, #1a1526 0%, #181818 100%);
 }
 
+/* Larger, more visible cells than a hairline grid — in the design the squares
+   read clearly across the whole hero rather than fading almost immediately.
+   The mask keeps them off the very edges without hiding the bulk of them. */
 .hero-grid {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 78px 78px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 25%, #000 30%, transparent 75%);
+    linear-gradient(to right, rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.075) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: center top;
+  mask-image: radial-gradient(ellipse 95% 85% at 50% 35%, #000 55%, transparent 100%);
 }
 
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a

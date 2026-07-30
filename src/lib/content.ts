@@ -126,6 +126,7 @@ export const CREATIVES = {
       image: "image143.webp",
       w: 538,
       h: 952,
+      avatar: "avatar-1.svg",
       verified: true,
     },
     {
@@ -134,6 +135,7 @@ export const CREATIVES = {
       image: "image139.webp",
       w: 631,
       h: 1125,
+      avatar: "avatar-2.svg",
     },
     {
       handle: "tryholo.ai",
@@ -141,6 +143,7 @@ export const CREATIVES = {
       image: "image140.webp",
       w: 444,
       h: 792,
+      avatar: "avatar-3.svg",
       verified: true,
     },
     {
@@ -149,6 +152,7 @@ export const CREATIVES = {
       image: "image141.webp",
       w: 633,
       h: 1127,
+      avatar: "avatar-4.svg",
     },
   ] satisfies Creative[],
 } as const;

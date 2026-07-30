@@ -96,10 +96,22 @@ export function Hero() {
       </div>
 
       <div className={`${SHELL} relative pb-14 pt-14 text-center md:pt-20`}>
-        {/* Animated gradient ring + panning gradient text, ported from
-            mushi-app's done-for-you hero so both properties match. */}
-        <span className="animated-gradient-border mb-7 inline-flex items-center rounded-full bg-brand/10 px-3 py-1.5 text-[13px] font-medium md:px-4 md:text-[17px]">
-          <span className="animate-gradient-x bg-gradient-to-r from-violet-300 via-fuchsia-400 to-violet-300 bg-[length:200%_auto] bg-clip-text text-transparent">
+        {/*
+          Figma nodes 3803:1591/1593/1594: a frosted white pill — a blurred
+          white fill under a 50px-radius container — carrying BLACK Poppins
+          Medium text at 20px. 417x45 at 1921 wide, so ~34px tall and 15px text
+          at 1440.
+
+          This is NOT the animated gradient badge from mushi-app's done-for-you
+          page; that one was ported here by mistake. The marketing design uses
+          a different treatment.
+        */}
+        <span className="relative mb-7 inline-flex items-center justify-center overflow-hidden rounded-[50px] px-6 py-2">
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 rounded-[50px] bg-white/85 blur-[6px]"
+          />
+          <span className="relative text-[13px] font-medium text-black md:text-[15px]">
             {HERO.eyebrow}
           </span>
         </span>
