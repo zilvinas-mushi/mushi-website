@@ -3,6 +3,7 @@ import { TrustBadges } from "./TrustBadges";
 import { CreativeCard } from "./CreativeCard";
 import {
   HERO,
+  HERO_FLOATERS,
   SOCIAL_PROOF,
   CREATIVES,
   CASE_STUDIES,
@@ -74,6 +75,26 @@ function Stars({ count = 5 }: { count?: number }) {
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
+      {/* Platform marks drifting around the hero, as in the design. Purely
+          decorative, so aria-hidden and empty alt; hidden below lg where there
+          is no room beside the headline. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block">
+        {HERO_FLOATERS.map((f) => (
+          <span
+            key={f.name}
+            className={`absolute ${f.pos} block`}
+            style={{ transform: `rotate(${f.rotate})` }}
+          >
+            <Img
+              src={f.image}
+              alt=""
+              width={f.size}
+              className="rounded-[14px] opacity-90 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)]"
+            />
+          </span>
+        ))}
+      </div>
+
       <div className={`${SHELL} relative pb-14 pt-14 text-center md:pt-20`}>
         {/* Animated gradient ring + panning gradient text, ported from
             mushi-app's done-for-you hero so both properties match. */}

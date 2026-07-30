@@ -15,6 +15,21 @@ export const NAV = [
   { label: "Templates", href: "#templates" },
 ] as const;
 
+/**
+ * Platform icons that float around the hero artwork in the design.
+ *
+ * Identified by rendering the extracted assets: image42/43/44/45 are the
+ * Instagram, Facebook, Google and TikTok marks. Positions are percentages of
+ * the hero box, eyeballed from the design; they are decorative and hidden
+ * below the lg breakpoint, where there is no room for them.
+ */
+export const HERO_FLOATERS = [
+  { name: "Instagram", image: "image42.webp", pos: "left-[4%] top-[18%]", size: 58, rotate: "-8deg" },
+  { name: "Google", image: "image44.webp", pos: "right-[6%] top-[12%]", size: 62, rotate: "7deg" },
+  { name: "TikTok", image: "image45.webp", pos: "left-[8%] bottom-[16%]", size: 54, rotate: "6deg" },
+  { name: "Facebook", image: "image43.webp", pos: "right-[4%] bottom-[20%]", size: 58, rotate: "-6deg" },
+] as const;
+
 export const HERO = {
   eyebrow: "Growth Partner for eCom & AI brands",
   heading: "Your Path to $100M.",
@@ -95,16 +110,22 @@ export const CREATIVES = {
   heading: "Want Creatives This Premium?",
   /** Add new creatives here — the card chrome needs no markup changes. */
   items: [
-    // Pairings corrected by rendering each file: image139 is the CELEMI
-    // skincare pouch, image141 is the planter. They were previously attached
-    // to the wrong handles. All four are placeholders pending the real
-    // creative exports.
+    // Pairings verified by rendering every candidate file:
+    //   image143 = "Soshie" on a laptop, Sintra branding
+    //   image139 = CELEMI skincare pouch
+    //   image140 = "10x more content / STAY consistent"
+    //   image141 = tevaplanter vs traditional planter comparison
+    //
+    // Only these four survived extraction. The design shows roughly ten, but
+    // the get_design_context response truncated at 100KB before reaching the
+    // rest, so their assets were never exported. Supply the remaining creative
+    // files to complete the rail — see public/creatives/README.md.
     {
       handle: "sintra.ai",
       caption: "AI Agents Comparison Video Ad",
-      image: "image140.webp",
-      w: 444,
-      h: 792,
+      image: "image143.webp",
+      w: 538,
+      h: 952,
       verified: true,
     },
     {
@@ -117,9 +138,9 @@ export const CREATIVES = {
     {
       handle: "tryholo.ai",
       caption: "AI Marketing UGC Video Ad",
-      image: "image143.webp",
-      w: 538,
-      h: 952,
+      image: "image140.webp",
+      w: 444,
+      h: 792,
       verified: true,
     },
     {
