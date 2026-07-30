@@ -11,6 +11,10 @@ import { BOOKING_URL } from "@/lib/site";
 
 const SHELL = "mx-auto w-full max-w-[1200px] px-5";
 
+/**
+ * CTA pill. Label is uppercased with tracking to match the design — the
+ * buttons read as small-caps chips, not sentence-case links.
+ */
 function Pill({
   href,
   children,
@@ -18,14 +22,14 @@ function Pill({
 }: {
   href: string;
   children: React.ReactNode;
-  variant?: "primary" | "ghost";
+  variant?: "primary" | "dark";
 }) {
   const base =
-    "inline-flex items-center justify-center rounded-[var(--radius-pill)] px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90";
+    "inline-flex items-center justify-center rounded-[var(--radius-pill)] px-7 py-3.5 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all hover:-translate-y-px";
   const style =
     variant === "primary"
-      ? "bg-accent text-white"
-      : "border border-white/20 bg-white/5 text-white";
+      ? "bg-accent text-white shadow-[0_0_0_1px_rgba(255,255,255,0.18)_inset,0_8px_24px_-8px_rgba(110,84,181,0.9)] hover:brightness-110"
+      : "bg-[#0d0d0f] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)_inset] hover:bg-[#151518]";
   return (
     <a href={href} className={`${base} ${style}`}>
       {children}
@@ -53,16 +57,18 @@ function Stars({ count = 5 }: { count?: number }) {
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-heading" className="relative overflow-hidden">
-      {/* Decorative purple glow — the design uses gradient washes behind the
-          hero. Kept out of the a11y tree. */}
+    <section
+      aria-labelledby="hero-heading"
+      className="hero-bg relative overflow-hidden"
+    >
+      {/* Faint square grid behind the hero, fading out at the edges. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-accent/25 blur-[140px]"
+        className="hero-grid pointer-events-none absolute inset-0"
       />
 
-      <div className={`${SHELL} relative pb-16 pt-20 text-center md:pb-24 md:pt-28`}>
-        <p className="mb-5 inline-block rounded-[var(--radius-pill)] border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-white/70">
+      <div className={`${SHELL} relative pb-14 pt-20 text-center md:pt-28`}>
+        <p className="mb-7 inline-block rounded-[var(--radius-pill)] border border-white/15 bg-white/10 px-5 py-2 text-[13px] text-white/85 backdrop-blur">
           {HERO.eyebrow}
         </p>
 
@@ -74,38 +80,54 @@ export function Hero() {
           {HERO.heading}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-pretty text-base text-white/70 sm:text-lg">
+        <p className="mx-auto mt-6 max-w-[620px] text-pretty text-base leading-relaxed text-white/75 sm:text-lg">
           {HERO.sub}
         </p>
 
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Pill href={BOOKING_URL}>{HERO.primaryCta}</Pill>
-          <Pill href="#case-studies" variant="ghost">
+          <Pill href="#case-studies" variant="dark">
             {HERO.secondaryCta}
           </Pill>
         </div>
 
-        {/*
-          The design's hero visual is a composite — a dashboard mockup with
-          floating stat cards layered over it. The flat Figma export split it
-          into unusable fragments (masks and empty device frames), and no
-          single asset represents it.
-
-          Rather than show a wrong image in the most prominent slot, the hero
-          runs on type, chips and the gradient wash. To restore it: export that
-          node from Figma as one flattened image (1 get_screenshot call) and
-          drop it in here with priority.
-        */}
-        <ul className="mx-auto mt-14 flex max-w-4xl flex-wrap justify-center gap-2">
-          {HERO.chips.map((chip) => (
-            <li
-              key={chip}
-              className="rounded-[var(--radius-pill)] border border-white/10 bg-surface px-3.5 py-1.5 text-xs text-white/60"
-            >
-              {chip}
+        {/* Award badges sit directly under the CTAs in the design, on the same
+            gradient — not in a separate band. */}
+        <ul className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
+          {SOCIAL_PROOF.awards.map((award) => (
+            <li key={award.name} className="flex items-center gap-3">
+              <Img
+                src={award.logo}
+                alt=""
+                width={34}
+                className="h-[34px] w-[34px] shrink-0 rounded-[9px] object-contain"
+              />
+              <span className="text-left">
+                <span className="block text-[13px] font-medium leading-tight text-white">
+                  {award.name}
+                </span>
+                <span className="block text-[11px] leading-tight text-white/50">
+                  <span aria-hidden="true">❰ </span>
+                  {award.detail}
+                  <span aria-hidden="true"> ❱</span>
+                </span>
+              </span>
             </li>
           ))}
         </ul>
+
+        {/*
+          The design's hero visual is a composite — a dashboard mockup with
+          floating stat cards (HERO.chips) layered around it. The flat Figma
+          export split it into unusable fragments: alpha masks and empty device
+          frames, with no single asset representing the whole.
+
+          The chips are deliberately not rendered as a plain list here. They
+          only make sense pinned around that artwork; free-floating they read
+          as stray tags. To restore the section: export the hero node from
+          Figma as one flattened image (1 get_screenshot call), drop it in with
+          `priority`, and position the chips over it.
+        */}
       </div>
     </section>
   );
@@ -115,30 +137,40 @@ export function Hero() {
 
 export function SocialProof() {
   return (
-    <section aria-labelledby="proof-heading" className="border-y border-white/5 bg-bg-alt py-14">
+    // Continues the hero gradient rather than sitting in its own band — in the
+    // design the brand strip is part of the same violet field.
+    <section
+      aria-labelledby="proof-heading"
+      className="relative bg-gradient-to-b from-[#181818] via-[#1a1526] to-[#181818] pb-20 pt-4"
+    >
       <div className={SHELL}>
-        <h2 id="proof-heading" className="text-center text-sm text-white/50">
-          {SOCIAL_PROOF.headline}
-        </h2>
+        {/* Rule-and-sparkle divider from the design. */}
+        <div className="flex items-center justify-center gap-4">
+          <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/10" />
+          <h2
+            id="proof-heading"
+            className="whitespace-nowrap text-center text-[13px] text-white/70"
+          >
+            <span aria-hidden="true" className="mr-2">
+              ✦
+            </span>
+            {SOCIAL_PROOF.headline}
+            <span aria-hidden="true" className="ml-2">
+              ✦
+            </span>
+          </h2>
+          <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/10" />
+        </div>
 
-        {/* Wordmarks are text, not images — no official client logo SVGs were
+        {/* Wordmarks are set in Poppins, not client logo files — none were
             supplied. See design/TOKENS.md "Client logotypes". */}
-        <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+        <ul className="mx-auto mt-9 flex max-w-3xl flex-wrap items-center justify-center gap-x-11 gap-y-5">
           {SOCIAL_PROOF.brands.map((brand) => (
-            <li key={brand} className="text-lg font-medium text-white/40">
-              {brand}
-            </li>
-          ))}
-        </ul>
-
-        <ul className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          {SOCIAL_PROOF.awards.map((award) => (
             <li
-              key={award.name}
-              className="rounded-[var(--radius-card)] border border-white/10 bg-surface px-4 py-2.5 text-center"
+              key={brand}
+              className="text-xl font-medium tracking-tight text-white/90 sm:text-2xl"
             >
-              <span className="block text-xs font-medium text-white/80">{award.name}</span>
-              <span className="block text-[11px] text-muted">{award.detail}</span>
+              {brand}
             </li>
           ))}
         </ul>

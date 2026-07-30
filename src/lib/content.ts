@@ -39,11 +39,21 @@ export const SOCIAL_PROOF = {
    * supplied — see design/TOKENS.md "Client logotypes". Replace with the
    * clients' own assets when available.
    */
-  brands: ["Sintra", "Holo", "we interiors", "Breezit", "Unive", "Xaviera"],
+  brands: [
+    "Sintra",
+    "Holo",
+    "we interiors",
+    "Breezit",
+    "Unive",
+    "SE Ranking",
+    "self.co",
+    "eany.io",
+    "Kiloverse",
+  ],
   awards: [
-    { name: "Foreplay Best Ad Award", detail: "Winner 2025" },
-    { name: "Trustpilot Reviews", detail: "Rated 4.9" },
-    { name: "FirstPick's VC Mentors", detail: "AI Accelerator" },
+    { name: "Foreplay Best Ad Award", detail: "Winner 2025", logo: "image271.webp" },
+    { name: "Trustpilot Reviews", detail: "Rated 4.9", logo: "image272.webp" },
+    { name: "FirstPick's VC Mentors", detail: "AI Accelerator", logo: "image274.webp" },
   ],
 } as const;
 

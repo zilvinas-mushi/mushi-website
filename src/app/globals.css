@@ -39,6 +39,28 @@ body {
   color: var(--text);
 }
 
+/* Hero atmosphere. The design's hero sits on a deep violet wash over a faint
+   square grid — the flat Figma export dropped both (57 gradient fills came
+   back as raster fragments), so they are rebuilt in CSS here. */
+.hero-bg {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 50% 0%,
+      rgba(110, 84, 181, 0.55) 0%,
+      rgba(110, 84, 181, 0.18) 45%,
+      transparent 75%
+    ),
+    linear-gradient(180deg, #1a1526 0%, #181818 100%);
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 78px 78px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 25%, #000 30%, transparent 75%);
+}
+
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a
    static export and the row must work with no hydration. */
 .scroll-row {
