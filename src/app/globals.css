@@ -26,7 +26,16 @@
   --color-paper: var(--paper);
   --color-sand: var(--sand);
 
+  /* Brand tokens shared with the mushi-app webapp. */
+  --color-brand: #6e54b5;
+  --color-brand-hover: #8f73f2;
+
   --font-sans: var(--font-poppins);
+  --font-serif: var(--font-dutch801);
+
+  /* Slow horizontal pan for animated gradient text. Pair with
+     bg-[length:200%_auto]. Ported from mushi-app. */
+  --animate-gradient-x: gradient-x 6s ease-in-out infinite;
 
   /* House radii — 15px default, 100px pills. */
   --radius-card: 15px;
@@ -70,7 +79,58 @@ body {
   display: none;
 }
 
+@keyframes gradient-x {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Animated 1px gradient ring, ported verbatim from mushi-app. border-color
+   cannot be a gradient and border-image breaks on rounded corners, so the ring
+   is a masked pseudo-element. Pans with the same keyframe as the text inside,
+   so ring and wording move together. Pair with a rounded-* utility. */
+.animated-gradient-border {
+  position: relative;
+}
+.animated-gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(196, 181, 253, 0.35),
+    rgba(232, 121, 249, 0.75),
+    rgba(196, 181, 253, 0.35)
+  );
+  background-size: 200% auto;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: gradient-x 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Tailwind v4 preflight sets cursor:default on buttons; restore the pointer. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .animate-gradient-x,
+  .animated-gradient-border::before {
+    animation: none;
+  }
   *,
   *::before,
   *::after {

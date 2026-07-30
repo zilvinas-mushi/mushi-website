@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import {
   SITE_URL,
@@ -21,7 +22,24 @@ import {
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+/**
+ * Serif display face for the "Mushi" wordmark — Dutch801 Rm WGL4 BT (Roman).
+ * Same file and setup as the mushi-app webapp, so the mark is identical
+ * across both properties. Single weight, so never apply font-bold to it:
+ * the browser would synthesise a faux bold.
+ *
+ * NOTE: Dutch801 is a licensed Bitstream face. It is already in use on
+ * app.mushi.agency; confirm the licence covers this second public domain.
+ */
+const dutch801 = localFont({
+  variable: "--font-dutch801",
+  src: "./fonts/Dutch801-Roman.ttf",
+  weight: "400",
+  style: "normal",
   display: "swap",
 });
 
@@ -100,7 +118,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${poppins.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${poppins.variable} ${dutch801.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col bg-bg font-sans text-white">
         <script
           type="application/ld+json"

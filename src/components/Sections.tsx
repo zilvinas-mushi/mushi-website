@@ -1,4 +1,5 @@
 import { Img } from "./Img";
+import { TrustBadges } from "./TrustBadges";
 import {
   HERO,
   SOCIAL_PROOF,
@@ -70,9 +71,13 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
       <div className={`${SHELL} relative pb-14 pt-14 text-center md:pt-20`}>
-        <p className="mb-7 inline-block rounded-[var(--radius-pill)] border border-white/15 bg-white/10 px-5 py-2 text-[13px] text-white/85 backdrop-blur">
-          {HERO.eyebrow}
-        </p>
+        {/* Animated gradient ring + panning gradient text, ported from
+            mushi-app's done-for-you hero so both properties match. */}
+        <span className="animated-gradient-border mb-7 inline-flex items-center rounded-full bg-brand/10 px-3 py-1.5 text-[13px] font-medium md:px-4 md:text-[17px]">
+          <span className="animate-gradient-x bg-gradient-to-r from-violet-300 via-fuchsia-400 to-violet-300 bg-[length:200%_auto] bg-clip-text text-transparent">
+            {HERO.eyebrow}
+          </span>
+        </span>
 
         {/* The only <h1> on the page. */}
         <h1
@@ -93,30 +98,9 @@ export function Hero() {
           </Pill>
         </div>
 
-        {/* Award badges sit directly under the CTAs in the design, on the same
-            gradient — not in a separate band. */}
-        <ul className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
-          {SOCIAL_PROOF.awards.map((award) => (
-            <li key={award.name} className="flex items-center gap-3">
-              <Img
-                src={award.logo}
-                alt=""
-                width={34}
-                className="h-[34px] w-[34px] shrink-0 rounded-[9px] object-contain"
-              />
-              <span className="text-left">
-                <span className="block text-[13px] font-medium leading-tight text-white">
-                  {award.name}
-                </span>
-                <span className="block text-[11px] leading-tight text-white/50">
-                  <span aria-hidden="true">❰ </span>
-                  {award.detail}
-                  <span aria-hidden="true"> ❱</span>
-                </span>
-              </span>
-            </li>
-          ))}
-        </ul>
+        {/* Real badge artwork and laurel sprigs, ported from mushi-app rather
+            than the hand-rolled text boxes this used to render. */}
+        <TrustBadges />
 
         {/*
           The design's hero visual is a composite — a dashboard mockup with
