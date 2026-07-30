@@ -85,7 +85,7 @@ disabled or link out; never point it at a local endpoint.
 ## Still to do
 
 - [ ] Confirm the three unnamed case-study brands
-- [ ] Wonderkids font licence, or accept Poppins SemiBold fallback
+- [ ] Client logo SVGs — Holo's wordmark is live text in Figma, not an asset
 - [ ] Choose the email provider for the footer capture
 - [ ] Mobile artboard was not pulled from Figma — verify breakpoints by eye
 - [ ] Rename assets from machine names as sections are built

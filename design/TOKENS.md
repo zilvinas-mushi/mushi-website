@@ -31,11 +31,22 @@ gradients as decorative; never put text contrast at their mercy.
 ## Type
 
 **Families**
-- **Poppins** — Regular (400), Medium (500), SemiBold (600). Body + UI.
+- **Poppins** — Regular (400), Medium (500), SemiBold (600). This is the
+  **entire site face**: body, UI, and every heading including the hero.
   Load via `next/font/google`; it self-hosts at build time, which keeps the
   static export free of runtime requests.
-- **Wonderkids** — display face used on the big headline. Commercial font, not
-  on Google Fonts, not exported by Figma. See "Open questions" below.
+- **Wonderkids** — **not a Mushi font.** It appears exactly twice, both times
+  rendering the single word "Holo" (nodes `3803:1632` at 33.132px and
+  `3803:3227` at 52.809px). It is the client Holo's own brand face. Do **not**
+  license or load it — see "Client logotypes" below.
+
+Verified headline fonts:
+
+| Element | Font | Size |
+| --- | --- | --- |
+| Hero `Your Path to $100M.` | Poppins SemiBold | 80px |
+| `Want Creatives This Premium?` | Poppins SemiBold | 48px |
+| `Not Just Pretty, but Profitable.` | Poppins SemiBold | 48px |
 
 **Scale** (measured occurrences in the frame)
 
@@ -54,8 +65,19 @@ gradients as decorative; never put text contrast at their mercy.
 
 Weight frequency across the frame: Medium ×17, SemiBold ×13, Regular ×10.
 
-Two odd sizes appear once each (`33.132px`, `52.809px`) — these are scaled
-artboard artefacts, not intentional steps. **Do not** add them to the scale.
+The two odd sizes (`33.132px`, `52.809px`) are the Holo wordmark, not steps in
+the scale. **Do not** add them.
+
+## Client logotypes
+
+In Figma the "Holo" logotype is a masked icon image plus the word "Holo" set as
+live text in Holo's own font. Client marks must ship as **images**, never as
+text in a licensed third-party face — that would mean licensing a font to
+render someone else's trademark.
+
+Preferred: obtain the client's official SVG logo.
+Interim: set "Holo" in Poppins SemiBold and treat it as a known visual
+deviation. Same rule for Sintra, Unive, Breezit, eany, we interiors, Xaviera.
 
 ## Radius
 
@@ -84,8 +106,5 @@ When in doubt use **15px**. Pills use **100px**.
 
 ## Open questions
 
-- **Wonderkids licence.** If the `.woff2`/`.otf` is available, wire it with
-  `next/font/local` and set it as the display family. If not, headlines fall
-  back to Poppins SemiBold — swap in one place (the font definition in
-  `src/app/layout.tsx`) rather than per-component.
+- Client logo SVGs (Holo especially) — see "Client logotypes".
 - Exact spacing between sections is eyeballed from the screenshot, not measured.
