@@ -18,6 +18,15 @@ Static marketing site for mushi.agency. Deployed to Cloudflare Pages.
 - JSON-LD Organization + WebSite schema.
 - app/sitemap.ts and app/robots.ts.
 
+## Design
+Read `design/README.md` before building any UI. It holds the measured tokens,
+the semantic page outline, the authoritative copy deck, and the asset
+inventory — everything the Figma file would tell you.
+
+Figma access is capped at **6 MCP calls per month** on this account. Do not
+spend one to re-read something `design/` already answers. If you do spend one,
+write the findings back into `design/` in the same commit.
+
 ## Deployment
 Cloudflare Pages, git-based. Build command `npx next build`,
 output directory `out`.

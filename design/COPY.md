@@ -1,0 +1,101 @@
+# Copy deck — Home page
+
+Source: supplied verbatim by Žilvinas on 2026-07-28, matching Figma page
+"HOME PAGE: Agency Services". This is the **authoritative text**. It was typed
+out by hand rather than extracted from Figma, which is why it is complete —
+the Figma design-context response truncated at 100KB before reaching the footer.
+
+Keep this in sync when copy changes. Components should read from it, not
+paraphrase it.
+
+## Nav
+
+- AGENCY
+- CASE STUDIES
+- TEMPLATES
+- Book a Call *(primary CTA)*
+
+## Hero
+
+- Eyebrow: Growth Partner for eCom & AI brands
+- **H1: Your Path to $100M.** *(the only `<h1>` on the page)*
+- Sub: Paid ads, banger creatives, landing pages, and strategy - all led by us, under one roof.
+- CTA primary: 15 MINUTE FIT-CHECK
+- CTA secondary: STEAL OUR SECRETS
+
+Floating proof chips around the hero visual:
+Performance Score · Successfully Reached 10M+ Views · Consistently Considered
+to be Excellent · Growth Performance Analysis · Refined, Delivered & Measured ·
+Optimized for the Quarter
+
+## Social proof strip
+
+- 110+ brands enhanced their ads with Mushi
+- Brands: Sintra · Holo · we interiors · Breezit · Unive · Xaviera
+- Awards: Foreplay Best Ad Award (Winner 2025) · Trustpilot Reviews (Rated 4.9) ·
+  FirstPick's VC Mentors (AI Accelerator)
+
+## Section — Creatives
+
+**Want Creatives This Premium?** · toggle: Yes
+
+Cards:
+| Brand | Title |
+| --- | --- |
+| sintra.ai | AI Agents Comparison Video Ad |
+| celemi | Minimalistic Skincare Static Ad |
+| tryholo.ai | AI Marketing UGC Video Ad |
+| tevaplanter | Planter Comparison Static Ad |
+
+## Section — Case studies
+
+**Not Just Pretty, but Profitable.**
+
+| Brand | Result | Tags |
+| --- | --- | --- |
+| Holo | Generated 700 sales calls & 1500 leads in 8 months. | AI, SALES, VENUES |
+| *(unnamed)* | From $0k/month to $117k/month in 7 months | AI, MARKETING, GENERATOR |
+| *(unnamed)* | Helped find 3 evergreen ads for an 8 figure company. | B2B, MARKETPLACE, RESELLERS |
+| *(unnamed)* | From $13k/month to $75k/month in 3 months. | ECOM, FURNITURE, HOME |
+
+> Three case studies have no brand name in the supplied copy. From the design,
+> they appear to be Breezit, eany, and we interiors — **confirm before publishing.**
+
+## Section — Testimonials
+
+**Reputation is everything. Ours is flawless.** · Trusted by 100+ brands · View More
+
+1. **Other marketers ask us who cooks our ads** — 5★ — Mushi team is exceptional, no other creative agency has ever met our needs - either because of the speed of execution, ideas or editing.\
+   Mushi delivers on all fronts. Other people & marketers even ask us where we get such creatives because they're top-notch. — *January 23, 2025 · Hana Skomra · PL*
+2. **Media Buying Best Kept Secret...** — 5★ — ...That is yours to discover. Mushi Agency is a collaborator who delivers. The team knows how to turn ideas into numbers and is communicative, analytical, creative, and creative. When they commit to a number, you can be sure they will do everything humanly possible to make it a reality. Mushi has my vote of confidence. — *November 01, 2024 · David Kovger · GB*
+3. **They make ads that convert** — 5★ — We had a fantastic experience working with Mushi! They were incredibly quick with delivery. From start to finish, the team took full ownership of the project, crafting a compelling narrative that truly resonated with our audience.\
+   Highly recommend them to anyone looking for a top-quality ad experience! — *November 11, 2024 · Akvilė Želnytė · CH*
+4. **Professional and reliable partner** — 5★ — I worked with Mushi agency as an internal marketing team member when our company collaborated with them.\
+   What I appreciated most was their professional approach to communication - clear deadlines, transparent project planning, and quick response to inquiries. The agency integrated exceptionally well with our internal team, which isn't always easy with external partners.\
+   I value their technical competence and creativity in solving e-commerce challenges.\
+   While Mushi is still young as an agency, the team's strong experience from previous projects is evident. I would recommend Mushi to those looking for a partner capable of working both independently and seamlessly integrating into an existing team. — *January 27, 2025 · Erika Zakarevičiūtė · LT*
+5. **Amazing quality ads** — 5★ — Mushi did on amazing job creating and creatives for our brand. Their ideas were spot-on, and the visuals really captured our brand. Our sales went up, and we couldn't be happier with their work! — *January 16, 2025 · Žilvinas Juzėnas · LT* *(initials avatar: ŽJ)*
+6. **Great experience working with Mushi...** — 5★ — Great experience working with Mushi agency. From a growth perspective, their team understands how to create video ads that actually perform on social channels - not just look good. Communication was smooth, turnaround was fast, and the creatives aligned well with performance goals. Solid partner for scaling paid social. — *November 01, 2025 · Lukas Raščiauskas · LT*
+7. **Young, creative team** — 5★ — We worked with Mushi to produce several short videos for advertising on social network. They are a team of young, creative talents who need little management or overseeing. Overall, very easy to work with! — *September 12, 2024 · Justė Semetaitė · LT*
+
+> Typos above (`Mushi did on amazing job`, `creative, and creative`) are
+> **as supplied**. They are real customer quotes — do not silently correct
+> them; ask first.
+
+## Final CTA
+
+- **You scrolled so far. You want this. Trust us.**
+- We have a cap. We don't know if you're the right fit yet. But we'd love to find out in 15 minutes.
+- CTA: 15 Minute Fit-Check
+- Scarcity note: 2/10 client spots left for 2026
+
+## Footer
+
+- Want a welcome gift? *(email capture — must post to a third-party email
+  provider; there is no server. See CLAUDE.md.)*
+- Columns: PRODUCT (SEO Tools, Templates · Agency Services) · LEGAL (Privacy
+  Policy · Terms & Conditions · Refund Policy · Money Back Guarantee) ·
+  COMPANY (Case Studies)
+- Trustpilot 4.0 · 100+ reviews
+- Social: LinkedIn · TikTok · Facebook · Instagram
+- Copyright 2026 © Mushi Agency
