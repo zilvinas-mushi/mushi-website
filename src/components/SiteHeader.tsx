@@ -34,9 +34,10 @@ export function SiteHeader() {
         </ul>
 
         <div className="flex items-center gap-3">
+          {/* Matches the hero's primary CTA, one step smaller. */}
           <a
             href={BOOKING_URL}
-            className="rounded-[var(--radius-pill)] bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            className="rounded-[var(--radius-pill)] bg-[#7857d8] px-5 py-2.5 text-[13px] font-semibold leading-none text-white ring-1 ring-inset ring-[#a78bfa]/60 shadow-[0_6px_18px_-8px_rgba(120,87,216,0.9)] transition-all hover:bg-[#8968e3]"
           >
             Book a Call
           </a>

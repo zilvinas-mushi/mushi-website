@@ -25,11 +25,14 @@ function Pill({
   variant?: "primary" | "dark";
 }) {
   const base =
-    "inline-flex items-center justify-center rounded-[var(--radius-pill)] px-7 py-3.5 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all hover:-translate-y-px";
+    "inline-flex items-center justify-center rounded-[var(--radius-pill)] px-8 py-4 text-[13px] font-semibold uppercase leading-none tracking-[0.03em] transition-all duration-150 hover:-translate-y-[1px]";
   const style =
     variant === "primary"
-      ? "bg-accent text-white shadow-[0_0_0_1px_rgba(255,255,255,0.18)_inset,0_8px_24px_-8px_rgba(110,84,181,0.9)] hover:brightness-110"
-      : "bg-[#0d0d0f] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)_inset] hover:bg-[#151518]";
+      ? // Brighter violet than the raw token with a visible lavender ring —
+        // in the design the primary CTA reads as lit from within, which a
+        // flat fill does not reproduce.
+        "bg-[#7857d8] text-white ring-1 ring-inset ring-[#a78bfa]/60 shadow-[0_6px_20px_-6px_rgba(120,87,216,0.85)] hover:bg-[#8968e3]"
+      : "bg-[#0a0a0c] text-white ring-1 ring-inset ring-white/15 hover:bg-[#141418]";
   return (
     <a href={href} className={`${base} ${style}`}>
       {children}
