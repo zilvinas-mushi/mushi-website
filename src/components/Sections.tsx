@@ -1,5 +1,6 @@
 import { Img } from "./Img";
 import { TrustBadges } from "./TrustBadges";
+import { CreativeCard } from "./CreativeCard";
 import {
   HERO,
   SOCIAL_PROOF,
@@ -192,22 +193,19 @@ export function Creatives() {
           {CREATIVES.heading}
         </h2>
 
-        {/* CSS scroll-snap, not a JS carousel — must work without hydration. */}
-        <ul className="scroll-row mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4">
+        {/*
+          Horizontal rail. CSS scroll-snap with smooth scrolling, not a JS
+          carousel — this is a static export and the rail must work unhydrated,
+          which also means it keeps native trackpad and touch momentum rather
+          than fighting it.
+
+          The list bleeds to the viewport edge on small screens so the last
+          card is visibly cut off, which is what signals "scrollable".
+        */}
+        <ul className="scroll-row -mr-5 mt-10 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth pb-4 pr-5 sm:gap-5">
           {CREATIVES.items.map((item) => (
-            <li
-              key={item.title}
-              className="w-[240px] shrink-0 snap-start sm:w-[280px]"
-            >
-              <article>
-                <Img
-                  src={item.image}
-                  alt={`${item.title} for ${item.brand}`}
-                  className="h-auto w-full rounded-[var(--radius-card)] border border-white/10 object-cover"
-                />
-                <h3 className="mt-4 text-sm font-medium">{item.title}</h3>
-                <p className="mt-1 text-xs text-muted">{item.brand}</p>
-              </article>
+            <li key={`${item.handle}-${item.caption}`} className="flex">
+              <CreativeCard item={item} />
             </li>
           ))}
         </ul>

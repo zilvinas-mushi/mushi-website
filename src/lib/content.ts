@@ -69,14 +69,67 @@ export const SOCIAL_PROOF = {
   ],
 } as const;
 
+/**
+ * One ad creative, framed as an Instagram post.
+ *
+ * `handle` is the account the ad ran under and `caption` is the line beneath
+ * it — both render in the card's account header, matching the design.
+ * `avatar` is optional: cards fall back to a neutral initial disc rather than
+ * a stand-in photo. Put avatars in /public/creatives, media in /public/images.
+ *
+ * `w`/`h` are the media's intrinsic pixel size. They are required — every
+ * image needs explicit dimensions (CLAUDE.md) so the rail does not reflow as
+ * cards load.
+ */
+export type Creative = {
+  handle: string;
+  caption: string;
+  image: string;
+  w: number;
+  h: number;
+  avatar?: string;
+  verified?: boolean;
+};
+
 export const CREATIVES = {
   heading: "Want Creatives This Premium?",
+  /** Add new creatives here — the card chrome needs no markup changes. */
   items: [
-    { brand: "sintra.ai", title: "AI Agents Comparison Video Ad", image: "image139.webp" },
-    { brand: "celemi", title: "Minimalistic Skincare Static Ad", image: "image140.webp" },
-    { brand: "tryholo.ai", title: "AI Marketing UGC Video Ad", image: "image141.webp" },
-    { brand: "tevaplanter", title: "Planter Comparison Static Ad", image: "image143.webp" },
-  ],
+    // Pairings corrected by rendering each file: image139 is the CELEMI
+    // skincare pouch, image141 is the planter. They were previously attached
+    // to the wrong handles. All four are placeholders pending the real
+    // creative exports.
+    {
+      handle: "sintra.ai",
+      caption: "AI Agents Comparison Video Ad",
+      image: "image140.webp",
+      w: 444,
+      h: 792,
+      verified: true,
+    },
+    {
+      handle: "celemi",
+      caption: "Minimalistic Skincare Static Ad",
+      image: "image139.webp",
+      w: 631,
+      h: 1125,
+    },
+    {
+      handle: "tryholo.ai",
+      caption: "AI Marketing UGC Video Ad",
+      image: "image143.webp",
+      w: 538,
+      h: 952,
+      verified: true,
+    },
+    {
+      handle: "tevaplanter",
+      caption: "Planter Comparison Static Ad",
+      image: "image141.webp",
+      w: 633,
+      h: 1127,
+    },
+  ] satisfies Creative[],
 } as const;
 
 /**
