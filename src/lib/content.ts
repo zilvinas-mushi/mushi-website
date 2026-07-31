@@ -143,6 +143,8 @@ export type Creative = {
 
 export const CREATIVES = {
   heading: "Want Creatives This Premium?",
+  /** Pill on the heading row — the answer to the heading's question. */
+  cta: "Yes",
   /** Add new creatives here — the card chrome needs no markup changes. */
   items: [
     // Pairings verified by rendering every candidate file:
