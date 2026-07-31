@@ -227,21 +227,33 @@ export function Creatives() {
         </h2>
 
         {/*
-          Horizontal rail. CSS scroll-snap with smooth scrolling, not a JS
-          carousel — this is a static export and the rail must work unhydrated,
-          which also means it keeps native trackpad and touch momentum rather
-          than fighting it.
+          Auto-scrolling marquee. The track carries the card list twice and
+          slides exactly one set width, so the wrap is seamless. Pure CSS — no
+          JS, no hydration — and it pauses on hover or keyboard focus so a
+          visitor can actually read a card. prefers-reduced-motion stops it and
+          turns the row back into a hand-scrollable rail.
 
-          The list bleeds to the viewport edge on small screens so the last
-          card is visibly cut off, which is what signals "scrollable".
+          The second copy is aria-hidden: it is the same content again, and a
+          screen reader announcing every creative twice would be noise.
         */}
-        <ul className="scroll-row -mr-5 mt-10 flex snap-x snap-mandatory scroll-pl-5 gap-4 overflow-x-auto scroll-smooth pb-4 pr-5 sm:gap-5">
-          {CREATIVES.items.map((item) => (
-            <li key={`${item.handle}-${item.caption}`} className="flex">
-              <CreativeCard item={item} />
-            </li>
-          ))}
-        </ul>
+        <div className="marquee -mx-5 mt-10 px-5">
+          <ul className="marquee-track gap-4 pb-4 sm:gap-5">
+            {CREATIVES.items.map((item) => (
+              <li key={`a-${item.handle}-${item.caption}`} className="flex">
+                <CreativeCard item={item} />
+              </li>
+            ))}
+            {CREATIVES.items.map((item) => (
+              <li
+                key={`b-${item.handle}-${item.caption}`}
+                className="flex"
+                aria-hidden="true"
+              >
+                <CreativeCard item={item} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

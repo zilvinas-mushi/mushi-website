@@ -35,6 +35,12 @@ export default function Home() {
             aria-hidden="true"
             className="hero-grid pointer-events-none absolute inset-0"
           />
+          {/* Light-streak burst, over the tiles so it lights them rather than
+              sitting behind. Decorative only. */}
+          <div
+            aria-hidden="true"
+            className="hero-rays pointer-events-none absolute inset-0"
+          />
           <Hero />
           <SocialProof />
         </div>

@@ -58,18 +58,51 @@ body {
   color: var(--text);
 }
 
-/* Hero atmosphere. The design's hero sits on a deep violet wash over a faint
-   square grid — the flat Figma export dropped both (57 gradient fills came
-   back as raster fragments), so they are rebuilt in CSS here. */
+/* Hero lighting.
+   Layered rather than a single wash, which is what gave the flat look:
+
+   1. a tight, bright violet core just under the header, where the design's
+      light source sits
+   2. a wide ambient bloom carrying colour out to the shoulders
+   3. a cool lift at the very top so the bar does not sit on dead black
+   4. the base ramp down to the page colour
+
+   Figma's own gradient fills came back from the export as raster fragments
+   (57 of them), so the light is rebuilt here rather than transcribed. */
 .hero-bg {
   background:
     radial-gradient(
-      ellipse 80% 60% at 50% 0%,
-      rgba(110, 84, 181, 0.55) 0%,
-      rgba(110, 84, 181, 0.18) 45%,
-      transparent 75%
+      ellipse 46% 34% at 50% 6%,
+      rgba(150, 116, 235, 0.5) 0%,
+      rgba(122, 92, 200, 0.26) 42%,
+      transparent 72%
     ),
-    linear-gradient(180deg, #1a1526 0%, #181818 100%);
+    radial-gradient(
+      ellipse 92% 70% at 50% 2%,
+      rgba(110, 84, 181, 0.42) 0%,
+      rgba(110, 84, 181, 0.14) 48%,
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 120% 44% at 50% 0%,
+      rgba(168, 142, 232, 0.16) 0%,
+      transparent 62%
+    ),
+    linear-gradient(180deg, #1d1730 0%, #191524 38%, #181818 82%);
+}
+
+/* Light-streak burst radiating from centre — the artwork Figma exported as
+   its own layer. Screen blending lets it read as light rather than as a
+   pasted image, and it is masked so it never reaches a hard edge. */
+.hero-rays {
+  background-image: url("/images/mask-group.svg");
+  background-repeat: no-repeat;
+  background-position: center 18%;
+  background-size: 130% auto;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 25%, transparent 78%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 25%, transparent 78%);
 }
 
 /* The hero grid is NOT hairlines. It is a field of filled, rounded tiles
@@ -110,6 +143,38 @@ body {
 }
 .scroll-row::-webkit-scrollbar {
   display: none;
+}
+
+/* Auto-scrolling creatives marquee.
+   The track holds the card list twice over and slides exactly one set width,
+   so the loop point is seamless. Pure CSS — no JS, no hydration, and it keeps
+   working if scripts never run. Hovering or keyboard-focusing anything inside
+   pauses it so a visitor can actually read a card. */
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x 70s linear infinite;
+  will-change: transform;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
 }
 
 @keyframes gradient-x {
@@ -163,6 +228,13 @@ body {
   .animate-gradient-x,
   .animated-gradient-border::before {
     animation: none;
+  }
+  /* Stop the marquee outright and let the row be scrolled by hand instead —
+     a continuously moving strip is exactly what this preference is about. */
+  .marquee-track {
+    animation: none;
+    width: auto;
+    overflow-x: auto;
   }
   *,
   *::before,
