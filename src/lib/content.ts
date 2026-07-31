@@ -253,17 +253,15 @@ export const CREATIVES = {
  * Brand-to-result pairings were verified against the design on 2026-07-28.
  * The original copy deck attached Breezit's result to Holo — do not reorder.
  *
- * Images: three were confirmed by opening the files. The `rectangle1611257xx`
- * series holds the real client screenshots, already perspective-warped to
- * match the design's tilted-device look. The separately-named device mockups
- * (`12-macbook-pro-…`, `iphone21`, `iphone-front1`) are EMPTY frames — in
- * Figma the visual is a frame plus a screenshot masked into it, and the flat
- * export split them apart. Using a frame alone renders a blank device.
+ * Images are the flattened composites pulled straight from Figma with
+ * get_screenshot on the four `Mask group` nodes — 3803:3257 (Breezit),
+ * 3803:3218 (Holo), 3803:3240 (eany), 3803:3251 (we interiors) — each 680x680.
  *
- * TODO(holo-image): no Holo screenshot exists in the export. Its card is a
- * composite that could not be reassembled from the pieces. Fix by exporting
- * that one node from Figma as a flattened image (1 get_screenshot call), or by
- * supplying a Holo screenshot directly.
+ * This matters: in Figma each visual is a device mockup with a screenshot
+ * masked INTO it, over a coloured gradient. The earlier flat export split
+ * those apart, so what shipped before was the bare screenshot with no device
+ * and no gradient, which is why the cards looked unfinished. The mockups
+ * export with transparency, so the gradient is reproduced by `bg` below.
  */
 export const CASE_STUDIES = {
   heading: "Not Just Pretty, but Profitable.",
@@ -272,25 +270,29 @@ export const CASE_STUDIES = {
       brand: "Breezit",
       result: "Generated 700 sales calls & 1500 leads in 8 months.",
       tags: ["AI", "SALES", "VENUES"],
-      image: "rectangle161125751.webp", // confirmed: Breezit landing page
+      image: "case-breezit.webp",
+      bg: "linear-gradient(158deg,#4a2c15 0%,#2a1a10 52%,#150e0a 100%)",
     },
     {
       brand: "Holo",
       result: "From $0k/month to $117k/month in 7 months",
       tags: ["AI", "MARKETING", "GENERATOR"],
-      image: "image239.webp", // UNCONFIRMED — see TODO(holo-image) above
+      image: "case-holo.webp",
+      bg: "linear-gradient(158deg,#5a4a9a 0%,#33285e 50%,#191430 100%)",
     },
     {
       brand: "eany.io",
       result: "Helped find 3 evergreen ads for an 8 figure company.",
       tags: ["B2B", "MARKETPLACE", "RESELLERS"],
-      image: "rectangle161125765.webp", // confirmed: eany.io catalogue
+      image: "case-eany.webp",
+      bg: "linear-gradient(158deg,#1c1f28 0%,#12141a 55%,#0a0b0e 100%)",
     },
     {
       brand: "we interiors",
       result: "From $13k/month to $75k/month in 3 months.",
       tags: ["ECOM", "FURNITURE", "HOME"],
-      image: "rectangle161125747.webp", // confirmed: we interiors storefront
+      image: "case-we-interiors.webp",
+      bg: "linear-gradient(158deg,#3f2c18 0%,#241a10 54%,#120d09 100%)",
     },
   ],
 } as const;

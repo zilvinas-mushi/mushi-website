@@ -353,13 +353,18 @@ export function CaseStudies() {
           {CASE_STUDIES.items.map((item, i) => (
             <li
               key={item.brand}
-              // Odd cards drop by a little over a third of a card height.
-              className={i % 2 === 1 ? "sm:mt-[88px]" : undefined}
+              // Figma puts the left column at y 2461/3358 and the right at
+              // 2611/3508 — a 150px drop, not the ~88px guessed before.
+              className={i % 2 === 1 ? "sm:mt-[150px]" : undefined}
             >
               <article className="flex h-full flex-col">
-                {/* Figma: each case-study visual is a 680x680 Mask group
-                    filling its column — a square, not a letterboxed crop. */}
-                <div className="relative aspect-square overflow-hidden rounded-[18px] bg-surface">
+                {/* 680x680 Mask group filling its column — a square, not a
+                    letterboxed crop. The mockup exports transparent, so the
+                    card's gradient sits behind it. */}
+                <div
+                  className="relative aspect-square overflow-hidden rounded-[18px]"
+                  style={{ background: item.bg }}
+                >
                   {/* Brand mark sits inside the artwork, top-left. */}
                   <span className="absolute left-6 top-5 z-10 text-[19px] font-medium text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
                     {item.brand}
