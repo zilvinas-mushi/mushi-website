@@ -24,19 +24,23 @@ export function SiteHeader() {
     <header className="sticky top-4 z-50 px-4 md:top-[22px]">
       <nav
         aria-label="Primary"
-        className="mx-auto grid max-w-[1040px] grid-cols-[1fr_auto] items-center gap-4 rounded-[15px] bg-[#181818] p-[11px] pl-5 md:grid-cols-[1fr_auto_1fr]"
+        // Single flex row with justify-between so every gap is equal —
+        // wordmark, the three links and the CTA all distribute together. The
+        // previous 3-column grid centred the nav as a block, which made the
+        // wordmark-to-nav and nav-to-CTA gaps differ from the gaps between the
+        // links themselves.
+        className="mx-auto flex max-w-[1040px] items-center justify-between rounded-[15px] bg-[#181818] p-[11px] pl-5"
       >
-        <Link
-          href="/"
-          aria-label={`${SITE_NAME} home`}
-          className="justify-self-start"
-        >
+        <Link href="/" aria-label={`${SITE_NAME} home`} className="shrink-0">
           {/* Figma 3803:1570: the wordmark box is 150x45 at 1921 -> ~112x34
               at 1440, which Dutch801 hits at roughly 34px. */}
           <Logo className="text-[28px] md:text-[34px]" />
         </Link>
 
-        <ul className="hidden items-center gap-10 justify-self-center md:flex lg:gap-14">
+        {/* `contents` dissolves the list box so the three links become direct
+            flex children of the bar and share its even distribution, while the
+            markup stays a real list for assistive tech. */}
+        <ul className="hidden md:contents">
           {NAV.map((item) => (
             <li key={item.label}>
               <a
@@ -52,7 +56,7 @@ export function SiteHeader() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-3 justify-self-end">
+        <div className="flex shrink-0 items-center gap-3">
           {/* Same gradient, 15px radius and hover inversion as the hero
               primary CTA — see the hover rule in CLAUDE.md. */}
           <a

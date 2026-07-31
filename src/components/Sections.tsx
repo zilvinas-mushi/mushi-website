@@ -100,15 +100,18 @@ export function Hero() {
         {HERO_FLOATERS.map((f) => (
           <span
             key={f.name}
-            className={`absolute ${f.pos} flex items-center justify-center rounded-[28px] border border-white/[0.07] bg-white/[0.045] shadow-[0_26px_54px_-18px_rgba(0,0,0,0.92)] backdrop-blur-[3px]`}
+            className={`absolute ${f.pos} flex items-center justify-center rounded-[28px] border border-white/[0.06] bg-white/[0.025] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)] backdrop-blur-[6px]`}
             style={{
               transform: `rotate(${f.rotate})`,
               width: f.size,
               height: f.size,
             }}
           >
+            {/* The inner tile is LIGHTER than the outer, not darker — that is
+                what lifts the logo forward. Having it darker inverted the
+                bevel and made the stack read as a hole. */}
             <span
-              className="flex items-center justify-center rounded-[21px] border border-white/[0.06] bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+              className="flex items-center justify-center rounded-[21px] border border-white/[0.10] bg-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
               style={{
                 width: Math.round(f.size * 0.76),
                 height: Math.round(f.size * 0.76),
@@ -193,7 +196,11 @@ export function SocialProof() {
     // Sits inside the same violet wrapper as the hero, so no background of its
     // own — it previously re-declared a gradient that did not line up with the
     // hero's, which showed as a visible seam.
-    <section aria-labelledby="proof-heading" className="relative pb-24 pt-2">
+    // Deep bottom padding on purpose: it gives the hero's violet ramp a long
+    // run of near-black to dissolve into before the next section starts, which
+    // is what makes the handover read as a fade rather than a stop. With a
+    // short tail the gradient had to resolve too fast and the join showed.
+    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         <div className="flex items-center justify-center gap-4">

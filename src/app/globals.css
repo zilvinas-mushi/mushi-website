@@ -87,31 +87,34 @@ body {
   background:
     /* 1. The sun: a bright violet source just outside the top-left corner. */
     radial-gradient(
-      ellipse 58% 52% at 4% -8%,
-      rgba(206, 176, 255, 0.62) 0%,
-      rgba(158, 122, 240, 0.34) 26%,
-      rgba(112, 84, 186, 0.14) 52%,
-      transparent 78%
+      ellipse 62% 58% at 2% -10%,
+      rgba(214, 186, 255, 0.7) 0%,
+      rgba(166, 130, 246, 0.42) 24%,
+      rgba(120, 92, 196, 0.2) 48%,
+      transparent 76%
     ),
-    /* 2. Its throw across the upper middle, keeping the headline off black. */
+    /* 2. Broad violet field across the whole upper half. The reference stays
+          saturated well past the middle rather than dropping to black early. */
     radial-gradient(
-      ellipse 78% 58% at 34% 2%,
-      rgba(132, 100, 212, 0.3) 0%,
-      rgba(108, 82, 176, 0.12) 44%,
-      transparent 74%
+      ellipse 96% 72% at 40% 0%,
+      rgba(140, 108, 220, 0.38) 0%,
+      rgba(114, 86, 184, 0.2) 40%,
+      rgba(92, 70, 150, 0.07) 64%,
+      transparent 84%
     ),
-    /* 3. A faint secondary bloom right of centre so fall-off is not linear. */
+    /* 3. Secondary bloom right of centre so fall-off is not linear. */
     radial-gradient(
-      ellipse 50% 40% at 74% 12%,
-      rgba(128, 98, 202, 0.14) 0%,
-      transparent 64%
+      ellipse 56% 46% at 76% 10%,
+      rgba(138, 106, 214, 0.2) 0%,
+      transparent 66%
     ),
-    /* 4. Vignette pulling the outer edges down to black. */
+    /* 4. Vignette, kept light — it should darken the outer edges without
+          draining the middle. */
     radial-gradient(
-      ellipse 92% 84% at 40% 20%,
-      transparent 48%,
-      rgba(0, 0, 0, 0.42) 86%,
-      rgba(0, 0, 0, 0.72) 100%
+      ellipse 96% 90% at 42% 18%,
+      transparent 56%,
+      rgba(0, 0, 0, 0.34) 88%,
+      rgba(0, 0, 0, 0.62) 100%
     ),
     /*
       5. Base ramp. Many closely-spaced stops rather than three, so the violet
@@ -121,13 +124,14 @@ body {
     */
     linear-gradient(
       180deg,
-      #191233 0%,
-      #171130 14%,
-      #150f2a 28%,
-      #120d23 42%,
-      #0f0b1b 56%,
-      #0c0a15 70%,
-      #0a0912 84%,
+      #221845 0%,
+      #201643 12%,
+      #1c133a 24%,
+      #17102f 38%,
+      #120d24 52%,
+      #0e0b1a 66%,
+      #0b0913 80%,
+      #0a090f 92%,
       #0a090f 100%
     );
 }
@@ -164,7 +168,13 @@ body {
 
    Pitch comes from the tile nodes themselves (3803:1425/1426/1427/1440/1441/
    1452/1453/1454), whose lefts run 216, 431, 646, 861, 1076, 1291, 1506 — a
-   constant 215px step at 1921 frame width, so 161px at 1440.
+   constant 215px step.
+
+   That 215px is used AT FACE VALUE, not multiplied by the 0.75 viewport scale
+   the type and boxes take. Scaling it gave 161px and visibly too many, too
+   small squares: counting columns in the reference at 1440 gives about 6.7,
+   which is 1440/215. The tiles are a fixed-size backdrop texture, not part of
+   the layout that scales with the frame.
 
    Drawn as one repeating SVG background rather than hundreds of divs: no DOM
    cost and it scales cleanly.
@@ -175,8 +185,8 @@ body {
    corners; a single vertical fade left hard edges at the sides. So: a vertical
    ramp intersected with a gentle horizontal feather. */
 .hero-grid {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='161' height='161'><rect x='0' y='0' width='150' height='150' rx='12' fill='rgba(255,255,255,0.035)'/></svg>");
-  background-size: 161px 161px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='rgba(255,255,255,0.038)'/></svg>");
+  background-size: 215px 215px;
   background-position: center top;
 
   -webkit-mask-image:
