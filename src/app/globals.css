@@ -83,14 +83,24 @@ body {
    Drawn as one repeating SVG background rather than hundreds of divs: no DOM
    cost and it scales cleanly.
 
-   The fade is vertical, not radial. The design keeps tiles reaching the left
-   and right edges and only lets them die away down the page, so a radial mask
-   wrongly ate the corners. */
+   The fade needs two axes, not one. In the design the tiles stay strong right
+   across the top — corners included — then die away down the page, with only
+   a soft feathering at the extreme left and right. A single radial ate the
+   corners; a single vertical fade left hard edges at the sides. So: a vertical
+   ramp intersected with a gentle horizontal feather. */
 .hero-grid {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='161' height='161'><rect x='0' y='0' width='150' height='150' rx='12' fill='rgba(255,255,255,0.03)'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='161' height='161'><rect x='0' y='0' width='150' height='150' rx='12' fill='rgba(255,255,255,0.035)'/></svg>");
   background-size: 161px 161px;
   background-position: center top;
-  mask-image: linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%);
+
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 0%, #000 48%, rgba(0, 0, 0, 0.35) 78%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, #000 0%, #000 48%, rgba(0, 0, 0, 0.35) 78%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  mask-composite: intersect;
 }
 
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a
