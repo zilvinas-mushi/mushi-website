@@ -31,7 +31,9 @@ export function SiteHeader() {
           aria-label={`${SITE_NAME} home`}
           className="justify-self-start"
         >
-          <Logo className="text-[26px] md:text-[32px]" />
+          {/* Figma 3803:1570: the wordmark box is 150x45 at 1921 -> ~112x34
+              at 1440, which Dutch801 hits at roughly 34px. */}
+          <Logo className="text-[28px] md:text-[34px]" />
         </Link>
 
         <ul className="hidden items-center gap-10 justify-self-center md:flex lg:gap-14">
@@ -39,7 +41,10 @@ export function SiteHeader() {
             <li key={item.label}>
               <a
                 href={item.href}
-                className="text-[14px] font-semibold uppercase tracking-[0.02em] text-white/85 transition-colors hover:text-white lg:text-[15px]"
+                // Figma 3803:1571/1572/1573: Poppins SemiBold 28px at 1921
+                // wide -> 21px at 1440. This was set at 14px, which made the
+                // whole bar read as a small utility nav rather than the design.
+                className="text-[17px] font-semibold uppercase tracking-[0.01em] text-white/85 transition-colors hover:text-white lg:text-[21px]"
               >
                 {item.label}
               </a>
@@ -56,7 +61,7 @@ export function SiteHeader() {
             // Poppins SemiBold at 1921 wide -> 52x182 with 22px text at 1440.
             // The label was previously 15px, which left the button looking
             // empty — the type has to scale with the box, not stay small.
-            className="inline-flex h-[52px] min-w-[182px] items-center justify-center rounded-[15px] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-6 text-[18px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] lg:text-[20px]"
+            className="inline-flex h-[52px] min-w-[182px] items-center justify-center rounded-[15px] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-6 text-[19px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] lg:text-[22px]"
           >
             Book a Call
           </a>

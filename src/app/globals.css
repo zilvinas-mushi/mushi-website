@@ -72,18 +72,25 @@ body {
     linear-gradient(180deg, #1a1526 0%, #181818 100%);
 }
 
-/* The hero grid is NOT hairlines. It is a field of filled, rounded tiles with
-   gaps between them, each only a touch lighter than the background — that is
-   why every line-based version read wrong.
+/* The hero grid is NOT hairlines. It is a field of filled, rounded tiles
+   separated by gutters, each only a touch lighter than the background — which
+   is why every line-based version read wrong.
 
-   Drawn as a tiled SVG rather than as hundreds of divs: one repeating
-   background paints the whole field, costs no DOM, and scales cleanly.
-   104px cell = 94px tile + 10px gutter, 12px corner radius. */
+   Pitch comes from the tile nodes themselves (3803:1425/1426/1427/1440/1441/
+   1452/1453/1454), whose lefts run 216, 431, 646, 861, 1076, 1291, 1506 — a
+   constant 215px step at 1921 frame width, so 161px at 1440.
+
+   Drawn as one repeating SVG background rather than hundreds of divs: no DOM
+   cost and it scales cleanly.
+
+   The fade is vertical, not radial. The design keeps tiles reaching the left
+   and right edges and only lets them die away down the page, so a radial mask
+   wrongly ate the corners. */
 .hero-grid {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='104' height='104'><rect x='0' y='0' width='94' height='94' rx='12' fill='rgba(255,255,255,0.028)'/></svg>");
-  background-size: 104px 104px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='161' height='161'><rect x='0' y='0' width='150' height='150' rx='12' fill='rgba(255,255,255,0.03)'/></svg>");
+  background-size: 161px 161px;
   background-position: center top;
-  mask-image: radial-gradient(ellipse 100% 90% at 50% 30%, #000 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%);
 }
 
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a
