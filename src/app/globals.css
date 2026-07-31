@@ -165,10 +165,22 @@ body {
   mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
 }
 
+/* Speed lives here — the only value to touch when tuning it.
+   The track is ~6380px, so it travels ~3190px (one set) per loop:
+     70s -> ~45px/s   too placid, reads as almost static
+     55s -> ~58px/s   current
+     40s -> ~80px/s   lively, still readable
+     25s -> ~128px/s  too fast to read a card, starts to feel frantic
+   Card marquees sit comfortably around 60-90px/s; logo strips can go slower
+   because a shape is recognisable at a glance where a caption is not.
+
+   Note this is a fixed duration, not a fixed speed: adding more creatives
+   lengthens the track, so the same duration moves it faster. If the rail grows
+   much past a dozen cards, raise this to keep the pace. */
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee-x 70s linear infinite;
+  animation: marquee-x var(--marquee-duration, 55s) linear infinite;
   will-change: transform;
 }
 
