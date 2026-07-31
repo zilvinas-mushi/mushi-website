@@ -3,9 +3,14 @@
 /* Tokens measured from the Figma frame. design/TOKENS.md is the source of
    truth — keep these in sync with it. */
 :root {
-  --bg: #181818;
-  --bg-alt: #191919;
-  --surface: #222222;
+  /* The page is near-black; the only colour on it is the purple light.
+     #181818 is the HEADER BAR's fill (Figma 3803:1568), not the page — reading
+     it as the background made everything grey and washed out. The bar reads as
+     a lighter panel sitting on black, which is the point. */
+  --bg: #0a090f;
+  --bg-alt: #0d0b13;
+  --surface: #1c1a24;
+  --bar: #181818;
   --accent-purple: #6e54b5;
   --accent-sage: #6a806a;
   --text: #ffffff;
@@ -69,40 +74,64 @@ body {
 
    Figma's own gradient fills came back from the export as raster fragments
    (57 of them), so the light is rebuilt here rather than transcribed. */
+/*
+  The page is essentially pitch black; the only colour in it is the purple
+  light. Earlier versions sat on a #181818 base with a broad violet tint,
+  which made everything grey and washed rather than black-with-a-light-in-it.
+
+  The light source is in the TOP-LEFT corner, not centred — that is what
+  throws the diagonal rays across the hero and lights the left-hand stat
+  panels from behind.
+*/
 .hero-bg {
   background:
+    /* 1. The sun: a bright violet source just outside the top-left corner. */
     radial-gradient(
-      ellipse 46% 34% at 50% 6%,
-      rgba(150, 116, 235, 0.5) 0%,
-      rgba(122, 92, 200, 0.26) 42%,
-      transparent 72%
-    ),
-    radial-gradient(
-      ellipse 92% 70% at 50% 2%,
-      rgba(110, 84, 181, 0.42) 0%,
-      rgba(110, 84, 181, 0.14) 48%,
+      ellipse 55% 48% at 6% -6%,
+      rgba(186, 152, 255, 0.5) 0%,
+      rgba(140, 106, 226, 0.26) 34%,
+      rgba(96, 72, 160, 0.08) 60%,
       transparent 80%
     ),
+    /* 2. Its throw across the upper middle, keeping the headline off black. */
     radial-gradient(
-      ellipse 120% 44% at 50% 0%,
-      rgba(168, 142, 232, 0.16) 0%,
-      transparent 62%
+      ellipse 70% 52% at 38% 6%,
+      rgba(122, 92, 200, 0.26) 0%,
+      rgba(104, 78, 172, 0.1) 46%,
+      transparent 76%
     ),
-    linear-gradient(180deg, #1d1730 0%, #191524 38%, #181818 82%);
+    /* 3. A faint secondary bloom right of centre so the fall-off is not linear. */
+    radial-gradient(
+      ellipse 44% 34% at 72% 16%,
+      rgba(126, 96, 200, 0.13) 0%,
+      transparent 66%
+    ),
+    /* 4. Vignette pulling every edge down to black. */
+    radial-gradient(
+      ellipse 86% 76% at 42% 22%,
+      transparent 42%,
+      rgba(0, 0, 0, 0.55) 84%,
+      rgba(0, 0, 0, 0.85) 100%
+    ),
+    /* 5. Near-black base. */
+    linear-gradient(180deg, #0d0b14 0%, #0a090f 46%, #08080a 100%);
 }
 
 /* Light-streak burst radiating from centre — the artwork Figma exported as
    its own layer. Screen blending lets it read as light rather than as a
    pasted image, and it is masked so it never reaches a hard edge. */
+/* Rays thrown from the top-left source, so they fan diagonally down and right
+   rather than radiating from the middle. Screen blending lets them read as
+   light rather than as a pasted image. */
 .hero-rays {
   background-image: url("/images/mask-group.svg");
   background-repeat: no-repeat;
-  background-position: center 18%;
-  background-size: 130% auto;
+  background-position: -18% -32%;
+  background-size: 150% auto;
   mix-blend-mode: screen;
-  opacity: 0.55;
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 25%, transparent 78%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 25%, transparent 78%);
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(ellipse 80% 72% at 14% 4%, #000 12%, transparent 74%);
+  mask-image: radial-gradient(ellipse 80% 72% at 14% 4%, #000 12%, transparent 74%);
 }
 
 /* The hero grid is NOT hairlines. It is a field of filled, rounded tiles

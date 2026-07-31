@@ -75,21 +75,43 @@ function Stars({ count = 5 }: { count?: number }) {
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
-      {/* Platform marks drifting around the hero, as in the design. Purely
-          decorative, so aria-hidden and empty alt; hidden below lg where there
-          is no room beside the headline. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block">
+      {/*
+        Platform marks — TWO nested squares, which is the detail that makes
+        them read correctly:
+
+          outer  a translucent frosted tile, barely lighter than the field,
+                 with a hairline edge and a soft cast shadow
+          inner  the brand logo as its own smaller rounded tile, ~58% of the
+                 outer, sitting within it
+
+        A logo on a solid dark square looks flat by comparison — the frosted
+        outer is what gives them the floating glass quality.
+
+        z-[3] puts these above the stat panels: in the design the Instagram
+        mark overlaps the left-hand panel, so the icons win.
+
+        Decorative, so aria-hidden with empty alt. Hidden below lg, where there
+        is no room beside the headline.
+      */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[3] hidden lg:block"
+      >
         {HERO_FLOATERS.map((f) => (
           <span
             key={f.name}
-            className={`absolute ${f.pos} block`}
-            style={{ transform: `rotate(${f.rotate})` }}
+            className={`absolute ${f.pos} flex items-center justify-center rounded-[26px] border border-white/[0.09] bg-white/[0.055] shadow-[0_22px_48px_-16px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[3px]`}
+            style={{
+              transform: `rotate(${f.rotate})`,
+              width: f.size,
+              height: f.size,
+            }}
           >
             <Img
               src={f.image}
               alt=""
-              width={f.size}
-              className="rounded-[14px] opacity-90 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)]"
+              width={Math.round(f.size * 0.58)}
+              className="rounded-[14px] shadow-[0_6px_16px_-6px_rgba(0,0,0,0.7)]"
             />
           </span>
         ))}

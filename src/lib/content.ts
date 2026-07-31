@@ -24,11 +24,42 @@ export const NAV = [
  * below the lg breakpoint, where there is no room for them.
  */
 export const HERO_FLOATERS = [
-  { name: "Instagram", image: "image42.webp", pos: "left-[4%] top-[18%]", size: 58, rotate: "-8deg" },
-  { name: "Google", image: "image44.webp", pos: "right-[6%] top-[12%]", size: 62, rotate: "7deg" },
-  { name: "TikTok", image: "image45.webp", pos: "left-[8%] bottom-[16%]", size: 54, rotate: "6deg" },
-  { name: "Facebook", image: "image43.webp", pos: "right-[4%] bottom-[20%]", size: 58, rotate: "-6deg" },
+  { name: "Instagram", image: "image42.webp", pos: "left-[13%] top-[15%]", size: 90, rotate: "-10deg" },
+  { name: "Google", image: "image44.webp", pos: "right-[13%] top-[12%]", size: 94, rotate: "8deg" },
+  { name: "TikTok", image: "image45.webp", pos: "left-[10%] bottom-[26%]", size: 86, rotate: "7deg" },
+  { name: "Facebook", image: "image43.webp", pos: "right-[10%] bottom-[24%]", size: 90, rotate: "-7deg" },
 ] as const;
+
+/**
+ * Stat panels that drift in from the left and right edges of the hero,
+ * deliberately cropped by the viewport as in the design. They carry the same
+ * proof copy the chips did — the chips only ever made sense as this artwork.
+ *
+ * Decorative: the same claims appear as real text elsewhere on the page, so
+ * these are aria-hidden rather than duplicated to screen readers.
+ */
+export const HERO_PANELS = [
+  {
+    side: "left" as const,
+    top: "18%",
+    rotate: "-9deg",
+    title: "Performance Score",
+    lines: ["Successfully Reached 10M+ Views", "Consistently Considered to be Excellent"],
+    emoji: "😎",
+    bars: [40, 62, 48, 78, 90],
+  },
+  {
+    side: "left" as const,
+    top: "56%",
+    rotate: "-7deg",
+    title: "Growth Performance Analysis",
+    lines: ["Refined, Delivered & Measured"],
+    bars: [30, 55, 44, 72],
+  },
+  // Left side only. The design puts stat panels exclusively on the left; the
+  // right edge carries just the platform marks. Mirroring them across both
+  // sides made the hero symmetrical in a way the design deliberately is not.
+];
 
 export const HERO = {
   eyebrow: "Growth Partner for eCom & AI brands",

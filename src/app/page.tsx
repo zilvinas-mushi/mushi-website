@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { HeroPanels } from "@/components/HeroPanels";
 import {
   Hero,
   SocialProof,
@@ -41,6 +42,7 @@ export default function Home() {
             aria-hidden="true"
             className="hero-rays pointer-events-none absolute inset-0"
           />
+          <HeroPanels />
           <Hero />
           <SocialProof />
         </div>
