@@ -76,16 +76,16 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
       {/*
-        Platform marks — TWO nested squares, which is the detail that makes
-        them read correctly:
+        Platform marks — THREE nested layers, which is what gives them depth:
 
-          outer  a translucent frosted tile, barely lighter than the field,
-                 with a hairline edge and a soft cast shadow
-          inner  the brand logo as its own smaller rounded tile, ~58% of the
-                 outer, sitting within it
+          outer   large translucent frosted tile, hairline edge, cast shadow
+          middle  a second inset tile in a slightly DIFFERENT tone (~76%) —
+                  not the same value as the outer; that difference is the
+                  whole effect and reads as a bevel
+          logo    the brand mark itself (~52%), its own rounded tile
 
-        A logo on a solid dark square looks flat by comparison — the frosted
-        outer is what gives them the floating glass quality.
+        Two layers looked flat and one looked pasted on. The doubled square is
+        the detail that makes them sit in the scene.
 
         z-[3] puts these above the stat panels: in the design the Instagram
         mark overlaps the left-hand panel, so the icons win.
@@ -100,19 +100,27 @@ export function Hero() {
         {HERO_FLOATERS.map((f) => (
           <span
             key={f.name}
-            className={`absolute ${f.pos} flex items-center justify-center rounded-[26px] border border-white/[0.09] bg-white/[0.055] shadow-[0_22px_48px_-16px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[3px]`}
+            className={`absolute ${f.pos} flex items-center justify-center rounded-[28px] border border-white/[0.07] bg-white/[0.045] shadow-[0_26px_54px_-18px_rgba(0,0,0,0.92)] backdrop-blur-[3px]`}
             style={{
               transform: `rotate(${f.rotate})`,
               width: f.size,
               height: f.size,
             }}
           >
-            <Img
-              src={f.image}
-              alt=""
-              width={Math.round(f.size * 0.58)}
-              className="rounded-[14px] shadow-[0_6px_16px_-6px_rgba(0,0,0,0.7)]"
-            />
+            <span
+              className="flex items-center justify-center rounded-[21px] border border-white/[0.06] bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+              style={{
+                width: Math.round(f.size * 0.76),
+                height: Math.round(f.size * 0.76),
+              }}
+            >
+              <Img
+                src={f.image}
+                alt=""
+                width={Math.round(f.size * 0.52)}
+                className="rounded-[13px] shadow-[0_6px_14px_-5px_rgba(0,0,0,0.75)]"
+              />
+            </span>
           </span>
         ))}
       </div>

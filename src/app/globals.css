@@ -87,51 +87,75 @@ body {
   background:
     /* 1. The sun: a bright violet source just outside the top-left corner. */
     radial-gradient(
-      ellipse 55% 48% at 6% -6%,
-      rgba(186, 152, 255, 0.5) 0%,
-      rgba(140, 106, 226, 0.26) 34%,
-      rgba(96, 72, 160, 0.08) 60%,
-      transparent 80%
+      ellipse 58% 52% at 4% -8%,
+      rgba(206, 176, 255, 0.62) 0%,
+      rgba(158, 122, 240, 0.34) 26%,
+      rgba(112, 84, 186, 0.14) 52%,
+      transparent 78%
     ),
     /* 2. Its throw across the upper middle, keeping the headline off black. */
     radial-gradient(
-      ellipse 70% 52% at 38% 6%,
-      rgba(122, 92, 200, 0.26) 0%,
-      rgba(104, 78, 172, 0.1) 46%,
-      transparent 76%
+      ellipse 78% 58% at 34% 2%,
+      rgba(132, 100, 212, 0.3) 0%,
+      rgba(108, 82, 176, 0.12) 44%,
+      transparent 74%
     ),
-    /* 3. A faint secondary bloom right of centre so the fall-off is not linear. */
+    /* 3. A faint secondary bloom right of centre so fall-off is not linear. */
     radial-gradient(
-      ellipse 44% 34% at 72% 16%,
-      rgba(126, 96, 200, 0.13) 0%,
-      transparent 66%
+      ellipse 50% 40% at 74% 12%,
+      rgba(128, 98, 202, 0.14) 0%,
+      transparent 64%
     ),
-    /* 4. Vignette pulling every edge down to black. */
+    /* 4. Vignette pulling the outer edges down to black. */
     radial-gradient(
-      ellipse 86% 76% at 42% 22%,
-      transparent 42%,
-      rgba(0, 0, 0, 0.55) 84%,
-      rgba(0, 0, 0, 0.85) 100%
+      ellipse 92% 84% at 40% 20%,
+      transparent 48%,
+      rgba(0, 0, 0, 0.42) 86%,
+      rgba(0, 0, 0, 0.72) 100%
     ),
-    /* 5. Near-black base. */
-    linear-gradient(180deg, #0d0b14 0%, #0a090f 46%, #08080a 100%);
+    /*
+      5. Base ramp. Many closely-spaced stops rather than three, so the violet
+      dissolves into black gradually instead of banding partway down. This is
+      the "smooth transition into the rest of the site" — the last stop is the
+      page colour exactly, so the hero's bottom edge is invisible.
+    */
+    linear-gradient(
+      180deg,
+      #191233 0%,
+      #171130 14%,
+      #150f2a 28%,
+      #120d23 42%,
+      #0f0b1b 56%,
+      #0c0a15 70%,
+      #0a0912 84%,
+      #0a090f 100%
+    );
 }
 
 /* Light-streak burst radiating from centre — the artwork Figma exported as
    its own layer. Screen blending lets it read as light rather than as a
    pasted image, and it is masked so it never reaches a hard edge. */
-/* Rays thrown from the top-left source, so they fan diagonally down and right
-   rather than radiating from the middle. Screen blending lets them read as
-   light rather than as a pasted image. */
+/*
+  Spinduliai — the light beams.
+
+  These are broad, soft diagonal shafts thrown from the top-left, the way light
+  falls through a window. The exported mask-group.svg is a centre-radiating
+  starburst, which is a different thing entirely and never matched; the beams
+  are drawn here instead.
+
+  Four shafts at slightly different angles and widths so the fan is irregular
+  rather than a repeating pattern. Screen blending makes them add light rather
+  than paint grey, and the mask keeps them strongest near the source.
+*/
 .hero-rays {
-  background-image: url("/images/mask-group.svg");
-  background-repeat: no-repeat;
-  background-position: -18% -32%;
-  background-size: 150% auto;
+  background-image:
+    linear-gradient(112deg, transparent 12%, rgba(214, 190, 255, 0.085) 17%, transparent 23%),
+    linear-gradient(107deg, transparent 22%, rgba(206, 180, 255, 0.06) 28.5%, transparent 36%),
+    linear-gradient(118deg, transparent 33%, rgba(198, 170, 255, 0.05) 38%, transparent 44%),
+    linear-gradient(103deg, transparent 44%, rgba(190, 162, 250, 0.035) 50%, transparent 58%);
   mix-blend-mode: screen;
-  opacity: 0.5;
-  -webkit-mask-image: radial-gradient(ellipse 80% 72% at 14% 4%, #000 12%, transparent 74%);
-  mask-image: radial-gradient(ellipse 80% 72% at 14% 4%, #000 12%, transparent 74%);
+  -webkit-mask-image: radial-gradient(ellipse 96% 88% at 8% -6%, #000 6%, rgba(0, 0, 0, 0.45) 46%, transparent 82%);
+  mask-image: radial-gradient(ellipse 96% 88% at 8% -6%, #000 6%, rgba(0, 0, 0, 0.45) 46%, transparent 82%);
 }
 
 /* The hero grid is NOT hairlines. It is a field of filled, rounded tiles

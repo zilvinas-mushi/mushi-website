@@ -41,20 +41,24 @@ export const HERO_FLOATERS = [
 export const HERO_PANELS = [
   {
     side: "left" as const,
-    top: "18%",
+    top: "17%",
     rotate: "-9deg",
     title: "Performance Score",
     lines: ["Successfully Reached 10M+ Views", "Consistently Considered to be Excellent"],
     emoji: "😎",
-    bars: [40, 62, 48, 78, 90],
+    /** Level-meter style: many thin segments, rising to the right. */
+    meter: 14,
+    bars: [],
   },
   {
     side: "left" as const,
-    top: "56%",
+    top: "58%",
     rotate: "-7deg",
     title: "Growth Performance Analysis",
-    lines: ["Refined, Delivered & Measured"],
-    bars: [30, 55, 44, 72],
+    lines: ["Optimized for the Quarter", "Refined, Delivered & Measured"],
+    /** Chart style: a few tall columns. */
+    meter: 0,
+    bars: [34, 58, 46, 76],
   },
   // Left side only. The design puts stat panels exclusively on the left; the
   // right edge carries just the platform marks. Mirroring them across both

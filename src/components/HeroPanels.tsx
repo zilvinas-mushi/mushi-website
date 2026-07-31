@@ -29,34 +29,52 @@ export function HeroPanels() {
           }`}
           style={{ top: p.top, transform: `rotate(${p.rotate})` }}
         >
-          <header className="flex items-start justify-between gap-3">
-            <h3 className="text-[16px] font-semibold leading-tight text-white/95">
-              {p.title}
-            </h3>
+          <h3 className="text-[17px] font-semibold leading-tight text-white/95">
+            {p.title}
+          </h3>
+
+          {/* Hairline rule under the title, as in the design. */}
+          <span className="mt-2.5 block h-px w-full bg-white/15" />
+
+          <div className="mt-2.5 flex items-start justify-between gap-3">
+            <ul className="space-y-0.5">
+              {p.lines.map((line) => (
+                <li key={line} className="text-[12px] leading-snug text-white/55">
+                  {line}
+                </li>
+              ))}
+            </ul>
             {p.emoji && (
-              <span className="text-[19px] leading-none">{p.emoji}</span>
+              <span className="shrink-0 text-[21px] leading-none">{p.emoji}</span>
             )}
-          </header>
-
-          <ul className="mt-2.5 space-y-1">
-            {p.lines.map((line) => (
-              <li key={line} className="text-[11px] leading-snug text-white/45">
-                {line}
-              </li>
-            ))}
-          </ul>
-
-          {/* Bar sparkline. Heights are data, so the panels differ from each
-              other rather than repeating one shape four times. */}
-          <div className="mt-4 flex h-[46px] items-end gap-2">
-            {p.bars.map((h, j) => (
-              <span
-                key={j}
-                className="flex-1 rounded-[4px] bg-gradient-to-t from-white/8 to-white/30"
-                style={{ height: `${h}%` }}
-              />
-            ))}
           </div>
+
+          {/* Two readouts, matching the design: the score panel uses a
+              level meter of many thin segments filling left to right, the
+              analysis panel a few tall columns. */}
+          {p.meter > 0 ? (
+            <div className="mt-3.5 flex h-[26px] items-stretch gap-[3px]">
+              {Array.from({ length: p.meter }, (_, j) => (
+                <span
+                  key={j}
+                  className="flex-1 rounded-[2px]"
+                  style={{
+                    background: `rgba(255,255,255,${0.07 + (j / p.meter) * 0.2})`,
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-3.5 flex h-[52px] items-end gap-2.5">
+              {p.bars.map((h, j) => (
+                <span
+                  key={j}
+                  className="flex-1 rounded-[4px] bg-gradient-to-t from-white/10 to-white/30"
+                  style={{ height: `${h}%` }}
+                />
+              ))}
+            </div>
+          )}
         </article>
       ))}
     </div>
