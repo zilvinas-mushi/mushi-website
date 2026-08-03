@@ -78,7 +78,7 @@ export function MobileHeader() {
             aria-label={`${SITE_NAME} home`}
             className="justify-self-center"
           >
-            <Logo className="text-[34px]" />
+            <Logo className="text-[38px]" />
           </Link>
 
           {/* Violet call button where the webapp keeps its avatar. */}
