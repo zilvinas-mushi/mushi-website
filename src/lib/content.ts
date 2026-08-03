@@ -278,7 +278,7 @@ export const CASE_STUDIES = {
       image: "case-breezit.webp",
       logo: "breezit.svg",
       logoW: 98,
-      glow: "radial-gradient(ellipse 55% 45% at 100% 0%, #e0621f59 0%, #e0621f1a 45%, transparent 68%), radial-gradient(ellipse 50% 42% at 0% 100%, #e0621f4d 0%, transparent 65%)",
+      glow: "radial-gradient(ellipse 62% 50% at 100% 0%, #e0621f66 0%, #e0621f21 45%, transparent 70%), radial-gradient(ellipse 56% 47% at 0% 100%, #e0621f59 0%, transparent 67%)",
       bg: "linear-gradient(158deg,#4a2c15 0%,#2a1a10 52%,#150e0a 100%)",
     },
     {
@@ -288,7 +288,7 @@ export const CASE_STUDIES = {
       image: "case-holo.webp",
       logo: "holo.svg",
       logoW: 62,
-      glow: "radial-gradient(ellipse 55% 45% at 100% 0%, #8a5cf666 0%, #8a5cf61f 46%, transparent 70%), radial-gradient(ellipse 50% 42% at 0% 100%, #8a5cf64d 0%, transparent 66%)",
+      glow: "radial-gradient(ellipse 62% 50% at 100% 0%, #8a5cf673 0%, #8a5cf626 46%, transparent 72%), radial-gradient(ellipse 56% 47% at 0% 100%, #8a5cf659 0%, transparent 68%)",
       bg: "linear-gradient(158deg,#5a4a9a 0%,#33285e 50%,#191430 100%)",
     },
     {
@@ -298,7 +298,7 @@ export const CASE_STUDIES = {
       image: "case-eany.webp",
       logo: "eany.svg",
       logoW: 96,
-      glow: "radial-gradient(ellipse 65% 55% at 100% 100%, #3b82f659 0%, #3b82f61a 45%, transparent 70%)",
+      glow: "radial-gradient(ellipse 72% 61% at 100% 100%, #3b82f666 0%, #3b82f621 45%, transparent 72%)",
       bg: "linear-gradient(158deg,#1c1f28 0%,#12141a 55%,#0a0b0e 100%)",
     },
     {
@@ -308,7 +308,7 @@ export const CASE_STUDIES = {
       image: "case-we-interiors.webp",
       logo: null, // supplied SVG was an empty white rect — needs re-export
       logoW: 0,
-      glow: "radial-gradient(ellipse 65% 55% at 100% 100%, #d9a42252 0%, #d9a4221a 45%, transparent 70%)",
+      glow: "radial-gradient(ellipse 72% 61% at 100% 100%, #d9a4225e 0%, #d9a42221 45%, transparent 72%)",
       bg: "linear-gradient(158deg,#3f2c18 0%,#241a10 54%,#120d09 100%)",
     },
   ],
