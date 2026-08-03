@@ -217,21 +217,37 @@ export function SocialProof() {
     <section aria-labelledby="proof-heading" className="relative pb-48 pt-2">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
-        <div className="flex items-center justify-center gap-4">
-          <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/30" />
+        {/* The design's own divider ornament — a gradient line running into a
+            four-pointed star — flanks the headline, mirrored on the left. */}
+        <div className="flex items-center justify-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/creatives/icons/divider.svg"
+            alt=""
+            width={161}
+            height={21}
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+            className="h-[21px] w-auto"
+          />
           <h2
             id="proof-heading"
             className="whitespace-nowrap text-center text-[15px] font-medium text-white"
           >
-            <span aria-hidden="true" className="mr-2 text-white">
-              ✦
-            </span>
             {SOCIAL_PROOF.headline}
-            <span aria-hidden="true" className="ml-2 text-white">
-              ✦
-            </span>
           </h2>
-          <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/30" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/creatives/icons/divider.svg"
+            alt=""
+            width={161}
+            height={21}
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+            className="h-[21px] w-auto -scale-x-100"
+          />
         </div>
 
         {/* Official client logotypes from /public/logos. Each keeps its own

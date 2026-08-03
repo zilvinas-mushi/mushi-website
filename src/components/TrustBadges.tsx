@@ -45,7 +45,7 @@ const BADGES: Badge[] = [
   {
     title: "Foreplay Best Ad Award",
     meta: "Winner 2025",
-    logo: "/badges/foreplay.svg",
+    logo: "/badges/firstpick.svg",
   },
   {
     title: "Trustpilot Reviews",
@@ -55,7 +55,7 @@ const BADGES: Badge[] = [
   {
     title: "FirstPick's VC Mentors",
     meta: "AI Accelerator",
-    logo: "/badges/firstpick.svg",
+    logo: "/badges/foreplay.svg",
   },
 ];
 

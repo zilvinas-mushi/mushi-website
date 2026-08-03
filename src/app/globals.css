@@ -96,10 +96,10 @@ body {
     /* 2. Headline light: a distinct source sitting right behind
           "Your Path to $100M." so the title reads as standing in a beam. */
     radial-gradient(
-      ellipse 44% 30% at 50% 17%,
-      rgba(160, 124, 248, 0.4) 0%,
-      rgba(130, 98, 212, 0.2) 46%,
-      transparent 74%
+      ellipse 50% 32% at 50% 27%,
+      rgba(160, 124, 248, 0.28) 0%,
+      rgba(130, 98, 212, 0.14) 48%,
+      transparent 76%
     ),
     /* 3. Broad violet field across the whole upper half. The reference stays
           saturated well past the middle rather than dropping to black early. */
@@ -205,8 +205,8 @@ body {
      Three mask layers, intersected: the repeating tile shapes, the vertical
      ramp down the page, and the horizontal edge feather. */
   background: radial-gradient(
-    ellipse 62% 50% at 50% 24%,
-    rgba(172, 136, 255, 0.38) 0%,
+    ellipse 64% 52% at 50% 30%,
+    rgba(172, 136, 255, 0.32) 0%,
     rgba(146, 110, 232, 0.22) 38%,
     rgba(120, 92, 196, 0.1) 62%,
     rgba(255, 255, 255, 0.04) 88%
