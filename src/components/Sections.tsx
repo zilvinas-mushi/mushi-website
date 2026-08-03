@@ -613,8 +613,26 @@ export function FinalCta() {
             {FINAL_CTA.sub}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Pill href={BOOKING_URL}>{FINAL_CTA.cta}</Pill>
-            <span className="rounded-[var(--radius-pill)] border border-white/15 px-5 py-3 text-xs text-white/60">
+            {/* Same treatment as the creatives "Yes" pill — rounded-full,
+                sentence case, arrow disc — with the house hover inversion. */}
+            <a
+              href={BOOKING_URL}
+              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-6 pr-[6px] text-[16px] font-semibold text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
+            >
+              {FINAL_CTA.cta}
+              <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  strokeWidth="2.2"
+                  className="size-4 stroke-current"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
+                </svg>
+              </span>
+            </a>
+            <span className="inline-flex h-[45px] items-center rounded-full border border-white/15 bg-[#17151d]/80 px-6 text-[14px] font-medium text-white/75">
               {FINAL_CTA.scarcity}
             </span>
           </div>
