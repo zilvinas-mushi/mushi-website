@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { MobileHeader } from "./MobileHeader";
 import { NAV } from "@/lib/content";
 import { BOOKING_URL, SITE_NAME } from "@/lib/site";
 
@@ -11,17 +12,18 @@ import { BOOKING_URL, SITE_NAME } from "@/lib/site";
  * and a 3-column grid so the nav is truly centred regardless of how wide the
  * logo and CTA are.
  *
- * The mobile menu is a <details> rather than React state — this is a static
- * export, and a disclosure that works before (or entirely without) hydration
- * is more robust than one that needs JS.
+ * Below md the bar hands over to MobileHeader, which carries mushi-app's
+ * animated hamburger-and-drawer so both properties share one motion.
  */
 export function SiteHeader() {
   return (
-    // Figma node 3803:1568: bg #181818, 100px tall, 15px radius, 30px from the
-    // top, and 1386px wide inside a 1921px frame — so it is a genuinely
-    // floating bar with ~14% clear on each side, not a near-full-width strip.
-    // Scaled ~0.75 for a 1440 viewport: max-width 1040, 15px inner padding.
-    <header className="sticky top-4 z-50 px-4 md:top-[22px]">
+    <>
+      {/* Phone header with mushi-app's drawer motion; hidden from md up. */}
+      <MobileHeader />
+
+      {/* Figma node 3803:1568: a genuinely floating bar, ~14% clear each
+          side, scaled 0.75 for 1440. Hidden below md. */}
+      <header className="sticky top-[22px] z-50 hidden px-4 md:block">
       <nav
         aria-label="Primary"
         // Single flex row with justify-between so every gap is equal —
@@ -69,31 +71,9 @@ export function SiteHeader() {
           >
             Book a Call
           </a>
-
-          <details className="relative md:hidden">
-            <summary
-              className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-[12px] border border-white/15 [&::-webkit-details-marker]:hidden"
-              aria-label="Open menu"
-            >
-              <span aria-hidden="true" className="text-lg leading-none">
-                ☰
-              </span>
-            </summary>
-            <ul className="absolute right-0 mt-3 w-56 rounded-[15px] border border-white/10 bg-[#222222] p-2 shadow-xl">
-              {NAV.map((item) => (
-                <li key={item.label}>
-                  <a
-                    href={item.href}
-                    className="block rounded-[12px] px-3 py-2.5 text-[15px] font-semibold uppercase tracking-[0.02em] text-white/85 hover:bg-white/5 hover:text-white"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </details>
         </div>
       </nav>
-    </header>
+      </header>
+    </>
   );
 }

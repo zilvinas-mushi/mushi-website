@@ -302,7 +302,7 @@ export function Creatives() {
         <div className="flex items-center justify-between gap-6">
           <h2
             id="creatives-heading"
-            className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-[36px]"
+            className="text-[24px] font-semibold tracking-tight"
           >
             {CREATIVES.heading}
           </h2>
@@ -349,7 +349,7 @@ export function CaseStudies() {
       <div className={SHELL}>
         <h2
           id="cases-heading"
-          className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-[36px]"
+          className="text-[24px] font-semibold tracking-tight"
         >
           {CASE_STUDIES.heading}
         </h2>
@@ -374,7 +374,7 @@ export function CaseStudies() {
                     behind the device — orange, purple, blue, yellow per
                     brand — over the card's own dark gradient. */}
                 <div
-                  className="relative aspect-square overflow-hidden rounded-[18px]"
+                  className="fade-border relative aspect-square overflow-hidden rounded-[18px]"
                   style={{ background: item.bg }}
                 >
                   {/* Brand mark inside the artwork, top-left — the same logo

@@ -322,6 +322,33 @@ body {
   pointer-events: none;
 }
 
+/* Partial border that fades away from the top-left and is gone by the
+   middle — the case-card treatment. Drawn as a masked 1px ring (border-color
+   cannot hold a gradient and border-image breaks on rounded corners), same
+   technique as the animated ring ported from mushi-app, but static. */
+.fade-border {
+  position: relative;
+}
+.fade-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.12) 26%,
+    transparent 52%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 /* Tailwind v4 preflight sets cursor:default on buttons; restore the pointer. */
 @layer base {
   button:not(:disabled),
