@@ -150,12 +150,15 @@ export function Hero() {
           page; that one was ported here by mistake. The marketing design uses
           a different treatment.
         */}
-        <span className="relative mb-7 inline-flex items-center justify-center rounded-[50px] px-6 py-2 shadow-[0_0_26px_8px_rgba(140,106,226,0.5)]">
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 rounded-[50px] bg-white/85 blur-[6px]"
-          />
-          <span className="relative text-[14px] font-medium text-black md:text-[16px]">
+        {/*
+          Crisp pill, not a blur cloud: a vertical gradient — lavender rim into
+          a white core and back — gives the rolled-edge look of the reference,
+          and the halo lives in a box-shadow OUTSIDE the shape so the edge
+          itself stays sharp. The earlier blurred white fill destroyed the
+          silhouette entirely.
+        */}
+        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-7 py-2.5 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)]">
+          <span className="text-[15px] font-semibold text-black md:text-[16px]">
             {HERO.eyebrow}
           </span>
         </span>

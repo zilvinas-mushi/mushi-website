@@ -24,12 +24,12 @@ export function HeroPanels() {
       {HERO_PANELS.map((p, i) => (
         <article
           key={`${p.side}-${i}`}
-          className={`absolute w-[310px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95)] backdrop-blur-[2px] ${
+          className={`absolute w-[330px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95)] backdrop-blur-[2px] ${
             p.side === "left" ? "left-[-96px]" : "right-[-96px]"
           }`}
           style={{ top: p.top, transform: `rotate(${p.rotate})` }}
         >
-          <h3 className="text-[17px] font-semibold leading-tight text-white/95">
+          <h3 className="text-[19px] font-semibold leading-tight text-white">
             {p.title}
           </h3>
 
@@ -39,13 +39,13 @@ export function HeroPanels() {
           <div className="mt-2.5 flex items-start justify-between gap-3">
             <ul className="space-y-0.5">
               {p.lines.map((line) => (
-                <li key={line} className="text-[12px] leading-snug text-white/55">
+                <li key={line} className="text-[13.5px] leading-snug text-white/60 first:text-white/85">
                   {line}
                 </li>
               ))}
             </ul>
             {p.emoji && (
-              <span className="shrink-0 text-[21px] leading-none">{p.emoji}</span>
+              <span className="shrink-0 text-[24px] leading-none">{p.emoji}</span>
             )}
           </div>
 
@@ -53,19 +53,19 @@ export function HeroPanels() {
               level meter of many thin segments filling left to right, the
               analysis panel a few tall columns. */}
           {p.meter > 0 ? (
-            <div className="mt-3.5 flex h-[26px] items-stretch gap-[3px]">
+            <div className="mt-4 flex h-[32px] items-stretch gap-[5px]">
               {Array.from({ length: p.meter }, (_, j) => (
                 <span
                   key={j}
-                  className="flex-1 rounded-[2px]"
+                  className="flex-1 rounded-[5px]"
                   style={{
-                    background: `rgba(255,255,255,${0.07 + (j / p.meter) * 0.2})`,
+                    background: `rgba(255,255,255,${0.09 + (j / p.meter) * 0.26})`,
                   }}
                 />
               ))}
             </div>
           ) : (
-            <div className="mt-3.5 flex h-[52px] items-end gap-2.5">
+            <div className="mt-4 flex h-[58px] items-end gap-2.5">
               {p.bars.map((h, j) => (
                 <span
                   key={j}
@@ -104,7 +104,7 @@ export function HeroPanels() {
       </article>
 
       <article className="absolute bottom-[10%] right-[-84px] w-[300px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95)] backdrop-blur-[2px] [transform:rotate(-6deg)]">
-        <h3 className="text-[17px] font-semibold leading-tight text-white/95">
+        <h3 className="text-[19px] font-semibold leading-tight text-white">
           Trending Video
         </h3>
         <span className="mt-2.5 block h-px w-full bg-white/15" />
