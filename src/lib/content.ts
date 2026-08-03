@@ -308,13 +308,10 @@ export const CASE_STUDIES = {
       image: "case-we-interiors-v2.webp",
       logo: null, // supplied SVG was an empty white rect — needs re-export
       logoW: 0,
-      // No coloured glow here: the Figma fill for this card is the neutral
-      // sand #D6CFC3 (confirmed in the inspector), and the laptop export is
-      // genuinely transparent — the earlier yellow wash was compensating for
-      // an opaque re-screenshot that no longer exists.
-      glow: "transparent",
-      bg: "linear-gradient(158deg,#d6cfc3 0%,#c8bfaf 55%,#b3a894 100%)",
-      darkLabel: true, // white text would vanish on the sand field
+      // Near-black card with a warm yellow glow spilling from the
+      // bottom-right behind the laptop; the label stays white.
+      glow: "radial-gradient(ellipse 72% 61% at 100% 100%, #d9a42266 0%, #d9a42221 45%, transparent 72%)",
+      bg: "linear-gradient(158deg,#1a1410 0%,#100d09 55%,#0a0908 100%)",
     },
   ],
 } as const;
