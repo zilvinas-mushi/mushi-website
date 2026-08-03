@@ -305,7 +305,7 @@ export const CASE_STUDIES = {
       brand: "we interiors",
       result: "From $13k/month to $75k/month in 3 months.",
       tags: ["ECOM", "FURNITURE", "HOME"],
-      image: "case-we-interiors.webp",
+      image: "case-we-interiors-v2.webp",
       logo: null, // supplied SVG was an empty white rect — needs re-export
       logoW: 0,
       // No coloured glow here: the Figma fill for this card is the neutral

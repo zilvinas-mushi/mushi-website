@@ -515,9 +515,7 @@ function TestimonialColumns({
 }
 
 export function Testimonials() {
-  const { items, visibleCount } = TESTIMONIALS;
-  const shown = items.slice(0, visibleCount);
-  const hidden = items.slice(visibleCount);
+  const { items } = TESTIMONIALS;
 
   return (
     <section id="agency" aria-labelledby="testimonials-heading" className="py-20">
@@ -530,32 +528,29 @@ export function Testimonials() {
         </h2>
 
         {/*
-          Two columns of quote cards. The first three are ALWAYS visible, the
-          rest peek through a clipped, fading preview with the trust pill
-          floating over the fade — matching the design.
+          ALL cards render once, in two continuous alternating columns. The
+          collapsed state is just a clip: the container is height-limited with
+          a fade at its bottom edge and the trust pill floating over it.
+          Opening the disclosure lifts the clip via :has().
 
-          Structurally: the visible cards and the preview live OUTSIDE the
-          <details>. A closed <details> hides every child except its summary,
-          which is why a previous version showed zero testimonials until
-          clicked. The preview duplicates the hidden cards purely visually and
-          is aria-hidden; the full crawlable set lives inside the disclosure.
-          The `:has(details[open])` rule swaps preview for the real list.
+          This replaces a visible-set + preview-set structure whose two
+          stacked grids could not interleave heights — a short right column in
+          the first grid left a block of dead space before the second began.
+          One continuous flow has no seam, and no duplicated cards either.
         */}
-        <div className="relative mt-12 [&:has(details[open])_.testi-preview]:hidden">
-          <TestimonialColumns list={shown} />
-
-          <div
-            aria-hidden="true"
-            className="testi-preview relative max-h-[230px] overflow-hidden"
-          >
-            <TestimonialColumns list={hidden} flip />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[230px] bg-gradient-to-b from-transparent to-[var(--bg)]" />
+        <div className="relative mt-12 [&:has(details[open])_.testi-clip]:max-h-none [&:has(details[open])_.testi-fade]:hidden">
+          <div className="testi-clip relative max-h-[960px] overflow-hidden">
+            <TestimonialColumns list={items} />
+            <div
+              aria-hidden="true"
+              className="testi-fade pointer-events-none absolute inset-x-0 bottom-0 h-[240px] bg-gradient-to-b from-transparent to-[var(--bg)]"
+            />
           </div>
 
           <details className="group">
-            <summary className="absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-4 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] group-open:static group-open:my-8 [&::-webkit-details-marker]:hidden">
+            <summary className="absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-4 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] group-open:static group-open:mt-8 [&::-webkit-details-marker]:hidden">
               <span aria-hidden="true" className="flex -space-x-3">
-                {TESTIMONIALS.items
+                {items
                   .filter((t) => t.avatar)
                   .slice(0, 3)
                   .map((t) => (
@@ -584,10 +579,6 @@ export function Testimonials() {
                 </span>
               </span>
             </summary>
-
-            <div className="mt-2">
-              <TestimonialColumns list={hidden} flip />
-            </div>
           </details>
         </div>
       </div>
