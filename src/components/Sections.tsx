@@ -157,7 +157,7 @@ export function Hero() {
           itself stays sharp. The earlier blurred white fill destroyed the
           silhouette entirely.
         */}
-        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-7 py-2.5 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)]">
+        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-7 py-3 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)]">
           <span className="text-[14px] font-medium text-black md:text-[20px]">
             {HERO.eyebrow}
           </span>
@@ -175,7 +175,7 @@ export function Hero() {
           {HERO.sub}
         </p>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-10 flex items-center justify-center gap-2.5 sm:gap-4">
           <Pill href={BOOKING_URL}>{HERO.primaryCta}</Pill>
           <Pill href="#case-studies" variant="dark">
             {HERO.secondaryCta}

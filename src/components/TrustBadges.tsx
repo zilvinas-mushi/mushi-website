@@ -61,9 +61,9 @@ const BADGES: Badge[] = [
 
 export function TrustBadges() {
   return (
-    <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+    <ul className="mt-6 grid grid-cols-3 gap-2 md:flex md:flex-wrap md:items-center md:justify-center md:gap-x-8 md:gap-y-4">
       {BADGES.map(({ title, meta, logo }) => (
-        <li key={title} className="flex items-center gap-3">
+        <li key={title} className="flex flex-col items-center gap-2 text-center md:flex-row md:gap-3 md:text-left">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logo}
@@ -74,11 +74,11 @@ export function TrustBadges() {
             decoding="async"
             className="size-12 shrink-0 object-contain"
           />
-          <span className="text-left">
+          <span className="text-center md:text-left">
             <span className="block text-[13px] font-semibold text-white">
               {title}
             </span>
-            <span className="flex items-center gap-1.5 text-xs text-zinc-500">
+            <span className="flex items-center justify-center gap-1.5 text-xs text-zinc-500 md:justify-start">
               <Laurel flip />
               {meta}
               <Laurel />
