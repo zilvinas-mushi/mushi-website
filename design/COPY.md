@@ -73,8 +73,8 @@ staggered — left column Breezit then eany, right column Holo then we interiors
 **Reputation is everything. Ours is flawless.** · Trusted by 100+ brands · View More
 
 1. **Other marketers ask us who cooks our ads** — 5★ — Mushi team is exceptional, no other creative agency has ever met our needs - either because of the speed of execution, ideas or editing.\
-   Mushi delivers on all fronts. Other people & marketers even ask us where we get such creatives because they're top-notch. — *January 23, 2025 · Hana Skomra · PL*
-2. **Media Buying Best Kept Secret...** — 5★ — ...That is yours to discover. Mushi Agency is a collaborator who delivers. The team knows how to turn ideas into numbers and is communicative, analytical, creative, and creative. When they commit to a number, you can be sure they will do everything humanly possible to make it a reality. Mushi has my vote of confidence. — *November 01, 2024 · David Kovger · GB*
+   Mushi delivers on all fronts. Other people & marketers even ask us where we get such creatives because they're top-notch. — *November 01, 2024 · David Kovger · GB*
+2. **Media Buying Best Kept Secret...** — 5★ — ...That is yours to discover. Mushi Agency is a collaborator who delivers. The team knows how to turn ideas into numbers and is communicative, analytical, creative, and creative. When they commit to a number, you can be sure they will do everything humanly possible to make it a reality. Mushi has my vote of confidence. — *January 23, 2025 · Hana Skomra · PL*
 3. **They make ads that convert** — 5★ — We had a fantastic experience working with Mushi! They were incredibly quick with delivery. From start to finish, the team took full ownership of the project, crafting a compelling narrative that truly resonated with our audience.\
    Highly recommend them to anyone looking for a top-quality ad experience! — *November 11, 2024 · Akvilė Želnytė · CH*
 4. **Professional and reliable partner** — 5★ — I worked with Mushi agency as an internal marketing team member when our company collaborated with them.\

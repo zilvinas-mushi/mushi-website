@@ -430,7 +430,7 @@ export function CaseStudies() {
 
 function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
   return (
-    <article className="mb-6 break-inside-avoid rounded-[18px] bg-[#161519] p-7">
+    <article className="rounded-[18px] bg-[#161519] p-7">
       {/* Title and avatar share the top row; the avatar is right-aligned. */}
       <div className="flex items-start justify-between gap-5">
         <h3 className="text-[19px] font-semibold leading-snug text-white">
@@ -476,6 +476,38 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
   );
 }
 
+/**
+ * Cards run one-after-the-other, alternating columns — L, R, L, R — as in the
+ * design. CSS multicol fills the whole first column before the second, which
+ * is not the design's order. `flip` continues the global alternation into the
+ * hidden set so an odd shown-count does not restart the pattern on the left.
+ */
+function TestimonialColumns({
+  list,
+  flip = false,
+}: {
+  list: readonly (typeof TESTIMONIALS.items)[number][];
+  flip?: boolean;
+}) {
+  const L: (typeof TESTIMONIALS.items)[number][] = [];
+  const R: (typeof TESTIMONIALS.items)[number][] = [];
+  list.forEach((t, i) => ((i % 2 === 0) !== flip ? L : R).push(t));
+  return (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="space-y-6">
+        {L.map((t) => (
+          <TestimonialCard key={t.title} t={t} />
+        ))}
+      </div>
+      <div className="space-y-6">
+        {R.map((t) => (
+          <TestimonialCard key={t.title} t={t} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Testimonials() {
   const { items, visibleCount } = TESTIMONIALS;
   const shown = items.slice(0, visibleCount);
@@ -504,21 +536,13 @@ export function Testimonials() {
           The `:has(details[open])` rule swaps preview for the real list.
         */}
         <div className="relative mt-12 [&:has(details[open])_.testi-preview]:hidden">
-          <div className="columns-1 gap-6 md:columns-2">
-            {shown.map((t) => (
-              <TestimonialCard key={t.title} t={t} />
-            ))}
-          </div>
+          <TestimonialColumns list={shown} />
 
           <div
             aria-hidden="true"
             className="testi-preview relative max-h-[230px] overflow-hidden"
           >
-            <div className="columns-1 gap-6 md:columns-2">
-              {hidden.map((t) => (
-                <TestimonialCard key={`p-${t.title}`} t={t} />
-              ))}
-            </div>
+            <TestimonialColumns list={hidden} flip />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[230px] bg-gradient-to-b from-transparent to-[var(--bg)]" />
           </div>
 
@@ -555,10 +579,8 @@ export function Testimonials() {
               </span>
             </summary>
 
-            <div className="columns-1 gap-6 md:columns-2">
-              {hidden.map((t) => (
-                <TestimonialCard key={t.title} t={t} />
-              ))}
+            <div className="mt-2">
+              <TestimonialColumns list={hidden} flip />
             </div>
           </details>
         </div>
