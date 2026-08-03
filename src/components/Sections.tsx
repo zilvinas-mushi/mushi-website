@@ -253,7 +253,7 @@ export function SocialProof() {
         {/* Official client logotypes from /public/logos. Each keeps its own
             viewBox width so relative sizing matches the design; only
             "we interiors" has no supplied SVG and falls back to text. */}
-        <div className="mx-auto mt-10 max-w-3xl space-y-6">
+        <div className="mx-auto mt-10 max-w-3xl space-y-4 md:space-y-6">
           {/*
             The design stacks the brands as a centred pyramid — four, three,
             two, one — not a width-driven wrap, which broke rows in different
@@ -263,7 +263,7 @@ export function SocialProof() {
           {[[0, 4], [4, 7], [7, 9], [9, 10]].map(([from, to]) => (
             <ul
               key={from}
-              className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6"
+              className="flex flex-nowrap items-center justify-center gap-x-6 md:gap-x-12"
             >
               {SOCIAL_PROOF.brands.slice(from, to).map((brand) => (
                 <li key={brand.name} className="flex items-center">
@@ -276,7 +276,7 @@ export function SocialProof() {
                       height={brand.h}
                       loading="lazy"
                       decoding="async"
-                      className="h-[26px] w-auto opacity-95"
+                      className="h-[19px] w-auto opacity-95 md:h-[26px]"
                     />
                   ) : (
                     <span className="text-[22px] font-medium tracking-tight text-white/90">
@@ -615,6 +615,29 @@ export function FinalCta() {
           aria-hidden="true"
           className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/30 blur-[120px]"
         />
+        {/* Drawn firework arcs — the exported streak artwork is too faint to
+            survive blending, so the trails are real strokes: sweeping curves
+            from the top corners with a violet-to-transparent fade. */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 800 420"
+          preserveAspectRatio="none"
+          className="pointer-events-none absolute inset-0 h-full w-full"
+        >
+          <defs>
+            <linearGradient id="fw" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#cdb9ff" stopOpacity="0" />
+              <stop offset="0.5" stopColor="#cdb9ff" stopOpacity="0.55" />
+              <stop offset="1" stopColor="#8a5cf6" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d="M-40 150 Q 200 -30 520 60" fill="none" stroke="url(#fw)" strokeWidth="1.6" />
+          <path d="M120 200 Q 400 -60 840 120" fill="none" stroke="url(#fw)" strokeWidth="1.2" opacity="0.8" />
+          <path d="M-60 60 Q 260 30 560 -20" fill="none" stroke="url(#fw)" strokeWidth="1" opacity="0.6" />
+          <path d="M300 430 Q 560 300 860 340" fill="none" stroke="url(#fw)" strokeWidth="1.4" opacity="0.7" />
+          <path d="M-80 380 Q 200 300 460 420" fill="none" stroke="url(#fw)" strokeWidth="1.1" opacity="0.6" />
+          <path d="M480 20 Q 660 90 830 40" fill="none" stroke="url(#fw)" strokeWidth="1" opacity="0.5" />
+        </svg>
         <div className="relative">
           <h2
             id="cta-heading"
