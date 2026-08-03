@@ -31,7 +31,7 @@ function Pill({
   // (secondary): 67px tall, 15px radius, Poppins SemiBold 24px. The frame is
   // 1921px wide, so values are scaled ~0.75 for a 1440 viewport.
   const base =
-    "inline-flex h-[50px] items-center justify-center rounded-[15px] px-7 text-[18px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px]";
+    "inline-flex h-[56px] items-center justify-center rounded-[15px] px-8 text-[24px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
@@ -166,7 +166,7 @@ export function Hero() {
         {/* The only <h1> on the page. */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-[60px]"
+          className="mx-auto max-w-4xl text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-6xl lg:text-[80px]"
         >
           {HERO.heading}
         </h1>

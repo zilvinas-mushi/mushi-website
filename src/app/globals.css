@@ -206,8 +206,8 @@ body {
      Three mask layers, intersected: the repeating tile shapes, the vertical
      ramp down the page, and the horizontal edge feather. */
   background: radial-gradient(
-    ellipse 64% 52% at 50% 30%,
-    rgba(172, 136, 255, 0.32) 0%,
+    ellipse 66% 54% at 50% 48%,
+    rgba(172, 136, 255, 0.27) 0%,
     rgba(146, 110, 232, 0.22) 38%,
     rgba(120, 92, 196, 0.1) 62%,
     rgba(255, 255, 255, 0.04) 88%
