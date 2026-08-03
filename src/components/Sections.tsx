@@ -601,7 +601,16 @@ export function FinalCta() {
       aria-labelledby="cta-heading"
       className="scroll-mt-28 px-5 pb-24 pt-8"
     >
-      <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[20px] border border-white/10 bg-bg-alt px-6 py-20 text-center">
+      <div
+        className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[24px] border border-[#8a5cf6]/45 px-6 py-16 text-center md:py-20"
+        style={{
+          // Layer order: the arc-streak artwork ("fireworks"), the supplied
+          // light-to-purple wash strongest at the top, then the deep base.
+          background:
+            "url('/images/mask-group.svg') center -30%/150% auto no-repeat, linear-gradient(180deg, rgba(238,234,248,0.16) 0%, rgba(168,148,214,0.12) 26%, rgba(90,66,160,0.08) 50%, rgba(0,0,0,0) 72%), linear-gradient(180deg,#251b47 0%,#170f30 48%,#0d0820 100%)",
+          backgroundBlendMode: "screen, normal, normal",
+        }}
+      >
         <div
           aria-hidden="true"
           className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/30 blur-[120px]"
@@ -609,7 +618,7 @@ export function FinalCta() {
         <div className="relative">
           <h2
             id="cta-heading"
-            className="mx-auto max-w-3xl text-balance text-[22px] font-semibold leading-[1.2] tracking-tight sm:text-[55px] sm:leading-[55px]"
+            className="mx-auto max-w-3xl text-balance text-[22px] font-semibold leading-[22px] tracking-tight sm:text-[55px] sm:leading-[55px]"
           >
             {FINAL_CTA.heading}
           </h2>
