@@ -104,7 +104,7 @@ export const SOCIAL_PROOF = {
     { name: "Sintra", logo: "sintra.svg", w: 80, h: 25 },
     { name: "superior care.pet", logo: "superior-care.svg", w: 73, h: 25 },
     { name: "Holo", logo: "holo.svg", w: 62, h: 25 },
-    { name: "we interiors", logo: null, w: 0, h: 0 },  // supplied SVG was an empty white rect — needs re-export
+    { name: "we interiors", logo: "we-interiors.webp", w: 849, h: 153 },
     { name: "Breezit", logo: "breezit.svg", w: 98, h: 25 },
     { name: "Unive", logo: "unive.svg", w: 95, h: 26 },
     { name: "SE Ranking", logo: "se-ranking.svg", w: 101, h: 25 },
@@ -306,11 +306,11 @@ export const CASE_STUDIES = {
       result: "From $13k/month to $75k/month in 3 months.",
       tags: ["ECOM", "FURNITURE", "HOME"],
       image: "case-we-interiors-v2.webp",
-      logo: null, // supplied SVG was an empty white rect — needs re-export
-      logoW: 0,
+      logo: "we-interiors.webp",
+      logoW: 133,
       // Near-black card with a warm yellow glow spilling from the
       // bottom-right behind the laptop; the label stays white.
-      glow: "radial-gradient(ellipse 72% 61% at 100% 100%, #d9a42266 0%, #d9a42221 45%, transparent 72%)",
+      glow: "radial-gradient(ellipse 88% 72% at 58% 40%, #d9a42259 0%, #d9a42626 46%, transparent 74%)",
       bg: "linear-gradient(158deg,#1a1410 0%,#100d09 55%,#0a0908 100%)",
     },
   ],

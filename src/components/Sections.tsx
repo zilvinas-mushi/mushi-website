@@ -166,7 +166,7 @@ export function Hero() {
         {/* The only <h1> on the page. */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-[80px]"
+          className="mx-auto max-w-4xl text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-[60px]"
         >
           {HERO.heading}
         </h1>
@@ -289,7 +289,7 @@ export function Creatives() {
         <div className="flex items-center justify-between gap-6">
           <h2
             id="creatives-heading"
-            className="text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl"
+            className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-[36px]"
           >
             {CREATIVES.heading}
           </h2>
@@ -336,7 +336,7 @@ export function CaseStudies() {
       <div className={SHELL}>
         <h2
           id="cases-heading"
-          className="text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl"
+          className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-[36px]"
         >
           {CASE_STUDIES.heading}
         </h2>
@@ -409,7 +409,7 @@ export function CaseStudies() {
                   />
                 </div>
 
-                <h3 className="mt-4 text-[15px] font-medium leading-snug text-white">
+                <h3 className="mt-5 text-[22px] font-medium leading-[1.2] text-white">
                   {item.result}
                 </h3>
 
@@ -522,7 +522,7 @@ export function Testimonials() {
       <div className={SHELL}>
         <h2
           id="testimonials-heading"
-          className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl"
+          className="text-2xl font-semibold leading-tight tracking-tight sm:text-3xl lg:text-[36px]"
         >
           {TESTIMONIALS.heading}
         </h2>
@@ -605,7 +605,7 @@ export function FinalCta() {
         <div className="relative">
           <h2
             id="cta-heading"
-            className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl"
+            className="mx-auto max-w-2xl text-balance text-2xl font-semibold tracking-tight sm:text-[36px]"
           >
             {FINAL_CTA.heading}
           </h2>
@@ -617,7 +617,7 @@ export function FinalCta() {
                 sentence case, arrow disc — with the house hover inversion. */}
             <a
               href={BOOKING_URL}
-              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-6 pr-[6px] text-[16px] font-semibold text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
+              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-6 pr-[6px] text-[20px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
             >
               {FINAL_CTA.cta}
               <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors">
@@ -632,7 +632,7 @@ export function FinalCta() {
                 </svg>
               </span>
             </a>
-            <span className="inline-flex h-[45px] items-center rounded-full border border-white/15 bg-[#17151d]/80 px-6 text-[14px] font-medium text-white/75">
+            <span className="inline-flex h-[45px] items-center rounded-full border border-white/15 bg-[#17151d]/80 px-6 text-[20px] font-normal text-white/75">
               {FINAL_CTA.scarcity}
             </span>
           </div>
