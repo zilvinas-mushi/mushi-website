@@ -196,7 +196,7 @@ body {
    corners; a single vertical fade left hard edges at the sides. So: a vertical
    ramp intersected with a gentle horizontal feather. */
 .hero-grid {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='rgba(255,255,255,0.038)'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='rgba(255,255,255,0.05)'/></svg>");
   background-size: 215px 215px;
   background-position: center top;
 

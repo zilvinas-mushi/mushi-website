@@ -46,7 +46,7 @@ function ActionIcon({ name, w, h }: { name: string; w: number; h: number }) {
       height={h}
       loading="eager"
       decoding="async"
-      className="h-[25px] w-auto"
+      className="h-[28px] w-auto"
       aria-hidden="true"
     />
   );

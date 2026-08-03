@@ -150,12 +150,12 @@ export function Hero() {
           page; that one was ported here by mistake. The marketing design uses
           a different treatment.
         */}
-        <span className="relative mb-7 inline-flex items-center justify-center overflow-hidden rounded-[50px] px-6 py-2">
+        <span className="relative mb-7 inline-flex items-center justify-center rounded-[50px] px-6 py-2 shadow-[0_0_26px_8px_rgba(140,106,226,0.5)]">
           <span
             aria-hidden="true"
             className="absolute inset-0 rounded-[50px] bg-white/85 blur-[6px]"
           />
-          <span className="relative text-[13px] font-medium text-black md:text-[15px]">
+          <span className="relative text-[14px] font-medium text-black md:text-[16px]">
             {HERO.eyebrow}
           </span>
         </span>
@@ -168,7 +168,7 @@ export function Hero() {
           {HERO.heading}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-[620px] text-pretty text-base leading-relaxed text-white/75 sm:text-lg">
+        <p className="mx-auto mt-6 max-w-[620px] text-pretty text-base leading-relaxed text-white sm:text-lg">
           {HERO.sub}
         </p>
 
@@ -218,7 +218,7 @@ export function SocialProof() {
           <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/10" />
           <h2
             id="proof-heading"
-            className="whitespace-nowrap text-center text-[13px] text-white/70"
+            className="whitespace-nowrap text-center text-[15px] font-medium text-white"
           >
             <span aria-hidden="true" className="mr-2">
               ✦

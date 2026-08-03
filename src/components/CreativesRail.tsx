@@ -64,14 +64,29 @@ export function CreativesRail() {
   const nudge = (dir: 1 | -1) => {
     const el = railRef.current;
     if (!el) return;
-    // Pause the drift while the smooth scroll animates — a drift write in the
-    // same frame would cancel it — then resync and resume.
+    // Hand-eased animation instead of native smooth scrollBy: the browser's
+    // default is short and abrupt, and its duration is not tunable. 750ms of
+    // ease-in-out-cubic reads as glide rather than jump. Drift pauses for the
+    // duration so its per-frame writes cannot cancel the animation.
     pausedRef.current = true;
-    el.scrollBy({ left: dir * 320, behavior: "smooth" });
-    window.setTimeout(() => {
-      posRef.current = el.scrollLeft;
-      pausedRef.current = false;
-    }, 700);
+    const from = el.scrollLeft;
+    const max = el.scrollWidth - el.clientWidth;
+    const to = Math.max(0, Math.min(max, from + dir * 320));
+    const D = 750;
+    const t0 = performance.now();
+    const ease = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = (now: number) => {
+      const t = Math.min((now - t0) / D, 1);
+      el.scrollLeft = from + (to - from) * ease(t);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        posRef.current = el.scrollLeft;
+        pausedRef.current = false;
+      }
+    };
+    requestAnimationFrame(step);
   };
 
   const pause = (v: boolean) => {
@@ -107,14 +122,16 @@ export function CreativesRail() {
           />
         </div>
 
+        {/* Prev is the quiet one; next is highlighted — the design leads the
+            eye toward "forward". Both a step larger than before. */}
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => nudge(-1)}
             aria-label="Previous creatives"
-            className="flex size-10 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white hover:text-black"
+            className="flex size-12 items-center justify-center rounded-full bg-white/[0.08] text-white/60 transition-colors hover:bg-white hover:text-black"
           >
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" className="size-4 stroke-current" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-5 stroke-current" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -122,9 +139,9 @@ export function CreativesRail() {
             type="button"
             onClick={() => nudge(1)}
             aria-label="Next creatives"
-            className="flex size-10 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white hover:text-black"
+            className="flex size-12 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white hover:text-black"
           >
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" className="size-4 stroke-current" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-5 stroke-current" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>
