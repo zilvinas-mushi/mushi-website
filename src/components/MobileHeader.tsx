@@ -87,20 +87,17 @@ export function MobileHeader() {
             aria-label="Book a call"
             className="grid h-12 w-12 place-items-center rounded-[12px] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] transition hover:brightness-110"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              strokeWidth="1.9"
-              className="size-[26px] stroke-white"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/creatives/icons/phone.svg"
+              alt=""
+              width={23}
+              height={23}
+              loading="eager"
+              decoding="async"
+              className="size-[24px]"
               aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6.6 4h2.1c.5 0 .9.3 1 .8l.7 2.7c.1.4 0 .9-.4 1.1l-1.3 1a12.3 12.3 0 0 0 5.7 5.7l1-1.3c.2-.4.7-.5 1.1-.4l2.7.7c.5.1.8.5.8 1v2.1c0 .6-.5 1.1-1.1 1.1A16.4 16.4 0 0 1 5.5 5.1C5.5 4.5 6 4 6.6 4z"
-              />
-              <path strokeLinecap="round" d="M14.5 5.5a4.6 4.6 0 0 1 4 4M15 2.6a7.6 7.6 0 0 1 6.4 6.4" />
-            </svg>
+            />
           </a>
         </header>
 
