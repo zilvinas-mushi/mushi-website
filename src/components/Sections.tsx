@@ -362,9 +362,7 @@ export function CaseStudies() {
                     brand — over the card's own dark gradient. */}
                 <div
                   className="relative aspect-square overflow-hidden rounded-[18px]"
-                  style={{
-                    background: `radial-gradient(ellipse 100% 80% at 38% 10%, ${item.glow}59 0%, ${item.glow}1f 42%, transparent 68%), ${item.bg}`,
-                  }}
+                  style={{ background: item.bg }}
                 >
                   {/* Brand mark inside the artwork, top-left — the same logo
                       artwork as the brand strip, not a text stand-in.
@@ -389,6 +387,17 @@ export function CaseStudies() {
                     src={item.image}
                     alt={`${item.brand} campaign work by Mushi`}
                     className="size-full object-cover object-center"
+                  />
+                  {/* The exports are OPAQUE — Figma baked their dark
+                      backgrounds in — so the brand colour is screen-blended
+                      over the image: it lights the dark areas behind the
+                      device and leaves the bright screenshot faces alone. */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 mix-blend-screen"
+                    style={{
+                      background: `radial-gradient(ellipse 100% 82% at 38% 8%, ${item.glow}8c 0%, ${item.glow}33 46%, transparent 72%)`,
+                    }}
                   />
                 </div>
 
@@ -481,65 +490,76 @@ export function Testimonials() {
         </h2>
 
         {/*
-          Two columns of quote cards. Every quote stays in the DOM so crawlers
-          see all of them — the disclosure only reveals what is visually
-          clipped, it does not fetch anything.
+          Two columns of quote cards. The first three are ALWAYS visible, the
+          rest peek through a clipped, fading preview with the trust pill
+          floating over the fade — matching the design.
+
+          Structurally: the visible cards and the preview live OUTSIDE the
+          <details>. A closed <details> hides every child except its summary,
+          which is why a previous version showed zero testimonials until
+          clicked. The preview duplicates the hidden cards purely visually and
+          is aria-hidden; the full crawlable set lives inside the disclosure.
+          The `:has(details[open])` rule swaps preview for the real list.
         */}
-        <details className="group relative mt-12">
+        <div className="relative mt-12 [&:has(details[open])_.testi-preview]:hidden">
           <div className="columns-1 gap-6 md:columns-2">
             {shown.map((t) => (
               <TestimonialCard key={t.title} t={t} />
             ))}
           </div>
 
-          {/* Clipped tail: the remaining quotes are cropped to a sliver and
-              faded out, which is what the floating pill sits over. */}
-          <div className="relative max-h-[210px] overflow-hidden group-open:max-h-none">
+          <div
+            aria-hidden="true"
+            className="testi-preview relative max-h-[230px] overflow-hidden"
+          >
+            <div className="columns-1 gap-6 md:columns-2">
+              {hidden.map((t) => (
+                <TestimonialCard key={`p-${t.title}`} t={t} />
+              ))}
+            </div>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[230px] bg-gradient-to-b from-transparent to-[var(--bg)]" />
+          </div>
+
+          <details className="group">
+            <summary className="absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-4 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] group-open:static group-open:my-8 [&::-webkit-details-marker]:hidden">
+              <span aria-hidden="true" className="flex -space-x-3">
+                {TESTIMONIALS.items
+                  .filter((t) => t.avatar)
+                  .slice(0, 3)
+                  .map((t) => (
+                    <Img
+                      key={t.title}
+                      src={t.avatar as string}
+                      alt=""
+                      width={34}
+                      className="size-[34px] rounded-full object-cover ring-2 ring-[#1b1a1f]"
+                    />
+                  ))}
+              </span>
+
+              <span className="text-[15px] font-medium text-white">
+                {TESTIMONIALS.trustLine}
+              </span>
+
+              <span aria-hidden="true" className="h-5 w-px bg-white/15" />
+
+              <span className="flex items-center gap-2.5 text-[15px] font-medium text-white/85">
+                <span className="group-open:hidden">{TESTIMONIALS.moreLabel}</span>
+                <span className="hidden group-open:inline">View Less</span>
+                <span className="flex size-7 items-center justify-center rounded-full bg-white/10 text-[16px] leading-none">
+                  <span className="group-open:hidden">+</span>
+                  <span className="hidden leading-none group-open:inline">−</span>
+                </span>
+              </span>
+            </summary>
+
             <div className="columns-1 gap-6 md:columns-2">
               {hidden.map((t) => (
                 <TestimonialCard key={t.title} t={t} />
               ))}
             </div>
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-[210px] bg-gradient-to-b from-transparent to-[var(--bg)] group-open:hidden"
-            />
-          </div>
-
-          {/* Floating pill straddling the fade: avatar stack, trust line, and
-              the disclosure toggle. */}
-          <summary className="absolute inset-x-0 bottom-0 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-4 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] group-open:static group-open:mt-8 [&::-webkit-details-marker]:hidden">
-            <span aria-hidden="true" className="flex -space-x-3">
-              {TESTIMONIALS.items
-                .filter((t) => t.avatar)
-                .slice(0, 3)
-                .map((t) => (
-                  <Img
-                    key={t.title}
-                    src={t.avatar as string}
-                    alt=""
-                    width={34}
-                    className="size-[34px] rounded-full object-cover ring-2 ring-[#1b1a1f]"
-                  />
-                ))}
-            </span>
-
-            <span className="text-[15px] font-medium text-white">
-              {TESTIMONIALS.trustLine}
-            </span>
-
-            <span aria-hidden="true" className="h-5 w-px bg-white/15" />
-
-            <span className="flex items-center gap-2.5 text-[15px] font-medium text-white/85">
-              <span className="group-open:hidden">{TESTIMONIALS.moreLabel}</span>
-              <span className="hidden group-open:inline">View Less</span>
-              <span className="flex size-7 items-center justify-center rounded-full bg-white/10 text-[16px] leading-none">
-                <span className="group-open:hidden">+</span>
-                <span className="hidden leading-none group-open:inline">−</span>
-              </span>
-            </span>
-          </summary>
-        </details>
+          </details>
+        </div>
       </div>
     </section>
   );
