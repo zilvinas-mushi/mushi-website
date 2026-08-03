@@ -172,17 +172,11 @@ body {
   background-position: -6% -10%;
   background-size: 118% auto;
   mix-blend-mode: screen;
-  opacity: 0.85;
+  /* Quiet on every breakpoint — it screen-blends over a near-black field,
+     and anything past ~0.35 reads as a blurry lavender wash, not rays. */
+  opacity: 0.35;
   -webkit-mask-image: linear-gradient(168deg, #000 0%, #000 42%, transparent 78%);
   mask-image: linear-gradient(168deg, #000 0%, #000 42%, transparent 78%);
-}
-
-/* Desktop runs the ray fan quiet — it screen-blends over the near-black
-   field, and anything past ~0.35 reads as a lavender wash instead of rays. */
-@media (min-width: 768px) {
-  .hero-rays {
-    opacity: 0.35;
-  }
 }
 
 /* The hero grid is NOT hairlines. It is a field of filled, rounded tiles
@@ -233,80 +227,70 @@ body {
   mask-composite: intersect;
 }
 
-/* Phone treatment (below Tailwind's md, matching the components' md: splits):
-   the tiles lose their rounding — square cells, per the phone design pass —
-   and the light is dimmer, sourced from the top-left corner and the middle
-   of the hero rather than the broad desktop wash. */
+/* Phone hero: same darkened field and gradient-filled tiles as desktop —
+   the old phone-only treatment (radial light shining through a tile mask,
+   rays at full strength) read as a blurry lavender wash next to the design.
+   Only the geometry differs: ~90px pitch, square corners, per the phone
+   frame's grid. */
 @media (max-width: 767px) {
+  .hero-grid {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='84' height='84' fill='url(%23g)' fill-opacity='0.35'/></svg>");
+    background-size: 90px 90px;
+    /* Tile brightness follows the LIGHT, not the pattern: a third mask layer
+       lets the middle tiles (behind the hero copy) show at full strength and
+       dims the outer columns and corners toward black, per the phone frame —
+       a uniform fill read as a wall of equally-bright squares. */
+    -webkit-mask-image:
+      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
+      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
+      radial-gradient(ellipse 85% 52% at 50% 28%, #000 0%, rgba(0, 0, 0, 0.6) 45%, rgba(0, 0, 0, 0.2) 72%, rgba(0, 0, 0, 0.07) 100%);
+    -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
+    -webkit-mask-size: 100% 100%, 100% 100%, 100% 100%;
+    -webkit-mask-position: 0 0, 0 0, 0 0;
+    -webkit-mask-composite: source-in, source-in;
+    mask-image:
+      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
+      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
+      radial-gradient(ellipse 85% 52% at 50% 28%, #000 0%, rgba(0, 0, 0, 0.6) 45%, rgba(0, 0, 0, 0.2) 72%, rgba(0, 0, 0, 0.07) 100%);
+    mask-repeat: no-repeat, no-repeat, no-repeat;
+    mask-size: 100% 100%, 100% 100%, 100% 100%;
+    mask-position: 0 0, 0 0, 0 0;
+    mask-composite: intersect;
+  }
+
+  /* Phone hero-bg: the desktop sources at the same darkness, but NO vignette
+     and the ramp's last stop is the page colour exactly — the vignette pushed
+     the hero's bottom edge below var(--bg) and the hand-off to the next
+     section showed as a hard line (an earlier, reported bug on phones). */
   .hero-bg {
     background:
-      /* Top-left sun, stepped down from the desktop intensities. */
       radial-gradient(
         ellipse 62% 58% at 2% -10%,
-        rgba(214, 186, 255, 0.4) 0%,
-        rgba(166, 130, 246, 0.24) 24%,
-        rgba(120, 92, 196, 0.11) 48%,
+        rgba(214, 186, 255, 0.3) 0%,
+        rgba(166, 130, 246, 0.17) 24%,
+        rgba(120, 92, 196, 0.08) 48%,
         transparent 76%
       ),
-      /* Middle light behind the headline. */
       radial-gradient(
-        ellipse 62% 34% at 50% 36%,
-        rgba(160, 124, 248, 0.18) 0%,
-        rgba(130, 98, 212, 0.09) 48%,
+        ellipse 50% 32% at 50% 27%,
+        rgba(160, 124, 248, 0.1) 0%,
+        rgba(130, 98, 212, 0.05) 48%,
         transparent 76%
       ),
-      /* No vignette on phones: it dragged the hero's bottom edge below the
-         page colour, so the hand-off to the next section showed as a hard
-         black-to-#0a090f line. Without it the ramp ends at var(--bg) exactly
-         and the boundary is invisible. The ambient field and right-of-centre
-         bloom are also dropped — that is what darkens the phone hero. */
+      /* Darker ramp than desktop's: phones carry no vignette (see above), so
+         the base itself must sit near-black to match the phone frame. */
       linear-gradient(
         180deg,
-        #221845 0%,
-        #201643 12%,
-        #1c133a 24%,
-        #17102f 38%,
-        #120d24 52%,
-        #0e0b1a 66%,
-        #0b0913 80%,
+        #191234 0%,
+        #171031 12%,
+        #150e2c 24%,
+        #120c26 38%,
+        #0f0a1e 52%,
+        #0d0918 66%,
+        #0b0912 80%,
         #0a090f 92%,
         #0a090f 100%
       );
-  }
-
-  .hero-grid {
-    background:
-      radial-gradient(
-        ellipse 70% 45% at 0% 0%,
-        rgba(150, 114, 238, 0.15) 0%,
-        rgba(120, 92, 196, 0.07) 55%,
-        transparent 80%
-      ),
-      radial-gradient(
-        ellipse 65% 42% at 50% 46%,
-        rgba(146, 110, 232, 0.13) 0%,
-        rgba(120, 92, 196, 0.06) 55%,
-        transparent 82%
-      );
-    /* The phone frame's tile pitch is ~90px (about four columns across a
-       390 frame), not the desktop's fixed 215px texture — measured from the
-       phone design's grid. Same 93% tile / 7% gutter split, square corners. */
-    -webkit-mask-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><rect x='0' y='0' width='84' height='84' fill='%23fff'/></svg>"),
-      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
-      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
-    -webkit-mask-repeat: repeat, no-repeat, no-repeat;
-    -webkit-mask-size: 90px 90px, 100% 100%, 100% 100%;
-    -webkit-mask-position: center top, 0 0, 0 0;
-    -webkit-mask-composite: source-in, source-in;
-    mask-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><rect x='0' y='0' width='84' height='84' fill='%23fff'/></svg>"),
-      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
-      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
-    mask-repeat: repeat, no-repeat, no-repeat;
-    mask-size: 90px 90px, 100% 100%, 100% 100%;
-    mask-position: center top, 0 0, 0 0;
-    mask-composite: intersect;
   }
 }
 
