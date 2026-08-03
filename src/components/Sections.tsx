@@ -158,7 +158,7 @@ export function Hero() {
           silhouette entirely.
         */}
         <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-7 py-2.5 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)]">
-          <span className="text-[16px] font-medium text-black md:text-[20px]">
+          <span className="text-[14px] font-medium text-black md:text-[20px]">
             {HERO.eyebrow}
           </span>
         </span>
@@ -233,7 +233,7 @@ export function SocialProof() {
           />
           <h2
             id="proof-heading"
-            className="whitespace-nowrap text-center text-[15px] font-medium text-white"
+            className="whitespace-nowrap text-center text-[14px] font-normal text-white md:text-[15px] md:font-medium"
           >
             {SOCIAL_PROOF.headline}
           </h2>
@@ -380,9 +380,10 @@ export function CaseStudies() {
                   {/* Brand mark inside the artwork, top-left — the same logo
                       artwork as the brand strip, not a text stand-in.
                       we interiors has no supplied logo and stays text. */}
-                  {item.logo ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                  {/* Every case study now carries its real logotype, so the old
+                      text fallback became dead code the type checker rightly
+                      rejected. */}
+                  <img
                       src={`/logos/${item.logo}`}
                       alt={item.brand}
                       width={item.logoW}
@@ -391,17 +392,6 @@ export function CaseStudies() {
                       decoding="async"
                       className="absolute left-6 top-5 z-10 h-[24px] w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
                     />
-                  ) : (
-                    <span
-                      className={`absolute left-6 top-5 z-10 text-[19px] font-medium ${
-                        "darkLabel" in item && item.darkLabel
-                          ? "text-[#2b2620]"
-                          : "text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
-                      }`}
-                    >
-                      {item.brand}
-                    </span>
-                  )}
                   <Img
                     src={item.image}
                     alt={`${item.brand} campaign work by Mushi`}
@@ -422,7 +412,7 @@ export function CaseStudies() {
                   />
                 </div>
 
-                <h3 className="mt-5 text-[22px] font-medium leading-[1.2] text-white">
+                <h3 className="mt-4 text-[17px] font-medium leading-[1.25] text-white md:mt-5 md:text-[22px]">
                   {item.result}
                 </h3>
 
@@ -535,7 +525,7 @@ export function Testimonials() {
       <div className={SHELL}>
         <h2
           id="testimonials-heading"
-          className="text-2xl font-semibold leading-tight tracking-tight sm:text-3xl lg:text-[36px]"
+          className="text-[22px] font-semibold leading-tight tracking-tight sm:text-3xl lg:text-[36px]"
         >
           {TESTIMONIALS.heading}
         </h2>
@@ -618,11 +608,11 @@ export function FinalCta() {
         <div className="relative">
           <h2
             id="cta-heading"
-            className="mx-auto max-w-3xl text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-[55px] sm:leading-[55px]"
+            className="mx-auto max-w-3xl text-balance text-[22px] font-semibold leading-[1.2] tracking-tight sm:text-[55px] sm:leading-[55px]"
           >
             {FINAL_CTA.heading}
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-[18px] font-normal leading-relaxed text-white/50 sm:text-[24px] sm:leading-[30px]">
+          <p className="mx-auto mt-6 max-w-2xl text-pretty text-[14px] font-normal leading-[19px] text-white/50 sm:text-[24px] sm:leading-[30px]">
             {FINAL_CTA.sub}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
