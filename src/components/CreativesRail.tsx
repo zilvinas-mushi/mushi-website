@@ -39,7 +39,10 @@ export function CreativesRail() {
 
     let raf = 0;
     let last = performance.now();
-    const DRIFT = 24; // px/s
+    // 40px/s: lively but readable. 24 read as almost static once the arrows
+    // took over navigation; the old pure marquee ran ~58 and felt right, so
+    // this sits between them. One number to tune.
+    const DRIFT = 40; // px/s
 
     const tick = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.1);
