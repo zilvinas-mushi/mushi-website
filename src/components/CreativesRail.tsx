@@ -131,7 +131,7 @@ export function CreativesRail() {
             aria-label="Previous creatives"
             className="flex size-12 items-center justify-center rounded-full bg-white/[0.08] text-white/60 transition-colors hover:bg-white hover:text-black"
           >
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-5 stroke-current" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-6 stroke-current" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -141,7 +141,7 @@ export function CreativesRail() {
             aria-label="Next creatives"
             className="flex size-12 items-center justify-center rounded-full bg-white/25 text-white transition-colors hover:bg-white hover:text-black"
           >
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-5 stroke-current" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-6 stroke-current" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>

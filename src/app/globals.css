@@ -160,17 +160,18 @@ body {
   than paint grey, and the mask keeps them strongest near the source.
 */
 .hero-rays {
-  /* Five shafts, bright enough to read as sunrays rather than a faint sheen.
-     Widths and angles vary so the fan stays irregular. */
-  background-image:
-    linear-gradient(112deg, transparent 10%, rgba(222, 200, 255, 0.16) 16%, transparent 24%),
-    linear-gradient(106deg, transparent 20%, rgba(214, 190, 255, 0.12) 27%, transparent 36%),
-    linear-gradient(118deg, transparent 31%, rgba(206, 180, 255, 0.1) 37%, transparent 45%),
-    linear-gradient(102deg, transparent 42%, rgba(198, 170, 252, 0.075) 49%, transparent 58%),
-    linear-gradient(122deg, transparent 54%, rgba(190, 162, 250, 0.05) 60%, transparent 68%);
+  /* The design's own EFFECTS LAYER export — the purple ray fan — anchored to
+     the top-left source. Screen blending adds it as light over the gradient;
+     the drawn CSS shafts this replaces never matched the artwork's soft,
+     irregular falloff. Masked so it dies out before mid-page. */
+  background-image: url("/images/effects-layer.webp");
+  background-repeat: no-repeat;
+  background-position: -6% -10%;
+  background-size: 118% auto;
   mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 105% 95% at 6% -6%, #000 10%, rgba(0, 0, 0, 0.5) 52%, transparent 86%);
-  mask-image: radial-gradient(ellipse 105% 95% at 6% -6%, #000 10%, rgba(0, 0, 0, 0.5) 52%, transparent 86%);
+  opacity: 0.85;
+  -webkit-mask-image: linear-gradient(168deg, #000 0%, #000 42%, transparent 78%);
+  mask-image: linear-gradient(168deg, #000 0%, #000 42%, transparent 78%);
 }
 
 /* The hero grid is NOT hairlines. It is a field of filled, rounded tiles

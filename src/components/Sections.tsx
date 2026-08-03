@@ -222,7 +222,7 @@ export function SocialProof() {
         <div className="flex items-center justify-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/creatives/icons/divider.svg"
+            src="/creatives/icons/divider-left.svg"
             alt=""
             width={161}
             height={21}
@@ -354,18 +354,37 @@ export function CaseStudies() {
               // 2611/3508 — a 150px drop, not the ~88px guessed before.
               className={i % 2 === 1 ? "sm:mt-[150px]" : undefined}
             >
-              <article className="flex h-full flex-col">
+              <article className="relative flex h-full flex-col">
                 {/* 680x680 Mask group filling its column — a square, not a
-                    letterboxed crop. The mockup exports transparent, so the
-                    card's gradient sits behind it. */}
+                    letterboxed crop. The mockup exports transparent, and the
+                    coloured light lives INSIDE the card, washing the area
+                    behind the device — orange, purple, blue, yellow per
+                    brand — over the card's own dark gradient. */}
                 <div
                   className="relative aspect-square overflow-hidden rounded-[18px]"
-                  style={{ background: item.bg }}
+                  style={{
+                    background: `radial-gradient(ellipse 100% 80% at 38% 10%, ${item.glow}59 0%, ${item.glow}1f 42%, transparent 68%), ${item.bg}`,
+                  }}
                 >
-                  {/* Brand mark sits inside the artwork, top-left. */}
-                  <span className="absolute left-6 top-5 z-10 text-[19px] font-medium text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
-                    {item.brand}
-                  </span>
+                  {/* Brand mark inside the artwork, top-left — the same logo
+                      artwork as the brand strip, not a text stand-in.
+                      we interiors has no supplied logo and stays text. */}
+                  {item.logo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`/logos/${item.logo}`}
+                      alt={item.brand}
+                      width={item.logoW}
+                      height={25}
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute left-6 top-5 z-10 h-[24px] w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+                    />
+                  ) : (
+                    <span className="absolute left-6 top-5 z-10 text-[19px] font-medium text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+                      {item.brand}
+                    </span>
+                  )}
                   <Img
                     src={item.image}
                     alt={`${item.brand} campaign work by Mushi`}
