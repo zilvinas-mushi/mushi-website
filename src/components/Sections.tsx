@@ -539,11 +539,11 @@ export function Testimonials() {
           One continuous flow has no seam, and no duplicated cards either.
         */}
         <div className="relative mt-12 [&:has(details[open])_.testi-clip]:max-h-none [&:has(details[open])_.testi-fade]:hidden">
-          <div className="testi-clip relative max-h-[960px] overflow-hidden">
+          <div className="testi-clip relative max-h-[540px] overflow-hidden">
             <TestimonialColumns list={items} />
             <div
               aria-hidden="true"
-              className="testi-fade pointer-events-none absolute inset-x-0 bottom-0 h-[240px] bg-gradient-to-b from-transparent to-[var(--bg)]"
+              className="testi-fade pointer-events-none absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-b from-transparent to-[var(--bg)]"
             />
           </div>
 
