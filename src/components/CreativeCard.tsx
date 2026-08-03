@@ -87,7 +87,7 @@ export function CreativeCard({ item }: { item: Creative }) {
             alt=""
             width={32}
             height={32}
-            loading="lazy"
+            loading="eager"
             decoding="async"
             className="size-8 shrink-0 rounded-full object-cover"
           />
@@ -113,13 +113,20 @@ export function CreativeCard({ item }: { item: Creative }) {
         </div>
       </header>
 
+      {/*
+        Eager, not lazy — deliberately. These cards live in an auto-scrolling
+        marquee, so something is ALWAYS just entering the viewport; lazy
+        loading guarantees the visitor watches images pop in blank for the
+        whole first loop. Everything loads up front instead, and the neutral
+        backing only shows for the brief moment before that finishes.
+      */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`/images/${item.image}`}
         alt={`${item.caption} — ad creative for ${item.handle}`}
         width={item.w}
         height={item.h}
-        loading="lazy"
+        loading="eager"
         decoding="async"
         // Creatives are portrait ads; a 4:5 crop cut the tops and bottoms off.
         // 9:16 matches the source material, so the whole ad stays visible.
