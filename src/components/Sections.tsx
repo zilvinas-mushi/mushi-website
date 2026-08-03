@@ -1,6 +1,6 @@
 import { Img } from "./Img";
 import { TrustBadges } from "./TrustBadges";
-import { CreativeCard } from "./CreativeCard";
+import { CreativesRail } from "./CreativesRail";
 import {
   HERO,
   HERO_FLOATERS,
@@ -298,33 +298,11 @@ export function Creatives() {
           </a>
         </div>
 
-        {/*
-          Auto-scrolling marquee. The track carries the card list twice and
-          slides exactly one set width, so the wrap is seamless. Pure CSS — no
-          JS, no hydration — and it pauses on hover or keyboard focus so a
-          visitor can actually read a card. prefers-reduced-motion stops it and
-          turns the row back into a hand-scrollable rail.
-
-          The second copy is aria-hidden: it is the same content again, and a
-          screen reader announcing every creative twice would be noise.
-        */}
-        <div className="marquee -mx-5 mt-10 px-5">
-          <ul className="marquee-track gap-4 pb-4 sm:gap-5">
-            {CREATIVES.items.map((item) => (
-              <li key={`a-${item.handle}-${item.caption}`} className="flex">
-                <CreativeCard item={item} />
-              </li>
-            ))}
-            {CREATIVES.items.map((item) => (
-              <li
-                key={`b-${item.handle}-${item.caption}`}
-                className="flex"
-                aria-hidden="true"
-              >
-                <CreativeCard item={item} />
-              </li>
-            ))}
-          </ul>
+        {/* Finite carousel with auto-drift, a progress timeline and prev/next
+            controls — see CreativesRail. The design's progress line implies a
+            carousel, not the endless duplicated marquee that was here. */}
+        <div className="mt-10">
+          <CreativesRail />
         </div>
       </div>
     </section>

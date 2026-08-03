@@ -14,21 +14,17 @@ import type { Creative } from "@/lib/content";
 
 function Verified() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      className="size-[13px] shrink-0"
-      aria-label="Verified account"
-      role="img"
-    >
-      <path
-        fill="#0095F6"
-        d="M12 1.5l2.6 2.1 3.3-.3.9 3.2 2.9 1.7-1.3 3.1 1.3 3.1-2.9 1.7-.9 3.2-3.3-.3L12 22.5l-2.6-2.1-3.3.3-.9-3.2-2.9-1.7 1.3-3.1-1.3-3.1 2.9-1.7.9-3.2 3.3.3L12 1.5z"
-      />
-      <path
-        fill="#fff"
-        d="M10.8 15.3l-3-3 1.1-1.1 1.9 1.9 4.3-4.3 1.1 1.1-5.4 5.4z"
-      />
-    </svg>
+    // The design's own badge artwork, not a redrawn tick.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/creatives/icons/verified.svg"
+      alt="Verified account"
+      width={21}
+      height={21}
+      loading="eager"
+      decoding="async"
+      className="size-[15px] shrink-0"
+    />
   );
 }
 
@@ -50,7 +46,7 @@ function ActionIcon({ name, w, h }: { name: string; w: number; h: number }) {
       height={h}
       loading="eager"
       decoding="async"
-      className="h-[21px] w-auto"
+      className="h-[25px] w-auto"
       aria-hidden="true"
     />
   );
