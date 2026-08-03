@@ -210,6 +210,7 @@ export const CREATIVES = {
       image: "bluechew.webp",
       w: 1320,
       h: 2340,
+      avatar: "bluechew-logo.svg",
       verified: true,
     },
     {
