@@ -379,7 +379,13 @@ export function CaseStudies() {
                       className="absolute left-6 top-5 z-10 h-[24px] w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
                     />
                   ) : (
-                    <span className="absolute left-6 top-5 z-10 text-[19px] font-medium text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+                    <span
+                      className={`absolute left-6 top-5 z-10 text-[19px] font-medium ${
+                        "darkLabel" in item && item.darkLabel
+                          ? "text-[#2b2620]"
+                          : "text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+                      }`}
+                    >
                       {item.brand}
                     </span>
                   )}
