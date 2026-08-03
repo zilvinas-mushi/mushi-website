@@ -19,12 +19,12 @@ import { BOOKING_URL, SITE_NAME } from "@/lib/site";
  */
 function MenuIcon({ open }: { open: boolean }) {
   const bar =
-    "block h-[2.5px] w-6 rounded-full bg-white transition-all duration-200";
+    "block h-[3px] w-[30px] rounded-full bg-white transition-all duration-200";
   return (
-    <span aria-hidden="true" className="flex flex-col items-center gap-[5px]">
-      <span className={`${bar} ${open ? "translate-y-[7.5px] opacity-0" : ""}`} />
+    <span aria-hidden="true" className="flex flex-col items-start gap-[7px]">
+      <span className={`${bar} ${open ? "translate-y-[10px] opacity-0" : ""}`} />
       <span className={bar} />
-      <span className={`${bar} ${open ? "-translate-y-[7.5px] opacity-0" : ""}`} />
+      <span className={`${bar} ${open ? "-translate-y-[10px] opacity-0" : ""}`} />
     </span>
   );
 }
@@ -61,14 +61,14 @@ export function MobileHeader() {
       {/* relative: the drawer is absolutely positioned against this box so it
           overlays the page instead of taking up layout space. */}
       <div className="relative">
-        <header className="grid grid-cols-[auto_1fr_auto] items-center gap-3 overflow-hidden rounded-2xl bg-[#181818] px-3 py-2.5">
+        <header className="grid grid-cols-[auto_1fr_auto] items-center gap-3 overflow-hidden rounded-2xl bg-[#181818] px-4 py-3">
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
-            className="grid h-11 w-11 place-items-center rounded-xl transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="grid h-12 w-12 place-items-center rounded-xl transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             <MenuIcon open={open} />
           </button>
@@ -85,13 +85,13 @@ export function MobileHeader() {
           <a
             href={BOOKING_URL}
             aria-label="Book a call"
-            className="grid h-11 w-11 place-items-center rounded-xl bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] transition hover:brightness-110"
+            className="grid h-12 w-12 place-items-center rounded-[12px] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] transition hover:brightness-110"
           >
             <svg
               viewBox="0 0 24 24"
               fill="none"
               strokeWidth="1.9"
-              className="size-[22px] stroke-white"
+              className="size-[26px] stroke-white"
               aria-hidden="true"
             >
               <path
