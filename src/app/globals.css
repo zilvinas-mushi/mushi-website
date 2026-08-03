@@ -244,7 +244,7 @@ body {
    frame's grid. */
 @media (max-width: 767px) {
   .hero-grid {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='84' height='84' fill='url(%23g)' fill-opacity='0.35'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='84' height='84' fill='url(%23g)' fill-opacity='0.3'/></svg>");
     background-size: 90px 90px;
     /* Tile brightness follows the LIGHT, not the pattern: a third mask layer
        lets the middle tiles (behind the hero copy) show at full strength and
@@ -253,7 +253,7 @@ body {
     -webkit-mask-image:
       linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
       linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-      radial-gradient(ellipse 85% 52% at 50% 28%, #000 0%, rgba(0, 0, 0, 0.6) 45%, rgba(0, 0, 0, 0.2) 72%, rgba(0, 0, 0, 0.07) 100%);
+      radial-gradient(ellipse 72% 40% at 50% 30%, #000 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.03) 100%);
     -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
     -webkit-mask-size: 100% 100%, 100% 100%, 100% 100%;
     -webkit-mask-position: 0 0, 0 0, 0 0;
@@ -261,7 +261,7 @@ body {
     mask-image:
       linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
       linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-      radial-gradient(ellipse 85% 52% at 50% 28%, #000 0%, rgba(0, 0, 0, 0.6) 45%, rgba(0, 0, 0, 0.2) 72%, rgba(0, 0, 0, 0.07) 100%);
+      radial-gradient(ellipse 72% 40% at 50% 30%, #000 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.03) 100%);
     mask-repeat: no-repeat, no-repeat, no-repeat;
     mask-size: 100% 100%, 100% 100%, 100% 100%;
     mask-position: 0 0, 0 0, 0 0;
