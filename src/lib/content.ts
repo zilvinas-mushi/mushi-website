@@ -163,7 +163,7 @@ export const CREATIVES = {
       image: "image143.webp",
       w: 538,
       h: 952,
-      avatar: "avatar-1.svg",
+      avatar: "sintra-logo.svg",
       verified: true,
     },
     {
@@ -172,7 +172,7 @@ export const CREATIVES = {
       image: "image139.webp",
       w: 631,
       h: 1125,
-      avatar: "avatar-2.svg",
+      avatar: "celemi-logo.svg",
     },
     {
       handle: "tryholo.ai",
@@ -180,7 +180,7 @@ export const CREATIVES = {
       image: "image140.webp",
       w: 444,
       h: 792,
-      avatar: "avatar-3.svg",
+      avatar: "tryholo-logo.svg",
       verified: true,
     },
     {
@@ -189,7 +189,7 @@ export const CREATIVES = {
       image: "image141.webp",
       w: 633,
       h: 1127,
-      avatar: "avatar-4.svg",
+      avatar: "tevaplanter-logo.svg",
     },
 
     // Exported from Figma at 1320x2340 and converted to WebP (12.9MB -> 0.52MB).
@@ -201,15 +201,16 @@ export const CREATIVES = {
       image: "sintra-soshie.webp",
       w: 1320,
       h: 2340,
-      avatar: "avatar-1.svg",
+      avatar: "sintra-logo.svg",
       verified: true,
     },
     {
       handle: "bluechew",
-      caption: "Benefit Breakdown Static Ad",
+      caption: "Tablet Benefit Static Ad",
       image: "bluechew.webp",
       w: 1320,
       h: 2340,
+      verified: true,
     },
     {
       handle: "unive",
@@ -217,6 +218,8 @@ export const CREATIVES = {
       image: "unive-dream-college.webp",
       w: 1320,
       h: 2340,
+      avatar: "unive-logo.svg",
+      verified: true,
     },
     {
       handle: "celemi",
@@ -224,24 +227,25 @@ export const CREATIVES = {
       image: "celemi-serum.webp",
       w: 1320,
       h: 2340,
-      avatar: "avatar-2.svg",
+      avatar: "celemi-logo.svg",
     },
-    // TODO(handles): these two ads carry no visible brand mark. Confirm the
-    // account each ran under before publishing — do not guess a client name.
+    // Owners confirmed against the design's own card headers.
     {
-      handle: "mushi.agency",
-      caption: "Review Wall UGC Video Ad",
+      handle: "SuperiorCarePet",
+      caption: "Dog Food Voiceover Video Ad",
       image: "dogfood-real-results.webp",
       w: 1320,
       h: 2340,
+      avatar: "superiorcarepet-logo.svg",
       verified: true,
     },
     {
-      handle: "mushi.agency",
-      caption: "Social Proof Collage Video Ad",
+      handle: "PersyBooths",
+      caption: "Booth Storytelling Video Ad",
       image: "used-by-10000.webp",
       w: 1320,
       h: 2340,
+      avatar: "persybooths-logo.svg",
       verified: true,
     },
   ] satisfies Creative[],

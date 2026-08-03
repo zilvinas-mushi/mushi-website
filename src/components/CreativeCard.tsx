@@ -32,48 +32,46 @@ function Verified() {
   );
 }
 
-/** Stroke icons matching Instagram's action row. */
-const ICON = "size-[22px] stroke-black";
+/**
+ * Action-row icons. One shared 24x24 viewBox and stroke weight so the four
+ * render as a set — the previous hand-written paths had lumpy curves and a
+ * crooked send plane, which read as stretched pictures rather than icons.
+ * These are proven Feather-geometry outlines, the same visual family as the
+ * icon set used across the mushi-app desktop UI.
+ */
+function Icon({ d, extra }: { d: string; extra?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth="1.8"
+      className="size-[22px] stroke-black"
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+      {extra && <path strokeLinecap="round" strokeLinejoin="round" d={extra} />}
+    </svg>
+  );
+}
 
 function Heart() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.7" className={ICON} aria-hidden="true">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 20.3l-1.4-1.3C5.6 14.5 2.5 11.7 2.5 8.2 2.5 5.4 4.7 3.2 7.5 3.2c1.6 0 3.1.7 4.1 1.9l.4.5.4-.5c1-1.2 2.5-1.9 4.1-1.9 2.8 0 5 2.2 5 5 0 3.5-3.1 6.3-8.1 10.8L12 20.3z"
-      />
-    </svg>
+    <Icon d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   );
 }
 
 function Comment() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.7" className={ICON} aria-hidden="true">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M21 11.5c0 4.1-3.9 7.5-8.7 7.5-1.1 0-2.2-.2-3.2-.5L3.5 20.5l1.6-4.1C4 15 3.3 13.3 3.3 11.5 3.3 7.4 7.2 4 12 4s9 3.4 9 7.5z"
-      />
-    </svg>
+    <Icon d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
   );
 }
 
 function Share() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.7" className={ICON} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21.5 3.5L2.8 9.9l6.6 2.6 2.6 6.6 9.5-15.6z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21.5 3.5L9.4 12.5" />
-    </svg>
-  );
+  return <Icon d="M22 2L11 13" extra="M22 2l-7 20-4-9-9-4 22-7z" />;
 }
 
 function Bookmark() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.7" className={ICON} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 21l-7-5-7 5V4.5A1.5 1.5 0 016.5 3h11A1.5 1.5 0 0119 4.5V21z" />
-    </svg>
-  );
+  return <Icon d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />;
 }
 
 export function CreativeCard({ item }: { item: Creative }) {
