@@ -5,14 +5,14 @@ import { CREATIVES } from "@/lib/content";
 import { CreativeCard } from "./CreativeCard";
 
 /**
- * The creatives rail: a finite, hand-scrollable strip with a slow auto-drift,
- * a progress line and prev/next controls — the design shows a timeline with
- * arrow buttons under the cards, which implies a carousel, not an endless
- * marquee.
+ * The creatives rail: an endless carousel. The card list renders twice and
+ * every navigation mode — the slow auto-drift, the arrow buttons, and manual
+ * scrolling — wraps by teleporting exactly one set-width while the content on
+ * screen is pixel-identical, so the loop point is invisible and the rail
+ * never ends in either direction.
  *
- * Client component, but it degrades: with JavaScript unavailable the list is
- * still a native overflow-x scroller with momentum, just without the drift or
- * the controls doing anything. No server involvement anywhere.
+ * Client component, but it degrades: without JavaScript the list is still a
+ * native overflow-x scroller, just finite. No server involvement anywhere.
  *
  * Auto-drift pauses while the visitor hovers, focuses into, or touches the
  * rail, and never runs at all under prefers-reduced-motion.
@@ -20,11 +20,17 @@ import { CreativeCard } from "./CreativeCard";
 export function CreativesRail() {
   const railRef = useRef<HTMLUListElement>(null);
   const pausedRef = useRef(false);
-  // Float accumulator for the drift. scrollLeft rounds to whole pixels, so at
-  // 24px/s the per-frame step (~0.4px) would round back to zero forever —
-  // the position has to accumulate here and only then be written out.
+  const animRef = useRef(false);
+  // Float accumulator: at 24px/s the per-frame step (~0.4px) rounds back to
+  // zero forever if written straight into integer scrollLeft.
   const posRef = useRef(0);
   const [progress, setProgress] = useState(0);
+
+  /** Width of ONE card set = half the duplicated track. */
+  const setWidth = () => {
+    const el = railRef.current;
+    return el ? el.scrollWidth / 2 : 0;
+  };
 
   useEffect(() => {
     const el = railRef.current;
@@ -33,19 +39,18 @@ export function CreativesRail() {
 
     let raf = 0;
     let last = performance.now();
-    const DRIFT = 24; // px/s — a slow creep; the arrows do the real driving
+    const DRIFT = 24; // px/s
 
     const tick = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.1);
       last = now;
-      if (pausedRef.current) {
-        // While the visitor drives (hover, touch, buttons), track their
-        // position instead of fighting it.
+      if (pausedRef.current || animRef.current) {
         posRef.current = el.scrollLeft;
       } else {
-        const max = el.scrollWidth - el.clientWidth;
-        posRef.current =
-          posRef.current >= max - 1 ? 0 : posRef.current + DRIFT * dt;
+        const setW = setWidth();
+        posRef.current += DRIFT * dt;
+        // Seam: one full set scrolled past — snap back by exactly a set.
+        if (setW > 0 && posRef.current >= setW) posRef.current -= setW;
         el.scrollLeft = posRef.current;
       }
       raf = requestAnimationFrame(tick);
@@ -57,33 +62,45 @@ export function CreativesRail() {
   const onScroll = () => {
     const el = railRef.current;
     if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    setProgress(max > 0 ? el.scrollLeft / max : 0);
+    const setW = setWidth();
+    // Manual scrolling wraps too — but never mid arrow-animation.
+    if (!animRef.current && setW > 0) {
+      if (el.scrollLeft >= setW) el.scrollLeft -= setW;
+    }
+    setProgress(setW > 0 ? (el.scrollLeft % setW) / setW : 0);
   };
 
   const nudge = (dir: 1 | -1) => {
     const el = railRef.current;
-    if (!el) return;
-    // Hand-eased animation instead of native smooth scrollBy: the browser's
-    // default is short and abrupt, and its duration is not tunable. 750ms of
-    // ease-in-out-cubic reads as glide rather than jump. Drift pauses for the
-    // duration so its per-frame writes cannot cancel the animation.
-    pausedRef.current = true;
-    const from = el.scrollLeft;
-    const max = el.scrollWidth - el.clientWidth;
-    const to = Math.max(0, Math.min(max, from + dir * 320));
+    if (el === null || animRef.current) return;
+    const STEP = 320;
+    const setW = setWidth();
+    let from = el.scrollLeft;
+    // Teleport by one identical set first when the step would leave the
+    // buffer — the jump lands on the same pixels, so it cannot be seen.
+    if (dir < 0 && from < STEP) {
+      from += setW;
+      el.scrollLeft = from;
+    } else if (dir > 0 && from > setW) {
+      from -= setW;
+      el.scrollLeft = from;
+    }
+    const to = from + dir * STEP;
     const D = 750;
     const t0 = performance.now();
     const ease = (t: number) =>
       t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    animRef.current = true;
     const step = (now: number) => {
       const t = Math.min((now - t0) / D, 1);
       el.scrollLeft = from + (to - from) * ease(t);
       if (t < 1) {
         requestAnimationFrame(step);
       } else {
+        const w = setWidth();
+        if (w > 0 && el.scrollLeft >= w) el.scrollLeft -= w;
         posRef.current = el.scrollLeft;
-        pausedRef.current = false;
+        animRef.current = false;
       }
     };
     requestAnimationFrame(step);
@@ -107,23 +124,34 @@ export function CreativesRail() {
         className="scroll-row -mx-5 flex gap-4 overflow-x-auto px-5 pb-4 sm:gap-5"
       >
         {CREATIVES.items.map((item) => (
-          <li key={`${item.handle}-${item.caption}`} className="flex">
+          <li key={`a-${item.handle}-${item.caption}`} className="flex">
+            <CreativeCard item={item} />
+          </li>
+        ))}
+        {/* Second copy makes the wrap seamless; hidden from screen readers so
+            each creative is announced once. */}
+        {CREATIVES.items.map((item) => (
+          <li
+            key={`b-${item.handle}-${item.caption}`}
+            className="flex"
+            aria-hidden="true"
+          >
             <CreativeCard item={item} />
           </li>
         ))}
       </ul>
 
-      {/* Timeline row: progress line left, prev/next discs right. */}
+      {/* Timeline row: loop progress left, prev/next discs right. */}
       <div className="mt-6 flex items-center gap-8">
         <div className="h-[2px] flex-1 overflow-hidden rounded-full bg-white/12">
           <div
             className="h-full rounded-full bg-white transition-[width] duration-150 ease-linear"
-            style={{ width: `${Math.max(4, progress * 100)}%` }}
+            style={{ width: `${Math.max(3, progress * 100)}%` }}
           />
         </div>
 
         {/* Prev is the quiet one; next is highlighted — the design leads the
-            eye toward "forward". Both a step larger than before. */}
+            eye toward "forward". */}
         <div className="flex items-center gap-3">
           <button
             type="button"

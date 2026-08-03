@@ -253,28 +253,41 @@ export function SocialProof() {
         {/* Official client logotypes from /public/logos. Each keeps its own
             viewBox width so relative sizing matches the design; only
             "we interiors" has no supplied SVG and falls back to text. */}
-        <ul className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-x-12 gap-y-7">
-          {SOCIAL_PROOF.brands.map((brand) => (
-            <li key={brand.name} className="flex items-center">
-              {brand.logo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={`/logos/${brand.logo}`}
-                  alt={brand.name}
-                  width={brand.w}
-                  height={brand.h}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-[25px] w-auto opacity-90 transition-opacity hover:opacity-100"
-                />
-              ) : (
-                <span className="text-[22px] font-medium tracking-tight text-white/90">
-                  {brand.name}
-                </span>
-              )}
-            </li>
+        <div className="mx-auto mt-10 max-w-3xl space-y-6">
+          {/*
+            The design stacks the brands as a centred pyramid — four, three,
+            two, one — not a width-driven wrap, which broke rows in different
+            places at every viewport. The order in content.ts already matches
+            the design's reading order.
+          */}
+          {[[0, 4], [4, 7], [7, 9], [9, 10]].map(([from, to]) => (
+            <ul
+              key={from}
+              className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6"
+            >
+              {SOCIAL_PROOF.brands.slice(from, to).map((brand) => (
+                <li key={brand.name} className="flex items-center">
+                  {brand.logo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`/logos/${brand.logo}`}
+                      alt={brand.name}
+                      width={brand.w}
+                      height={brand.h}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-[26px] w-auto opacity-95"
+                    />
+                  ) : (
+                    <span className="text-[22px] font-medium tracking-tight text-white/90">
+                      {brand.name}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );
@@ -548,7 +561,7 @@ export function Testimonials() {
           </div>
 
           <details className="group">
-            <summary className="absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-4 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] group-open:static group-open:mt-8 [&::-webkit-details-marker]:hidden">
+            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-4 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] transition-colors duration-150 hover:bg-white group-open:static group-open:mt-8 [&::-webkit-details-marker]:hidden">
               <span aria-hidden="true" className="flex -space-x-3">
                 {items
                   .filter((t) => t.avatar)
@@ -564,16 +577,16 @@ export function Testimonials() {
                   ))}
               </span>
 
-              <span className="text-[15px] font-medium text-white">
+              <span className="text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
                 {TESTIMONIALS.trustLine}
               </span>
 
-              <span aria-hidden="true" className="h-5 w-px bg-white/15" />
+              <span aria-hidden="true" className="h-5 w-px bg-white/15 transition-colors group-hover/pill:bg-black/20" />
 
-              <span className="flex items-center gap-2.5 text-[15px] font-medium text-white/85">
+              <span className="flex items-center gap-2.5 text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
                 <span className="group-open:hidden">{TESTIMONIALS.moreLabel}</span>
                 <span className="hidden group-open:inline">View Less</span>
-                <span className="flex size-7 items-center justify-center rounded-full bg-white/10 text-[16px] leading-none">
+                <span className="flex size-7 items-center justify-center rounded-full bg-white text-[16px] leading-none text-black transition-colors group-hover/pill:bg-black group-hover/pill:text-white">
                   <span className="group-open:hidden">+</span>
                   <span className="hidden leading-none group-open:inline">−</span>
                 </span>
@@ -605,11 +618,11 @@ export function FinalCta() {
         <div className="relative">
           <h2
             id="cta-heading"
-            className="mx-auto max-w-2xl text-balance text-2xl font-semibold tracking-tight sm:text-[36px]"
+            className="mx-auto max-w-3xl text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-[55px] sm:leading-[55px]"
           >
             {FINAL_CTA.heading}
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-pretty text-sm text-white/70">
+          <p className="mx-auto mt-6 max-w-2xl text-pretty text-[18px] font-normal leading-relaxed text-white/50 sm:text-[24px] sm:leading-[30px]">
             {FINAL_CTA.sub}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

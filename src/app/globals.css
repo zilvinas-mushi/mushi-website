@@ -206,15 +206,15 @@ body {
      Three mask layers, intersected: the repeating tile shapes, the vertical
      ramp down the page, and the horizontal edge feather. */
   background: radial-gradient(
-    ellipse 66% 54% at 50% 48%,
-    rgba(172, 136, 255, 0.27) 0%,
+    ellipse 70% 56% at 50% 64%,
+    rgba(172, 136, 255, 0.2) 0%,
     rgba(146, 110, 232, 0.22) 38%,
     rgba(120, 92, 196, 0.1) 62%,
     rgba(255, 255, 255, 0.04) 88%
   );
   -webkit-mask-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='%23fff'/></svg>"),
-    linear-gradient(to bottom, #000 0%, #000 48%, rgba(0, 0, 0, 0.35) 78%, transparent 100%),
+    linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
     linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
   -webkit-mask-repeat: repeat, no-repeat, no-repeat;
   -webkit-mask-size: 215px 215px, 100% 100%, 100% 100%;
@@ -222,7 +222,7 @@ body {
   -webkit-mask-composite: source-in, source-in;
   mask-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='%23fff'/></svg>"),
-    linear-gradient(to bottom, #000 0%, #000 48%, rgba(0, 0, 0, 0.35) 78%, transparent 100%),
+    linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
     linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
   mask-repeat: repeat, no-repeat, no-repeat;
   mask-size: 215px 215px, 100% 100%, 100% 100%;
