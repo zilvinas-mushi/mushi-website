@@ -90,6 +90,16 @@ body {
      top-left source and behind the headline. Resist brightening these:
      every stacked layer (wash + tiles + rays) compounds. */
   background:
+    /* 0. Settle layer, painted over everything: the vignette below darkens
+       the hero's bottom edge past the page colour, so the hand-off to the
+       flat section underneath showed as a hard line. The last stops here
+       bring the edge back to var(--bg) exactly, making it invisible. */
+    linear-gradient(
+      180deg,
+      rgba(10, 9, 15, 0) 88%,
+      rgba(10, 9, 15, 0.85) 97%,
+      #0a090f 100%
+    ),
     /* 1. The sun: a violet source just outside the top-left corner. */
     radial-gradient(
       ellipse 62% 58% at 2% -10%,
