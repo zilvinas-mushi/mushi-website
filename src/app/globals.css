@@ -84,45 +84,48 @@ body {
   panels from behind.
 */
 .hero-bg {
+  /* Matched against the Figma frame, not tuned by feel: the field is
+     near-black — the tiles' own 35% fill supplies most of the visible
+     purple — and the washes only breathe a little light around the
+     top-left source and behind the headline. Resist brightening these:
+     every stacked layer (wash + tiles + rays) compounds. */
   background:
-    /* 1. The sun: a bright violet source just outside the top-left corner. */
+    /* 1. The sun: a violet source just outside the top-left corner. */
     radial-gradient(
       ellipse 62% 58% at 2% -10%,
-      rgba(214, 186, 255, 0.7) 0%,
-      rgba(166, 130, 246, 0.42) 24%,
-      rgba(120, 92, 196, 0.2) 48%,
+      rgba(214, 186, 255, 0.3) 0%,
+      rgba(166, 130, 246, 0.17) 24%,
+      rgba(120, 92, 196, 0.08) 48%,
       transparent 76%
     ),
     /* 2. Headline light: a distinct source sitting right behind
           "Your Path to $100M." so the title reads as standing in a beam. */
     radial-gradient(
       ellipse 50% 32% at 50% 27%,
-      rgba(160, 124, 248, 0.28) 0%,
-      rgba(130, 98, 212, 0.14) 48%,
+      rgba(160, 124, 248, 0.1) 0%,
+      rgba(130, 98, 212, 0.05) 48%,
       transparent 76%
     ),
-    /* 3. Broad violet field across the whole upper half. The reference stays
-          saturated well past the middle rather than dropping to black early. */
+    /* 3. Broad violet field across the upper half — barely there. */
     radial-gradient(
       ellipse 96% 72% at 40% 0%,
-      rgba(140, 108, 220, 0.38) 0%,
-      rgba(114, 86, 184, 0.2) 40%,
-      rgba(92, 70, 150, 0.07) 64%,
+      rgba(140, 108, 220, 0.09) 0%,
+      rgba(114, 86, 184, 0.045) 40%,
+      rgba(92, 70, 150, 0.015) 64%,
       transparent 84%
     ),
     /* 3. Secondary bloom right of centre so fall-off is not linear. */
     radial-gradient(
       ellipse 56% 46% at 76% 10%,
-      rgba(138, 106, 214, 0.2) 0%,
+      rgba(138, 106, 214, 0.05) 0%,
       transparent 66%
     ),
-    /* 4. Vignette, kept light — it should darken the outer edges without
-          draining the middle. */
+    /* 4. Vignette, deepened: the design's corners and edges sit on black. */
     radial-gradient(
       ellipse 96% 90% at 42% 18%,
-      transparent 56%,
-      rgba(0, 0, 0, 0.34) 88%,
-      rgba(0, 0, 0, 0.62) 100%
+      transparent 50%,
+      rgba(0, 0, 0, 0.45) 85%,
+      rgba(0, 0, 0, 0.7) 100%
     ),
     /*
       5. Base ramp. Many closely-spaced stops rather than three, so the violet
@@ -174,6 +177,14 @@ body {
   mask-image: linear-gradient(168deg, #000 0%, #000 42%, transparent 78%);
 }
 
+/* Desktop runs the ray fan quiet — it screen-blends over the near-black
+   field, and anything past ~0.35 reads as a lavender wash instead of rays. */
+@media (min-width: 768px) {
+  .hero-rays {
+    opacity: 0.35;
+  }
+}
+
 /* The hero grid is NOT hairlines. It is a field of filled, rounded tiles
    separated by gutters, each only a touch lighter than the background — which
    is why every line-based version read wrong.
@@ -197,37 +208,106 @@ body {
    corners; a single vertical fade left hard edges at the sides. So: a vertical
    ramp intersected with a gentle horizontal feather. */
 .hero-grid {
-  /* The tiles ARE the light. The tile pattern is a MASK, and a purple field
-     shines through it — brightest in the middle where the headline sits,
-     fading to a faint neutral at the edges. Painting the tiles as a uniform
-     white overlay could never do this: the vignette dimmed the centre
-     exactly where the design lights up.
-
-     Three mask layers, intersected: the repeating tile shapes, the vertical
-     ramp down the page, and the horizontal edge feather. */
-  background: radial-gradient(
-    ellipse 70% 56% at 50% 64%,
-    rgba(172, 136, 255, 0.2) 0%,
-    rgba(146, 110, 232, 0.22) 38%,
-    rgba(120, 92, 196, 0.1) 62%,
-    rgba(255, 255, 255, 0.04) 88%
-  );
+  /* Each tile carries the design's own fill — Figma "Rectangle": 200x200,
+     radius 15, a diagonal A08ADE -> 7C54B5 (40%) -> 6E54B5 linear gradient
+     at 35% layer opacity — drawn straight into the repeating SVG rather than
+     shining a light field through a mask. The masks that remain are only the
+     fades: the vertical ramp down the page and the horizontal edge feather.
+     (The design's second fill on that node, 583378 at 50%, is toggled off
+     in Figma and stays off here.) */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='200' height='200' rx='15' fill='url(%23g)' fill-opacity='0.35'/></svg>");
+  background-repeat: repeat;
+  background-size: 215px 215px;
+  background-position: center top;
   -webkit-mask-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='%23fff'/></svg>"),
     linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
     linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
-  -webkit-mask-repeat: repeat, no-repeat, no-repeat;
-  -webkit-mask-size: 215px 215px, 100% 100%, 100% 100%;
-  -webkit-mask-position: center top, 0 0, 0 0;
-  -webkit-mask-composite: source-in, source-in;
+  -webkit-mask-repeat: no-repeat, no-repeat;
+  -webkit-mask-size: 100% 100%, 100% 100%;
+  -webkit-mask-composite: source-in;
   mask-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='%23fff'/></svg>"),
     linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
     linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
-  mask-repeat: repeat, no-repeat, no-repeat;
-  mask-size: 215px 215px, 100% 100%, 100% 100%;
-  mask-position: center top, 0 0, 0 0;
+  mask-repeat: no-repeat, no-repeat;
+  mask-size: 100% 100%, 100% 100%;
   mask-composite: intersect;
+}
+
+/* Phone treatment (below Tailwind's md, matching the components' md: splits):
+   the tiles lose their rounding — square cells, per the phone design pass —
+   and the light is dimmer, sourced from the top-left corner and the middle
+   of the hero rather than the broad desktop wash. */
+@media (max-width: 767px) {
+  .hero-bg {
+    background:
+      /* Top-left sun, stepped down from the desktop intensities. */
+      radial-gradient(
+        ellipse 62% 58% at 2% -10%,
+        rgba(214, 186, 255, 0.4) 0%,
+        rgba(166, 130, 246, 0.24) 24%,
+        rgba(120, 92, 196, 0.11) 48%,
+        transparent 76%
+      ),
+      /* Middle light behind the headline. */
+      radial-gradient(
+        ellipse 62% 34% at 50% 36%,
+        rgba(160, 124, 248, 0.18) 0%,
+        rgba(130, 98, 212, 0.09) 48%,
+        transparent 76%
+      ),
+      /* No vignette on phones: it dragged the hero's bottom edge below the
+         page colour, so the hand-off to the next section showed as a hard
+         black-to-#0a090f line. Without it the ramp ends at var(--bg) exactly
+         and the boundary is invisible. The ambient field and right-of-centre
+         bloom are also dropped — that is what darkens the phone hero. */
+      linear-gradient(
+        180deg,
+        #221845 0%,
+        #201643 12%,
+        #1c133a 24%,
+        #17102f 38%,
+        #120d24 52%,
+        #0e0b1a 66%,
+        #0b0913 80%,
+        #0a090f 92%,
+        #0a090f 100%
+      );
+  }
+
+  .hero-grid {
+    background:
+      radial-gradient(
+        ellipse 70% 45% at 0% 0%,
+        rgba(150, 114, 238, 0.15) 0%,
+        rgba(120, 92, 196, 0.07) 55%,
+        transparent 80%
+      ),
+      radial-gradient(
+        ellipse 65% 42% at 50% 46%,
+        rgba(146, 110, 232, 0.13) 0%,
+        rgba(120, 92, 196, 0.06) 55%,
+        transparent 82%
+      );
+    /* The phone frame's tile pitch is ~90px (about four columns across a
+       390 frame), not the desktop's fixed 215px texture — measured from the
+       phone design's grid. Same 93% tile / 7% gutter split, square corners. */
+    -webkit-mask-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><rect x='0' y='0' width='84' height='84' fill='%23fff'/></svg>"),
+      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
+      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+    -webkit-mask-repeat: repeat, no-repeat, no-repeat;
+    -webkit-mask-size: 90px 90px, 100% 100%, 100% 100%;
+    -webkit-mask-position: center top, 0 0, 0 0;
+    -webkit-mask-composite: source-in, source-in;
+    mask-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><rect x='0' y='0' width='84' height='84' fill='%23fff'/></svg>"),
+      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
+      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+    mask-repeat: repeat, no-repeat, no-repeat;
+    mask-size: 90px 90px, 100% 100%, 100% 100%;
+    mask-position: center top, 0 0, 0 0;
+    mask-composite: intersect;
+  }
 }
 
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a
@@ -322,28 +402,25 @@ body {
   pointer-events: none;
 }
 
-/* Phone lighting for the tile field: the mobile frame lights from the TOP
-   RIGHT with a second soft pool around the brand strip, and stays dark
-   elsewhere. Desktop keeps its lower-centre pool. */
-@media (max-width: 767px) {
-  .hero-grid {
-    background: radial-gradient(
-        ellipse 70% 30% at 88% 6%,
-        rgba(172, 136, 255, 0.22) 0%,
-        rgba(146, 110, 232, 0.1) 45%,
-        transparent 72%
-      ),
-      radial-gradient(
-        ellipse 90% 24% at 50% 62%,
-        rgba(172, 136, 255, 0.16) 0%,
-        transparent 68%
-      ),
-      radial-gradient(
-        ellipse 100% 100% at 50% 40%,
-        rgba(255, 255, 255, 0.025) 0%,
-        rgba(255, 255, 255, 0.015) 100%
-      );
-  }
+/* Final-CTA card. Desktop: the design's own streak artwork — the exported
+   1380x842 "mask ground" layer of violet arcs converging on the centre —
+   laid over a light-at-the-top wash and a deep violet base. The artwork is
+   drawn for exactly this card, so it stretches 100% both ways rather than
+   cover-cropping. */
+.cta-card {
+  /* Matched to the Figma card — and note the ORIENTATION: the card is black
+     at the top, and the purple is a glow rising from the BOTTOM edge, gone
+     by mid-height. Every earlier version had this upside-down (light at the
+     top), which is why it kept reading too bright no matter the alphas. */
+  background:
+    url("/images/cta-streaks.svg") center / 100% 100% no-repeat,
+    radial-gradient(
+      ellipse 85% 65% at 50% 110%,
+      rgba(122, 92, 196, 0.3) 0%,
+      rgba(90, 66, 150, 0.15) 40%,
+      rgba(0, 0, 0, 0) 64%
+    ),
+    linear-gradient(180deg, #0a0710 0%, #0b0814 55%, #0e0a1a 100%);
 }
 
 /* Partial border that fades away from the top-left and is gone by the

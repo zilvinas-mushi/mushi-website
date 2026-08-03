@@ -31,7 +31,7 @@ function Pill({
   // (secondary): 67px tall, 15px radius, Poppins SemiBold 24px. The frame is
   // 1921px wide, so values are scaled ~0.75 for a 1440 viewport.
   const base =
-    "inline-flex h-[56px] items-center justify-center rounded-[15px] px-8 text-[24px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px]";
+    "inline-flex h-[56px] items-center justify-center rounded-[15px] px-8 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:text-[24px]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
@@ -52,7 +52,8 @@ function Pill({
 /**
  * Rating as filled violet tiles, each holding a white star — the design's
  * treatment, not bare ★ glyphs, which render inconsistently across platforms
- * and cannot carry the tile colour.
+ * and cannot carry the tile colour. Trustpilot-style: square corners, and the
+ * star runs nearly edge to edge rather than floating small in the middle.
  */
 function Stars({ count = 5 }: { count?: number }) {
   return (
@@ -65,9 +66,9 @@ function Stars({ count = 5 }: { count?: number }) {
         <span
           key={i}
           aria-hidden="true"
-          className="flex size-[22px] items-center justify-center rounded-[4px] bg-[#7c54b5]"
+          className="flex size-[22px] items-center justify-center bg-[#7c54b5]"
         >
-          <svg viewBox="0 0 24 24" className="size-[13px] fill-white">
+          <svg viewBox="0 0 24 24" className="size-[17px] fill-white">
             <path d="M12 2.6l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.7 6.1 20.8l1.2-6.6L2.5 9.6l6.6-.9L12 2.6z" />
           </svg>
         </span>
@@ -139,7 +140,7 @@ export function Hero() {
         ))}
       </div>
 
-      <div className={`${SHELL} relative pb-14 pt-14 text-center md:pt-20`}>
+      <div className={`${SHELL} relative pb-14 pt-5 text-center md:pt-20`}>
         {/*
           Figma nodes 3803:1591/1593/1594: a frosted white pill — a blurred
           white fill under a 50px-radius container — carrying BLACK Poppins
@@ -157,7 +158,7 @@ export function Hero() {
           itself stays sharp. The earlier blurred white fill destroyed the
           silhouette entirely.
         */}
-        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-7 py-3 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)]">
+        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-5 py-2 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)] md:px-7 md:py-3">
           <span className="text-[14px] font-medium text-black md:text-[20px]">
             {HERO.eyebrow}
           </span>
@@ -166,12 +167,12 @@ export function Hero() {
         {/* The only <h1> on the page. */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-6xl lg:text-[80px]"
+          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] tracking-tight sm:text-6xl lg:text-[80px]"
         >
           {HERO.heading}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[20px] font-normal leading-[1.33] text-white md:text-[30px] md:leading-[40px]">
+        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:text-[30px] md:leading-[40px]">
           {HERO.sub}
         </p>
 
@@ -313,7 +314,7 @@ export function Creatives() {
             href={BOOKING_URL}
             // Figma 3803:1218: the pill is 143x60 with a 45x45 circle inset
             // 7px from the right — 107x45 with a 34px circle at 1440.
-            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-5 pr-[6px] text-[18px] font-semibold text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
+            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-5 pr-[6px] text-[20px] font-semibold text-white md:text-[18px] transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
           >
             {CREATIVES.cta}
             <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors">
@@ -413,7 +414,13 @@ export function CaseStudies() {
                   />
                 </div>
 
-                <h3 className="mt-4 text-[17px] font-medium leading-[1.25] text-white md:mt-5 md:text-[22px]">
+                {/* On phones Holo's revenue line runs 2px larger than the
+                    other three cards' — a deliberate emphasis, not drift. */}
+                <h3
+                  className={`mt-4 font-medium leading-[1.25] text-white md:mt-5 md:text-[22px] ${
+                    item.brand === "Holo" ? "text-[22px]" : "text-[20px]"
+                  }`}
+                >
                   {item.result}
                 </h3>
 
@@ -552,7 +559,7 @@ export function Testimonials() {
           </div>
 
           <details className="group">
-            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-4 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] transition-colors duration-150 hover:bg-white group-open:static group-open:mt-8 [&::-webkit-details-marker]:hidden">
+            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-2.5 rounded-[var(--radius-pill)] md:gap-4 border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] transition-colors duration-150 hover:bg-white group-open:static group-open:mt-8 [&::-webkit-details-marker]:hidden">
               <span aria-hidden="true" className="flex -space-x-3">
                 {items
                   .filter((t) => t.avatar)
@@ -568,15 +575,18 @@ export function Testimonials() {
                   ))}
               </span>
 
-              <span className="text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
+              <span className="whitespace-nowrap text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
                 {TESTIMONIALS.trustLine}
               </span>
 
               <span aria-hidden="true" className="h-5 w-px bg-white/15 transition-colors group-hover/pill:bg-black/20" />
 
+              {/* Phones drop the "View More" label so the pill stays one line
+                  — avatars, trust line, divider, the +/− disc — per the phone
+                  design. The label returns from md up. */}
               <span className="flex items-center gap-2.5 text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
-                <span className="group-open:hidden">{TESTIMONIALS.moreLabel}</span>
-                <span className="hidden group-open:inline">View Less</span>
+                <span className="hidden md:inline md:group-open:hidden">{TESTIMONIALS.moreLabel}</span>
+                <span className="hidden md:group-open:inline">View Less</span>
                 <span className="flex size-7 items-center justify-center rounded-full bg-white text-[16px] leading-none text-black transition-colors group-hover/pill:bg-black group-hover/pill:text-white">
                   <span className="group-open:hidden">+</span>
                   <span className="hidden leading-none group-open:inline">−</span>
@@ -599,45 +609,16 @@ export function FinalCta() {
     <section
       id={BOOKING_ANCHOR}
       aria-labelledby="cta-heading"
-      className="scroll-mt-28 px-5 pb-24 pt-8"
+      className="scroll-mt-28 px-[15px] pb-24 pt-8 md:px-5"
     >
-      <div
-        className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[24px] border border-[#8a5cf6]/45 px-6 py-16 text-center md:py-20"
-        style={{
-          // Layer order: the arc-streak artwork ("fireworks"), the supplied
-          // light-to-purple wash strongest at the top, then the deep base.
-          background:
-            "url('/images/mask-group.svg') center -30%/150% auto no-repeat, linear-gradient(180deg, rgba(238,234,248,0.16) 0%, rgba(168,148,214,0.12) 26%, rgba(90,66,160,0.08) 50%, rgba(0,0,0,0) 72%), linear-gradient(180deg,#251b47 0%,#170f30 48%,#0d0820 100%)",
-          backgroundBlendMode: "screen, normal, normal",
-        }}
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/30 blur-[120px]"
-        />
-        {/* Drawn firework arcs — the exported streak artwork is too faint to
-            survive blending, so the trails are real strokes: sweeping curves
-            from the top corners with a violet-to-transparent fade. */}
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 800 420"
-          preserveAspectRatio="none"
-          className="pointer-events-none absolute inset-0 h-full w-full"
-        >
-          <defs>
-            <linearGradient id="fw" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#cdb9ff" stopOpacity="0" />
-              <stop offset="0.5" stopColor="#cdb9ff" stopOpacity="0.55" />
-              <stop offset="1" stopColor="#8a5cf6" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path d="M-40 150 Q 200 -30 520 60" fill="none" stroke="url(#fw)" strokeWidth="1.6" />
-          <path d="M120 200 Q 400 -60 840 120" fill="none" stroke="url(#fw)" strokeWidth="1.2" opacity="0.8" />
-          <path d="M-60 60 Q 260 30 560 -20" fill="none" stroke="url(#fw)" strokeWidth="1" opacity="0.6" />
-          <path d="M300 430 Q 560 300 860 340" fill="none" stroke="url(#fw)" strokeWidth="1.4" opacity="0.7" />
-          <path d="M-80 380 Q 200 300 460 420" fill="none" stroke="url(#fw)" strokeWidth="1.1" opacity="0.6" />
-          <path d="M480 20 Q 660 90 830 40" fill="none" stroke="url(#fw)" strokeWidth="1" opacity="0.5" />
-        </svg>
+      {/* Phone frame: 345x320 card on a light-to-dark wash (see .cta-card);
+          desktop keeps the dark artwork treatment and full width. */}
+      <div className="cta-card relative mx-auto min-h-[320px] w-[345px] max-w-full overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:min-h-0 md:w-full md:max-w-[1200px] md:border-[#8a5cf6]/45 md:py-20">
+        {/* No centre glow: the design's card is black through the middle,
+            with its only light rising from the bottom edge (see .cta-card). */}
+        {/* The streaks live in the card background itself now — the design's
+            own exported artwork (cta-streaks.svg) — replacing the hand-drawn
+            stand-in curves that used to sit here. */}
         <div className="relative">
           <h2
             id="cta-heading"
@@ -653,7 +634,7 @@ export function FinalCta() {
                 sentence case, arrow disc — with the house hover inversion. */}
             <a
               href={BOOKING_URL}
-              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-6 pr-[6px] text-[20px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
+              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] sm:text-[20px]"
             >
               {FINAL_CTA.cta}
               <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors">
@@ -668,7 +649,7 @@ export function FinalCta() {
                 </svg>
               </span>
             </a>
-            <span className="inline-flex h-[45px] items-center rounded-full border border-white/15 bg-[#17151d]/80 px-6 text-[20px] font-normal text-white/75">
+            <span className="inline-flex h-[45px] items-center rounded-full border border-white/15 bg-[#17151d]/80 px-6 text-[16px] font-normal text-white/75 sm:text-[20px]">
               {FINAL_CTA.scarcity}
             </span>
           </div>
