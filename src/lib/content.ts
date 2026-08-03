@@ -104,7 +104,7 @@ export const SOCIAL_PROOF = {
     { name: "Sintra", logo: "sintra.svg", w: 80, h: 25 },
     { name: "superior care.pet", logo: "superior-care.svg", w: 73, h: 25 },
     { name: "Holo", logo: "holo.svg", w: 62, h: 25 },
-    { name: "we interiors", logo: "we-interiors.svg", w: 211, h: 36 },
+    { name: "we interiors", logo: null, w: 0, h: 0 },  // supplied SVG was an empty white rect — needs re-export
     { name: "Breezit", logo: "breezit.svg", w: 98, h: 25 },
     { name: "Unive", logo: "unive.svg", w: 95, h: 26 },
     { name: "SE Ranking", logo: "se-ranking.svg", w: 101, h: 25 },
@@ -306,8 +306,8 @@ export const CASE_STUDIES = {
       result: "From $13k/month to $75k/month in 3 months.",
       tags: ["ECOM", "FURNITURE", "HOME"],
       image: "case-we-interiors.webp",
-      logo: "we-interiors.svg",
-      logoW: 211,
+      logo: null, // supplied SVG was an empty white rect — needs re-export
+      logoW: 0,
       glow: "#d9a422",
       bg: "linear-gradient(158deg,#3f2c18 0%,#241a10 54%,#120d09 100%)",
     },
