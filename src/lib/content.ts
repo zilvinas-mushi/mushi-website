@@ -278,7 +278,7 @@ export const CASE_STUDIES = {
       image: "case-breezit.webp",
       logo: "breezit.svg",
       logoW: 98,
-      glow: "radial-gradient(ellipse 80% 60% at 15% 0%, #e0621f66 0%, #e0621f1c 45%, transparent 70%)",
+      glow: "radial-gradient(ellipse 55% 45% at 100% 0%, #e0621f59 0%, #e0621f1a 45%, transparent 68%), radial-gradient(ellipse 50% 42% at 0% 100%, #e0621f4d 0%, transparent 65%)",
       bg: "linear-gradient(158deg,#4a2c15 0%,#2a1a10 52%,#150e0a 100%)",
     },
     {
@@ -288,7 +288,7 @@ export const CASE_STUDIES = {
       image: "case-holo.webp",
       logo: "holo.svg",
       logoW: 62,
-      glow: "radial-gradient(ellipse 95% 75% at 35% 5%, #8a5cf673 0%, #8a5cf626 48%, transparent 74%)",
+      glow: "radial-gradient(ellipse 55% 45% at 100% 0%, #8a5cf666 0%, #8a5cf61f 46%, transparent 70%), radial-gradient(ellipse 50% 42% at 0% 100%, #8a5cf64d 0%, transparent 66%)",
       bg: "linear-gradient(158deg,#5a4a9a 0%,#33285e 50%,#191430 100%)",
     },
     {
@@ -298,7 +298,7 @@ export const CASE_STUDIES = {
       image: "case-eany.webp",
       logo: "eany.svg",
       logoW: 96,
-      glow: "radial-gradient(ellipse 75% 60% at 18% 88%, #3b82f64d 0%, #3b82f614 45%, transparent 70%)",
+      glow: "radial-gradient(ellipse 65% 55% at 100% 100%, #3b82f659 0%, #3b82f61a 45%, transparent 70%)",
       bg: "linear-gradient(158deg,#1c1f28 0%,#12141a 55%,#0a0b0e 100%)",
     },
     {
@@ -308,7 +308,7 @@ export const CASE_STUDIES = {
       image: "case-we-interiors.webp",
       logo: null, // supplied SVG was an empty white rect — needs re-export
       logoW: 0,
-      glow: "radial-gradient(ellipse 85% 65% at 55% 12%, #d9a42259 0%, #d9a4221c 46%, transparent 72%)",
+      glow: "radial-gradient(ellipse 65% 55% at 100% 100%, #d9a42252 0%, #d9a4221a 45%, transparent 70%)",
       bg: "linear-gradient(158deg,#3f2c18 0%,#241a10 54%,#120d09 100%)",
     },
   ],
