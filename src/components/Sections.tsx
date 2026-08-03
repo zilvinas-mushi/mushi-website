@@ -383,6 +383,7 @@ export function CaseStudies() {
                   {/* Every case study now carries its real logotype, so the old
                       text fallback became dead code the type checker rightly
                       rejected. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                       src={`/logos/${item.logo}`}
                       alt={item.brand}
