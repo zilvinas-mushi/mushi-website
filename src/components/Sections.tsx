@@ -395,9 +395,11 @@ export function CaseStudies() {
                   <div
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-0 mix-blend-screen"
-                    style={{
-                      background: `radial-gradient(ellipse 100% 82% at 38% 8%, ${item.glow}8c 0%, ${item.glow}33 46%, transparent 72%)`,
-                    }}
+                    // Each brand's wash has its own position and strength,
+                    // tuned to the reference: Breezit hugs the top-left,
+                    // Holo spreads broad, eany sits low by the phones,
+                    // we interiors centres behind the laptop.
+                    style={{ background: item.glow }}
                   />
                 </div>
 
