@@ -196,17 +196,36 @@ body {
    corners; a single vertical fade left hard edges at the sides. So: a vertical
    ramp intersected with a gentle horizontal feather. */
 .hero-grid {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='rgba(255,255,255,0.05)'/></svg>");
-  background-size: 215px 215px;
-  background-position: center top;
+  /* The tiles ARE the light. The tile pattern is a MASK, and a purple field
+     shines through it — brightest in the middle where the headline sits,
+     fading to a faint neutral at the edges. Painting the tiles as a uniform
+     white overlay could never do this: the vignette dimmed the centre
+     exactly where the design lights up.
 
+     Three mask layers, intersected: the repeating tile shapes, the vertical
+     ramp down the page, and the horizontal edge feather. */
+  background: radial-gradient(
+    ellipse 62% 50% at 50% 24%,
+    rgba(172, 136, 255, 0.38) 0%,
+    rgba(146, 110, 232, 0.22) 38%,
+    rgba(120, 92, 196, 0.1) 62%,
+    rgba(255, 255, 255, 0.04) 88%
+  );
   -webkit-mask-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='%23fff'/></svg>"),
     linear-gradient(to bottom, #000 0%, #000 48%, rgba(0, 0, 0, 0.35) 78%, transparent 100%),
     linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
-  -webkit-mask-composite: source-in;
+  -webkit-mask-repeat: repeat, no-repeat, no-repeat;
+  -webkit-mask-size: 215px 215px, 100% 100%, 100% 100%;
+  -webkit-mask-position: center top, 0 0, 0 0;
+  -webkit-mask-composite: source-in, source-in;
   mask-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><rect x='0' y='0' width='200' height='200' rx='16' fill='%23fff'/></svg>"),
     linear-gradient(to bottom, #000 0%, #000 48%, rgba(0, 0, 0, 0.35) 78%, transparent 100%),
     linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  mask-repeat: repeat, no-repeat, no-repeat;
+  mask-size: 215px 215px, 100% 100%, 100% 100%;
+  mask-position: center top, 0 0, 0 0;
   mask-composite: intersect;
 }
 

@@ -24,7 +24,7 @@ export function HeroPanels() {
       {HERO_PANELS.map((p, i) => (
         <article
           key={`${p.side}-${i}`}
-          className={`absolute w-[330px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95)] backdrop-blur-[2px] ${
+          className={`absolute w-[330px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-[2px] ${
             p.side === "left" ? "left-[-96px]" : "right-[-96px]"
           }`}
           style={{ top: p.top, transform: `rotate(${p.rotate})` }}
@@ -84,10 +84,10 @@ export function HeroPanels() {
         the left panels. These are unique one-offs, so they live here rather
         than being forced into the meter/bars data shape.
       */}
-      <article className="absolute right-[-84px] top-[14%] w-[300px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95)] backdrop-blur-[2px] [transform:rotate(7deg)]">
+      <article className="absolute right-[-84px] top-[14%] w-[300px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-[2px] [transform:rotate(7deg)]">
         <div className="flex items-center justify-between">
-          <span className="flex size-8 items-center justify-center rounded-full bg-white/10">
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-4 stroke-white/85">
+          <span className="flex size-9 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.06]">
+            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-[18px] stroke-white/90">
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </span>
@@ -103,20 +103,94 @@ export function HeroPanels() {
         </p>
       </article>
 
-      <article className="absolute bottom-[10%] right-[-84px] w-[300px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95)] backdrop-blur-[2px] [transform:rotate(-6deg)]">
-        <h3 className="text-[19px] font-semibold leading-tight text-white">
-          Trending Video
-        </h3>
-        <span className="mt-2.5 block h-px w-full bg-white/15" />
-        <ul className="mt-3 space-y-2.5">
-          {["Video 1", "Video 2", "Video 3"].map((v, i) => (
-            <li key={v} className="flex items-center gap-3">
-              <span className="h-9 w-14 shrink-0 rounded-[8px] bg-white/10" />
-              <span className="flex-1 text-[13px] text-white/70">{v}</span>
-              <span className="text-[11px] text-white/40">{["12K", "8K", "4K"][i]}</span>
-            </li>
-          ))}
-        </ul>
+      {/*
+        Trending Video — a real horizontal bar chart, as the reference shows:
+        an icon tile beside the title, three labelled bars, dashed vertical
+        gridlines at 0 / 2K / 4K / 8K with axis labels underneath. Everything
+        is text and CSS, so it stays sharp at any zoom.
+      */}
+      <article className="absolute bottom-[10%] right-[-84px] w-[320px] rounded-[18px] border border-white/10 bg-[#221f2c]/80 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-[2px] [transform:rotate(-6deg)]">
+        <div className="flex items-center gap-3">
+          <span className="flex size-9 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.06]">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              strokeWidth="2"
+              className="size-[18px] stroke-white/90"
+            >
+              <path strokeLinecap="round" d="M7 17v-6M12 17V7M17 17v-4" />
+            </svg>
+          </span>
+          <h3 className="text-[19px] font-semibold leading-tight text-white">
+            Trending Video
+          </h3>
+        </div>
+
+        {(() => {
+          const ROWS = [
+            { label: "Video 1", w: 62 },
+            { label: "Video 2", w: 84 },
+            { label: "Video 3", w: 38 },
+          ];
+          const TICKS = [
+            { x: 0, t: "0" },
+            { x: 33.3, t: "2K" },
+            { x: 66.6, t: "4K" },
+            { x: 96, t: "8K" },
+          ];
+          return (
+            <div className="mt-4">
+              <div className="grid grid-cols-[auto_1fr] items-stretch gap-x-3">
+                <div className="flex flex-col justify-between">
+                  {ROWS.map((r) => (
+                    <span
+                      key={r.label}
+                      className="text-[13px] leading-[24px] text-white/75"
+                    >
+                      {r.label}
+                    </span>
+                  ))}
+                </div>
+                <div className="relative">
+                  {TICKS.map(({ x }) => (
+                    <span
+                      key={x}
+                      aria-hidden="true"
+                      className="absolute inset-y-0 border-l border-dashed border-white/15"
+                      style={{ left: `${x}%` }}
+                    />
+                  ))}
+                  <div className="relative flex h-full flex-col justify-between">
+                    {ROWS.map((r) => (
+                      <span key={r.label} className="flex h-[24px] items-center">
+                        <span
+                          className="block h-[13px] rounded-[4px] bg-white/[0.22]"
+                          style={{ width: `${r.w}%` }}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-[auto_1fr] gap-x-3">
+                <span aria-hidden="true" className="invisible text-[13px]">
+                  Video 1
+                </span>
+                <div className="relative h-5">
+                  {TICKS.map(({ x, t }) => (
+                    <span
+                      key={t}
+                      className="absolute top-1 -translate-x-1/2 text-[11px] text-white/45"
+                      style={{ left: `${x}%` }}
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </article>
     </div>
   );

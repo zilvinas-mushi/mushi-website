@@ -218,20 +218,20 @@ export function SocialProof() {
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         <div className="flex items-center justify-center gap-4">
-          <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/10" />
+          <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/30" />
           <h2
             id="proof-heading"
             className="whitespace-nowrap text-center text-[15px] font-medium text-white"
           >
-            <span aria-hidden="true" className="mr-2">
+            <span aria-hidden="true" className="mr-2 text-white">
               ✦
             </span>
             {SOCIAL_PROOF.headline}
-            <span aria-hidden="true" className="ml-2">
+            <span aria-hidden="true" className="ml-2 text-white">
               ✦
             </span>
           </h2>
-          <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/10" />
+          <span aria-hidden="true" className="h-px max-w-[180px] flex-1 bg-white/30" />
         </div>
 
         {/* Official client logotypes from /public/logos. Each keeps its own
