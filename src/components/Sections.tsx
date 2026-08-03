@@ -158,7 +158,7 @@ export function Hero() {
           silhouette entirely.
         */}
         <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-7 py-2.5 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)]">
-          <span className="text-[15px] font-semibold text-black md:text-[16px]">
+          <span className="text-[16px] font-medium text-black md:text-[20px]">
             {HERO.eyebrow}
           </span>
         </span>
@@ -171,7 +171,7 @@ export function Hero() {
           {HERO.heading}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-[620px] text-pretty text-base leading-relaxed text-white sm:text-lg">
+        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[20px] font-normal leading-[1.33] text-white md:text-[30px] md:leading-[40px]">
           {HERO.sub}
         </p>
 
