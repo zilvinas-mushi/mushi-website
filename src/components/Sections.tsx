@@ -322,7 +322,7 @@ export function Creatives() {
                 viewBox="0 0 24 24"
                 fill="none"
                 strokeWidth="2.2"
-                className="size-4 stroke-current"
+                className="size-5 stroke-current md:size-6"
                 aria-hidden="true"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
