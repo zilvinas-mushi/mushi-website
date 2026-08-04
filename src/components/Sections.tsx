@@ -314,10 +314,10 @@ export function Creatives() {
             href={BOOKING_URL}
             // Figma 3803:1218: the pill is 143x60 with a 45x45 circle inset
             // 7px from the right — 107x45 with a 34px circle at 1440.
-            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-5 pr-[6px] text-[20px] font-semibold text-white md:text-[30px] transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
+            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-5 pr-[6px] text-[20px] font-semibold text-white md:h-[58px] md:pl-7 md:pr-2 md:text-[30px] transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
           >
             {CREATIVES.cta}
-            <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors">
+            <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors md:size-[42px]">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -533,7 +533,7 @@ export function Testimonials() {
       <div className={SHELL}>
         <h2
           id="testimonials-heading"
-          className="text-[22px] font-semibold leading-tight tracking-tight sm:text-3xl lg:text-[36px]"
+          className="text-[22px] font-semibold leading-tight tracking-tight md:text-[48px]"
         >
           {TESTIMONIALS.heading}
         </h2>
