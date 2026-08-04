@@ -223,17 +223,25 @@ body {
   background-repeat: repeat;
   background-size: 215px 215px;
   background-position: center top;
+  /* Three fades intersected: the vertical ramp down the page, the horizontal
+     edge feather, and — same as the phone treatment — a lighting ellipse so
+     only the tiles around the hero copy show at full strength while the
+     outer columns and corners fall toward black. Without the third layer the
+     desktop grid read as a wall of equally-bright squares; the Figma frame
+     is dark everywhere the light doesn't reach. */
   -webkit-mask-image:
     linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
-  -webkit-mask-repeat: no-repeat, no-repeat;
-  -webkit-mask-size: 100% 100%, 100% 100%;
-  -webkit-mask-composite: source-in;
+    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
+    radial-gradient(ellipse 55% 42% at 50% 30%, #000 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.04) 100%);
+  -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
+  -webkit-mask-size: 100% 100%, 100% 100%, 100% 100%;
+  -webkit-mask-composite: source-in, source-in;
   mask-image:
     linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
-  mask-repeat: no-repeat, no-repeat;
-  mask-size: 100% 100%, 100% 100%;
+    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
+    radial-gradient(ellipse 55% 42% at 50% 30%, #000 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.04) 100%);
+  mask-repeat: no-repeat, no-repeat, no-repeat;
+  mask-size: 100% 100%, 100% 100%, 100% 100%;
   mask-composite: intersect;
 }
 
