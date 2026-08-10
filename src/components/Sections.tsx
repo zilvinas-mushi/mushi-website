@@ -30,7 +30,7 @@ function Pill({
   // 56 here — the old 0.75 scale-down for a 1440 viewport — and is now the
   // design's 67 at lg. Below lg it still steps down; that is the phone pass.
   const base =
-    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] lg:h-[67px] lg:px-8 lg:text-[24px]";
+    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] md:h-[calc(var(--hero-u)*0.67)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
@@ -51,8 +51,12 @@ function Pill({
 /**
  * Rating as filled violet tiles, each holding a white star — the design's
  * treatment, not bare ★ glyphs, which render inconsistently across platforms
- * and cannot carry the tile colour. Trustpilot-style: square corners, and the
- * star runs nearly edge to edge rather than floating small in the middle.
+ * and cannot carry the tile colour.
+ *
+ * Tile and star are the `star-x2.svg` asset inlined verbatim: a 35 × 35 box
+ * filled #6E54B5 with the Trustpilot-style star notched out of it in white,
+ * running edge to edge. Inlined rather than <img> so the five tiles cost no
+ * requests and the geometry stays exact at any rendered size.
  */
 function Stars({ count = 5 }: { count?: number }) {
   return (
@@ -62,15 +66,18 @@ function Stars({ count = 5 }: { count?: number }) {
       aria-label={`${count} out of 5 stars`}
     >
       {Array.from({ length: count }, (_, i) => (
-        <span
+        <svg
           key={i}
           aria-hidden="true"
-          className="flex size-[22px] items-center justify-center bg-[#7c54b5]"
+          viewBox="0 0 35 35"
+          className="size-[22px] shrink-0"
         >
-          <svg viewBox="0 0 24 24" className="size-[17px] fill-white">
-            <path d="M12 2.6l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.7 6.1 20.8l1.2-6.6L2.5 9.6l6.6-.9L12 2.6z" />
-          </svg>
-        </span>
+          <rect width="35" height="35" fill="#6E54B5" />
+          <path
+            d="M17.5 24.0645L22.9315 22.6101L25.2009 30L17.5 24.0645ZM30 14.5126H20.439L17.5 5L14.561 14.5126H5L12.7381 20.4088L9.7991 29.9214L17.5372 24.0252L22.2991 20.4088L30 14.5126Z"
+            fill="white"
+          />
+        </svg>
       ))}
     </span>
   );
@@ -86,7 +93,7 @@ function Stars({ count = 5 }: { count?: number }) {
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
-      <div className={`${SHELL} relative pb-14 pt-5 text-center md:pt-20`}>
+      <div className={`${SHELL} relative pb-14 pt-5 text-center md:pb-[calc(var(--hero-u)*0.56)] md:pt-[calc(var(--hero-u)*0.8)]`}>
         {/*
           Figma nodes 3803:1591/1593/1594: a frosted white pill — a blurred
           white fill under a 50px-radius container — carrying BLACK Poppins
@@ -106,8 +113,8 @@ export function Hero() {
           it is now `inset`, so the only radiance is #6E54B5 creeping a little
           way in from the rim.
         */}
-        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-5 py-2 shadow-[inset_0_0_12px_rgba(110,84,181,0.5)] md:px-7 md:py-3">
-          <span className="text-[14px] font-medium text-black md:text-[20px]">
+        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-5 py-2 shadow-[inset_0_0_12px_rgba(110,84,181,0.5)] md:mb-[calc(var(--hero-u)*0.28)] md:px-[calc(var(--hero-u)*0.28)] md:py-[calc(var(--hero-u)*0.12)]">
+          <span className="text-[14px] font-medium text-black md:text-[length:calc(var(--hero-u)*0.2)]">
             {HERO.eyebrow}
           </span>
         </span>
@@ -118,7 +125,7 @@ export function Hero() {
             dropping the class leaves it at 0 rather than needing an override. */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] sm:text-6xl lg:text-[80px]"
+          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] sm:text-6xl md:text-[length:calc(var(--hero-u)*0.8)]"
         >
           {HERO.heading}
         </h1>
@@ -126,14 +133,14 @@ export function Hero() {
         {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
             case from md up, and nothing above sets tracking. Below md it steps
             down to 16, which the phone pass still has to confirm. */}
-        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:text-[30px] md:leading-[40px]">
+        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:mt-[calc(var(--hero-u)*0.24)] md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
           {HERO.sub}
         </p>
 
         {/* `isolate` keeps the glow's -z-10 inside this row's stacking
             context — without it the glow would drop behind .hero-bg's
             background and vanish. */}
-        <div className="relative isolate mt-10 flex items-center justify-center gap-2.5 sm:gap-4">
+        <div className="relative isolate mt-10 flex items-center justify-center gap-2.5 sm:gap-4 md:mt-[calc(var(--hero-u)*0.4)]">
           <span
             aria-hidden="true"
             className="cta-glow pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2"
@@ -176,7 +183,7 @@ export function SocialProof() {
     // run of near-black to dissolve into before the next section starts, which
     // is what makes the handover read as a fade rather than a stop. With a
     // short tail the gradient had to resolve too fast and the join showed.
-    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2">
+    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2 md:pt-[calc(var(--hero-u)*0.08)]">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         {/* The design's own divider ornament — a gradient line running into a
@@ -191,13 +198,13 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[21px] w-auto"
+            className="h-[21px] w-auto md:h-[calc(var(--hero-u)*0.21)]"
           />
           {/* Poppins Regular 20 at every width — it was 14 stepping up to 15
               Medium, so both the size and the weight were off. */}
           <h2
             id="proof-heading"
-            className="whitespace-nowrap text-center text-[20px] font-normal text-white"
+            className="whitespace-nowrap text-center text-[20px] font-normal text-white md:text-[length:calc(var(--hero-u)*0.2)]"
           >
             {SOCIAL_PROOF.headline}
           </h2>
@@ -210,14 +217,14 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[21px] w-auto -scale-x-100"
+            className="h-[21px] w-auto -scale-x-100 md:h-[calc(var(--hero-u)*0.21)]"
           />
         </div>
 
         {/* Official client logotypes from /public/logos. Each keeps its own
             viewBox width so relative sizing matches the design; only
             "we interiors" has no supplied SVG and falls back to text. */}
-        <div className="mx-auto mt-10 max-w-3xl space-y-4 md:space-y-6">
+        <div className="mx-auto mt-10 max-w-3xl space-y-4 md:mt-[calc(var(--hero-u)*0.4)] md:space-y-[calc(var(--hero-u)*0.24)]">
           {/*
             The design stacks the brands as a centred pyramid — four, three,
             two, one — not a width-driven wrap, which broke rows in different
@@ -240,7 +247,7 @@ export function SocialProof() {
                       height={brand.h}
                       loading="lazy"
                       decoding="async"
-                      className="h-[19px] w-auto opacity-95 md:h-[26px]"
+                      className="h-[19px] w-auto opacity-95 md:h-[calc(var(--hero-u)*0.26)]"
                     />
                   ) : (
                     <span className="text-[22px] font-medium tracking-tight text-white/90">
@@ -521,11 +528,18 @@ export function Testimonials() {
   return (
     <section id="agency" aria-labelledby="testimonials-heading" className="py-20">
       <div className={SHELL}>
+        {/* 48/48 from the design — line-height equals the size, so the two
+            sentences sit tight on top of each other. Each sentence is its own
+            block rather than a <br>, so the break survives any wrapping. */}
         <h2
           id="testimonials-heading"
-          className="text-[22px] font-semibold leading-tight tracking-tight md:text-[48px]"
+          className="text-[22px] font-semibold leading-tight tracking-tight md:text-[48px] md:leading-[48px]"
         >
-          {TESTIMONIALS.heading}
+          {TESTIMONIALS.headingLines.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
         </h2>
 
         {/*
