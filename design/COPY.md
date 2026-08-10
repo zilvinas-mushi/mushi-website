@@ -28,6 +28,21 @@ Performance Score · Successfully Reached 10M+ Views · Consistently Considered
 to be Excellent · Growth Performance Analysis · Refined, Delivered & Measured ·
 Optimized for the Quarter
 
+The hero carries **four** stat panels, each a title plus two lines. The six
+strings above supply exactly two of them:
+
+| # | Title | Line 1 | Line 2 |
+| --- | --- | --- | --- |
+| 1 | Performance Score | Successfully Reached 10M+ Views | Consistently Considered to be Excellent |
+| 2 | Growth Performance Analysis | Optimized for the Quarter | Refined, Delivered & Measured |
+| 3 | Total Revenue | $6,240.28 in the Last 7 Days | Steadily Ahead of Target |
+| 4 | Trending Video | 8K+ Views on the Top Cut | Reliably Outperforming the Set |
+
+> **⚠️ Panels 3 and 4 are NOT deck copy.** They reflow strings an earlier
+> session invented for two one-off cards that have since been folded into the
+> shared panel. Replace them with Žilvinas's real wording — here first, then in
+> `src/lib/content.ts`.
+
 ## Social proof strip
 
 - 110+ brands enhanced their ads with Mushi

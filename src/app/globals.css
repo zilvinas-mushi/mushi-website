@@ -58,6 +58,16 @@ html {
   scroll-padding-top: 110px;
 }
 
+/* From md up the floating bar is SiteHeader's 1u-tall box (100px at the design's
+   1920 reference) sitting 22px below the viewport top, so the landing point has
+   to clear that plus a little air. Keep the clamp identical to `--u` in
+   SiteHeader.tsx — if one changes, so does the other. */
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: calc(clamp(53.1px, 5.2083vw, 100px) + 40px);
+  }
+}
+
 body {
   background: var(--bg);
   color: var(--text);

@@ -22,6 +22,17 @@ by a future session, or by you.
 - Frame `Desktop Home`, node `3843:28`, 1921 × 7426
 - Extracted 2026-07-28
 
+> **⚠️ This node is GONE as of 2026-08-07.** `get_metadata` on `3843:28` returns
+> "node ID was not found in the file", and listing the file's pages returns
+> exactly one: `1748:21` "INSPIRATION: Unorganized" — a moodboard of ~300 loose
+> reference images, not the home page. The design page was renamed, moved to
+> another file, or deleted.
+>
+> **Do not spend further calls hunting for it in this file** — three were burned
+> confirming the above. The next session needs a fresh `figma.com/design/...`
+> URL *with a `node-id`* from Žilvinas pointing at the current desktop frame.
+> When that arrives, update the three lines above and delete this block.
+
 The frame was created by wrapping loose layers, so it has **no auto-layout**.
 Figma therefore emits absolute pixel positions, which cannot be shipped. See
 [SECTIONS.md](SECTIONS.md) for why and what to do instead.

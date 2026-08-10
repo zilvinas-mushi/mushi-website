@@ -23,6 +23,22 @@
     "w": 800,
     "h": 800
   },
+  "case-breezit.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-eany.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-holo.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-we-interiors-v2.webp": {
+    "w": 1000,
+    "h": 1000
+  },
   "deividas-kovger1.svg": {
     "w": 80,
     "h": 80
@@ -54,6 +70,10 @@
   "ellipse54.svg": {
     "w": 80,
     "h": 80
+  },
+  "emoji-sunglasses.png": {
+    "w": 160,
+    "h": 160
   },
   "erika-zakareviciute1.webp": {
     "w": 800,
@@ -366,21 +386,5 @@
   "vector4.svg": {
     "w": 10,
     "h": 19
-  },
-  "case-breezit.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-eany.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-holo.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-we-interiors-v2.webp": {
-    "w": 1000,
-    "h": 1000
   }
 }

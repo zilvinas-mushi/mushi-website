@@ -31,38 +31,114 @@ export const HERO_FLOATERS = [
 ] as const;
 
 /**
- * Stat panels that drift in from the left and right edges of the hero,
- * deliberately cropped by the viewport as in the design. They carry the same
- * proof copy the chips did — the chips only ever made sense as this artwork.
+ * The four stat panels that drift in from the left and right edges of the
+ * hero, deliberately cropped by the viewport as in the design.
+ *
+ * All four are the SAME card — same fill, border, rule, meter, rotation and
+ * type scale (see design/TOKENS.md "Hero stat panel"). Only the copy and the
+ * position change. Earlier versions gave each panel its own layout — a revenue
+ * figure here, a horizontal bar chart there — which is not what the design
+ * does.
+ *
+ * The copy is the full string in every case. The reference shows each line
+ * cropped mid-word ("Score", "ched 10M+ Views"); that is the viewport crop, not
+ * the copy — see the offset note in HeroPanels.tsx.
  *
  * Decorative: the same claims appear as real text elsewhere on the page, so
  * these are aria-hidden rather than duplicated to screen readers.
+ *
+ * TODO(copy): design/COPY.md only carries the first two panels' text (it lists
+ * exactly six hero chips = two titles plus four lines). The third and fourth
+ * panels below reflow copy an earlier session invented; they need Žilvinas's
+ * real deck entries, and COPY.md updated first.
  */
-export const HERO_PANELS = [
+export type HeroPanel = {
+  side: "left" | "right";
+  top: string;
+  /**
+   * CSS rotation — clockwise-positive.
+   *
+   * NOTE the sign flip against Figma, which reports rotation
+   * counter-clockwise-positive. Figma's -9.19 on panel 2 is `9.19deg` here.
+   * Panel 1's -5.09159deg came from an SVG export instead, and SVG shares
+   * CSS's convention, so that one carries across unchanged.
+   */
+  rotate: string;
+  /** Always 25px Poppins Medium. */
+  title: string;
+  /** Two lines under the divider; `size` is the design px at 1920. */
+  lines: [{ text: string; size: number }, { text: string; size: number }];
+  /** Gap between the two lines, design px. */
+  lineGap: number;
+  /**
+   * Distance from the card's bottom EDGE to the bottom of line 2, design px.
+   *
+   * Omit to let the lines centre against whatever sits beside them, which is
+   * what panel 1 does. Panel 2 pins it, because its 95-tall chart is taller
+   * than its text and centring would leave the lines floating.
+   */
+  linesFromBottom?: number;
+  /** What sits to the right of the lines. */
+  aside: "icon" | "chart";
+  /** Whether the full-width level meter runs along the bottom. */
+  meter: boolean;
+};
+
+export const HERO_PANELS: HeroPanel[] = [
   {
-    side: "left" as const,
+    side: "left",
     top: "17%",
-    rotate: "-9deg",
+    rotate: "-5.09159deg",
     title: "Performance Score",
-    lines: ["Successfully Reached 10M+ Views", "Consistently Considered to be Excellent"],
-    emoji: "😎",
-    /** Level-meter style: many thin segments, rising to the right. */
-    meter: 14,
-    bars: [],
+    lines: [
+      { text: "Successfully Reached 10M+ Views", size: 20 },
+      { text: "Consistently Considered to be Excellent", size: 15 },
+    ],
+    lineGap: 4,
+    aside: "icon",
+    meter: true,
   },
   {
-    side: "left" as const,
+    side: "left",
     top: "58%",
-    rotate: "-7deg",
+    rotate: "9.19deg",
     title: "Growth Performance Analysis",
-    lines: ["Optimized for the Quarter", "Refined, Delivered & Measured"],
-    /** Chart style: a few tall columns. */
-    meter: 0,
-    bars: [34, 58, 46, 76],
+    lines: [
+      { text: "Optimized for the Quarter", size: 15 },
+      { text: "Refined, Delivered & Measured", size: 15 },
+    ],
+    lineGap: 32,
+    linesFromBottom: 40,
+    aside: "chart",
+    meter: false,
   },
-  // Left side only. The design puts stat panels exclusively on the left; the
-  // right edge carries just the platform marks. Mirroring them across both
-  // sides made the hero symmetrical in a way the design deliberately is not.
+  // TODO(spec): panels 3 and 4 are still panel 1's shape with placeholder copy.
+  {
+    side: "right",
+    top: "14%",
+    rotate: "-5.09159deg",
+    title: "Total Revenue",
+    lines: [
+      { text: "$6,240.28 in the Last 7 Days", size: 20 },
+      { text: "Steadily Ahead of Target", size: 15 },
+    ],
+    lineGap: 4,
+    aside: "icon",
+    meter: true,
+  },
+  {
+    side: "right",
+    top: "70%",
+    rotate: "-5.09159deg",
+    title: "Trending Video",
+    lines: [
+      { text: "8K+ Views on the Top Cut", size: 20 },
+      { text: "Reliably Outperforming the Set", size: 15 },
+    ],
+    lineGap: 4,
+    aside: "icon",
+    meter: true,
+  },
 ];
 
 export const HERO = {
