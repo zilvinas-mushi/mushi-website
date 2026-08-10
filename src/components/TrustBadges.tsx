@@ -68,17 +68,17 @@ export function TrustBadges() {
           <img
             src={logo}
             alt=""
-            width={48}
-            height={48}
+            width={64}
+            height={64}
             loading="lazy"
             decoding="async"
-            className="size-12 shrink-0 object-contain"
+            className="size-16 shrink-0 object-contain"
           />
           <span className="text-center md:text-left">
-            <span className="block text-[14px] font-semibold leading-snug text-white">
+            <span className="block text-[16px] font-normal leading-snug text-white">
               {title}
             </span>
-            <span className="flex items-center justify-center gap-1.5 text-xs text-zinc-500 md:justify-start">
+            <span className="flex items-center justify-center gap-1.5 text-sm text-zinc-500 md:justify-start">
               <Laurel flip />
               {meta}
               <Laurel />

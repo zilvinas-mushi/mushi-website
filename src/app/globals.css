@@ -110,42 +110,41 @@ body {
       rgba(10, 9, 15, 0.85) 97%,
       #0a090f 100%
     ),
-    /* 1. The sun: a violet source just outside the top-left corner. */
+    /* 1. The sun: a violet source just outside the top-left corner. Candle
+       logic: a slightly brighter core with a FAST falloff, so the glow is
+       concentrated at the corner and has died away before it reaches the
+       header bar — the light touches the corner tiles, not the chrome. */
     radial-gradient(
-      ellipse 62% 58% at 2% -10%,
-      rgba(214, 186, 255, 0.3) 0%,
-      rgba(166, 130, 246, 0.17) 24%,
-      rgba(120, 92, 196, 0.08) 48%,
-      transparent 76%
+      ellipse 48% 44% at 0% -6%,
+      rgba(218, 192, 255, 0.55) 0%,
+      rgba(170, 134, 248, 0.3) 22%,
+      rgba(122, 94, 198, 0.12) 44%,
+      transparent 68%
     ),
-    /* 2. Headline light: a distinct source sitting right behind
-          "Your Path to $100M." so the title reads as standing in a beam. */
+    /* 2. Headline light: a faint lift right behind "Your Path to $100M." —
+          kept well below the sun so it never competes with it. */
     radial-gradient(
       ellipse 50% 32% at 50% 27%,
-      rgba(160, 124, 248, 0.1) 0%,
-      rgba(130, 98, 212, 0.05) 48%,
+      rgba(160, 124, 248, 0.07) 0%,
+      rgba(130, 98, 212, 0.035) 48%,
       transparent 76%
     ),
-    /* 3. Broad violet field across the upper half — barely there. */
+    /* 3. Ambient bloom around the corner source — kept short so the top of
+       the page (where the header floats) stays out of the light. */
     radial-gradient(
-      ellipse 96% 72% at 40% 0%,
-      rgba(140, 108, 220, 0.09) 0%,
-      rgba(114, 86, 184, 0.045) 40%,
-      rgba(92, 70, 150, 0.015) 64%,
-      transparent 84%
+      ellipse 64% 48% at 10% 0%,
+      rgba(140, 108, 220, 0.055) 0%,
+      rgba(114, 86, 184, 0.028) 40%,
+      rgba(92, 70, 150, 0.01) 62%,
+      transparent 80%
     ),
-    /* 3. Secondary bloom right of centre so fall-off is not linear. */
+    /* 4. Vignette, biased toward the light: centred near the source so the
+       far (right/bottom) edges sit deepest in shadow. */
     radial-gradient(
-      ellipse 56% 46% at 76% 10%,
-      rgba(138, 106, 214, 0.05) 0%,
-      transparent 66%
-    ),
-    /* 4. Vignette, deepened: the design's corners and edges sit on black. */
-    radial-gradient(
-      ellipse 96% 90% at 42% 18%,
-      transparent 50%,
-      rgba(0, 0, 0, 0.45) 85%,
-      rgba(0, 0, 0, 0.7) 100%
+      ellipse 105% 95% at 26% 10%,
+      transparent 40%,
+      rgba(0, 0, 0, 0.5) 78%,
+      rgba(0, 0, 0, 0.78) 100%
     ),
     /*
       5. Base ramp. Many closely-spaced stops rather than three, so the violet
@@ -155,13 +154,13 @@ body {
     */
     linear-gradient(
       180deg,
-      #221845 0%,
-      #201643 12%,
-      #1c133a 24%,
-      #17102f 38%,
-      #120d24 52%,
-      #0e0b1a 66%,
-      #0b0913 80%,
+      #1c1440 0%,
+      #1a123c 12%,
+      #171034 24%,
+      #130d2a 38%,
+      #100b20 52%,
+      #0d0a18 66%,
+      #0b0912 80%,
       #0a090f 92%,
       #0a090f 100%
     );
@@ -183,20 +182,71 @@ body {
   than paint grey, and the mask keeps them strongest near the source.
 */
 .hero-rays {
-  /* The design's own EFFECTS LAYER export — the purple ray fan — anchored to
-     the top-left source. Screen blending adds it as light over the gradient;
-     the drawn CSS shafts this replaces never matched the artwork's soft,
-     irregular falloff. Masked so it dies out before mid-page. */
-  background-image: url("/images/effects-layer.webp");
-  background-repeat: no-repeat;
-  background-position: -6% -10%;
-  background-size: 118% auto;
+  /* Drawn as a conic fan, not the exported effects-layer.webp: that file
+     turned out to be a featureless purple blur with no rays in it, which is
+     why no opacity ever produced beams. The fan's centre sits just outside
+     the top-left corner — the same point as .hero-bg's sun — so the shafts
+     radiate from the visible glow. `from 90deg` zeroes the stop angles at
+     "pointing right": the beams live between ~10deg (just under horizontal)
+     and ~80deg (nearly straight down), i.e. the down-right quadrant.
+
+     Widths, gaps and alphas are deliberately irregular so it reads as light
+     through a window rather than a repeating pattern. The blur softens the
+     stop edges; the radial mask is the falloff — beams are strongest near
+     the source and dissolve before they reach the headline's right side. */
+  background: conic-gradient(
+    from 90deg at -5% -12%,
+    transparent 8deg,
+    rgba(205, 178, 255, 0.2) 14deg,
+    transparent 21deg,
+    transparent 25deg,
+    rgba(198, 168, 255, 0.33) 32deg,
+    transparent 40deg,
+    rgba(205, 178, 255, 0.14) 45deg,
+    transparent 51deg,
+    rgba(198, 168, 255, 0.28) 58deg,
+    transparent 67deg,
+    rgba(205, 178, 255, 0.18) 73deg,
+    transparent 81deg
+  );
+  filter: blur(14px);
   mix-blend-mode: screen;
-  /* Quiet on every breakpoint — it screen-blends over a near-black field,
-     and anything past ~0.35 reads as a blurry lavender wash, not rays. */
-  opacity: 0.35;
-  -webkit-mask-image: linear-gradient(168deg, #000 0%, #000 42%, transparent 78%);
-  mask-image: linear-gradient(168deg, #000 0%, #000 42%, transparent 78%);
+  opacity: 0.85;
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 76% at 0% -8%,
+    #000 0%,
+    rgba(0, 0, 0, 0.6) 42%,
+    rgba(0, 0, 0, 0.2) 62%,
+    transparent 82%
+  );
+  mask-image: radial-gradient(
+    ellipse 80% 76% at 0% -8%,
+    #000 0%,
+    rgba(0, 0, 0, 0.6) 42%,
+    rgba(0, 0, 0, 0.2) 62%,
+    transparent 82%
+  );
+}
+
+/* Centre light: the hero's second source, an elegant pool of light in the
+   middle of the page — NOT a lit tile, and not a spotlight. A tall soft
+   ellipse anchored to the CTA row (absolute centring in Sections.tsx) so
+   its heart sits between the two buttons while its reach kisses the
+   headline above and the logo strip below, dissolving evenly in every
+   direction. Screen blending lets it lift the tiles it crosses; the low
+   core alpha is what keeps it a glow rather than a beam. */
+.cta-glow {
+  /* Candle-like: a touch brighter at the heart, gone sooner at the rim. */
+  width: min(780px, 94vw);
+  height: 470px;
+  background: radial-gradient(
+    ellipse closest-side,
+    rgba(214, 188, 255, 0.16) 0%,
+    rgba(170, 134, 248, 0.09) 36%,
+    rgba(124, 96, 200, 0.04) 62%,
+    transparent 92%
+  );
+  mix-blend-mode: screen;
 }
 
 /* The hero grid is NOT hairlines. It is a field of filled, rounded tiles
@@ -229,27 +279,36 @@ body {
      fades: the vertical ramp down the page and the horizontal edge feather.
      (The design's second fill on that node, 583378 at 50%, is toggled off
      in Figma and stays off here.) */
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='200' height='200' rx='15' fill='url(%23g)' fill-opacity='0.35'/></svg>");
+  /* The rect sits at 7.5,7.5 — CENTRED in the 215px unit, gutter split
+     evenly on both sides — so `center` puts a tile's midline exactly on the
+     page's centreline. That is what lets the .cta-tile element (200x200,
+     centred behind the CTA buttons) land on a grid column instead of
+     straddling a gutter. The 171.5px vertical offset does the same for the
+     rows: it places a row of tile centres through the CTA row's centre
+     (~494px from the hero top at desktop type sizes: 494 - 107.5 - 215). */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='215' height='215'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect x='7.5' y='7.5' width='200' height='200' rx='15' fill='url(%23g)' fill-opacity='0.35'/></svg>");
   background-repeat: repeat;
   background-size: 215px 215px;
-  background-position: center top;
+  background-position: center 171.5px;
   /* Three fades intersected: the vertical ramp down the page, the horizontal
      edge feather, and — same as the phone treatment — a lighting ellipse so
-     only the tiles around the hero copy show at full strength while the
-     outer columns and corners fall toward black. Without the third layer the
-     desktop grid read as a wall of equally-bright squares; the Figma frame
-     is dark everywhere the light doesn't reach. */
+     tile brightness follows the LIGHT. The ellipse spans both sources —
+     stretched from the top-left sun across the centre pool — so tiles near
+     either glow show strongly and only the far corners fall toward black.
+     Without the third layer the desktop grid read as a wall of
+     equally-bright squares; the Figma frame is dark everywhere the light
+     doesn't reach. */
   -webkit-mask-image:
-    linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
+    linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.28) 87%, transparent 100%),
     linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-    radial-gradient(ellipse 55% 42% at 50% 30%, #000 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.04) 100%);
+    radial-gradient(ellipse 78% 62% at 42% 32%, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.42) 50%, rgba(0, 0, 0, 0.12) 76%, rgba(0, 0, 0, 0.04) 100%);
   -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
   -webkit-mask-size: 100% 100%, 100% 100%, 100% 100%;
   -webkit-mask-composite: source-in, source-in;
   mask-image:
-    linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
+    linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.28) 87%, transparent 100%),
     linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-    radial-gradient(ellipse 55% 42% at 50% 30%, #000 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.04) 100%);
+    radial-gradient(ellipse 78% 62% at 42% 32%, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.42) 50%, rgba(0, 0, 0, 0.12) 76%, rgba(0, 0, 0, 0.04) 100%);
   mask-repeat: no-repeat, no-repeat, no-repeat;
   mask-size: 100% 100%, 100% 100%, 100% 100%;
   mask-composite: intersect;

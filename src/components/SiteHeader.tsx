@@ -55,7 +55,12 @@ export function SiteHeader() {
           // Padding: 0.15u right and top/bottom, which is exactly the inset
           // that leaves the 0.70u-tall CTA centred in the 1u bar. The left side
           // gets 0.30u so the wordmark is not jammed against the corner radius.
-          className="mx-auto flex items-center justify-between rounded-[15px] bg-[#181818]"
+          // The 15px radius scales with `--u` like everything else here.
+          // Commit 8b07942 found this independently at the old fixed 1440
+          // scale: a flat 15 rounded a third of the CTA's height and read as a
+          // half-pill against the reference. 0.15u is 15 at 1920 and 11 at
+          // 1440, which is the value that commit landed on.
+          className="mx-auto flex items-center justify-between rounded-[calc(var(--u)*0.15)] bg-[#181818]"
           style={{
             width: "calc(var(--u) * 13.86)",
             // Belt and braces: the 53.1px floor on `--u` is set so the bar is
@@ -128,7 +133,7 @@ export function SiteHeader() {
           */}
           <a
             href={BOOKING_URL}
-            className="inline-flex shrink-0 items-center justify-center rounded-[15px] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5]"
+            className="inline-flex shrink-0 items-center justify-center rounded-[calc(var(--u)*0.15)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5]"
             style={{
               width: "calc(var(--u) * 2.42)",
               height: "calc(var(--u) * 0.7)",

@@ -176,7 +176,14 @@ export function Hero() {
           {HERO.sub}
         </p>
 
-        <div className="mt-10 flex items-center justify-center gap-2.5 sm:gap-4">
+        {/* `isolate` keeps the glow's -z-10 inside this row's stacking
+            context — without it the glow would drop behind .hero-bg's
+            background and vanish. */}
+        <div className="relative isolate mt-10 flex items-center justify-center gap-2.5 sm:gap-4">
+          <span
+            aria-hidden="true"
+            className="cta-glow pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2"
+          />
           <Pill href={BOOKING_URL}>{HERO.primaryCta}</Pill>
           <Pill href="#case-studies" variant="dark">
             {HERO.secondaryCta}
