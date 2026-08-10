@@ -3,7 +3,6 @@ import { TrustBadges } from "./TrustBadges";
 import { CreativesRail } from "./CreativesRail";
 import {
   HERO,
-  HERO_FLOATERS,
   SOCIAL_PROOF,
   CREATIVES,
   CASE_STUDIES,
@@ -27,11 +26,12 @@ function Pill({
   children: React.ReactNode;
   variant?: "primary" | "dark";
 }) {
-  // Measured from Figma nodes 3803:1672/1673 (primary) and 3803:1583/1584
-  // (secondary): 67px tall, 15px radius, Poppins SemiBold 24px. The frame is
-  // 1921px wide, so values are scaled ~0.75 for a 1440 viewport.
+  // Measured from Figma nodes 3803:1672/1673 (primary) and 3803:1583/1584:
+  // 67px tall, 15px radius, Poppins SemiBold 24px on desktop. The height was
+  // 56 here — the old 0.75 scale-down for a 1440 viewport — and is now the
+  // design's 67 at lg. Below lg it still steps down; that is the phone pass.
   const base =
-    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] lg:h-[56px] lg:px-8 lg:text-[24px]";
+    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] lg:h-[67px] lg:px-8 lg:text-[24px]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
@@ -87,59 +87,6 @@ function Stars({ count = 5 }: { count?: number }) {
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
-      {/*
-        Platform marks — THREE nested layers, which is what gives them depth:
-
-          outer   large translucent frosted tile, hairline edge, cast shadow
-          middle  a second inset tile in a slightly DIFFERENT tone (~76%) —
-                  not the same value as the outer; that difference is the
-                  whole effect and reads as a bevel
-          logo    the brand mark itself (~52%), its own rounded tile
-
-        Two layers looked flat and one looked pasted on. The doubled square is
-        the detail that makes them sit in the scene.
-
-        z-[3] puts these above the stat panels: in the design the Instagram
-        mark overlaps the left-hand panel, so the icons win.
-
-        Decorative, so aria-hidden with empty alt. Hidden below lg, where there
-        is no room beside the headline.
-      */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[3] hidden lg:block"
-      >
-        {HERO_FLOATERS.map((f) => (
-          <span
-            key={f.name}
-            className={`absolute ${f.pos} flex items-center justify-center rounded-[28px] border border-white/[0.06] bg-white/[0.025] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)] backdrop-blur-[6px]`}
-            style={{
-              transform: `rotate(${f.rotate})`,
-              width: f.size,
-              height: f.size,
-            }}
-          >
-            {/* The inner tile is LIGHTER than the outer, not darker — that is
-                what lifts the logo forward. Having it darker inverted the
-                bevel and made the stack read as a hole. */}
-            <span
-              className="flex items-center justify-center rounded-[21px] border border-white/[0.10] bg-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
-              style={{
-                width: Math.round(f.size * 0.76),
-                height: Math.round(f.size * 0.76),
-              }}
-            >
-              <Img
-                src={f.image}
-                alt=""
-                width={Math.round(f.size * 0.52)}
-                className="rounded-[13px] shadow-[0_6px_14px_-5px_rgba(0,0,0,0.75)]"
-              />
-            </span>
-          </span>
-        ))}
-      </div>
-
       <div className={`${SHELL} relative pb-14 pt-5 text-center md:pt-20`}>
         {/*
           Figma nodes 3803:1591/1593/1594: a frosted white pill — a blurred
@@ -153,25 +100,33 @@ export function Hero() {
         */}
         {/*
           Crisp pill, not a blur cloud: a vertical gradient — lavender rim into
-          a white core and back — gives the rolled-edge look of the reference,
-          and the halo lives in a box-shadow OUTSIDE the shape so the edge
-          itself stays sharp. The earlier blurred white fill destroyed the
-          silhouette entirely.
+          a white core and back — gives the rolled-edge look of the reference.
+
+          It throws NOTHING outwards. The glow was a 30px-blur, 10px-spread
+          box-shadow in lavender, which bled a halo onto the tiles behind it;
+          it is now `inset`, so the only radiance is #6E54B5 creeping a little
+          way in from the rim.
         */}
-        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-5 py-2 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)] md:px-7 md:py-3">
+        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-5 py-2 shadow-[inset_0_0_12px_rgba(110,84,181,0.5)] md:px-7 md:py-3">
           <span className="text-[14px] font-medium text-black md:text-[20px]">
             {HERO.eyebrow}
           </span>
         </span>
 
-        {/* The only <h1> on the page. */}
+        {/* The only <h1> on the page. Poppins SemiBold 80 with letter-spacing
+            0 — it carried `tracking-tight` (-0.025em), which at 80px pulled
+            two full pixels out of every gap. Nothing above it sets tracking, so
+            dropping the class leaves it at 0 rather than needing an override. */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] tracking-tight sm:text-6xl lg:text-[80px]"
+          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] sm:text-6xl lg:text-[80px]"
         >
           {HERO.heading}
         </h1>
 
+        {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
+            case from md up, and nothing above sets tracking. Below md it steps
+            down to 16, which the phone pass still has to confirm. */}
         <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:text-[30px] md:leading-[40px]">
           {HERO.sub}
         </p>
@@ -239,9 +194,11 @@ export function SocialProof() {
             aria-hidden="true"
             className="h-[21px] w-auto"
           />
+          {/* Poppins Regular 20 at every width — it was 14 stepping up to 15
+              Medium, so both the size and the weight were off. */}
           <h2
             id="proof-heading"
-            className="whitespace-nowrap text-center text-[14px] font-normal text-white md:text-[15px] md:font-medium"
+            className="whitespace-nowrap text-center text-[20px] font-normal text-white"
           >
             {SOCIAL_PROOF.headline}
           </h2>

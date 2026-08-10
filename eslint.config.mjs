@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Sibling git worktrees live here and carry their own build output, which
+    // `.next/**` above does not match — it is anchored at the repo root. Without
+    // this, `npx eslint .` fails on another session's compiled bundles.
+    ".claude/**",
   ]),
 ]);
 
