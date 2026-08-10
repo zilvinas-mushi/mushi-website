@@ -35,13 +35,24 @@ strings above supply exactly two of them:
 | --- | --- | --- | --- |
 | 1 | Performance Score | Successfully Reached 10M+ Views | Consistently Considered to be Excellent |
 | 2 | Growth Performance Analysis | Optimized for the Quarter | Refined, Delivered & Measured |
-| 3 | Total Revenue | $6,240.28 in the Last 7 Days | Steadily Ahead of Target |
-| 4 | Trending Video | 8K+ Views on the Top Cut | Reliably Outperforming the Set |
+Panels 3 and 4 have different shapes. Panel 3:
 
-> **⚠️ Panels 3 and 4 are NOT deck copy.** They reflow strings an earlier
-> session invented for two one-off cards that have since been folded into the
-> shared panel. Replace them with Žilvinas's real wording — here first, then in
-> `src/lib/content.ts`.
+| | |
+| --- | --- |
+| Label | Total Revenue (last 7 days) |
+| Figure | $6,240.28 |
+| Badge | +2 |
+
+Panel 4:
+
+| | |
+| --- | --- |
+| Title | Trending Videos |
+| Rows | Video 1 · Video 2 · Video 3 |
+| Axis | 0 · 2K · 4K · 8K |
+
+All four panels' copy is now real: panels 1 and 2 from the chip list above,
+panels 3 and 4 supplied with their measurements on 2026-08-10.
 
 ## Social proof strip
 

@@ -31,8 +31,14 @@ import { BOOKING_URL, SITE_NAME } from "@/lib/site";
  * animated hamburger-and-drawer so both properties share one motion.
  */
 
-/** 100px at 1920 wide; see the sizing note above. */
-const SCALE = { "--u": "clamp(53.1px, 5.2083vw, 100px)" } as CSSProperties;
+/**
+ * 100px at 1920 wide; see the sizing note above.
+ *
+ * The clamp itself lives on :root as --header-u, because the page needs it too:
+ * the hero field is pulled up by the header's flow height, and duplicating the
+ * number there is exactly how it went stale and left a black band at the top.
+ */
+const SCALE = { "--u": "var(--header-u)" } as CSSProperties;
 
 export function SiteHeader() {
   return (

@@ -23,22 +23,50 @@ export const NAV = [
  * the hero box, eyeballed from the design; they are decorative and hidden
  * below the lg breakpoint, where there is no room for them.
  */
+/*
+  Rotations are all measured now. Each is Figma's figure with the sign flipped,
+  since Figma reports rotation counter-clockwise-positive and CSS is
+  clockwise-positive:
+
+    Instagram  Figma  19.81  ->  -19.81deg
+    Google     Figma -26.63  ->   26.63deg
+    TikTok     Figma -12.88  ->   12.88deg
+    Facebook   Figma  15.24  ->  -15.24deg   (sign checked against the artwork)
+
+  `x`/`y` are the tile's CENTRE as a percentage of the whole violet hero field
+  — not of the hero section, which is shorter. Solved from the Figma frame
+  screenshot together with the supplied canvas coordinates (Instagram
+  2369,-504; Google 3508,-457; Facebook 3563,-26; TikTok 2349,-51): the frame
+  comes out 1915 x 1083, and its origin fits from all four tiles independently
+  to within 7px. See design/TOKENS.md for the working.
+*/
+/**
+ * `ink` is the fraction of each asset's canvas its artwork actually covers,
+ * measured by decoding the alpha channel — not estimated.
+ *
+ *   Instagram 100%   Facebook 99.7%   Google 73.7% x 75.4%   TikTok 75.5%
+ *
+ * Google and TikTok were exported with about 25% transparent padding baked in,
+ * so at a common 50px box their marks rendered ~37px and read as smaller and
+ * dimmer than the other two. The logo box is divided by this, which sizes every
+ * mark by its INK rather than by its canvas. Re-measure with the alpha scan in
+ * design/TOKENS.md if an asset is ever replaced.
+ */
 export const HERO_FLOATERS = [
-  { name: "Instagram", image: "image42.webp", pos: "left-[13%] top-[15%]", size: 90, rotate: "-10deg" },
-  { name: "Google", image: "image44.webp", pos: "right-[13%] top-[12%]", size: 94, rotate: "8deg" },
-  { name: "TikTok", image: "image45.webp", pos: "left-[10%] bottom-[26%]", size: 86, rotate: "7deg" },
-  { name: "Facebook", image: "image43.webp", pos: "right-[10%] bottom-[24%]", size: 90, rotate: "-7deg" },
+  { name: "Instagram", image: "image42.webp", ink: 1.0, x: 20.51, y: 24.73, rotate: "-19.81deg" },
+  { name: "Google", image: "image44.webp", ink: 0.754, x: 79.98, y: 29.06, rotate: "26.63deg" },
+  { name: "TikTok", image: "image45.webp", ink: 0.755, x: 19.46, y: 66.54, rotate: "12.88deg" },
+  { name: "Facebook", image: "image43.webp", ink: 0.997, x: 82.86, y: 68.85, rotate: "-15.24deg" },
 ] as const;
 
 /**
  * The four stat panels that drift in from the left and right edges of the
  * hero, deliberately cropped by the viewport as in the design.
  *
- * All four are the SAME card — same fill, border, rule, meter, rotation and
- * type scale (see design/TOKENS.md "Hero stat panel"). Only the copy and the
- * position change. Earlier versions gave each panel its own layout — a revenue
- * figure here, a horizontal bar chart there — which is not what the design
- * does.
+ * All four share the CHROME — 500 x 200, #181818, an inner 3px #222222 border,
+ * radius 30 (see design/TOKENS.md "Hero stat panel"). What sits inside does
+ * not: the rotation, the type sizes and the layout are all per panel, so the
+ * shape is a discriminated union rather than one row of optional fields.
  *
  * The copy is the full string in every case. The reference shows each line
  * cropped mid-word ("Score", "ched 10M+ Views"); that is the viewport crop, not
@@ -47,12 +75,12 @@ export const HERO_FLOATERS = [
  * Decorative: the same claims appear as real text elsewhere on the page, so
  * these are aria-hidden rather than duplicated to screen readers.
  *
- * TODO(copy): design/COPY.md only carries the first two panels' text (it lists
- * exactly six hero chips = two titles plus four lines). The third and fourth
- * panels below reflow copy an earlier session invented; they need Žilvinas's
- * real deck entries, and COPY.md updated first.
+ * TODO(copy): design/COPY.md carries panels 1 and 2 only (it lists exactly six
+ * hero chips = two titles plus four lines). Panel 3's copy came with its
+ * measurements and should be added to the deck; panel 4 is still placeholder
+ * text an earlier session invented and needs Žilvinas's real wording.
  */
-export type HeroPanel = {
+type HeroPanelBase = {
   side: "left" | "right";
   top: string;
   /**
@@ -64,6 +92,20 @@ export type HeroPanel = {
    * CSS's convention, so that one carries across unchanged.
    */
   rotate: string;
+  /**
+   * How far the card hangs off the viewport edge, in `--k` units. Defaults to
+   * 2, i.e. 200 of its 500 hidden — the measured crop. Raise it to push a card
+   * further off.
+   */
+  edgeOffset?: number;
+};
+
+/**
+ * The default panel: a 25px title, the divider, two lines, something beside
+ * them, and optionally the level meter along the bottom.
+ */
+type StatPanel = HeroPanelBase & {
+  variant: "stat";
   /** Always 25px Poppins Medium. */
   title: string;
   /** Two lines under the divider; `size` is the design px at 1920. */
@@ -84,8 +126,42 @@ export type HeroPanel = {
   meter: boolean;
 };
 
+/**
+ * Panel 3's layout, which shares only the card chrome: an arrow in a disc at
+ * the top, then a small label over a large figure, with a badge alongside it.
+ * No title and no divider.
+ */
+type RevenuePanel = HeroPanelBase & {
+  variant: "revenue";
+  /** 15px Poppins Medium, sitting directly above the figure. */
+  label: string;
+  /** 43px Poppins Medium. Its BOX BOTTOM is pinned by `amountFromBottom`. */
+  amount: string;
+  /** Distance from the card's bottom edge to the figure's box, design px. */
+  amountFromBottom: number;
+  /** 25px Poppins Regular in a 50 x 30 badge, set right after the figure. */
+  badge: string;
+};
+
+/**
+ * Panel 4's layout: an icon beside the title, the divider, then a horizontal
+ * bar chart with a labelled row per video and a tick axis underneath.
+ */
+type TrendingPanel = HeroPanelBase & {
+  variant: "trending";
+  /** 25px Poppins Medium, with the 28.5 icon beside it. */
+  title: string;
+  /** One row per bar. `label` is 15px Poppins Medium; `w` is design px. */
+  rows: { label: string; w: number }[];
+  /** Axis labels, each in a 34 x 12 box. */
+  ticks: string[];
+};
+
+export type HeroPanel = StatPanel | RevenuePanel | TrendingPanel;
+
 export const HERO_PANELS: HeroPanel[] = [
   {
+    variant: "stat",
     side: "left",
     top: "17%",
     rotate: "-5.09159deg",
@@ -99,6 +175,7 @@ export const HERO_PANELS: HeroPanel[] = [
     meter: true,
   },
   {
+    variant: "stat",
     side: "left",
     top: "58%",
     rotate: "9.19deg",
@@ -112,32 +189,34 @@ export const HERO_PANELS: HeroPanel[] = [
     aside: "chart",
     meter: false,
   },
-  // TODO(spec): panels 3 and 4 are still panel 1's shape with placeholder copy.
   {
+    variant: "revenue",
     side: "right",
     top: "14%",
-    rotate: "-5.09159deg",
-    title: "Total Revenue",
-    lines: [
-      { text: "$6,240.28 in the Last 7 Days", size: 20 },
-      { text: "Steadily Ahead of Target", size: 15 },
-    ],
-    lineGap: 4,
-    aside: "icon",
-    meter: true,
+    rotate: "16.97deg",
+    label: "Total Revenue (last 7 days)",
+    amount: "$6,240.28",
+    amountFromBottom: 32.6,
+    badge: "+2",
   },
   {
+    variant: "trending",
     side: "right",
     top: "70%",
-    rotate: "-5.09159deg",
-    title: "Trending Video",
-    lines: [
-      { text: "8K+ Views on the Top Cut", size: 20 },
-      { text: "Reliably Outperforming the Set", size: 15 },
+    // Figma's 15, so -15 here. Confirmed against the reference: "Video 1/2/3"
+    // step RIGHT as they go down, which only happens under a counter-clockwise
+    // rotation. The icon inherits this and needs none of its own.
+    rotate: "-15deg",
+    // Pushed a further 40 off the right edge than the other three.
+    edgeOffset: 2.4,
+    title: "Trending Videos",
+    rows: [
+      { label: "Video 1", w: 94 },
+      { label: "Video 2", w: 137 },
+      // TODO(spec): row 3's width was not supplied — 60 is a placeholder.
+      { label: "Video 3", w: 60 },
     ],
-    lineGap: 4,
-    aside: "icon",
-    meter: true,
+    ticks: ["0", "2K", "4K", "8K"],
   },
 ];
 
@@ -248,7 +327,7 @@ export const CREATIVES = {
       image: "celemi-pouch.webp",
       w: 1320,
       h: 2340,
-      avatar: "celemi-logo.svg",
+      avatar: "celemi-logo.webp",
     },
     {
       handle: "tryholo.ai",
@@ -304,7 +383,7 @@ export const CREATIVES = {
       image: "celemi-serum.webp",
       w: 1320,
       h: 2340,
-      avatar: "celemi-logo.svg",
+      avatar: "celemi-logo.webp",
     },
     // Owners confirmed against the design's own card headers.
     {
@@ -460,6 +539,8 @@ export type Testimonial = {
 
 export const TESTIMONIALS = {
   heading: "Reputation is everything. Ours is flawless.",
+  /** The design breaks the heading after the first sentence — one line each. */
+  headingLines: ["Reputation is everything.", "Ours is flawless."],
   trustLine: "Trusted by 100+ brands",
   moreLabel: "View More",
   /** First three render immediately; the rest sit behind the disclosure. */
@@ -552,7 +633,14 @@ export const TESTIMONIALS = {
 
 export const FINAL_CTA = {
   heading: "You scrolled so far. You want this. Trust us.",
+  /** The design breaks after the first sentence — "You scrolled so far." alone. */
+  headingLines: ["You scrolled so far.", "You want this. Trust us."],
   sub: "We have a cap. We don't know if you're the right fit yet. But we'd love to find out in 15 minutes.",
+  /** Same break as the reference: the cap sentence, then the invitation. */
+  subLines: [
+    "We have a cap. We don't know if you're the right fit yet.",
+    "But we'd love to find out in 15 minutes.",
+  ],
   cta: "15 Minute Fit-Check",
   scarcity: "2/10 client spots left for 2026",
 } as const;

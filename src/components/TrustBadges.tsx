@@ -61,7 +61,10 @@ const BADGES: Badge[] = [
 
 export function TrustBadges() {
   return (
-    <ul className="mt-6 grid grid-cols-3 gap-2 md:flex md:flex-wrap md:items-center md:justify-center md:gap-x-8 md:gap-y-4">
+    // This top margin IS the gap between the hero's two CTAs and the awards —
+    // nothing sits between them — so the design's 50 lives here. Below md it
+    // stays at 24 until the phone pass sets its own value.
+    <ul className="mt-6 grid grid-cols-3 gap-2 md:mt-[calc(var(--hero-u)*0.5)] md:flex md:flex-wrap md:items-center md:justify-center md:gap-x-8 md:gap-y-4">
       {BADGES.map(({ title, meta, logo }) => (
         <li key={title} className="flex flex-col items-center gap-2 text-center md:flex-row md:gap-3 md:text-left">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -72,13 +75,16 @@ export function TrustBadges() {
             height={64}
             loading="lazy"
             decoding="async"
-            className="size-16 shrink-0 object-contain"
+            className="size-16 shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
           />
+          {/* Both lines are Poppins 16 — the award name and the "Winner 2025"
+              line under it are the same size, not a heading over smaller meta.
+              Only the colour separates them. */}
           <span className="text-center md:text-left">
-            <span className="block text-[16px] font-normal leading-snug text-white">
+            <span className="block text-[16px] font-normal leading-snug text-white md:text-[length:calc(var(--hero-u)*0.16)]">
               {title}
             </span>
-            <span className="flex items-center justify-center gap-1.5 text-sm text-zinc-500 md:justify-start">
+            <span className="flex items-center justify-center gap-1.5 text-[16px] text-zinc-500 md:justify-start md:text-[length:calc(var(--hero-u)*0.16)]">
               <Laurel flip />
               {meta}
               <Laurel />

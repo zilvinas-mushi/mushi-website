@@ -7,7 +7,7 @@
      #181818 is the HEADER BAR's fill (Figma 3803:1568), not the page — reading
      it as the background made everything grey and washed out. The bar reads as
      a lighter panel sitting on black, which is the point. */
-  --bg: #0a090f;
+  --bg: #000000;
   --bg-alt: #0d0b13;
   --surface: #1c1a24;
   --bar: #181818;
@@ -18,6 +18,54 @@
   --text-dim: #9e9e9e;
   --paper: #ececec;
   --sand: #d6cfc3;
+
+  /*
+    Header geometry, kept here rather than in the component because the PAGE
+    needs it too: the hero field is pulled up by exactly the header's flow
+    height so it starts at the very top, and a stale hardcoded number there
+    showed up as a black band across the top of the page.
+
+    --header-u  the scale SiteHeader is built from; 100px at the design's 1920
+                reference. See the sizing note in SiteHeader.tsx.
+    --header-h  how much room the header actually takes in normal flow. It is
+                `sticky`, so it occupies its box. On phones that is
+                MobileHeader: pt-3 + (py-3 + its 48px controls) + pb-2 = 92.
+                From md up the bar is 1u tall.
+  */
+  --header-u: clamp(53.1px, 5.2083vw, 100px);
+  --header-h: 92px;
+
+  /*
+    The hero's own scale, 100px at 1920. Drives the stat panels, the platform
+    tiles AND the hero's whole vertical rhythm, which is why it lives here
+    rather than being declared per component — a duplicated clamp is exactly
+    how the header's height and the hero's pull-up drifted apart.
+
+    It is bound by viewport HEIGHT as well as width, and that is what makes the
+    hero fit without scrolling. The design is 1083 tall at 1920 wide; a laptop
+    at 1920 has roughly 990px of viewport, so at full size it cannot fit — no
+    amount of spacing tuning changes that, only scale does. The hero's content
+    measures about 9.75u top to bottom, so capping u at 9.6vh keeps it inside
+    the window with a little room whatever the window is:
+
+      1440 x 812   u = 75.0  (width-bound)   content 731
+      1440 x 755   u = 72.5  (height-bound)  content 707
+      1920 x 992   u = 95.2  (height-bound)  content 929
+
+    The floor is higher than --header-u's because a 15px panel line stops being
+    legible sooner than nav type does.
+
+    Consequence worth knowing: a card is exactly 500 x 200 only when the window
+    is tall enough for u to reach 100. In a short window everything scales
+    together, which is the trade for never scrolling.
+  */
+  --hero-u: clamp(66px, min(5.2083vw, 9.6vh), 100px);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: var(--header-u);
+  }
 }
 
 @theme inline {
@@ -56,15 +104,30 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 110px;
+
+  /*
+    THE CANVAS — what the browser paints into the rubber-band area when you
+    overscroll past the top of the page.
+
+    The root element's background propagates to the canvas and tiles infinitely
+    beyond the document, whereas `body`'s only covers the document itself. So
+    without setting it here, overscrolling revealed whatever `body` happened to
+    be and the field looked like it had been cut off.
+
+    It carried the tile pattern for a while, to read as more of the hero. That
+    is now WRONG: .hero-light's vignette takes the field to fully opaque black
+    at its top edge, so continuing violet tiles above the fold would clash with
+    the black they sit against rather than extend it. Plain black is the
+    continuation now. Revisit if the vignette ever stops reaching the top.
+  */
+  background-color: #000000;
 }
 
-/* From md up the floating bar is SiteHeader's 1u-tall box (100px at the design's
-   1920 reference) sitting 22px below the viewport top, so the landing point has
-   to clear that plus a little air. Keep the clamp identical to `--u` in
-   SiteHeader.tsx — if one changes, so does the other. */
+/* The landing point has to clear the sticky bar plus its 22px top gap and a
+   little air. --header-h already tracks the bar's height per breakpoint. */
 @media (min-width: 768px) {
   html {
-    scroll-padding-top: calc(clamp(53.1px, 5.2083vw, 100px) + 40px);
+    scroll-padding-top: calc(var(--header-h) + 40px);
   }
 }
 
@@ -95,10 +158,14 @@ body {
 */
 .hero-bg {
   /* Matched against the Figma frame, not tuned by feel: the field is
-     near-black — the tiles' own 35% fill supplies most of the visible
-     purple — and the washes only breathe a little light around the
+     near-black and the washes only breathe a little light around the
      top-left source and behind the headline. Resist brightening these:
-     every stacked layer (wash + tiles + rays) compounds. */
+     every stacked layer (wash + tiles + rays) compounds.
+
+     NOTE these washes are largely redundant now. The tiles above them are a
+     35% layer (Figma's own opacity for that group) and the lighting is built
+     on .hero-glow / .hero-rays / .hero-light, which sit on top. Reach for
+     those, not these. */
   background:
     /* 0. Settle layer, painted over everything: the vignette below darkens
        the hero's bottom edge past the page colour, so the hand-off to the
@@ -106,9 +173,9 @@ body {
        bring the edge back to var(--bg) exactly, making it invisible. */
     linear-gradient(
       180deg,
-      rgba(10, 9, 15, 0) 88%,
-      rgba(10, 9, 15, 0.85) 97%,
-      #0a090f 100%
+      rgba(0, 0, 0, 0) 88%,
+      rgba(0, 0, 0, 0.85) 97%,
+      #000000 100%
     ),
     /* 1. The sun: a violet source just outside the top-left corner. Candle
        logic: a slightly brighter core with a FAST falloff, so the glow is
@@ -161,8 +228,8 @@ body {
       #100b20 52%,
       #0d0a18 66%,
       #0b0912 80%,
-      #0a090f 92%,
-      #0a090f 100%
+      #000000 92%,
+      #000000 100%
     );
 }
 
@@ -181,52 +248,100 @@ body {
   rather than a repeating pattern. Screen blending makes them add light rather
   than paint grey, and the mask keeps them strongest near the source.
 */
+/*
+  A soft violet presence spilling in from just outside the top-left corner.
+
+  Deliberately FAINT and very wide. The reference's accent is in the MIDDLE of
+  the hero — the centre is bright because .hero-light's vignette leaves it clear
+  and the 35% tiles show through there. This corner is atmosphere around that,
+  not a second sun; an earlier pass ran it at 0.62 alpha and it took the accent
+  off the centre entirely.
+
+  Screen-blended, so it adds light rather than tinting the black. It sits ABOVE
+  .hero-light (which only darkens) and BELOW .hero-rays. No mask — the
+  gradient's own falloff is the falloff.
+*/
+.hero-glow {
+  background: radial-gradient(
+    ellipse 135% 120% at -4% -8%,
+    rgba(196, 160, 255, 0.11) 0%,
+    rgba(162, 116, 248, 0.07) 26%,
+    rgba(124, 84, 210, 0.035) 48%,
+    rgba(80, 54, 142, 0.012) 68%,
+    transparent 86%
+  );
+  mix-blend-mode: screen;
+}
+
 .hero-rays {
   /* Drawn as a conic fan, not the exported effects-layer.webp: that file
-     turned out to be a featureless purple blur with no rays in it, which is
-     why no opacity ever produced beams. The fan's centre sits just outside
-     the top-left corner — the same point as .hero-bg's sun — so the shafts
-     radiate from the visible glow. `from 90deg` zeroes the stop angles at
-     "pointing right": the beams live between ~10deg (just under horizontal)
-     and ~80deg (nearly straight down), i.e. the down-right quadrant.
+     turned out to be a featureless purple blur with no rays in it. The fan's
+     centre sits just outside the top-left corner, so the shafts radiate from
+     there. `from 90deg` zeroes the stop angles at "pointing right": the beams
+     live between ~10deg and ~80deg, i.e. the down-right quadrant.
 
-     Widths, gaps and alphas are deliberately irregular so it reads as light
-     through a window rather than a repeating pattern. The blur softens the
-     stop edges; the radial mask is the falloff — beams are strongest near
-     the source and dissolve before they reach the headline's right side. */
+     SEVEN shafts. There were five, but the two faintest lost against the field
+     and it read as three — so the count is up and no band sits under 0.32,
+     which is what makes them all survive. Widths, gaps and alphas stay
+     irregular so it reads as morning light through a window rather than a
+     repeating pattern.
+
+     They do not merge into a wash despite the 30px blur, because the bands are
+     ANGULAR: near the origin they are a few pixels apart and blur into the
+     source, while out across the hero a 5deg band is already ~87px wide.
+
+     SOFT BUT STRONG. The shafts have to overwhelm the tile grid in the
+     top-left — the tiles there should stop reading as squares at all. That
+     works because .hero-light takes that corner to 95% black first: a tile is
+     rgb(4,3,6) there, and inside a band it screens up to rgb(82,61,118). The
+     BANDS become the structure you see, not the tile edges.
+
+     Which is why the corner must stay dark. An earlier pass tried to protect
+     it from the vignette so the rays would show, and that just washed the
+     whole area out — the rays read as light precisely because what is beneath
+     them does not. The 30px blur is what smears them across the tile edges;
+     drop it and the grid reappears through the bands.
+
+     The broad ambient glow lives on .hero-glow, kept deliberately faint; this
+     layer is only the shafts. */
   background: conic-gradient(
     from 90deg at -5% -12%,
     transparent 8deg,
-    rgba(205, 178, 255, 0.2) 14deg,
-    transparent 21deg,
-    transparent 25deg,
-    rgba(198, 168, 255, 0.33) 32deg,
-    transparent 40deg,
-    rgba(205, 178, 255, 0.14) 45deg,
-    transparent 51deg,
-    rgba(198, 168, 255, 0.28) 58deg,
-    transparent 67deg,
-    rgba(205, 178, 255, 0.18) 73deg,
-    transparent 81deg
+    rgba(198, 162, 255, 0.44) 12deg,
+    transparent 17deg,
+    rgba(176, 130, 255, 0.32) 22deg,
+    transparent 27deg,
+    rgba(198, 162, 255, 0.54) 33deg,
+    transparent 38deg,
+    rgba(176, 130, 255, 0.36) 43deg,
+    transparent 47deg,
+    rgba(198, 162, 255, 0.48) 53deg,
+    transparent 58deg,
+    rgba(176, 130, 255, 0.34) 63deg,
+    transparent 68deg,
+    rgba(198, 162, 255, 0.46) 74deg,
+    transparent 80deg
   );
-  filter: blur(14px);
+  filter: blur(30px);
   mix-blend-mode: screen;
-  opacity: 0.85;
+  opacity: 0.9;
   -webkit-mask-image: radial-gradient(
-    ellipse 80% 76% at 0% -8%,
+    ellipse 110% 105% at 0% -8%,
     #000 0%,
-    rgba(0, 0, 0, 0.6) 42%,
-    rgba(0, 0, 0, 0.2) 62%,
-    transparent 82%
+    rgba(0, 0, 0, 0.7) 40%,
+    rgba(0, 0, 0, 0.32) 64%,
+    transparent 90%
   );
   mask-image: radial-gradient(
-    ellipse 80% 76% at 0% -8%,
+    ellipse 110% 105% at 0% -8%,
     #000 0%,
-    rgba(0, 0, 0, 0.6) 42%,
-    rgba(0, 0, 0, 0.2) 62%,
-    transparent 82%
+    rgba(0, 0, 0, 0.7) 40%,
+    rgba(0, 0, 0, 0.32) 64%,
+    transparent 90%
   );
 }
+
+
 
 /* Centre light: the hero's second source, an elegant pool of light in the
    middle of the page — NOT a lit tile, and not a spotlight. A tall soft
@@ -290,28 +405,77 @@ body {
   background-repeat: repeat;
   background-size: 215px 215px;
   background-position: center 171.5px;
-  /* Three fades intersected: the vertical ramp down the page, the horizontal
-     edge feather, and — same as the phone treatment — a lighting ellipse so
-     tile brightness follows the LIGHT. The ellipse spans both sources —
-     stretched from the top-left sun across the centre pool — so tiles near
-     either glow show strongly and only the far corners fall toward black.
-     Without the third layer the desktop grid read as a wall of
-     equally-bright squares; the Figma frame is dark everywhere the light
-     doesn't reach. */
-  -webkit-mask-image:
-    linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.28) 87%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-    radial-gradient(ellipse 78% 62% at 42% 32%, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.42) 50%, rgba(0, 0, 0, 0.12) 76%, rgba(0, 0, 0, 0.04) 100%);
-  -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
-  -webkit-mask-size: 100% 100%, 100% 100%, 100% 100%;
-  -webkit-mask-composite: source-in, source-in;
-  mask-image:
-    linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.28) 87%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-    radial-gradient(ellipse 78% 62% at 42% 32%, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.42) 50%, rgba(0, 0, 0, 0.12) 76%, rgba(0, 0, 0, 0.04) 100%);
-  mask-repeat: no-repeat, no-repeat, no-repeat;
-  mask-size: 100% 100%, 100% 100%, 100% 100%;
-  mask-composite: intersect;
+  /*
+    EVERY TILE THE SAME COLOUR. The lighting ellipse and the left/right edge
+    feather are gone — nothing varies a tile's brightness by where it sits any
+    more, which is what those two did. The light is now a layer of its own (see
+    .hero-light below) rather than something baked into the grid's alpha.
+
+    The one mask left is the last 12% of the field. It is not lighting: it
+    fades the grid out so it hands off to the flat section underneath instead
+    of stopping on a hard line. Take it out and the tiles end mid-square.
+  */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+/*
+  The light over the tiles. Two radials from the centre, both listed
+  top-of-stack first:
+
+    1. the vignette — #000000 from 0% opacity out to 94%. Note its origin is
+       28% / 26%, NOT the box centre.
+
+       It is sized and placed so ONLY the middle few tiles read — about 3.4
+       across by 1.9 down, seven or so — and everything else goes to near
+       black:
+
+         centre 8% black     top-left (rays) 95% black     bottom-right 98%
+
+       The corner the rays come from is deliberately dark HERE. The rays are
+       not exempted by the vignette — they are screen-blended on a layer above
+       it, so they lighten the tiles they cross rather than being spared by a
+       hole in the darkness. Widening this to protect that corner is what made
+       the whole top-left wash out.
+
+       IT MUST ALSO BE READ AGAINST THE TILES' OPACITY. A steep version of this
+       (45% black a sixth of the way out) was correct while the tiles painted at
+       full strength. At their real 35% a tile is already only rgb(43,29,63),
+       and that curve took it to rgb(7,4,10) — the field went black and the
+       light looked broken. Retune whenever the tile opacity changes; the two
+       are one setting.
+    2. the tint — #2D1940 at 10% in the centre, clearing to #000000 at 0%.
+
+  Both use `farthest-side`, which is how Figma's radial behaves: the ellipse's
+  radii are half the box's width and height, so the edge midpoints reach the
+  final stop and the corners sit past it. CSS's default is `farthest-corner`,
+  which would leave the left and right edges of a wide hero noticeably
+  under-darkened.
+
+  This is its own layer rather than more backgrounds on .hero-grid because that
+  element is masked and the light should not inherit the grid's bottom fade. It
+  sits ABOVE the tiles but BELOW .hero-rays, so the sunshine rays paint over the
+  vignette and keep their full strength — do not reorder those two.
+*/
+.hero-light {
+  background-image:
+    radial-gradient(
+      ellipse 68% 68% at 45% 40%,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.14) 28%,
+      rgba(0, 0, 0, 0.62) 48%,
+      rgba(0, 0, 0, 0.9) 68%,
+      rgba(0, 0, 0, 0.98) 100%
+    ),
+    radial-gradient(
+      ellipse farthest-side at 50% 50%,
+      rgba(45, 25, 64, 0.1) 0%,
+      rgba(0, 0, 0, 0) 100%
+    );
 }
 
 /* Phone hero: same darkened field and gradient-filled tiles as desktop —
@@ -375,8 +539,8 @@ body {
         #0f0a1e 52%,
         #0d0918 66%,
         #0b0912 80%,
-        #0a090f 92%,
-        #0a090f 100%
+        #000000 92%,
+        #000000 100%
       );
   }
 }
@@ -479,19 +643,22 @@ body {
    drawn for exactly this card, so it stretches 100% both ways rather than
    cover-cropping. */
 .cta-card {
-  /* Matched to the Figma card — and note the ORIENTATION: the card is black
-     at the top, and the purple is a glow rising from the BOTTOM edge, gone
-     by mid-height. Every earlier version had this upside-down (light at the
-     top), which is why it kept reading too bright no matter the alphas. */
+  /*
+    The fill is the Figma one, verbatim: a single LINEAR gradient of ONE
+    colour, #1d0937, from 0% opacity at the top of the card to 100% at the
+    bottom, over the page's black. Note the ORIENTATION — the purple rises
+    from the bottom edge; every early version had this upside-down, which is
+    why it kept reading too bright no matter the alphas.
+
+    It replaces an eyeballed radial "glow" that pooled light in the lower
+    middle. A flat vertical ramp is both what the design says and what makes
+    it read as subtle: #1d0937 is dark enough that even at full opacity it
+    only just lifts off the black.
+  */
   background:
     url("/images/cta-streaks.svg") center / 100% 100% no-repeat,
-    radial-gradient(
-      ellipse 85% 65% at 50% 110%,
-      rgba(122, 92, 196, 0.3) 0%,
-      rgba(90, 66, 150, 0.15) 40%,
-      rgba(0, 0, 0, 0) 64%
-    ),
-    linear-gradient(180deg, #0a0710 0%, #0b0814 55%, #0e0a1a 100%);
+    linear-gradient(180deg, rgba(29, 9, 55, 0) 0%, rgba(29, 9, 55, 1) 100%),
+    var(--bg);
 }
 
 /* Partial border that fades away from the top-left and is gone by the

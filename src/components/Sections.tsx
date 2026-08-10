@@ -3,7 +3,6 @@ import { TrustBadges } from "./TrustBadges";
 import { CreativesRail } from "./CreativesRail";
 import {
   HERO,
-  HERO_FLOATERS,
   SOCIAL_PROOF,
   CREATIVES,
   CASE_STUDIES,
@@ -11,8 +10,7 @@ import {
   FINAL_CTA,
 } from "@/lib/content";
 import { BOOKING_ANCHOR, BOOKING_URL } from "@/lib/site";
-
-const SHELL = "mx-auto w-full max-w-[1200px] px-5";
+import { SHELL } from "@/lib/layout";
 
 /**
  * CTA pill. Label is uppercased with tracking to match the design — the
@@ -27,11 +25,17 @@ function Pill({
   children: React.ReactNode;
   variant?: "primary" | "dark";
 }) {
-  // Measured from Figma nodes 3803:1672/1673 (primary) and 3803:1583/1584
-  // (secondary): 67px tall, 15px radius, Poppins SemiBold 24px. The frame is
-  // 1921px wide, so values are scaled ~0.75 for a 1440 viewport.
+  // Measured from Figma nodes 3803:1672/1673 (primary) and 3803:1583/1584:
+  // 67px tall, 15px radius, Poppins SemiBold 24px on desktop.
+  //
+  // The radius scales with --hero-u like the height does. Left at a flat 15 it
+  // was 22% of the button's height at 1920 and 30% at 1440 — reading as a
+  // half-pill as the button shrank. Commit 8b07942 found the same thing on the
+  // header CTA independently. The height was
+  // 56 here — the old 0.75 scale-down for a 1440 viewport — and is now the
+  // design's 67 at lg. Below lg it still steps down; that is the phone pass.
   const base =
-    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] lg:h-[56px] lg:px-8 lg:text-[24px]";
+    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
@@ -52,8 +56,12 @@ function Pill({
 /**
  * Rating as filled violet tiles, each holding a white star — the design's
  * treatment, not bare ★ glyphs, which render inconsistently across platforms
- * and cannot carry the tile colour. Trustpilot-style: square corners, and the
- * star runs nearly edge to edge rather than floating small in the middle.
+ * and cannot carry the tile colour.
+ *
+ * Tile and star are the `star-x2.svg` asset inlined verbatim: a 35 × 35 box
+ * filled #6E54B5 with the Trustpilot-style star notched out of it in white,
+ * running edge to edge. Inlined rather than <img> so the five tiles cost no
+ * requests and the geometry stays exact at any rendered size.
  */
 function Stars({ count = 5 }: { count?: number }) {
   return (
@@ -63,15 +71,18 @@ function Stars({ count = 5 }: { count?: number }) {
       aria-label={`${count} out of 5 stars`}
     >
       {Array.from({ length: count }, (_, i) => (
-        <span
+        <svg
           key={i}
           aria-hidden="true"
-          className="flex size-[22px] items-center justify-center bg-[#7c54b5]"
+          viewBox="0 0 35 35"
+          className="size-[22px] shrink-0"
         >
-          <svg viewBox="0 0 24 24" className="size-[17px] fill-white">
-            <path d="M12 2.6l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.7 6.1 20.8l1.2-6.6L2.5 9.6l6.6-.9L12 2.6z" />
-          </svg>
-        </span>
+          <rect width="35" height="35" fill="#6E54B5" />
+          <path
+            d="M17.5 24.0645L22.9315 22.6101L25.2009 30L17.5 24.0645ZM30 14.5126H20.439L17.5 5L14.561 14.5126H5L12.7381 20.4088L9.7991 29.9214L17.5372 24.0252L22.2991 20.4088L30 14.5126Z"
+            fill="white"
+          />
+        </svg>
       ))}
     </span>
   );
@@ -87,60 +98,7 @@ function Stars({ count = 5 }: { count?: number }) {
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
-      {/*
-        Platform marks — THREE nested layers, which is what gives them depth:
-
-          outer   large translucent frosted tile, hairline edge, cast shadow
-          middle  a second inset tile in a slightly DIFFERENT tone (~76%) —
-                  not the same value as the outer; that difference is the
-                  whole effect and reads as a bevel
-          logo    the brand mark itself (~52%), its own rounded tile
-
-        Two layers looked flat and one looked pasted on. The doubled square is
-        the detail that makes them sit in the scene.
-
-        z-[3] puts these above the stat panels: in the design the Instagram
-        mark overlaps the left-hand panel, so the icons win.
-
-        Decorative, so aria-hidden with empty alt. Hidden below lg, where there
-        is no room beside the headline.
-      */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[3] hidden lg:block"
-      >
-        {HERO_FLOATERS.map((f) => (
-          <span
-            key={f.name}
-            className={`absolute ${f.pos} flex items-center justify-center rounded-[28px] border border-white/[0.06] bg-white/[0.025] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)] backdrop-blur-[6px]`}
-            style={{
-              transform: `rotate(${f.rotate})`,
-              width: f.size,
-              height: f.size,
-            }}
-          >
-            {/* The inner tile is LIGHTER than the outer, not darker — that is
-                what lifts the logo forward. Having it darker inverted the
-                bevel and made the stack read as a hole. */}
-            <span
-              className="flex items-center justify-center rounded-[21px] border border-white/[0.10] bg-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
-              style={{
-                width: Math.round(f.size * 0.76),
-                height: Math.round(f.size * 0.76),
-              }}
-            >
-              <Img
-                src={f.image}
-                alt=""
-                width={Math.round(f.size * 0.52)}
-                className="rounded-[13px] shadow-[0_6px_14px_-5px_rgba(0,0,0,0.75)]"
-              />
-            </span>
-          </span>
-        ))}
-      </div>
-
-      <div className={`${SHELL} relative pb-14 pt-5 text-center md:pt-20`}>
+      <div className={`${SHELL} relative pb-14 pt-5 text-center md:pb-[calc(var(--hero-u)*0.56)] md:pt-[calc(var(--hero-u)*0.8)]`}>
         {/*
           Figma nodes 3803:1591/1593/1594: a frosted white pill — a blurred
           white fill under a 50px-radius container — carrying BLACK Poppins
@@ -153,33 +111,41 @@ export function Hero() {
         */}
         {/*
           Crisp pill, not a blur cloud: a vertical gradient — lavender rim into
-          a white core and back — gives the rolled-edge look of the reference,
-          and the halo lives in a box-shadow OUTSIDE the shape so the edge
-          itself stays sharp. The earlier blurred white fill destroyed the
-          silhouette entirely.
+          a white core and back — gives the rolled-edge look of the reference.
+
+          It throws NOTHING outwards. The glow was a 30px-blur, 10px-spread
+          box-shadow in lavender, which bled a halo onto the tiles behind it;
+          it is now `inset`, so the only radiance is #6E54B5 creeping a little
+          way in from the rim.
         */}
-        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-5 py-2 shadow-[0_0_30px_10px_rgba(140,106,226,0.35)] md:px-7 md:py-3">
-          <span className="text-[14px] font-medium text-black md:text-[20px]">
+        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-5 py-2 shadow-[inset_0_0_12px_rgba(110,84,181,0.5)] md:mb-[calc(var(--hero-u)*0.28)] md:px-[calc(var(--hero-u)*0.28)] md:py-[calc(var(--hero-u)*0.12)]">
+          <span className="text-[14px] font-medium text-black md:text-[length:calc(var(--hero-u)*0.2)]">
             {HERO.eyebrow}
           </span>
         </span>
 
-        {/* The only <h1> on the page. */}
+        {/* The only <h1> on the page. Poppins SemiBold 80 with letter-spacing
+            0 — it carried `tracking-tight` (-0.025em), which at 80px pulled
+            two full pixels out of every gap. Nothing above it sets tracking, so
+            dropping the class leaves it at 0 rather than needing an override. */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] tracking-tight sm:text-6xl lg:text-[80px]"
+          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] sm:text-6xl md:text-[length:calc(var(--hero-u)*0.8)]"
         >
           {HERO.heading}
         </h1>
 
-        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:text-[30px] md:leading-[40px]">
+        {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
+            case from md up, and nothing above sets tracking. Below md it steps
+            down to 16, which the phone pass still has to confirm. */}
+        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:mt-[calc(var(--hero-u)*0.24)] md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
           {HERO.sub}
         </p>
 
         {/* `isolate` keeps the glow's -z-10 inside this row's stacking
             context — without it the glow would drop behind .hero-bg's
             background and vanish. */}
-        <div className="relative isolate mt-10 flex items-center justify-center gap-2.5 sm:gap-4">
+        <div className="relative isolate mt-10 flex items-center justify-center gap-2.5 sm:gap-4 md:mt-[calc(var(--hero-u)*0.4)]">
           <span
             aria-hidden="true"
             className="cta-glow pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2"
@@ -218,11 +184,13 @@ export function SocialProof() {
     // Sits inside the same violet wrapper as the hero, so no background of its
     // own — it previously re-declared a gradient that did not line up with the
     // hero's, which showed as a visible seam.
-    // Deep bottom padding on purpose: it gives the hero's violet ramp a long
-    // run of near-black to dissolve into before the next section starts, which
-    // is what makes the handover read as a fade rather than a stop. With a
-    // short tail the gradient had to resolve too fast and the join showed.
-    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2">
+    // Bottom padding gives the hero's violet ramp a run of near-black to
+    // dissolve into before the next section starts, so the handover reads as a
+    // fade rather than a stop. It scales with --hero-u at md+ rather than
+    // sitting at a flat 192: it is empty space, but the stat panels are
+    // positioned as a percentage of this whole field, so a fixed tail pushed
+    // them further down the page the smaller the window got.
+    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2 md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         {/* The design's own divider ornament — a gradient line running into a
@@ -237,11 +205,13 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[21px] w-auto"
+            className="h-[21px] w-auto md:h-[calc(var(--hero-u)*0.21)]"
           />
+          {/* Poppins Regular 20 at every width — it was 14 stepping up to 15
+              Medium, so both the size and the weight were off. */}
           <h2
             id="proof-heading"
-            className="whitespace-nowrap text-center text-[14px] font-normal text-white md:text-[15px] md:font-medium"
+            className="whitespace-nowrap text-center text-[20px] font-normal text-white md:text-[length:calc(var(--hero-u)*0.2)]"
           >
             {SOCIAL_PROOF.headline}
           </h2>
@@ -254,14 +224,14 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[21px] w-auto -scale-x-100"
+            className="h-[21px] w-auto -scale-x-100 md:h-[calc(var(--hero-u)*0.21)]"
           />
         </div>
 
         {/* Official client logotypes from /public/logos. Each keeps its own
             viewBox width so relative sizing matches the design; only
             "we interiors" has no supplied SVG and falls back to text. */}
-        <div className="mx-auto mt-10 max-w-3xl space-y-4 md:space-y-6">
+        <div className="mx-auto mt-10 max-w-3xl space-y-4 md:mt-[calc(var(--hero-u)*0.4)] md:space-y-[calc(var(--hero-u)*0.24)]">
           {/*
             The design stacks the brands as a centred pyramid — four, three,
             two, one — not a width-driven wrap, which broke rows in different
@@ -284,7 +254,7 @@ export function SocialProof() {
                       height={brand.h}
                       loading="lazy"
                       decoding="async"
-                      className="h-[19px] w-auto opacity-95 md:h-[26px]"
+                      className="h-[19px] w-auto opacity-95 md:h-[calc(var(--hero-u)*0.26)]"
                     />
                   ) : (
                     <span className="text-[22px] font-medium tracking-tight text-white/90">
@@ -315,35 +285,62 @@ export function Creatives() {
             {CREATIVES.heading}
           </h2>
 
-          {/* The heading asks a question; this pill is the answer. Violet
-              pill with a circular arrow badge, as in the design. */}
+          {/*
+            The heading asks a question; this pill is the answer.
+
+            Desktop is measured, not eyeballed: 143 x 60, radius 30 on all four
+            corners, a 45x45 #222222 disc inset 7.5px from the right edge (the
+            same inset as the 7.5px it gets top and bottom from 60 - 45), and
+            exactly 18px between the end of "Yes" and the start of the disc.
+            `justify-end` is what holds both of those at once — the content is
+            packed against the right edge, so the 18px gap and the 7.5px inset
+            are both literal and the leftover space falls on the left of "Yes"
+            instead of being a padding value that has to be kept in sync with
+            the text's width.
+
+            The fill is the header's "Book a Call" gradient verbatim so the two
+            CTAs read as the same button. Hover inverts fill and text per
+            CLAUDE.md, keeping a gradient on both states so it cross-fades; the
+            disc stays dark through the inversion so the arrow never disappears
+            against the white fill.
+          */}
           <a
             href={BOOKING_URL}
-            // Figma 3803:1218: the pill is 143x60 with a 45x45 circle inset
-            // 7px from the right — 107x45 with a 34px circle at 1440.
-            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-5 pr-[6px] text-[20px] font-semibold text-white md:h-[58px] md:pl-7 md:pr-2 md:text-[30px] transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
+            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[6px] text-[20px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:w-[143px] md:justify-end md:gap-[18px] md:rounded-[30px] md:pl-0 md:pr-[7.5px] md:text-[30px] md:font-normal"
           >
             {CREATIVES.cta}
-            <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors md:size-[42px]">
+            <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[45px]">
+              {/* ~/Documents/arrow icon.svg, inlined. Its 17-unit viewBox is
+                  the 15-unit arrow plus the 1-unit stroke overhang on each
+                  side, so the box has to render at 17 for the drawn arrow to
+                  measure the 15 it is specified at. Rendering the box itself
+                  at 15 shrank the arrow to 13.2. */}
               <svg
-                viewBox="0 0 24 24"
+                viewBox="0 0 17 17"
                 fill="none"
-                strokeWidth="2.2"
-                className="size-5 stroke-current md:size-6"
+                className="size-[13px] stroke-current md:size-[17px]"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 aria-hidden="true"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
+                <path d="M0.999888 15.9999L15.9998 1M15.9998 14.1708L15.9998 1L2.82898 1" />
               </svg>
             </span>
           </a>
         </div>
+      </div>
 
-        {/* Finite carousel with auto-drift, a progress timeline and prev/next
-            controls — see CreativesRail. The design's progress line implies a
-            carousel, not the endless duplicated marquee that was here. */}
-        <div className="mt-10">
-          <CreativesRail />
-        </div>
+      {/*
+        The rail is deliberately OUTSIDE the shell. It clips at the screen
+        edges, not the 1200px column, so a card that leaves the view travels
+        the full width of the display rather than vanishing into a margin two
+        hundred pixels short of it. It re-establishes the column's left edge
+        with its own padding, so the first card still starts directly under the
+        "W" of the heading. See CreativesRail.
+      */}
+      <div className="mt-10">
+        <CreativesRail />
       </div>
     </section>
   );
@@ -463,10 +460,10 @@ export function CaseStudies() {
 
 function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
   return (
-    <article className="rounded-[18px] bg-[#161519] p-7">
+    <article className="rounded-[20px] bg-[#161519] p-7">
       {/* Title and avatar share the top row; the avatar is right-aligned. */}
       <div className="flex items-start justify-between gap-5">
-        <h3 className="text-[19px] font-semibold leading-snug text-white">
+        <h3 className="text-[30px] font-semibold leading-snug text-white">
           {t.title}
         </h3>
         {t.avatar ? (
@@ -492,13 +489,13 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
 
       <div className="mt-4 space-y-4">
         {t.body.map((para, i) => (
-          <p key={i} className="text-[14px] leading-relaxed text-white/65">
+          <p key={i} className="text-[21px] font-normal leading-relaxed text-white/50">
             {para}
           </p>
         ))}
       </div>
 
-      <footer className="mt-6 text-[13px] text-white/40">
+      <footer className="mt-6 text-[21px] font-light text-white/40">
         <time dateTime={t.iso}>{t.date}</time>
         {"  •  "}
         <span>{t.author}</span>
@@ -547,11 +544,18 @@ export function Testimonials() {
   return (
     <section id="agency" aria-labelledby="testimonials-heading" className="py-20">
       <div className={SHELL}>
+        {/* 48/48 from the design — line-height equals the size, so the two
+            sentences sit tight on top of each other. Each sentence is its own
+            block rather than a <br>, so the break survives any wrapping. */}
         <h2
           id="testimonials-heading"
-          className="text-[22px] font-semibold leading-tight tracking-tight md:text-[48px]"
+          className="text-[22px] font-semibold leading-tight tracking-tight md:text-[48px] md:leading-[48px]"
         >
-          {TESTIMONIALS.heading}
+          {TESTIMONIALS.headingLines.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
         </h2>
 
         {/*
@@ -566,7 +570,19 @@ export function Testimonials() {
           One continuous flow has no seam, and no duplicated cards either.
         */}
         <div className="relative mt-12 [&:has(details[open])_.testi-clip]:max-h-none [&:has(details[open])_.testi-fade]:hidden">
-          <div className="testi-clip relative max-h-[540px] overflow-hidden">
+          {/*
+            The collapsed height is tuned so the first card in each column is
+            whole and the second is cut near its middle — two full cards and
+            two halves before the pill is pressed. Cards are content-sized, so
+            these are measured values, not a formula: each one is the midpoint
+            of the left column's second card at that breakpoint, which also
+            clears the tallest first card there. Below lg the grid is one
+            column, so it reads as one full card and a half.
+
+            Re-measure if the testimonial copy changes — the numbers come from
+            the text's own wrapping.
+          */}
+          <div className="testi-clip relative max-h-[1170px] overflow-hidden lg:max-h-[840px] xl:max-h-[740px]">
             <TestimonialColumns list={items} />
             <div
               aria-hidden="true"
@@ -575,7 +591,10 @@ export function Testimonials() {
           </div>
 
           <details className="group">
-            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-2.5 rounded-[var(--radius-pill)] md:gap-4 border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] transition-colors duration-150 hover:bg-white group-open:static group-open:mt-8 [&::-webkit-details-marker]:hidden">
+            {/* 594 × 62 from the design, fixed from md up so the pill matches
+                the measured box rather than hugging its content. Phones keep
+                the content-width pill — 594 would overflow a 375 viewport. */}
+            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center justify-center gap-2.5 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] transition-colors duration-150 hover:bg-white group-open:static group-open:mt-8 md:h-[62px] md:w-[594px] md:gap-4 md:py-0 [&::-webkit-details-marker]:hidden">
               <span aria-hidden="true" className="flex -space-x-3">
                 {items
                   .filter((t) => t.avatar)
@@ -585,25 +604,25 @@ export function Testimonials() {
                       key={t.title}
                       src={t.avatar as string}
                       alt=""
-                      width={34}
-                      className="size-[34px] rounded-full object-cover ring-2 ring-[#1b1a1f]"
+                      width={40}
+                      className="size-[40px] rounded-full object-cover ring-2 ring-[#1b1a1f]"
                     />
                   ))}
               </span>
 
-              <span className="whitespace-nowrap text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
+              <span className="whitespace-nowrap text-[15px] font-medium leading-[30px] text-white transition-colors group-hover/pill:text-black md:text-[21px]">
                 {TESTIMONIALS.trustLine}
               </span>
 
-              <span aria-hidden="true" className="h-5 w-px bg-white/15 transition-colors group-hover/pill:bg-black/20" />
+              <span aria-hidden="true" className="h-5 w-px bg-white/15 transition-colors group-hover/pill:bg-black/20 md:h-[30px]" />
 
               {/* Phones drop the "View More" label so the pill stays one line
                   — avatars, trust line, divider, the +/− disc — per the phone
                   design. The label returns from md up. */}
-              <span className="flex items-center gap-2.5 text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
+              <span className="flex items-center gap-2.5 text-[15px] font-medium leading-[30px] text-white transition-colors group-hover/pill:text-black md:text-[21px]">
                 <span className="hidden md:inline md:group-open:hidden">{TESTIMONIALS.moreLabel}</span>
                 <span className="hidden md:group-open:inline">View Less</span>
-                <span className="flex size-7 items-center justify-center rounded-full bg-white text-[16px] leading-none text-black transition-colors group-hover/pill:bg-black group-hover/pill:text-white">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[16px] leading-none text-black transition-colors group-hover/pill:bg-black group-hover/pill:text-white md:size-[30px] md:text-[18px]">
                   <span className="group-open:hidden">+</span>
                   <span className="hidden leading-none group-open:inline">−</span>
                 </span>
@@ -627,45 +646,102 @@ export function FinalCta() {
       aria-labelledby="cta-heading"
       className="scroll-mt-28 px-[15px] pb-24 pt-8 md:px-5"
     >
-      {/* Phone frame: 345x320 card on a light-to-dark wash (see .cta-card);
-          desktop keeps the dark artwork treatment and full width. */}
-      <div className="cta-card relative mx-auto min-h-[320px] w-[345px] max-w-full overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:min-h-0 md:w-full md:max-w-[1200px] md:border-[#8a5cf6]/45 md:py-20">
+      {/*
+        Phone frame: 345x320 card on a light-to-dark wash (see .cta-card).
+
+        Desktop is the measured card: 1380 x 842 — the full content column
+        wide (see lib/layout.ts) and a FIXED height rather than a padding
+        budget. The design gives the panel's box, and letting the type set the
+        height drifts it by tens of pixels every time the copy changes.
+
+        The content block is centred in it, which leaves 272 above and below.
+        The reference has it about 9px above centre; that is inside the error
+        of reading a screenshot, so it does not earn a hardcoded offset.
+      */}
+      <div className="cta-card relative mx-auto flex min-h-[320px] w-[345px] max-w-full items-center justify-center overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:h-[842px] md:min-h-0 md:w-full md:max-w-[1380px] md:border-[#8a5cf6]/45 md:px-5 md:py-0">
         {/* No centre glow: the design's card is black through the middle,
             with its only light rising from the bottom edge (see .cta-card). */}
         {/* The streaks live in the card background itself now — the design's
             own exported artwork (cta-streaks.svg) — replacing the hand-drawn
             stand-in curves that used to sit here. */}
         <div className="relative">
+          {/* 55/55 — line-height equals the size, so the two lines sit tight
+              on each other, same treatment as the testimonials heading. The
+              design breaks after "You scrolled so far."; each line is its own
+              block rather than a <br>, so the break survives any wrapping. */}
           <h2
             id="cta-heading"
-            className="mx-auto max-w-3xl text-balance text-[22px] font-semibold leading-[22px] tracking-tight sm:text-[55px] sm:leading-[55px]"
+            className="text-[22px] font-semibold leading-[22px] tracking-tight md:text-[55px] md:leading-[55px]"
           >
-            {FINAL_CTA.heading}
+            {FINAL_CTA.headingLines.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-[14px] font-normal leading-[19px] text-white/50 sm:text-[24px] sm:leading-[30px]">
-            {FINAL_CTA.sub}
+
+          {/* 24/30 Regular, white at 50%. mt-6 is the measured 24 from the
+              heading's last line box. */}
+          <p className="mt-6 text-[14px] font-normal leading-[19px] text-white/50 md:text-[24px] md:leading-[30px]">
+            {FINAL_CTA.subLines.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            {/* Same treatment as the creatives "Yes" pill — rounded-full,
-                sentence case, arrow disc — with the house hover inversion. */}
+
+          {/*
+            44 below the sub and 28 between the pills are read off the
+            reference, not supplied — treat them as close, not exact. Same for
+            the pills' horizontal insets, which are checked rather than
+            guessed: Poppins Regular 26 sets "15 Minute Fit-Check" 251.5 wide
+            and "2/10 client spots left for 2026" 366.5 (advance widths from
+            the woff2 `hmtx`), so 25 + text + 15 + 40 disc + 10 comes to 341.5
+            and 28 + text + 28 to 422.5 — against the ~342 and ~422 the
+            reference measures.
+          */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:mt-11 md:gap-[28px]">
+            {/*
+              The creatives "Yes" pill's fill verbatim — the header's "Book a
+              Call" gradient — so every primary CTA on the page reads as the
+              same button. 60 tall, radius 36, label Poppins 26, and a 40x40
+              #222222 disc inset 10 from the right edge, which is the same 10
+              it gets top and bottom from 60 - 40.
+
+              Hover inverts fill and text per CLAUDE.md, keeping a gradient on
+              both states so the fill cross-fades instead of snapping; the disc
+              stays #222222 through the inversion so the arrow never
+              disappears against the white.
+            */}
             <a
               href={BOOKING_URL}
-              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] sm:text-[20px]"
+              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:gap-[15px] md:rounded-[36px] md:pl-[25px] md:pr-[10px] md:text-[26px]"
             >
               {FINAL_CTA.cta}
-              <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors">
+              <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[40px]">
+                {/* The house arrow (see the creatives pill): a 15-unit arrow
+                    in a 17-unit viewBox, the extra unit each side being the
+                    stroke's overhang. So the box has to render at 17/15 of the
+                    size the arrow is specified at — 14 x 17/15 = 15.87 here.
+                    Rendering the box itself at 14 would draw a 12.4 arrow. */}
                 <svg
-                  viewBox="0 0 24 24"
+                  viewBox="0 0 17 17"
                   fill="none"
-                  strokeWidth="2.2"
-                  className="size-4 stroke-current"
+                  className="size-[13px] stroke-current md:size-[15.87px]"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   aria-hidden="true"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
+                  <path d="M0.999888 15.9999L15.9998 1M15.9998 14.1708L15.9998 1L2.82898 1" />
                 </svg>
               </span>
             </a>
-            <span className="inline-flex h-[45px] items-center rounded-full border border-white/15 bg-[#17151d]/80 px-6 text-[16px] font-normal text-white/75 sm:text-[20px]">
+
+            {/* Flat white at 20% over the card — no border and no tinted fill
+                of its own. Same 60 tall and radius 36 as the primary, label
+                Poppins Regular 26. */}
+            <span className="inline-flex h-[45px] items-center rounded-full bg-white/20 px-6 text-[16px] font-normal text-white md:h-[60px] md:rounded-[36px] md:px-[28px] md:text-[26px]">
               {FINAL_CTA.scarcity}
             </span>
           </div>
