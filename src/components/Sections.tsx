@@ -561,7 +561,19 @@ export function Testimonials() {
           One continuous flow has no seam, and no duplicated cards either.
         */}
         <div className="relative mt-12 [&:has(details[open])_.testi-clip]:max-h-none [&:has(details[open])_.testi-fade]:hidden">
-          <div className="testi-clip relative max-h-[540px] overflow-hidden">
+          {/*
+            The collapsed height is tuned so the first card in each column is
+            whole and the second is cut near its middle — two full cards and
+            two halves before the pill is pressed. Cards are content-sized, so
+            these are measured values, not a formula: each one is the midpoint
+            of the left column's second card at that breakpoint, which also
+            clears the tallest first card there. Below lg the grid is one
+            column, so it reads as one full card and a half.
+
+            Re-measure if the testimonial copy changes — the numbers come from
+            the text's own wrapping.
+          */}
+          <div className="testi-clip relative max-h-[1170px] overflow-hidden lg:max-h-[840px] xl:max-h-[740px]">
             <TestimonialColumns list={items} />
             <div
               aria-hidden="true"
