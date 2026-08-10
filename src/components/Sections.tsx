@@ -637,45 +637,102 @@ export function FinalCta() {
       aria-labelledby="cta-heading"
       className="scroll-mt-28 px-[15px] pb-24 pt-8 md:px-5"
     >
-      {/* Phone frame: 345x320 card on a light-to-dark wash (see .cta-card);
-          desktop keeps the dark artwork treatment and full width. */}
-      <div className="cta-card relative mx-auto min-h-[320px] w-[345px] max-w-full overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:min-h-0 md:w-full md:max-w-[1380px] md:border-[#8a5cf6]/45 md:py-20">
+      {/*
+        Phone frame: 345x320 card on a light-to-dark wash (see .cta-card).
+
+        Desktop is the measured card: 1380 x 842 — the full content column
+        wide (see lib/layout.ts) and a FIXED height rather than a padding
+        budget. The design gives the panel's box, and letting the type set the
+        height drifts it by tens of pixels every time the copy changes.
+
+        The content block is centred in it, which leaves 272 above and below.
+        The reference has it about 9px above centre; that is inside the error
+        of reading a screenshot, so it does not earn a hardcoded offset.
+      */}
+      <div className="cta-card relative mx-auto flex min-h-[320px] w-[345px] max-w-full items-center justify-center overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:h-[842px] md:min-h-0 md:w-full md:max-w-[1380px] md:border-[#8a5cf6]/45 md:px-5 md:py-0">
         {/* No centre glow: the design's card is black through the middle,
             with its only light rising from the bottom edge (see .cta-card). */}
         {/* The streaks live in the card background itself now — the design's
             own exported artwork (cta-streaks.svg) — replacing the hand-drawn
             stand-in curves that used to sit here. */}
         <div className="relative">
+          {/* 55/55 — line-height equals the size, so the two lines sit tight
+              on each other, same treatment as the testimonials heading. The
+              design breaks after "You scrolled so far."; each line is its own
+              block rather than a <br>, so the break survives any wrapping. */}
           <h2
             id="cta-heading"
-            className="mx-auto max-w-3xl text-balance text-[22px] font-semibold leading-[22px] tracking-tight sm:text-[55px] sm:leading-[55px]"
+            className="text-[22px] font-semibold leading-[22px] tracking-tight md:text-[55px] md:leading-[55px]"
           >
-            {FINAL_CTA.heading}
+            {FINAL_CTA.headingLines.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-[14px] font-normal leading-[19px] text-white/50 sm:text-[24px] sm:leading-[30px]">
-            {FINAL_CTA.sub}
+
+          {/* 24/30 Regular, white at 50%. mt-6 is the measured 24 from the
+              heading's last line box. */}
+          <p className="mt-6 text-[14px] font-normal leading-[19px] text-white/50 md:text-[24px] md:leading-[30px]">
+            {FINAL_CTA.subLines.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            {/* Same treatment as the creatives "Yes" pill — rounded-full,
-                sentence case, arrow disc — with the house hover inversion. */}
+
+          {/*
+            44 below the sub and 28 between the pills are read off the
+            reference, not supplied — treat them as close, not exact. Same for
+            the pills' horizontal insets, which are checked rather than
+            guessed: Poppins Regular 26 sets "15 Minute Fit-Check" 251.5 wide
+            and "2/10 client spots left for 2026" 366.5 (advance widths from
+            the woff2 `hmtx`), so 25 + text + 15 + 40 disc + 10 comes to 341.5
+            and 28 + text + 28 to 422.5 — against the ~342 and ~422 the
+            reference measures.
+          */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:mt-11 md:gap-[28px]">
+            {/*
+              The creatives "Yes" pill's fill verbatim — the header's "Book a
+              Call" gradient — so every primary CTA on the page reads as the
+              same button. 60 tall, radius 36, label Poppins 26, and a 40x40
+              #222222 disc inset 10 from the right edge, which is the same 10
+              it gets top and bottom from 60 - 40.
+
+              Hover inverts fill and text per CLAUDE.md, keeping a gradient on
+              both states so the fill cross-fades instead of snapping; the disc
+              stays #222222 through the inversion so the arrow never
+              disappears against the white.
+            */}
             <a
               href={BOOKING_URL}
-              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] sm:text-[20px]"
+              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:gap-[15px] md:rounded-[36px] md:pl-[25px] md:pr-[10px] md:text-[26px]"
             >
               {FINAL_CTA.cta}
-              <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors">
+              <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[40px]">
+                {/* The house arrow (see the creatives pill): a 15-unit arrow
+                    in a 17-unit viewBox, the extra unit each side being the
+                    stroke's overhang. So the box has to render at 17/15 of the
+                    size the arrow is specified at — 14 x 17/15 = 15.87 here.
+                    Rendering the box itself at 14 would draw a 12.4 arrow. */}
                 <svg
-                  viewBox="0 0 24 24"
+                  viewBox="0 0 17 17"
                   fill="none"
-                  strokeWidth="2.2"
-                  className="size-4 stroke-current"
+                  className="size-[13px] stroke-current md:size-[15.87px]"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   aria-hidden="true"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
+                  <path d="M0.999888 15.9999L15.9998 1M15.9998 14.1708L15.9998 1L2.82898 1" />
                 </svg>
               </span>
             </a>
-            <span className="inline-flex h-[45px] items-center rounded-full border border-white/15 bg-[#17151d]/80 px-6 text-[16px] font-normal text-white/75 sm:text-[20px]">
+
+            {/* Flat white at 20% over the card — no border and no tinted fill
+                of its own. Same 60 tall and radius 36 as the primary, label
+                Poppins Regular 26. */}
+            <span className="inline-flex h-[45px] items-center rounded-full bg-white/20 px-6 text-[16px] font-normal text-white md:h-[60px] md:rounded-[36px] md:px-[28px] md:text-[26px]">
               {FINAL_CTA.scarcity}
             </span>
           </div>
