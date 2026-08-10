@@ -636,9 +636,14 @@ export const FINAL_CTA = {
   /** The design breaks after the first sentence — "You scrolled so far." alone. */
   headingLines: ["You scrolled so far.", "You want this. Trust us."],
   sub: "We have a cap. We don't know if you're the right fit yet. But we'd love to find out in 15 minutes.",
-  /** Same break as the reference: the cap sentence, then the invitation. */
+  /**
+   * One sentence per line — the phone card's three breaks. The desktop card is
+   * wide enough to carry the first two on one line, which is the break the
+   * reference shows there, so FinalCta joins them from md up.
+   */
   subLines: [
-    "We have a cap. We don't know if you're the right fit yet.",
+    "We have a cap.",
+    "We don't know if you're the right fit yet.",
     "But we'd love to find out in 15 minutes.",
   ],
   cta: "15 Minute Fit-Check",

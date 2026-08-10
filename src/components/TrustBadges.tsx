@@ -75,16 +75,19 @@ export function TrustBadges() {
             height={64}
             loading="lazy"
             decoding="async"
-            className="size-16 shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
+            // The phone row is three columns of ~110, so the desktop badge
+            // scales down with the text rather than keeping its 64.
+            className="size-10 shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
           />
-          {/* Both lines are Poppins 16 — the award name and the "Winner 2025"
-              line under it are the same size, not a heading over smaller meta.
-              Only the colour separates them. */}
+          {/* On the phone the two lines differ: the award name is Poppins
+              medium 14 on a tight 16 line, the "Winner 2025" line under it
+              medium 12. From md up they go back to being the same size —
+              both Poppins 16, separated only by colour. */}
           <span className="text-center md:text-left">
-            <span className="block text-[16px] font-normal leading-snug text-white md:text-[length:calc(var(--hero-u)*0.16)]">
+            <span className="block text-[14px] font-medium leading-4 text-white md:text-[length:calc(var(--hero-u)*0.16)] md:font-normal md:leading-snug">
               {title}
             </span>
-            <span className="flex items-center justify-center gap-1.5 text-[16px] text-zinc-500 md:justify-start md:text-[length:calc(var(--hero-u)*0.16)]">
+            <span className="flex items-center justify-center gap-1.5 text-[12px] font-medium text-zinc-500 md:justify-start md:text-[length:calc(var(--hero-u)*0.16)] md:font-normal">
               <Laurel flip />
               {meta}
               <Laurel />
