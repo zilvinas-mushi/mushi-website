@@ -36,13 +36,30 @@
   --header-h: 92px;
 
   /*
-    The hero's own scale, 100px at 1920. Drives the stat panels AND the
-    platform tiles, which is why it lives here rather than being declared
-    twice — a duplicated clamp is exactly how the header's height and the
-    hero's pull-up drifted apart. Its floor is higher than --header-u's
-    because a 15px panel line stops being legible sooner than nav type does.
+    The hero's own scale, 100px at 1920. Drives the stat panels, the platform
+    tiles AND the hero's whole vertical rhythm, which is why it lives here
+    rather than being declared per component — a duplicated clamp is exactly
+    how the header's height and the hero's pull-up drifted apart.
+
+    It is bound by viewport HEIGHT as well as width, and that is what makes the
+    hero fit without scrolling. The design is 1083 tall at 1920 wide; a laptop
+    at 1920 has roughly 990px of viewport, so at full size it cannot fit — no
+    amount of spacing tuning changes that, only scale does. The hero's content
+    measures about 9.75u top to bottom, so capping u at 9.6vh keeps it inside
+    the window with a little room whatever the window is:
+
+      1440 x 812   u = 75.0  (width-bound)   content 731
+      1440 x 755   u = 72.5  (height-bound)  content 707
+      1920 x 992   u = 95.2  (height-bound)  content 929
+
+    The floor is higher than --header-u's because a 15px panel line stops being
+    legible sooner than nav type does.
+
+    Consequence worth knowing: a card is exactly 500 x 200 only when the window
+    is tall enough for u to reach 100. In a short window everything scales
+    together, which is the trade for never scrolling.
   */
-  --hero-u: clamp(66px, 5.2083vw, 100px);
+  --hero-u: clamp(66px, min(5.2083vw, 9.6vh), 100px);
 }
 
 @media (min-width: 768px) {

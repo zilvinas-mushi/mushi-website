@@ -179,11 +179,13 @@ export function SocialProof() {
     // Sits inside the same violet wrapper as the hero, so no background of its
     // own — it previously re-declared a gradient that did not line up with the
     // hero's, which showed as a visible seam.
-    // Deep bottom padding on purpose: it gives the hero's violet ramp a long
-    // run of near-black to dissolve into before the next section starts, which
-    // is what makes the handover read as a fade rather than a stop. With a
-    // short tail the gradient had to resolve too fast and the join showed.
-    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2 md:pt-[calc(var(--hero-u)*0.08)]">
+    // Bottom padding gives the hero's violet ramp a run of near-black to
+    // dissolve into before the next section starts, so the handover reads as a
+    // fade rather than a stop. It scales with --hero-u at md+ rather than
+    // sitting at a flat 192: it is empty space, but the stat panels are
+    // positioned as a percentage of this whole field, so a fixed tail pushed
+    // them further down the page the smaller the window got.
+    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2 md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         {/* The design's own divider ornament — a gradient line running into a
@@ -563,7 +565,10 @@ export function Testimonials() {
           </div>
 
           <details className="group">
-            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center gap-2.5 rounded-[var(--radius-pill)] md:gap-4 border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] transition-colors duration-150 hover:bg-white group-open:static group-open:mt-8 [&::-webkit-details-marker]:hidden">
+            {/* 594 × 62 from the design, fixed from md up so the pill matches
+                the measured box rather than hugging its content. Phones keep
+                the content-width pill — 594 would overflow a 375 viewport. */}
+            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center justify-center gap-2.5 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] transition-colors duration-150 hover:bg-white group-open:static group-open:mt-8 md:h-[62px] md:w-[594px] md:gap-4 md:py-0 [&::-webkit-details-marker]:hidden">
               <span aria-hidden="true" className="flex -space-x-3">
                 {items
                   .filter((t) => t.avatar)
@@ -573,25 +578,25 @@ export function Testimonials() {
                       key={t.title}
                       src={t.avatar as string}
                       alt=""
-                      width={34}
-                      className="size-[34px] rounded-full object-cover ring-2 ring-[#1b1a1f]"
+                      width={40}
+                      className="size-[40px] rounded-full object-cover ring-2 ring-[#1b1a1f]"
                     />
                   ))}
               </span>
 
-              <span className="whitespace-nowrap text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
+              <span className="whitespace-nowrap text-[15px] font-medium leading-[30px] text-white transition-colors group-hover/pill:text-black md:text-[21px]">
                 {TESTIMONIALS.trustLine}
               </span>
 
-              <span aria-hidden="true" className="h-5 w-px bg-white/15 transition-colors group-hover/pill:bg-black/20" />
+              <span aria-hidden="true" className="h-5 w-px bg-white/15 transition-colors group-hover/pill:bg-black/20 md:h-[30px]" />
 
               {/* Phones drop the "View More" label so the pill stays one line
                   — avatars, trust line, divider, the +/− disc — per the phone
                   design. The label returns from md up. */}
-              <span className="flex items-center gap-2.5 text-[15px] font-medium text-white transition-colors group-hover/pill:text-black">
+              <span className="flex items-center gap-2.5 text-[15px] font-medium leading-[30px] text-white transition-colors group-hover/pill:text-black md:text-[21px]">
                 <span className="hidden md:inline md:group-open:hidden">{TESTIMONIALS.moreLabel}</span>
                 <span className="hidden md:group-open:inline">View Less</span>
-                <span className="flex size-7 items-center justify-center rounded-full bg-white text-[16px] leading-none text-black transition-colors group-hover/pill:bg-black group-hover/pill:text-white">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[16px] leading-none text-black transition-colors group-hover/pill:bg-black group-hover/pill:text-white md:size-[30px] md:text-[18px]">
                   <span className="group-open:hidden">+</span>
                   <span className="hidden leading-none group-open:inline">−</span>
                 </span>
