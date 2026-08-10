@@ -201,7 +201,9 @@ equals 100px at 1920.
 
 ### Per panel
 
-The chrome is shared; these differ.
+**Only the chrome is shared** — 500 × 200, `#181818`, the inner 3px `#222222`
+border, radius 30. Rotation, type sizes and layout are all per panel, which is
+why `HeroPanel` is a discriminated union rather than one row of optional fields.
 
 | | 1 · Performance Score | 2 · Growth Performance Analysis |
 | --- | --- | --- |
@@ -212,6 +214,59 @@ The chrome is shared; these differ.
 | Beside the lines | 35px icon on a 50px disc | column chart |
 | Meter along the bottom | yes | no |
 
+**Panel 3 · Total Revenue** drops the title, the divider and the meter
+entirely. Rotation **+16.97°** (CSS; Figma's −16.97).
+
+| Part | Size |
+| --- | --- |
+| Arrow icon | 27 × 27, on a **60** × 60 `#222222` disc |
+| Label "Total Revenue (last 7 days)" | Poppins Medium 15 |
+| Figure "$6,240.28" | Poppins Medium 43 |
+| Figure's box → bottom edge | 32.6 |
+| "+2" badge | 50 × 30, Poppins **Regular** 25 |
+
+The disc is 60 here against panel 1's 50. That is the design's own
+inconsistency and is deliberate — do not normalise the two.
+
+The arrow node is a 38 × 28 viewBox, so it is drawn into the 27 × 27 box under
+the default `xMidYMid meet` rather than stretched to fill it: scaling by
+min(27/38, 27/28) = 0.711 renders it 27 × 19.9 and keeps its round stroke caps
+circular. It is inlined in `HeroPanels.tsx` — two paths, no asset needed.
+
+**The badge sits immediately after the figure**, with a 10 gap — not pushed to
+the card's far edge. `justify-between` left 156px of air between them (the
+figure is 208 wide in a 434 content box), which parked the badge on the right
+edge, exactly the part a right-side panel crops off-screen.
+
+**The arrow needs no rotation of its own.** Its raw shaft is 28° below
+horizontal; inside the card's +16.97° it lands at 45° on screen, which is what
+the reference shows. 28 = 45 − 16.97, so Figma exported this node in **local**
+coordinates and inheritance does the rest.
+
+> ### Check every exported icon for a baked rotation
+>
+> Figma is not consistent about this, and the two failure modes look identical
+> until you measure:
+>
+> | Node | Export | Fix |
+> | --- | --- | --- |
+> | Panel 1 emoji | rotation in a `transform` attribute | strip it |
+> | Panel 3 arrow | local coordinates (28 = 45 − 16.97) | nothing |
+> | Panel 4 icon | **baked into the path data** | counter-rotate |
+>
+> Panel 4's icon had the card's −15 baked into its geometry: its outer square's
+> edge measures −15.00° from horizontal and all three bars 15.00° from vertical.
+> Inheriting the card's −15 on top drew it at −30°, twice the intended tilt, so
+> it carries a `rotate: 15deg` that undoes the bake. That counter-rotation
+> tracks the **artwork**, not the card — if the card's rotation changes, the
+> bake does not, so it stays 15.
+>
+> To test a new icon: take two points along an edge that should be axis-aligned
+> and check the angle. Anything that comes out at the card's rotation is baked.
+
+Still eyeballed on panel 3: the badge's 10 radius, and the gap between the
+label and the figure (currently 0 — they nearly touch in the reference).
+
 **Rotation signs are not interchangeable.** Figma reports rotation
 counter-clockwise-positive; CSS and SVG are clockwise-positive. Panel 2 was
 given as "−9.19" read off Figma's field, so it is `9.19deg` in CSS — the
@@ -220,7 +275,37 @@ runs down to the right, +495x/+78y ⇒ 8.96°). Panel 1's figure came from an SV
 export instead, so it carried across with its sign intact. When a rotation
 arrives, always check it against the artwork before trusting the sign.
 
-Panels 3 and 4 are still panel 1's shape carrying placeholder copy.
+**Panel 4 · Trending Videos** puts a 28.5 × 28.5 icon beside the title, keeps
+the divider, and drops everything else for a horizontal bar chart. Rotation
+**−15°** (Figma's 15). Confirmed against the reference: "Video 1/2/3" step
+*right* as they go down, which only happens under a counter-clockwise rotation.
+The icon inherits it and needs none of its own — same trap as panel 3's arrow.
+
+| Part | Size |
+| --- | --- |
+| Icon | 28.5 × 28.5 (35 × 35 viewBox, so it scales without distortion) |
+| Title | Poppins Medium 25 |
+| Row labels "Video 1/2/3" | Poppins Medium 15 |
+| Axis labels | Poppins 15, each in a 34 × 12 box |
+| Bar 1 / bar 2 | 94 / 137 wide, `#222222` |
+
+The axis type is larger than its box — both as supplied. The 34 × 12 is what
+positions the label and hangs its gridline, not what clips it; the text centres
+and overflows about 1.5px each way.
+
+Those numbers cohere, which is what makes the reading trustworthy: four 34-wide
+label boxes come to 136, and bar 2's 137 spans the plot exactly. So the plot is
+**137 wide** and the ticks step by (137 − 34) / 3, centring at 17 / 51.3 / 85.7
+/ 120 — which is where the dashed gridlines hang from.
+
+The labels and the bars are two `justify-between` columns of equal height
+rather than three label+bar rows, because the gridlines must run unbroken
+across all three; the label boxes are set to the bar height so both columns
+step in lockstep.
+
+Still unsupplied on panel 4: **bar 3's width** (60 is a placeholder), the bar
+height (12, matching the tick box), the row pitch, the axis font size, and the
+icon-to-title gap.
 
 **Panel 2's column chart.** Five columns, all 20 wide, radius 5, on a shared
 baseline; the box is as tall as the tallest, 95.
@@ -258,7 +343,11 @@ text row, which is the one gap here that is not a supplied number. The budget
 closes at 141.4 used out of a 152 content box.
 
 **Crop.** 200 of the card's 500 hangs off the viewport edge, leaving 300
-visible. Measured, not eyeballed: the reference crops the three lines to
+visible — except panel 4, which is pushed a further 40 off (`edgeOffset: 2.4`)
+because it sat too far into the page next to the Facebook tile. That extra 40 is
+a judgement call, not a measurement.
+
+The 200 itself is measured, not eyeballed: the reference crops the three lines to
 "Score", "ched 10M+ Views" and "ed to be Excellent". Reading the *hidden*
 substrings' advance widths out of the Poppins Medium woff2 `hmtx` table gives
 169.8 / 168.3 / 165.7px at 25 / 20 / 15px; add the 33px inset (3 border + 30
@@ -307,8 +396,92 @@ ever needed.
 > catch a truncated image — inflate the `IDAT` stream.** Prefer a real file
 > export over pasted base64.
 
+**No drop shadow.** The cards are flat `#181818` — nothing tints, blurs or
+darkens them. An earlier version cast `0 24px 60px -24px rgba(0,0,0,0.95)`,
+which pooled darkness around each card and stopped the fill reading as the
+`#181818` it actually was. The reference has no shadow; do not reintroduce one.
+
 **Eyeballed, not measured** — replace when the Figma numbers arrive: the card's
-30px padding (inferred from the 22-bar fit above) and the drop shadow.
+30px padding, inferred from the 22-bar fit above.
+
+## Hero platform tiles
+
+The Instagram / Google / TikTok / Facebook marks floating around the hero.
+Three nested layers, all **flat** — no blur, no translucency, no shadow, no
+inset highlight. An earlier version faked a bevel with stacked white alphas and
+a backdrop blur; the design uses two solid tones.
+
+| Layer | Size | Radius | Fill | Stroke |
+| --- | --- | --- | --- | --- |
+| Outer | 100 × 100 | 20 | `#181818` | 2px `#222222` |
+| Inner | 75 × 75 | 15 | `#222222` | — |
+| Logo | 50 × 50 | — | asset | — |
+
+The logos need no CSS radius: all four `.webp` assets carry alpha (`VP8X` with
+the alpha flag set), so their shapes are baked in.
+
+**Size each logo by its INK, not its canvas.** The four assets are not packed
+alike — measured by decoding their alpha channels:
+
+| | canvas | ink | fills |
+| --- | --- | --- | --- |
+| Instagram | 640² | 640² | 100% |
+| Facebook | 1200² | 1196² | 99.7% |
+| Google | 1080² | 796 × 814 | 73.7 / 75.4% |
+| TikTok | 980² | 740² | 75.5% |
+
+Google's and TikTok's were exported with ~25% transparent padding baked in, so
+at a flat 50px box their marks rendered about 37px and read as smaller and
+dimmer than the other two — the "TikTok isn't the same size" report. The `ink`
+field in `HERO_FLOATERS` divides it out. **Re-measure if an asset is replaced**:
+convert to PNG (`sips -s format png`) and scan the alpha channel for the
+non-transparent bounding box; do not eyeball it.
+
+All four rotations are measured. Each is Figma's figure with the sign flipped,
+since Figma reports counter-clockwise-positive and CSS is clockwise-positive:
+
+| | Figma | CSS |
+| --- | --- | --- |
+| Instagram | 19.81 | −19.81° |
+| Google | −26.63 | 26.63° |
+| TikTok | −12.88 | 12.88° |
+| Facebook | 15.24 | −15.24° |
+
+### Tile positions
+
+Measured. The supplied Figma coordinates are canvas-absolute — Instagram
+(2369, −504), Google (3508, −457), Facebook (3563, −26), TikTok (2349, −51) —
+so they were solved against a screenshot of the frame rather than used raw.
+
+Method, worth repeating for any other canvas-absolute coordinates:
+
+1. Take the Instagram→Google Δx, 1139 design px, and measure the same gap in
+   the screenshot as a fraction of the frame's width (0.594). Dividing gives
+   the frame's true width: **1915**, i.e. the 1921 these notes already record.
+2. With the scale known, fit the frame's origin from each tile independently.
+   All four agree to within **7px in x and 10px in y** — that agreement is the
+   check, and it is what makes the result trustworthy rather than a guess.
+
+| | left % | top % |
+| --- | --- | --- |
+| Instagram | 20.51 | 24.73 |
+| Google | 79.98 | 29.06 |
+| TikTok | 19.46 | 66.54 |
+| Facebook | 82.86 | 68.85 |
+
+These are **centres**, as a percentage of the whole violet field — not of the
+hero section, which is shorter: the lower two tiles sit *below* the section's
+bottom edge, which is why `HeroFloaters` mounts in `page.tsx` beside
+`HeroPanels` rather than inside `Hero`. Being centres, they need
+`translate(-50%, -50%)`; `left`/`top` alone would anchor the top-left corner and
+put every tile half a tile off.
+
+> An earlier pass concluded the frame "must be 1440 wide". That was wrong — it
+> assumed the tiles were centred within the frame, which they are not. Solve
+> the scale from a known delta instead of from an assumed layout.
+
+Sizes scale from `--hero-u`, the same root token the stat panels use, so the
+tiles and the cards stay in proportion at every width.
 
 ## Open questions
 

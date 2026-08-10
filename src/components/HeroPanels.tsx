@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { HERO_PANELS } from "@/lib/content";
+import { HERO_PANELS, type HeroPanel } from "@/lib/content";
 import { Img } from "./Img";
 
 /**
@@ -10,26 +10,31 @@ import { Img } from "./Img";
  * allowed to be clipped by the hero's own overflow-hidden. That crop is the
  * effect, not an accident.
  *
- * All four panels are the SAME card: same fill, border, rule, icon and meter.
- * Only the copy and the position differ.
+ * All four share the CHROME — fill, border, radius, the 24/24 vertical inset
+ * and the 2px divider. What sits inside does not: each has its own body
+ * component below, picked by `p.variant`.
+ *
+ *   stat      panels 1 and 2 — title, two lines, an aside, sometimes a meter
+ *   revenue   panel 3 — arrow disc, a label over a figure, a badge
+ *   trending  panel 4 — icon and title, then a horizontal bar chart
  *
  * ## Sizing
  *
- * Same one-property scheme as SiteHeader: every number below is quoted at the
+ * Same one-property scheme as SiteHeader: every number is quoted at the
  * design's 1920 reference and driven from `--k`, which is 100px there.
  *
  *   card   500 x 200, radius 30, 3px border -> 5k x 2k, 0.3k, 0.03k
  *   title  25px                             -> 0.25k
- *   line 1 20px / line 2 15px               -> 0.20k / 0.15k
- *   icon   38 box on a 56 disc              -> 0.38k / 0.56k
- *   meter  22 bars of 14 x 32, radius 5     -> 0.14k x 0.32k, 0.05k
  *
- * The 66px floor is where a card is 330 wide — the size it was built at before
- * these measurements arrived, and about as small as the 15px line can go and
- * stay legible. It only bites below 1267px, and the panels are hidden below xl
- * (1280) anyway, where they would collide with the headline.
+ * Per-panel numbers live in design/TOKENS.md rather than here, because they
+ * differ far more than they agree.
+ *
+ * The clamp itself is --hero-u on :root, shared with the platform tiles in
+ * Sections.tsx. Its 66px floor is where a card is 330 wide — about as small as
+ * the 15px line can go and stay legible. That only bites below 1267px, and the
+ * panels are hidden below xl (1280) anyway.
  */
-const SCALE = { "--k": "clamp(66px, 5.2083vw, 100px)" } as CSSProperties;
+const SCALE = { "--k": "var(--hero-u)" } as CSSProperties;
 
 /**
  * Bar count.
@@ -82,7 +87,7 @@ export function HeroPanels() {
       {HERO_PANELS.map((p, i) => (
         <article
           key={`${p.side}-${i}`}
-          className="absolute flex flex-col rounded-[calc(var(--k)*0.3)] border-solid border-[#222222] bg-[#181818] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95)]"
+          className="absolute flex flex-col rounded-[calc(var(--k)*0.3)] border-solid border-[#222222] bg-[#181818]"
           style={{
             width: "calc(var(--k) * 5)",
             height: "calc(var(--k) * 2)",
@@ -111,11 +116,28 @@ export function HeroPanels() {
               what makes it trustworthy.
             */
             ...(p.side === "left"
-              ? { left: "calc(var(--k) * -2)" }
-              : { right: "calc(var(--k) * -2)" }),
+              ? { left: `calc(var(--k) * ${-(p.edgeOffset ?? 2)})` }
+              : { right: `calc(var(--k) * ${-(p.edgeOffset ?? 2)})` }),
             transform: `rotate(${p.rotate})`,
           }}
         >
+          {p.variant === "revenue" ? (
+            <RevenueBody p={p} />
+          ) : p.variant === "trending" ? (
+            <TrendingBody p={p} />
+          ) : (
+            <StatBody p={p} />
+          )}
+        </article>
+      ))}
+    </div>
+  );
+}
+
+/** Panels 1 and 2: title, divider, two lines, an aside, sometimes a meter. */
+function StatBody({ p }: { p: Extract<HeroPanel, { variant: "stat" }> }) {
+  return (
+    <>
           <h3
             className="font-medium leading-tight text-white"
             style={{ fontSize: "calc(var(--k) * 0.25)" }}
@@ -254,8 +276,301 @@ export function HeroPanels() {
             </div>
           )}
           </div>
-        </article>
-      ))}
-    </div>
+    </>
+  );
+}
+
+/**
+ * Panel 3: an arrow in a disc, then a small label over a large figure with a
+ * badge beside it. No title and no divider — it shares only the card chrome.
+ */
+function RevenueBody({ p }: { p: Extract<HeroPanel, { variant: "revenue" }> }) {
+  return (
+    <>
+      {/*
+        27 x 27 arrow centred in a 60 x 60 disc. `self-start` matters: a
+        flex column stretches its children across, which would have pulled
+        the disc to the full card width.
+
+        The disc is 60 here against panel 1's 50 — the design's own
+        inconsistency, not a mistake to normalise away.
+      */}
+      <span
+        className="grid shrink-0 self-start place-items-center rounded-full bg-[#222222]"
+        style={{ width: "calc(var(--k) * 0.6)", height: "calc(var(--k) * 0.6)" }}
+      >
+        {/*
+          The supplied node is a 38 x 28 viewBox, so it is drawn into a 27 x 27
+          box under the default `xMidYMid meet` rather than stretched to fill
+          it: scaling to fit keeps the arrow's proportions and its round stroke
+          caps circular.
+
+          The viewBox is built around the arrow's SHAFT MIDPOINT, not its
+          bounding box — that is the whole trick, and centring on the bounding
+          box is why this read wrong twice.
+
+          The eye takes a line-art arrow's centre to be the middle of its long
+          stroke. Its bounding box disagrees: the arrowhead's lower barb reaches
+          about 5 units further down than the shaft does, which drags the box
+          down, so centring the BOX pushes the arrow 1.88px UP on screen.
+
+          The two agree exactly in x (both 18.8535), so only y moves. The box
+          below is symmetric about the shaft midpoint (18.8535, 10.971) and
+          sized to still contain every bit of ink — the four path points
+          expanded by the 2 stroke radius, y 0.000..27.197 — so nothing clips.
+        */}
+        <svg
+          viewBox="0.0005 -5.2543 37.7060 32.4512"
+          fill="none"
+          aria-hidden="true"
+          /*
+            Sized so the ARROW is 27, not its box. In a 27 x 27 box the
+            artwork's 1.386:1 aspect left it 27 wide but only 19.5 tall — the
+            box was square, the arrow was not, and `meet` letterboxed the
+            difference. Scaling until the short side reaches 27 makes it
+            37.4 x 27.0, which still clears the 60 disc (diagonal 46.2).
+
+            The two numbers below are the shaft-centred viewBox at that scale,
+            so the centring above is untouched.
+          */
+          style={{
+            width: "calc(var(--k) * 0.374336)",
+            height: "calc(var(--k) * 0.322167)",
+          }}
+        >
+          <path
+            d="M35.7065 2.0004L2.00052 19.9422M7.25522 2.72631L2.00052 19.9422L19.2164 25.1969"
+            stroke="white"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+
+      {/* `amountFromBottom` is measured from the card's EDGE and this block
+          sits inside the 24 bottom inset, so the two differ by that inset —
+          the same arrangement panel 2's `linesFromBottom` uses. */}
+      <div
+        className="mt-auto"
+        style={{
+          marginBottom: `calc(var(--k) * ${(p.amountFromBottom - 24) / 100})`,
+        }}
+      >
+        <p
+          className="font-medium leading-snug text-white"
+          style={{ fontSize: "calc(var(--k) * 0.15)" }}
+        >
+          {p.label}
+        </p>
+
+        {/*
+          The badge sits immediately AFTER the figure, not at the far edge.
+          `justify-between` put 156px of air between them — the figure is 208
+          wide in a 434 content box — which parked the badge on the card's right
+          edge, exactly the part a right-side panel crops off-screen.
+        */}
+        <div className="flex items-end" style={{ gap: "calc(var(--k) * 0.1)" }}>
+          {/* `leading-none` so the box hugs the figure: `amountFromBottom` is
+              measured to the text's box, and a looser line-height would put
+              half-leading between the digits and that edge. */}
+          <p
+            className="font-medium leading-none text-white"
+            style={{ fontSize: "calc(var(--k) * 0.43)" }}
+          >
+            {p.amount}
+          </p>
+
+          {/* 50 x 30, Poppins Regular 25. TODO(spec): the 10 radius is still
+              eyeballed. */}
+          <span
+            className="grid shrink-0 place-items-center rounded-[calc(var(--k)*0.1)] bg-[#222222] font-normal leading-none text-white"
+            style={{
+              width: "calc(var(--k) * 0.5)",
+              height: "calc(var(--k) * 0.3)",
+              fontSize: "calc(var(--k) * 0.25)",
+            }}
+          >
+            {p.badge}
+          </span>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/** Panel 4's plot area, design px. Row 2's bar spans it exactly. */
+const PLOT_W = 137;
+/**
+ * Each axis label sits in a 34 x 12 box. Four of them nearly fill PLOT_W.
+ *
+ * The type is 15px, larger than the 12 box — both numbers are as supplied, and
+ * the box is what positions the label and its gridline, not what clips it. The
+ * text is centred, so it overflows about 1.5px each way.
+ */
+const TICK_W = 34;
+const TICK_H = 12;
+const TICK_FONT = 15;
+/** Bar height and the plot's height: three 12s with two 18 gaps. */
+const BAR_H = 12;
+const PLOT_H = 3 * BAR_H + 2 * 18;
+
+/**
+ * Centre of tick `i` within the plot, design px.
+ *
+ * The four 34-wide boxes are laid out `justify-between` across the 137, so they
+ * step by (137 - 34) / 3 and each label centres 17 into its own box. The dashed
+ * gridlines hang off these same centres, which is what keeps them under the
+ * labels.
+ */
+const tickCentre = (i: number, count: number) =>
+  (i * (PLOT_W - TICK_W)) / (count - 1) + TICK_W / 2;
+
+/**
+ * Panel 4: an icon beside the title, the divider, then a horizontal bar chart.
+ *
+ * The labels and the bars are two `justify-between` columns of the same height
+ * rather than three label+bar rows, because the dashed gridlines have to run
+ * unbroken across all three — they belong to the plot, not to any one row. The
+ * label boxes are therefore set to BAR_H so the two columns step in lockstep.
+ */
+function TrendingBody({ p }: { p: Extract<HeroPanel, { variant: "trending" }> }) {
+  return (
+    <>
+      <div className="flex items-center" style={{ gap: "calc(var(--k) * 0.1)" }}>
+        {/*
+          28.5 x 28.5. The node's viewBox is square, so it scales without
+          distortion — unlike panel 3's arrow.
+
+          The +15deg undoes a rotation baked into the ARTWORK. Unlike panel 3's
+          arrow, which Figma exported in local coordinates, this node came out
+          with the card's -15 already applied: its outer square's edge sits at
+          -15.00 from horizontal and all three bars at 15.00 from vertical, too
+          exact to be anything else. Inheriting the card's -15 on top of that
+          drew it at -30, twice the intended tilt.
+
+          Note this counter-rotation tracks the ARTWORK, not the card. If the
+          card's rotation changes the bake does not, so this stays 15.
+        */}
+        <svg
+          viewBox="0 0 35 35"
+          fill="none"
+          aria-hidden="true"
+          className="shrink-0"
+          style={{
+            width: "calc(var(--k) * 0.285)",
+            height: "calc(var(--k) * 0.285)",
+            rotate: "15deg",
+          }}
+        >
+          <path
+            d="M11.6482 20.5245L13.2874 26.642M23.0637 14.1874L25.5224 23.3637M15.307 9.70902L19.4049 25.0028M14.6207 32.8415L27.4675 29.3992C30.0371 28.7107 31.3219 28.3664 32.1694 27.6034C32.9148 26.9322 33.4287 26.0422 33.6372 25.061C33.8743 23.9456 33.53 22.6608 32.8415 20.0912L29.3992 7.24436C28.7107 4.67475 28.3664 3.38995 27.6034 2.54249C26.9322 1.79704 26.0422 1.28321 25.061 1.07466C23.9456 0.83756 22.6608 1.18182 20.0912 1.87034L7.24436 5.31264C4.67475 6.00116 3.38995 6.34542 2.54249 7.10848C1.79704 7.77969 1.28321 8.66966 1.07466 9.65084C0.83756 10.7663 1.18182 12.0511 1.87034 14.6207L5.31264 27.4675C6.00116 30.0371 6.34542 31.3219 7.10848 32.1694C7.77969 32.9148 8.66966 33.4287 9.65084 33.6372C10.7663 33.8743 12.0511 33.53 14.6207 32.8415Z"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <h3
+          className="font-medium leading-tight text-white"
+          style={{ fontSize: "calc(var(--k) * 0.25)" }}
+        >
+          {p.title}
+        </h3>
+      </div>
+
+      {/* Same divider as every other panel: 2px of solid #9D9D9D. */}
+      <span
+        className="block w-full bg-[#9d9d9d]"
+        style={{ height: "calc(var(--k) * 0.02)", marginTop: "calc(var(--k) * 0.1)" }}
+      />
+
+      <div className="mt-auto">
+        <div className="flex" style={{ gap: "calc(var(--k) * 0.12)" }}>
+          <div
+            className="flex flex-col justify-between"
+            style={{ height: `calc(var(--k) * ${PLOT_H / 100})` }}
+          >
+            {p.rows.map((r) => (
+              <span
+                key={r.label}
+                className="flex items-center whitespace-nowrap font-medium leading-none text-white"
+                style={{
+                  height: `calc(var(--k) * ${BAR_H / 100})`,
+                  fontSize: "calc(var(--k) * 0.15)",
+                }}
+              >
+                {r.label}
+              </span>
+            ))}
+          </div>
+
+          <div
+            className="relative shrink-0"
+            style={{
+              width: `calc(var(--k) * ${PLOT_W / 100})`,
+              height: `calc(var(--k) * ${PLOT_H / 100})`,
+            }}
+          >
+            {p.ticks.map((t, j) => (
+              <span
+                key={t}
+                aria-hidden="true"
+                className="absolute inset-y-0 border-l border-dashed border-white/25"
+                style={{
+                  left: `calc(var(--k) * ${tickCentre(j, p.ticks.length) / 100})`,
+                }}
+              />
+            ))}
+            <div className="relative flex h-full flex-col justify-between">
+              {p.rows.map((r) => (
+                <span
+                  key={r.label}
+                  className="block rounded-[calc(var(--k)*0.05)]"
+                  style={{
+                    width: `calc(var(--k) * ${r.w / 100})`,
+                    height: `calc(var(--k) * ${BAR_H / 100})`,
+                    background: UNLIT,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Axis. The invisible label reserves exactly the label column's width
+            so the ticks stay under the plot without hardcoding that width. */}
+        <div className="flex" style={{ gap: "calc(var(--k) * 0.12)" }}>
+          <span
+            aria-hidden="true"
+            className="invisible whitespace-nowrap font-medium leading-none"
+            style={{ fontSize: "calc(var(--k) * 0.15)" }}
+          >
+            {p.rows[0].label}
+          </span>
+          <div
+            className="flex shrink-0 justify-between"
+            style={{
+              width: `calc(var(--k) * ${PLOT_W / 100})`,
+              marginTop: "calc(var(--k) * 0.06)",
+            }}
+          >
+            {p.ticks.map((t) => (
+              <span
+                key={t}
+                className="grid place-items-center font-medium leading-none text-white/70"
+                style={{
+                  width: `calc(var(--k) * ${TICK_W / 100})`,
+                  height: `calc(var(--k) * ${TICK_H / 100})`,
+                  fontSize: `calc(var(--k) * ${TICK_FONT / 100})`,
+                }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

@@ -42,3 +42,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code scratch: agent worktrees and session state live here. The
+# worktrees are checkouts of this same repo, so committing them would nest a
+# copy of the project inside itself.
+/.claude/
