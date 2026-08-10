@@ -11,8 +11,7 @@ import {
   FINAL_CTA,
 } from "@/lib/content";
 import { BOOKING_ANCHOR, BOOKING_URL } from "@/lib/site";
-
-const SHELL = "mx-auto w-full max-w-[1200px] px-5";
+import { SHELL } from "@/lib/layout";
 
 /**
  * CTA pill. Label is uppercased with tracking to match the design — the
@@ -341,12 +340,14 @@ export function Creatives() {
             {CREATIVES.cta}
             <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[45px]">
               {/* ~/Documents/arrow icon.svg, inlined. Its 17-unit viewBox is
-                  the 15-unit arrow plus the 2-unit stroke, and the whole box
-                  renders at 15x15 on desktop. */}
+                  the 15-unit arrow plus the 1-unit stroke overhang on each
+                  side, so the box has to render at 17 for the drawn arrow to
+                  measure the 15 it is specified at. Rendering the box itself
+                  at 15 shrank the arrow to 13.2. */}
               <svg
                 viewBox="0 0 17 17"
                 fill="none"
-                className="size-[11px] stroke-current md:size-[15px]"
+                className="size-[13px] stroke-current md:size-[17px]"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -357,13 +358,18 @@ export function Creatives() {
             </span>
           </a>
         </div>
+      </div>
 
-        {/* Finite carousel with auto-drift, a progress timeline and prev/next
-            controls — see CreativesRail. The design's progress line implies a
-            carousel, not the endless duplicated marquee that was here. */}
-        <div className="mt-10">
-          <CreativesRail />
-        </div>
+      {/*
+        The rail is deliberately OUTSIDE the shell. It clips at the screen
+        edges, not the 1200px column, so a card that leaves the view travels
+        the full width of the display rather than vanishing into a margin two
+        hundred pixels short of it. It re-establishes the column's left edge
+        with its own padding, so the first card still starts directly under the
+        "W" of the heading. See CreativesRail.
+      */}
+      <div className="mt-10">
+        <CreativesRail />
       </div>
     </section>
   );
