@@ -248,7 +248,7 @@ export const CREATIVES = {
       image: "celemi-pouch.webp",
       w: 1320,
       h: 2340,
-      avatar: "celemi-logo.svg",
+      avatar: "celemi-logo.webp",
     },
     {
       handle: "tryholo.ai",
@@ -304,7 +304,7 @@ export const CREATIVES = {
       image: "celemi-serum.webp",
       w: 1320,
       h: 2340,
-      avatar: "celemi-logo.svg",
+      avatar: "celemi-logo.webp",
     },
     // Owners confirmed against the design's own card headers.
     {
