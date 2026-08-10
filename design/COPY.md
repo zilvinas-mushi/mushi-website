@@ -83,6 +83,24 @@ staggered — left column Breezit then eany, right column Holo then we interiors
 > reputational and legal problem, so this table — verified against the design —
 > is authoritative over any loose copy.
 
+**Line breaks are part of the copy, not the layout** (Žilvinas, 2026-08-11).
+Each result breaks at a fixed point and must break there at every width, so
+the break is written into the string rather than left to wrapping:
+
+| Brand | Line 1 | Line 2 |
+| --- | --- | --- |
+| Breezit | Generated 700 sales calls & 1500 | leads in 8 months. |
+| Holo | From $0k/month to $117k/month | in 7 months |
+| eany.io | Helped find 3 evergreen ads for | an 8 figure company. |
+| we interiors | From $13k/month to $75k/month | in 3 months. |
+
+Holo's line genuinely has no full stop; the other three do. That is the deck,
+not a typo to tidy.
+
+Breezit breaks after "1500", not after "leads": at 30px "…& 1500 leads" is
+wider than the card, so breaking there wrapped it onto a third line and left
+"leads" stranded alone. "leads in 8 months." stays together.
+
 ## Section — Testimonials
 
 **Reputation is everything. Ours is flawless.** · Trusted by 100+ brands · View More

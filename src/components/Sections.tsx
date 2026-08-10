@@ -366,14 +366,24 @@ export function CaseStudies() {
           Two columns, with the right one pushed down so the cards stagger
           rather than sitting in level rows. That offset is the design's
           rhythm — an aligned grid reads as a table by comparison.
+
+          Each column is its OWN list rather than a two-column grid. A grid
+          sizes each row to its tallest cell, so the right column's 140px drop
+          was silently inflating the left column's vertical gap to 138px —
+          the spacing could not be set, only fought. Separate columns make the
+          70px between a card's badges and the next card's artwork exact.
         */}
-        <ul className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
-          {CASE_STUDIES.items.map((item, i) => (
+        <div className="mt-12 flex flex-col gap-y-[70px] sm:flex-row sm:gap-x-[18px] sm:gap-y-0">
+          {[0, 1].map((col) => (
+            <ul
+              key={col}
+              className={`flex flex-1 flex-col gap-y-[70px] ${
+                col === 1 ? "sm:mt-[140px]" : ""
+              }`}
+            >
+              {CASE_STUDIES.items.filter((_, i) => i % 2 === col).map((item) => (
             <li
               key={item.brand}
-              // Figma puts the left column at y 2461/3358 and the right at
-              // 2611/3508 — a 150px drop, not the ~88px guessed before.
-              className={i % 2 === 1 ? "sm:mt-[150px]" : undefined}
             >
               <article className="relative flex h-full flex-col">
                 {/* 680x680 Mask group filling its column — a square, not a
@@ -406,36 +416,33 @@ export function CaseStudies() {
                     alt={`${item.brand} campaign work by Mushi`}
                     className="size-full object-cover object-center"
                   />
-                  {/* The exports are OPAQUE — Figma baked their dark
-                      backgrounds in — so the brand colour is screen-blended
-                      over the image: it lights the dark areas behind the
-                      device and leaves the bright screenshot faces alone. */}
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 mix-blend-screen"
-                    // Each brand's wash has its own position and strength,
-                    // tuned to the reference: Breezit hugs the top-left,
-                    // Holo spreads broad, eany sits low by the phones,
-                    // we interiors centres behind the laptop.
-                    style={{ background: item.glow }}
-                  />
+                  {/* Nothing sits over the artwork. Figma bakes a flat plate
+                      into these exports, and an earlier build screen-blended
+                      the brand colour on top to get any colour back — which
+                      lit the device up along with the plate. All four are now
+                      keyed to real alpha, so the gradient is simply behind
+                      them and the devices are untouched. */}
                 </div>
 
-                {/* On phones Holo's revenue line runs 2px larger than the
-                    other three cards' — a deliberate emphasis, not drift. */}
-                <h3
-                  className={`mt-4 font-medium leading-[1.25] text-white md:mt-5 md:text-[22px] ${
-                    item.brand === "Holo" ? "text-[22px]" : "text-[20px]"
-                  }`}
-                >
+                {/* Poppins Medium 30 at every width, per Žilvinas 2026-08-11.
+                    `whitespace-pre-line` is what makes the \n in each result
+                    bind: the break sits at a fixed word in the copy deck, so
+                    it must land there at any card width rather than falling
+                    wherever the line happens to run out. */}
+                <h3 className="mt-4 whitespace-pre-line text-[30px] font-medium leading-[1.25] text-white md:mt-5">
                   {item.result}
                 </h3>
 
+                {/* Žilvinas 2026-08-11: Poppins Regular 20 / #9E9E9E on
+                    #191919, always caps. 20 at EVERY width — asked for twice,
+                    so it is deliberately not stepped down on phones. The fill
+                    and text colour are literal rather than white-at-an-opacity,
+                    so they no longer shift with whatever sits behind. */}
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {item.tags.map((tag) => (
                     <li
                       key={tag}
-                      className="rounded-[6px] bg-white/[0.08] px-2.5 py-1 text-[10px] font-medium tracking-wide text-white/55"
+                      className="rounded-[6px] bg-[#191919] px-3.5 py-1.5 text-[20px] font-normal uppercase tracking-wide text-[#9e9e9e]"
                     >
                       {tag}
                     </li>
@@ -443,8 +450,10 @@ export function CaseStudies() {
                 </ul>
               </article>
             </li>
+              ))}
+            </ul>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );

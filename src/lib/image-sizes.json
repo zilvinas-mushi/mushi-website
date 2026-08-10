@@ -23,7 +23,15 @@
     "w": 800,
     "h": 800
   },
+  "case-breezit-cut.webp": {
+    "w": 1000,
+    "h": 1000
+  },
   "case-breezit.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-eany-cut.webp": {
     "w": 1000,
     "h": 1000
   },
@@ -31,9 +39,17 @@
     "w": 1000,
     "h": 1000
   },
+  "case-holo-cut.webp": {
+    "w": 1000,
+    "h": 1000
+  },
   "case-holo.webp": {
     "w": 1000,
     "h": 1000
+  },
+  "case-we-interiors-macbook.webp": {
+    "w": 680,
+    "h": 680
   },
   "case-we-interiors-v2.webp": {
     "w": 1000,

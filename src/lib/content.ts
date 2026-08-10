@@ -349,45 +349,99 @@ export const CASE_STUDIES = {
   items: [
     {
       brand: "Breezit",
-      result: "Generated 700 sales calls & 1500 leads in 8 months.",
+      result: "Generated 700 sales calls & 1500\nleads in 8 months.",
       tags: ["AI", "SALES", "VENUES"],
-      image: "case-breezit.webp",
+      // All four artworks have their plate keyed to alpha, so `bg` sits BEHIND
+      // the device instead of being washed over it. See
+      // scripts/key-case-artwork.py; each card needs a different mode and the
+      // exact command is noted beside it.
+      //
+      // Breezit and Holo take the plain path: alpha is READ from the export's
+      // own antialiasing rather than redrawn, which is what finally stopped
+      // the edges stair-stepping.
+      image: "case-breezit-cut.webp",
       logo: "breezit.svg",
       logoW: 98,
-      glow: "radial-gradient(ellipse 62% 50% at 100% 0%, #e0621f66 0%, #e0621f21 45%, transparent 70%), radial-gradient(ellipse 56% 47% at 0% 100%, #e0621f59 0%, transparent 67%)",
-      bg: "linear-gradient(158deg,#4a2c15 0%,#2a1a10 52%,#150e0a 100%)",
+      // Figma's fill with the device deleted: ONE radial ramp, #C5611E out of
+      // the bottom-right corner to pure black, the handle sitting at ~85%/97%
+      // and running up past the top-left corner.
+      //
+      // The radius is the dial for how much of the card reads as black, and it
+      // is tuned to a number rather than by eye: at 114% the near-black band
+      // (anything at or below a quarter brightness) covers 27% of the square.
+      // Figma's own ~129% only got it to 3%, which left the corner looking
+      // like a smudge instead of a side of the card. The dial is steep near
+      // here — a point of radius moves the share by about a point — so nudge
+      // it rather than redrawing the ramp.
+      //
+      // `glow` and `bg` carry the same ramp deliberately. The artwork is
+      // opaque, so `glow` (screen-blended over it) is what you actually see;
+      // screen over the near-black plate reproduces the gradient and its black
+      // end leaves the plate alone. `bg` only shows if the image fails.
+      bg: "radial-gradient(ellipse 114% 114% at 85% 97%, #c5611e 0%, #000000 100%)",
     },
     {
       brand: "Holo",
-      result: "From $0k/month to $117k/month in 7 months",
+      result: "From $0k/month to $117k/month\nin 7 months",
       tags: ["AI", "MARKETING", "GENERATOR"],
-      image: "case-holo.webp",
+      // #8A5CF6 is the purple this card already wore as its wash, kept as-is.
+      image: "case-holo-cut.webp",
       logo: "holo.svg",
       logoW: 62,
-      glow: "radial-gradient(ellipse 62% 50% at 100% 0%, #8a5cf673 0%, #8a5cf626 46%, transparent 72%), radial-gradient(ellipse 56% 47% at 0% 100%, #8a5cf659 0%, transparent 68%)",
-      bg: "linear-gradient(158deg,#5a4a9a 0%,#33285e 50%,#191430 100%)",
+      // Same ramp as Breezit, same 27% near-black share of the square — only
+      // the colour changes, so the two cards catch the light identically.
+      bg: "radial-gradient(ellipse 114% 114% at 85% 97%, #8a5cf6 0%, #000000 100%)",
     },
     {
       brand: "eany.io",
-      result: "Helped find 3 evergreen ads for an 8 figure company.",
+      result: "Helped find 3 evergreen ads for\nan 8 figure company.",
       tags: ["B2B", "MARKETPLACE", "RESELLERS"],
-      image: "case-eany.webp",
+      // This export has a DROP SHADOW baked onto its plate, at values darker
+      // than the plate itself, so no plate key removes it — it showed over the
+      // gradient as a stepped black blob. It cannot be keyed by brightness
+      // either: the phones' own dark bottom bezels sit at exactly those
+      // values, so erasing the shadow punched holes in the devices. The
+      // outline therefore comes from Žilvinas's clean mockups, which register
+      // onto the export as a plain rotation + scale (both phones independently
+      // at 0.794 / 60deg). Every visible pixel is still the export's:
+      //
+      //   python3 scripts/key-case-artwork.py case-eany.webp \
+      //     case-eany-cut.webp --silhouette iphone21.webp,iphone11.webp
+      image: "case-eany-cut.webp",
       logo: "eany.svg",
       logoW: 96,
-      glow: "radial-gradient(ellipse 72% 61% at 100% 100%, #3b82f666 0%, #3b82f621 45%, transparent 72%)",
-      bg: "linear-gradient(158deg,#1c1f28 0%,#12141a 55%,#0a0b0e 100%)",
+      // The only fill here read straight off Figma's own gradient panel rather
+      // than fitted from a screenshot: four stops, teal through blue and navy
+      // to black, NOT the single flat blue this card wore before.
+      //
+      // Geometry off the handle line: the centre stop sits at the cyan diamond
+      // BELOW AND RIGHT OF THE CARD — 105%/121%, outside its own bounds — and
+      // the line runs up to the black stop past the top-left corner, 141% of
+      // the card away. The two intermediate diamonds measure 24% and 62% along
+      // that line, which matches the panel's 24% and 63% stops, so the reading
+      // is confirmed rather than guessed.
+      bg: "radial-gradient(ellipse 141% 141% at 105% 121%, #47b19c 0%, #3c6488 24%, #38405b 63%, #000000 100%)",
     },
     {
       brand: "we interiors",
-      result: "From $13k/month to $75k/month in 3 months.",
+      result: "From $13k/month to $75k/month\nin 3 months.",
       tags: ["ECOM", "FURNITURE", "HOME"],
-      image: "case-we-interiors-v2.webp",
+      // The one card NOT keyed out of its export. Alone among the four, that
+      // export's outline was rasterised WITHOUT antialiasing — 73% of its
+      // boundary pixels are a hard step against 99-100% on the others — so
+      // there is no soft edge to read and every way of cutting it out leaves
+      // a saw along the lid.
+      //
+      // It does not need keying: Žilvinas supplied a clean render of the same
+      // laptop, and its device bounding box lands within a few px of the
+      // export's, so it drops in at 1:1 with the composition unchanged. The
+      // flat we-interiors page is mapped into its transparent screen:
+      //
+      //   python3 scripts/build-we-interiors-card.py
+      image: "case-we-interiors-macbook.webp",
       logo: "we-interiors.webp",
       logoW: 133,
-      // Near-black card with a warm yellow glow spilling from the
-      // bottom-right behind the laptop; the label stays white.
-      glow: "radial-gradient(ellipse 88% 72% at 58% 40%, #d9a42259 0%, #d9a42626 46%, transparent 74%)",
-      bg: "linear-gradient(158deg,#1a1410 0%,#100d09 55%,#0a0908 100%)",
+      bg: "radial-gradient(ellipse 114% 114% at 85% 97%, #d9a422 0%, #000000 100%)",
     },
   ],
 } as const;
