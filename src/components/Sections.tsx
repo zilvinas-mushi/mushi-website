@@ -130,7 +130,10 @@ export function Hero() {
             dropping the class leaves it at 0 rather than needing an override. */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] sm:text-6xl md:text-[length:calc(var(--hero-u)*0.8)]"
+          // Poppins SemiBold 32 on phones, per Žilvinas 2026-08-11. The old
+          // sm:text-6xl step jumped it to 60px between 640 and 767px — still
+          // phone width — so 32 now holds all the way to md.
+          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] md:text-[length:calc(var(--hero-u)*0.8)]"
         >
           {HERO.heading}
         </h1>
@@ -138,7 +141,9 @@ export function Hero() {
         {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
             case from md up, and nothing above sets tracking. Below md it steps
             down to 16, which the phone pass still has to confirm. */}
-        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:mt-[calc(var(--hero-u)*0.24)] md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
+        {/* 16px on phones, and 75px clear of the heading — Žilvinas
+            2026-08-11. Desktop keeps its measured --hero-u scaling. */}
+        <p className="mx-auto mt-[75px] max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:mt-[calc(var(--hero-u)*0.24)] md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
           {HERO.sub}
         </p>
 
