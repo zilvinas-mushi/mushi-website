@@ -661,6 +661,36 @@ body {
     var(--bg);
 }
 
+/* Phone: the card's 1px inside stroke is a gradient, not a flat colour —
+   #6E54B5 solid along the TOP edge, fading to nothing by the bottom. Note it
+   runs the opposite way to the fill above, whose light rises from the bottom;
+   the two crossing ramps are what give the phone card its shape.
+
+   Painted as a masked ring because border-color cannot hold a gradient and
+   border-image breaks on rounded corners — the same technique as
+   .fade-border. From md up the flat violet border on the element takes over
+   and this is switched off. */
+@media (max-width: 767px) {
+  .cta-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      180deg,
+      #6e54b5 0%,
+      rgba(110, 84, 181, 0) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
 /* Partial border that fades away from the top-left and is gone by the
    middle — the case-card treatment. Drawn as a masked 1px ring (border-color
    cannot hold a gradient and border-image breaks on rounded corners), same

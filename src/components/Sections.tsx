@@ -195,7 +195,11 @@ export function SocialProof() {
         {/* Rule-and-sparkle divider from the design. */}
         {/* The design's own divider ornament — a gradient line running into a
             four-pointed star — flanks the headline, mirrored on the left. */}
-        <div className="flex items-center justify-center gap-3">
+        {/* On the phone this row alone breaks out of SHELL's 20px gutter, so
+            the two ornaments run to the screen edges instead of stopping at
+            the content column. It also hands them the 40px they need to show
+            the star at full size beside the headline. */}
+        <div className="-mx-5 flex items-center justify-center gap-2 md:mx-0 md:gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/creatives/icons/divider-left.svg"
@@ -205,13 +209,19 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[21px] w-auto md:h-[calc(var(--hero-u)*0.21)]"
+            // On the phone there is no room for all 161 of the ornament, so the
+            // box flexes into the space the headline leaves and object-cover
+            // crops the fading tail of the line off its open end. The star sits
+            // at the headline end of the artwork, so it survives at full size —
+            // scaling the whole SVG down instead shrank it to a speck.
+            className="h-[21px] min-w-0 flex-1 object-cover object-right md:h-[calc(var(--hero-u)*0.21)] md:w-auto md:flex-none"
           />
-          {/* Poppins Regular 20 at every width — it was 14 stepping up to 15
-              Medium, so both the size and the weight were off. */}
+          {/* Poppins Regular — 20 from md up, 14 on the phone so the line still
+              fits on one row at 375. The dividers flanking it flex into
+              whatever width is left over. */}
           <h2
             id="proof-heading"
-            className="whitespace-nowrap text-center text-[20px] font-normal text-white md:text-[length:calc(var(--hero-u)*0.2)]"
+            className="whitespace-nowrap text-center text-[14px] font-normal text-white md:text-[length:calc(var(--hero-u)*0.2)]"
           >
             {SOCIAL_PROOF.headline}
           </h2>
@@ -224,7 +234,7 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[21px] w-auto -scale-x-100 md:h-[calc(var(--hero-u)*0.21)]"
+            className="h-[21px] min-w-0 flex-1 -scale-x-100 object-cover object-right md:h-[calc(var(--hero-u)*0.21)] md:w-auto md:flex-none"
           />
         </div>
 
@@ -306,7 +316,7 @@ export function Creatives() {
           */}
           <a
             href={BOOKING_URL}
-            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[6px] text-[20px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:w-[143px] md:justify-end md:gap-[18px] md:rounded-[30px] md:pl-0 md:pr-[7.5px] md:text-[30px] md:font-normal"
+            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[6px] text-[20px] font-normal leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:w-[143px] md:justify-end md:gap-[18px] md:rounded-[30px] md:pl-0 md:pr-[7.5px] md:text-[30px]"
           >
             {CREATIVES.cta}
             <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[45px]">
@@ -454,7 +464,9 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
     <article className="rounded-[20px] bg-[#161519] p-7">
       {/* Title and avatar share the top row; the avatar is right-aligned. */}
       <div className="flex items-start justify-between gap-5">
-        <h3 className="text-[30px] font-semibold leading-snug text-white">
+        {/* 16/16 on the phone — the line-height equals the size, so a title
+            that wraps sits as a tight two-line block. 30 from md up. */}
+        <h3 className="text-[16px] font-semibold leading-4 text-white md:text-[30px] md:leading-snug">
           {t.title}
         </h3>
         {t.avatar ? (
@@ -480,13 +492,15 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
 
       <div className="mt-4 space-y-4">
         {t.body.map((para, i) => (
-          <p key={i} className="text-[21px] font-normal leading-relaxed text-white/50">
+          <p key={i} className="text-[14px] font-normal leading-relaxed text-white/50 md:text-[21px]">
             {para}
           </p>
         ))}
       </div>
 
-      <footer className="mt-6 text-[21px] font-light text-white/40">
+      {/* The byline is a touch dimmer than the quote from md up; on the phone
+          the design puts both at 50%. */}
+      <footer className="mt-6 text-[14px] font-light text-white/50 md:text-[21px] md:text-white/40">
         <time dateTime={t.iso}>{t.date}</time>
         {"  •  "}
         <span>{t.author}</span>
@@ -649,7 +663,7 @@ export function FinalCta() {
         The reference has it about 9px above centre; that is inside the error
         of reading a screenshot, so it does not earn a hardcoded offset.
       */}
-      <div className="cta-card relative mx-auto flex min-h-[320px] w-[345px] max-w-full items-center justify-center overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:h-[842px] md:min-h-0 md:w-full md:max-w-[1380px] md:border-[#8a5cf6]/45 md:px-5 md:py-0">
+      <div className="cta-card relative mx-auto flex h-[320px] w-[345px] max-w-full items-center justify-center overflow-hidden rounded-[15px] border border-transparent px-6 text-center md:h-[842px] md:w-full md:max-w-[1380px] md:rounded-[24px] md:border-[#8a5cf6]/45 md:px-5">
         {/* No centre glow: the design's card is black through the middle,
             with its only light rising from the bottom edge (see .cta-card). */}
         {/* The streaks live in the card background itself now — the design's
@@ -674,9 +688,13 @@ export function FinalCta() {
           {/* 24/30 Regular, white at 50%. mt-6 is the measured 24 from the
               heading's last line box. */}
           <p className="mt-6 text-[14px] font-normal leading-[19px] text-white/50 md:text-[24px] md:leading-[30px]">
-            {FINAL_CTA.subLines.map((line) => (
-              <span key={line} className="block">
+            {/* Three lines on the phone, one sentence each. From md up the
+                first two go inline and share a line, which is the reference's
+                desktop break — the trailing space only shows once they do. */}
+            {FINAL_CTA.subLines.map((line, i) => (
+              <span key={line} className={i < 2 ? "block md:inline" : "block"}>
                 {line}
+                {i === 0 ? " " : ""}
               </span>
             ))}
           </p>
@@ -706,7 +724,7 @@ export function FinalCta() {
             */}
             <a
               href={BOOKING_URL}
-              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:gap-[15px] md:rounded-[36px] md:pl-[25px] md:pr-[10px] md:text-[26px]"
+              className="group inline-flex h-[42px] items-center gap-2 rounded-[36px] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:gap-[15px] md:pl-[25px] md:pr-[10px] md:text-[26px]"
             >
               {FINAL_CTA.cta}
               <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[40px]">
