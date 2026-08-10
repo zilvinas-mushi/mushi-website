@@ -141,9 +141,9 @@ export function Hero() {
         {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
             case from md up, and nothing above sets tracking. Below md it steps
             down to 16, which the phone pass still has to confirm. */}
-        {/* 16px on phones, and 75px clear of the heading — Žilvinas
+        {/* Phones: Poppins Regular 16 on a flat 20px line — Žilvinas
             2026-08-11. Desktop keeps its measured --hero-u scaling. */}
-        <p className="mx-auto mt-[75px] max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:mt-[calc(var(--hero-u)*0.24)] md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
+        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[20px] text-white md:mt-[calc(var(--hero-u)*0.24)] md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
           {HERO.sub}
         </p>
 
@@ -195,7 +195,11 @@ export function SocialProof() {
     // sitting at a flat 192: it is empty space, but the stat panels are
     // positioned as a percentage of this whole field, so a fixed tail pushed
     // them further down the page the smaller the window got.
-    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2 md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
+    // On phones that tail was 192px, and the next section adds 80 on top of
+    // it — nearly 270px of empty screen between the logo strip and "Want
+    // Creatives This Premium?". Halved to 96; the ramp still has room to
+    // dissolve. Desktop keeps its --hero-u scaling.
+    <section aria-labelledby="proof-heading" className="relative pb-[37.5px] pt-2 md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         {/* The design's own divider ornament — a gradient line running into a
@@ -204,7 +208,7 @@ export function SocialProof() {
             the two ornaments run to the screen edges instead of stopping at
             the content column. It also hands them the 40px they need to show
             the star at full size beside the headline. */}
-        <div className="-mx-5 flex items-center justify-center gap-2 md:mx-0 md:gap-3">
+        <div className="-mx-[var(--gutter)] flex items-center justify-center gap-2 md:mx-0 md:gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/creatives/icons/divider-left.svg"
@@ -290,7 +294,7 @@ export function SocialProof() {
 
 export function Creatives() {
   return (
-    <section id="templates" aria-labelledby="creatives-heading" className="py-20">
+    <section id="templates" aria-labelledby="creatives-heading" className="py-[37.5px] md:py-20">
       <div className={SHELL}>
         <div className="flex items-center justify-between gap-6">
           <h2
@@ -368,7 +372,7 @@ export function Creatives() {
 
 export function CaseStudies() {
   return (
-    <section id="case-studies" aria-labelledby="cases-heading" className="py-20">
+    <section id="case-studies" aria-labelledby="cases-heading" className="py-[37.5px] md:py-20">
       <div className={SHELL}>
         <h2
           id="cases-heading"
@@ -444,7 +448,7 @@ export function CaseStudies() {
                     bind: the break sits at a fixed word in the copy deck, so
                     it must land there at any card width rather than falling
                     wherever the line happens to run out. */}
-                <h3 className="mt-4 whitespace-pre-line text-[30px] font-medium leading-[1.25] text-white md:mt-5">
+                <h3 className="mt-4 whitespace-pre-line text-[20px] font-medium leading-[1.25] text-white md:mt-5 md:text-[30px]">
                   {item.result}
                 </h3>
 
@@ -564,7 +568,7 @@ export function Testimonials() {
   const { items } = TESTIMONIALS;
 
   return (
-    <section id="agency" aria-labelledby="testimonials-heading" className="py-20">
+    <section id="agency" aria-labelledby="testimonials-heading" className="py-[37.5px] md:py-20">
       <div className={SHELL}>
         {/* 48/48 from the design — line-height equals the size, so the two
             sentences sit tight on top of each other. Each sentence is its own
