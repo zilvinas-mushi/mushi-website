@@ -26,11 +26,16 @@ function Pill({
   variant?: "primary" | "dark";
 }) {
   // Measured from Figma nodes 3803:1672/1673 (primary) and 3803:1583/1584:
-  // 67px tall, 15px radius, Poppins SemiBold 24px on desktop. The height was
+  // 67px tall, 15px radius, Poppins SemiBold 24px on desktop.
+  //
+  // The radius scales with --hero-u like the height does. Left at a flat 15 it
+  // was 22% of the button's height at 1920 and 30% at 1440 — reading as a
+  // half-pill as the button shrank. Commit 8b07942 found the same thing on the
+  // header CTA independently. The height was
   // 56 here — the old 0.75 scale-down for a 1440 viewport — and is now the
   // design's 67 at lg. Below lg it still steps down; that is the phone pass.
   const base =
-    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] md:h-[calc(var(--hero-u)*0.67)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
+    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
