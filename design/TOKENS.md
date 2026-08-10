@@ -115,8 +115,12 @@ When in doubt use **15px**. Pills use **100px**.
 
 ## Layout
 
-- Design frame width **1921px**; treat **1440px** as the desktop reference and
-  cap content around **1200–1280px** with generous gutters.
+- Design frame width **1921px**; treat **1440px** as the desktop reference.
+- Side margin is **270px at 1920**, so the content column is **1380px**. This
+  supersedes the earlier "cap around 1200–1280" estimate, which was read off
+  the screenshot rather than measured; 1200 left the testimonial cards too
+  narrow for their 21px body text. `SHELL` in `src/lib/layout.ts` is the
+  single source.
 - The mockup has no auto-layout, so there is no reliable spacing scale to
   extract. Use a consistent 4px-based rhythm (4 / 8 / 12 / 16 / 24 / 32 / 48 /
   64 / 96) and match the screenshot visually.

@@ -627,7 +627,7 @@ export function FinalCta() {
     >
       {/* Phone frame: 345x320 card on a light-to-dark wash (see .cta-card);
           desktop keeps the dark artwork treatment and full width. */}
-      <div className="cta-card relative mx-auto min-h-[320px] w-[345px] max-w-full overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:min-h-0 md:w-full md:max-w-[1200px] md:border-[#8a5cf6]/45 md:py-20">
+      <div className="cta-card relative mx-auto min-h-[320px] w-[345px] max-w-full overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:min-h-0 md:w-full md:max-w-[1380px] md:border-[#8a5cf6]/45 md:py-20">
         {/* No centre glow: the design's card is black through the middle,
             with its only light rising from the bottom edge (see .cta-card). */}
         {/* The streaks live in the card background itself now — the design's
