@@ -643,19 +643,22 @@ body {
    drawn for exactly this card, so it stretches 100% both ways rather than
    cover-cropping. */
 .cta-card {
-  /* Matched to the Figma card — and note the ORIENTATION: the card is black
-     at the top, and the purple is a glow rising from the BOTTOM edge, gone
-     by mid-height. Every earlier version had this upside-down (light at the
-     top), which is why it kept reading too bright no matter the alphas. */
+  /*
+    The fill is the Figma one, verbatim: a single LINEAR gradient of ONE
+    colour, #1d0937, from 0% opacity at the top of the card to 100% at the
+    bottom, over the page's black. Note the ORIENTATION — the purple rises
+    from the bottom edge; every early version had this upside-down, which is
+    why it kept reading too bright no matter the alphas.
+
+    It replaces an eyeballed radial "glow" that pooled light in the lower
+    middle. A flat vertical ramp is both what the design says and what makes
+    it read as subtle: #1d0937 is dark enough that even at full opacity it
+    only just lifts off the black.
+  */
   background:
     url("/images/cta-streaks.svg") center / 100% 100% no-repeat,
-    radial-gradient(
-      ellipse 85% 65% at 50% 110%,
-      rgba(122, 92, 196, 0.3) 0%,
-      rgba(90, 66, 150, 0.15) 40%,
-      rgba(0, 0, 0, 0) 64%
-    ),
-    linear-gradient(180deg, #0a0710 0%, #0b0814 55%, #0e0a1a 100%);
+    linear-gradient(180deg, rgba(29, 9, 55, 0) 0%, rgba(29, 9, 55, 1) 100%),
+    var(--bg);
 }
 
 /* Partial border that fades away from the top-left and is gone by the

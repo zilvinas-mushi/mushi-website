@@ -115,8 +115,12 @@ When in doubt use **15px**. Pills use **100px**.
 
 ## Layout
 
-- Design frame width **1921px**; treat **1440px** as the desktop reference and
-  cap content around **1200–1280px** with generous gutters.
+- Design frame width **1921px**; treat **1440px** as the desktop reference.
+- Side margin is **270px at 1920**, so the content column is **1380px**. This
+  supersedes the earlier "cap around 1200–1280" estimate, which was read off
+  the screenshot rather than measured; 1200 left the testimonial cards too
+  narrow for their 21px body text. `SHELL` in `src/lib/layout.ts` is the
+  single source.
 - The mockup has no auto-layout, so there is no reliable spacing scale to
   extract. Use a consistent 4px-based rhythm (4 / 8 / 12 / 16 / 24 / 32 / 48 /
   64 / 96) and match the screenshot visually.
@@ -483,7 +487,70 @@ put every tile half a tile off.
 Sizes scale from `--hero-u`, the same root token the stat panels use, so the
 tiles and the cards stay in proportion at every width.
 
+## Final CTA card
+
+The closing panel. Measured at 1920 (supplied by Žilvinas, 2026-08-11) and
+implemented in `FinalCta` in `src/components/Sections.tsx`. **Desktop only** —
+the numbers below are the desktop design; the phone card keeps its own smaller
+treatment.
+
+| Part | Size |
+| --- | --- |
+| Card | **1380 × 842** — the full content column (see `SHELL`) |
+| Heading | Poppins SemiBold **55 / 55** |
+| Sub | Poppins Regular **24 / 30**, `#FFFFFF` at **50%** |
+| Primary CTA | **60** tall, radius **36**, label Poppins **26** |
+| Primary CTA fill | the "Yes" / "Book a Call" gradient, verbatim |
+| Arrow disc | **40 × 40**, `#222222` at 100% |
+| Arrow | **14 × 14** |
+| Scarcity pill | **60** tall, radius 36, `#FFFFFF` at **20%**, Poppins Regular 26 |
+
+The height is **fixed**, not a padding budget: the design gives the panel's
+box, and letting the type set the height drifts it every time the copy changes.
+The content block is centred in it, leaving 272 above and below.
+
+### Line breaks
+
+Both blocks break where the design breaks them, as `block` spans rather than
+`<br>` so the break survives wrapping:
+
+- Heading: **"You scrolled so far."** alone, then "You want this. Trust us."
+- Sub: "We have a cap. We don't know if you're the right fit yet." /
+  "But we'd love to find out in 15 minutes."
+
+### Fill
+
+One **linear** gradient of one colour — `#1D0937` at **0% opacity** at the top
+of the card to **100%** at the bottom — over the page's black, with the
+`cta-streaks.svg` artwork on top. See `.cta-card` in `globals.css`.
+
+It reads as subtle because `#1D0937` is dark enough that even at full opacity
+it only just lifts off the black. This replaced an eyeballed radial glow that
+pooled light in the lower middle. The **orientation matters**: purple rises
+from the bottom edge. Early versions had it upside-down and it read too bright
+at any alpha.
+
+### Eyeballed, not supplied
+
+Read off the reference screenshot — close, not exact:
+
+- 24 from the heading to the sub, **44** from the sub to the pills, **28**
+  between the two pills.
+- The pills' horizontal insets. These are checked rather than guessed: Poppins
+  Regular 26 sets "15 Minute Fit-Check" 251.5 wide and "2/10 client spots left
+  for 2026" 366.5 (advance widths out of the woff2 `hmtx`), so 25 + text + 15 +
+  40 disc + 10 comes to 341.5 and 28 + text + 28 to 422.5 — against the ~342
+  and ~422 the reference measures.
+
+The arrow is the same house arrow as the creatives "Yes" pill: a 15-unit arrow
+in a 17-unit viewBox, the spare unit each side being the stroke's overhang. The
+box therefore renders at 17/15 of the size the arrow is specified at — 14 ×
+17/15 = **15.87** here. Rendering the box itself at 14 would draw a 12.4 arrow,
+the same trap the creatives pill documents.
+
 ## Open questions
 
 - Client logo SVGs (Holo especially) — see "Client logotypes".
 - Exact spacing between sections is eyeballed from the screenshot, not measured.
+- The final CTA's card radius (currently 24) and its purple hairline border are
+  both still eyeballed.
