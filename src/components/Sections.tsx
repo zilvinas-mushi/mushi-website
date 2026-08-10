@@ -444,10 +444,10 @@ export function CaseStudies() {
 
 function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
   return (
-    <article className="rounded-[18px] bg-[#161519] p-7">
+    <article className="rounded-[20px] bg-[#161519] p-7">
       {/* Title and avatar share the top row; the avatar is right-aligned. */}
       <div className="flex items-start justify-between gap-5">
-        <h3 className="text-[19px] font-semibold leading-snug text-white">
+        <h3 className="text-[30px] font-semibold leading-snug text-white">
           {t.title}
         </h3>
         {t.avatar ? (
@@ -473,13 +473,13 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
 
       <div className="mt-4 space-y-4">
         {t.body.map((para, i) => (
-          <p key={i} className="text-[14px] leading-relaxed text-white/65">
+          <p key={i} className="text-[21px] font-normal leading-relaxed text-white/50">
             {para}
           </p>
         ))}
       </div>
 
-      <footer className="mt-6 text-[13px] text-white/40">
+      <footer className="mt-6 text-[21px] font-light text-white/40">
         <time dateTime={t.iso}>{t.date}</time>
         {"  •  "}
         <span>{t.author}</span>
