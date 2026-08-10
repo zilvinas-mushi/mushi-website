@@ -315,24 +315,44 @@ export function Creatives() {
             {CREATIVES.heading}
           </h2>
 
-          {/* The heading asks a question; this pill is the answer. Violet
-              pill with a circular arrow badge, as in the design. */}
+          {/*
+            The heading asks a question; this pill is the answer.
+
+            Desktop is measured, not eyeballed: 143 x 60, radius 30 on all four
+            corners, a 45x45 #222222 disc inset 7.5px from the right edge (the
+            same inset as the 7.5px it gets top and bottom from 60 - 45), and
+            exactly 18px between the end of "Yes" and the start of the disc.
+            `justify-end` is what holds both of those at once — the content is
+            packed against the right edge, so the 18px gap and the 7.5px inset
+            are both literal and the leftover space falls on the left of "Yes"
+            instead of being a padding value that has to be kept in sync with
+            the text's width.
+
+            The fill is the header's "Book a Call" gradient verbatim so the two
+            CTAs read as the same button. Hover inverts fill and text per
+            CLAUDE.md, keeping a gradient on both states so it cross-fades; the
+            disc stays dark through the inversion so the arrow never disappears
+            against the white fill.
+          */}
           <a
             href={BOOKING_URL}
-            // Figma 3803:1218: the pill is 143x60 with a 45x45 circle inset
-            // 7px from the right — 107x45 with a 34px circle at 1440.
-            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] pl-5 pr-[6px] text-[20px] font-semibold text-white md:h-[58px] md:pl-7 md:pr-2 md:text-[30px] transition-all duration-150 hover:bg-[linear-gradient(140deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5]"
+            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[6px] text-[20px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:w-[143px] md:justify-end md:gap-[18px] md:rounded-[30px] md:pl-0 md:pr-[7.5px] md:text-[30px] md:font-normal"
           >
             {CREATIVES.cta}
-            <span className="flex size-[34px] items-center justify-center rounded-full bg-[#141318] text-white transition-colors md:size-[42px]">
+            <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[45px]">
+              {/* ~/Documents/arrow icon.svg, inlined. Its 17-unit viewBox is
+                  the 15-unit arrow plus the 2-unit stroke, and the whole box
+                  renders at 15x15 on desktop. */}
               <svg
-                viewBox="0 0 24 24"
+                viewBox="0 0 17 17"
                 fill="none"
-                strokeWidth="2.2"
-                className="size-5 stroke-current md:size-6"
+                className="size-[11px] stroke-current md:size-[15px]"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 aria-hidden="true"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
+                <path d="M0.999888 15.9999L15.9998 1M15.9998 14.1708L15.9998 1L2.82898 1" />
               </svg>
             </span>
           </a>
