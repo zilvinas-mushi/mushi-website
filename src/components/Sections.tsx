@@ -461,7 +461,7 @@ export function CaseStudies() {
                   {item.tags.map((tag) => (
                     <li
                       key={tag}
-                      className="rounded-[6px] bg-[#191919] px-3.5 py-1.5 text-[20px] font-normal uppercase tracking-wide text-[#9e9e9e]"
+                      className="rounded-[6px] bg-[#191919] px-2.5 py-1 text-[14px] font-normal uppercase tracking-wide text-[#9e9e9e] md:px-3.5 md:py-1.5 md:text-[20px]"
                     >
                       {tag}
                     </li>
