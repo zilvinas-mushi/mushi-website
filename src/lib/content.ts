@@ -151,8 +151,15 @@ type TrendingPanel = HeroPanelBase & {
   variant: "trending";
   /** 25px Poppins Medium, with the 28.5 icon beside it. */
   title: string;
-  /** One row per bar. `label` is 15px Poppins Medium; `w` is design px. */
-  rows: { label: string; w: number }[];
+  /**
+   * One row per bar. `label` is 15px Poppins Medium.
+   *
+   * `k` is the bar's VALUE in thousands, not a width — the chart maps it onto
+   * the tick axis below. It used to be a raw design-px width, which meant the
+   * bars and the axis were two unrelated sets of numbers and nothing stopped
+   * them drifting out of agreement (they had).
+   */
+  rows: { label: string; k: number }[];
   /** Axis labels, each in a 34 x 12 box. */
   ticks: string[];
 };
@@ -194,7 +201,10 @@ export const HERO_PANELS: HeroPanel[] = [
     side: "right",
     top: "14%",
     rotate: "16.97deg",
-    label: "Total Revenue (last 7 days)",
+    // "(today)", not the design's "(last 7 days)". A week's figure invites the
+    // reader to divide it down and read the client as small; a daily one does
+    // not. Deliberate copy change — see design/COPY.md.
+    label: "Total Revenue (today)",
     amount: "$6,240.28",
     amountFromBottom: 32.6,
     badge: "+2",
@@ -210,20 +220,49 @@ export const HERO_PANELS: HeroPanel[] = [
     // Pushed a further 40 off the right edge than the other three.
     edgeOffset: 2.4,
     title: "Trending Videos",
+    // Values read off the Figma card, in thousands. Note row 2 is 10K against
+    // an axis that stops at 8K — its bar is meant to run past the last
+    // gridline, which is what the reference shows. This replaces three
+    // hand-measured pixel widths, one of which was an admitted placeholder.
     rows: [
-      { label: "Video 1", w: 94 },
-      { label: "Video 2", w: 137 },
-      // TODO(spec): row 3's width was not supplied — 60 is a placeholder.
-      { label: "Video 3", w: 60 },
+      // 6K lands exactly midway between the 4K and 8K gridlines.
+      { label: "Video 1", k: 6 },
+      { label: "Video 2", k: 10 },
+      { label: "Video 3", k: 2 },
     ],
+    // The axis DOUBLES at the end — 0, 2, 4, then 8 — while the ticks stay
+    // evenly spaced. So it is not a linear scale, and a bar's length has to be
+    // interpolated between the ticks it falls between rather than computed as
+    // value/max. See barX() in HeroPanels.tsx.
     ticks: ["0", "2K", "4K", "8K"],
   },
 ];
 
+/**
+ * The hero sub breaks in ONE specific place in the design:
+ *
+ *   Paid ads, banger creatives, landing pages,
+ *   and strategy - all led by us, under one roof.
+ *
+ * Left to the browser it put "and" at the end of the first line, which is what
+ * was reported against the live page. No width can be trusted to produce the
+ * right break — it shifts with the viewport, and again while the fallback face
+ * is showing before Poppins loads — so the break is authored, not tuned.
+ *
+ * Hence LINES, with `sub` joined from them rather than typed twice: the flat
+ * string is still what any single-string consumer wants, and the two can never
+ * drift apart.
+ */
+const HERO_SUB_LINES = [
+  "Paid ads, banger creatives, landing pages,",
+  "and strategy - all led by us, under one roof.",
+] as const;
+
 export const HERO = {
   eyebrow: "Growth Partner for eCom & AI brands",
   heading: "Your Path to $100M.",
-  sub: "Paid ads, banger creatives, landing pages, and strategy - all led by us, under one roof.",
+  subLines: HERO_SUB_LINES,
+  sub: HERO_SUB_LINES.join(" "),
   primaryCta: "15 Minute Fit-Check",
   secondaryCta: "Steal Our Secrets",
   /** Floating proof chips around the hero visual. */
@@ -349,23 +388,25 @@ export const CREATIVES = {
 
     // Exported from Figma at 1320x2340 and converted to WebP (12.9MB -> 0.52MB).
     // Handles are taken from the brand visible inside each ad, so nothing is
-    // invented. The last two carry no visible brand — see TODO below.
+    // invented; the owners of the last two were confirmed against the design's
+    // own card headers.
+    //
+    // THIS ARRAY'S ORDER IS THE DESIGN'S ORDER, positions 5-10 set from the
+    // Figma frame rather than from how the assets happened to be extracted.
+    // The rail steps one card at a time with no drag and no shuffle, so what
+    // is written here is exactly the sequence a visitor walks through — moving
+    // an entry re-sequences the section. Do not reorder to group brands or to
+    // tidy the file.
+    //
+    //   5 SuperiorCarePet   6 unive   7 celemi
+    //   8 bluechew          9 PersyBooths   10 sintra.ai
     {
-      handle: "sintra.ai",
-      caption: "3D Character Hook Video Ad",
-      image: "sintra-soshie.webp",
+      handle: "SuperiorCarePet",
+      caption: "Dog Food Voiceover Video Ad",
+      image: "dogfood-real-results.webp",
       w: 1320,
       h: 2340,
-      avatar: "sintra-logo.svg",
-      verified: true,
-    },
-    {
-      handle: "bluechew",
-      caption: "Tablet Benefit Static Ad",
-      image: "bluechew.webp",
-      w: 1320,
-      h: 2340,
-      avatar: "bluechew-logo.svg",
+      avatar: "superiorcarepet-logo.svg",
       verified: true,
     },
     {
@@ -385,14 +426,13 @@ export const CREATIVES = {
       h: 2340,
       avatar: "celemi-logo.webp",
     },
-    // Owners confirmed against the design's own card headers.
     {
-      handle: "SuperiorCarePet",
-      caption: "Dog Food Voiceover Video Ad",
-      image: "dogfood-real-results.webp",
+      handle: "bluechew",
+      caption: "Tablet Benefit Static Ad",
+      image: "bluechew.webp",
       w: 1320,
       h: 2340,
-      avatar: "superiorcarepet-logo.svg",
+      avatar: "bluechew-logo.svg",
       verified: true,
     },
     {
@@ -402,6 +442,15 @@ export const CREATIVES = {
       w: 1320,
       h: 2340,
       avatar: "persybooths-logo.svg",
+      verified: true,
+    },
+    {
+      handle: "sintra.ai",
+      caption: "3D Character Hook Video Ad",
+      image: "sintra-soshie.webp",
+      w: 1320,
+      h: 2340,
+      avatar: "sintra-logo.svg",
       verified: true,
     },
   ] satisfies Creative[],
@@ -460,7 +509,7 @@ export const CASE_STUDIES = {
       brand: "we interiors",
       result: "From $13k/month to $75k/month in 3 months.",
       tags: ["ECOM", "FURNITURE", "HOME"],
-      image: "case-we-interiors-v2.webp",
+      image: "case-we-interiors-v4.webp",
       logo: "we-interiors.webp",
       logoW: 133,
       // Near-black card with a warm yellow glow spilling from the
@@ -561,6 +610,8 @@ export const TESTIMONIALS = {
       iso: "2025-11-01",
       author: "Lukas Raščiauskas",
       country: "LT",
+      // `initials` stays as the fallback if the file ever goes missing.
+      avatar: "lukas-rasciauskas1.webp",
       initials: "LR",
     },
     {

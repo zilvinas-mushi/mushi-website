@@ -370,7 +370,13 @@ function RevenueBody({ p }: { p: Extract<HeroPanel, { variant: "revenue" }> }) {
           wide in a 434 content box — which parked the badge on the card's right
           edge, exactly the part a right-side panel crops off-screen.
         */}
-        <div className="flex items-end" style={{ gap: "calc(var(--k) * 0.1)" }}>
+        {/* `items-center`, not `items-end`. The badge is 30 tall against a 43
+            figure, so bottom-aligning them dropped it 13 below the figure's
+            optical middle and it read as hanging off the number rather than
+            sitting beside it. The figure is the taller item either way, so it
+            still sets the row's height and `amountFromBottom` is unaffected —
+            only the badge moves. */}
+        <div className="flex items-center" style={{ gap: "calc(var(--k) * 0.1)" }}>
           {/* `leading-none` so the box hugs the figure: `amountFromBottom` is
               measured to the text's box, and a looser line-height would put
               half-leading between the digits and that edge. */}
@@ -418,13 +424,53 @@ const PLOT_H = 3 * BAR_H + 2 * 18;
 /**
  * Centre of tick `i` within the plot, design px.
  *
- * The four 34-wide boxes are laid out `justify-between` across the 137, so they
- * step by (137 - 34) / 3 and each label centres 17 into its own box. The dashed
- * gridlines hang off these same centres, which is what keeps them under the
- * labels.
+ * THE AXIS SPANS THE PLOT: tick 0 sits at x=0, the last at x=PLOT_W. So the
+ * first gridline lands exactly on the bars' left edge and the last on the end
+ * of row 2's full-width bar, which is what puts the bars and the stripes on one
+ * rhythm.
+ *
+ * It used to be `i * (PLOT_W - TICK_W) / (count - 1) + TICK_W / 2` — the four
+ * 34-wide LABEL BOXES laid out justify-between, with the gridlines hung off
+ * their centres. That inset the whole axis by half a label box (17px) at each
+ * end, so the first stripe fell 17px INSIDE the bars' start and every bar
+ * crossed the stripes off-beat. The label box is for typesetting the number;
+ * it should never have set where the axis begins.
+ *
+ * Consequence worth knowing: the outer labels now overhang the plot by about
+ * half their box, "0" to the left and "8K" to the right. That is normal axis
+ * behaviour — the number is centred on the value it marks — and it is why the
+ * labels are positioned absolutely rather than laid out in a flex row.
  */
-const tickCentre = (i: number, count: number) =>
-  (i * (PLOT_W - TICK_W)) / (count - 1) + TICK_W / 2;
+const tickCentre = (i: number, count: number) => (i * PLOT_W) / (count - 1);
+
+/**
+ * Where a bar of value `k` (thousands) ends, in design px across the plot.
+ *
+ * The axis is NOT linear: its labels run 0, 2K, 4K, 8K while the ticks sit at
+ * equal spacing, so the last segment covers twice the value of the ones before
+ * it. `k / max * PLOT_W` would therefore put every bar in the wrong place. The
+ * value is interpolated between the two ticks it falls between instead.
+ *
+ * Values past the last tick extrapolate at the final segment's rate rather than
+ * clamping — row 2 is 9K on an 8K axis and is supposed to run past the last
+ * gridline, exactly as the Figma card shows it.
+ */
+function barX(k: number, ticks: string[]) {
+  // "2K" -> 2. parseFloat stops at the K, which is all this needs.
+  const values = ticks.map((t) => parseFloat(t));
+  const last = values.length - 1;
+  // The segment whose lower tick is the biggest one not above `k`, capped so an
+  // out-of-range value extrapolates off the final segment instead of falling
+  // out of the loop.
+  let i = 0;
+  while (i < last - 1 && values[i + 1] <= k) i += 1;
+
+  const span = values[i + 1] - values[i];
+  const t = span === 0 ? 0 : (k - values[i]) / span;
+  const x0 = tickCentre(i, ticks.length);
+  const x1 = tickCentre(i + 1, ticks.length);
+  return x0 + t * (x1 - x0);
+}
 
 /**
  * Panel 4: an icon beside the title, the divider, then a horizontal bar chart.
@@ -512,23 +558,57 @@ function TrendingBody({ p }: { p: Extract<HeroPanel, { variant: "trending" }> })
               height: `calc(var(--k) * ${PLOT_H / 100})`,
             }}
           >
+            {/*
+              Drawn as a repeating gradient, NOT `border-dashed`.
+
+              Figma's stroke settings, exactly: #9D9D9D at 100%, weight 1,
+              style Dashed, DASH 5 GAP 5. Hence the 0.05 / 0.10 stops — 5 on,
+              5 off, a 10 period.
+
+              CSS's `border-dashed` cannot express that: it derives its own
+              pattern from the border width, so a 1px line came out a dotted
+              hairline — far too fine, and at the 25% white it used to carry,
+              far too faint. That is why they barely read as dashes at all.
+
+              A gradient is the only way to state the dash length outright.
+
+              NO -translate-x-1/2. Centring each line ON its tick put HALF of
+              the first one at x = -0.5, outside the bars, so a hairline of it
+              stayed visible down the left edge no matter how wide the bars got
+              — the bars are supposed to bury that line completely. Left-edge
+              alignment puts it at [0, 1], fully inside them.
+
+              MIN 1px WIDE. `calc(var(--k) * 0.01)` alone is 0.76px at the
+              panel's live scale, i.e. sub-pixel: each line then antialiases
+              differently depending on where its fractional x lands, so the four
+              rendered at visibly different weights — some crisp, some ghosted.
+              The max() guarantees every line covers a whole device pixel and
+              they all come out identical.
+            */}
             {p.ticks.map((t, j) => (
               <span
                 key={t}
                 aria-hidden="true"
-                className="absolute inset-y-0 border-l border-dashed border-white/25"
+                className="absolute inset-y-0"
                 style={{
                   left: `calc(var(--k) * ${tickCentre(j, p.ticks.length) / 100})`,
+                  width: "max(1px, calc(var(--k) * 0.01))",
+                  background:
+                    "repeating-linear-gradient(to bottom, #9d9d9d 0, #9d9d9d calc(var(--k) * 0.05), transparent calc(var(--k) * 0.05), transparent calc(var(--k) * 0.1))",
                 }}
               />
             ))}
             <div className="relative flex h-full flex-col justify-between">
               {p.rows.map((r) => (
+                /* SQUARE ENDS — corner radius 0, per Figma. It was 5, the house
+                   chip radius, applied here by default; on a 12-tall bar that
+                   rounds a quarter of the height at each end and reads as a
+                   lozenge. These are plot bars, not chips. */
                 <span
                   key={r.label}
-                  className="block rounded-[calc(var(--k)*0.05)]"
+                  className="block"
                   style={{
-                    width: `calc(var(--k) * ${r.w / 100})`,
+                    width: `calc(var(--k) * ${barX(r.k, p.ticks) / 100})`,
                     height: `calc(var(--k) * ${BAR_H / 100})`,
                     background: UNLIT,
                   }}
@@ -548,18 +628,29 @@ function TrendingBody({ p }: { p: Extract<HeroPanel, { variant: "trending" }> })
           >
             {p.rows[0].label}
           </span>
+          {/* Absolutely positioned on the SAME tickCentre() the gridlines use,
+              so a label can never drift off its stripe. A justify-between flex
+              row cannot do that once the axis spans the full plot: it would
+              have to let the outer boxes hang past both edges, which flex will
+              not do. */}
           <div
-            className="flex shrink-0 justify-between"
+            className="relative shrink-0"
             style={{
               width: `calc(var(--k) * ${PLOT_W / 100})`,
+              height: `calc(var(--k) * ${TICK_H / 100})`,
               marginTop: "calc(var(--k) * 0.06)",
             }}
           >
-            {p.ticks.map((t) => (
+            {p.ticks.map((t, j) => (
+              /* FULL WHITE. These were white/70 and read as half-faded next to
+                 the row labels, which are solid. Nothing in the design dims
+                 them — the 70% was doing the job the 25% on the gridlines
+                 already does, and it made the numbers look like a mistake. */
               <span
                 key={t}
-                className="grid place-items-center font-medium leading-none text-white/70"
+                className="absolute grid -translate-x-1/2 place-items-center font-medium leading-none text-white"
                 style={{
+                  left: `calc(var(--k) * ${tickCentre(j, p.ticks.length) / 100})`,
                   width: `calc(var(--k) * ${TICK_W / 100})`,
                   height: `calc(var(--k) * ${TICK_H / 100})`,
                   fontSize: `calc(var(--k) * ${TICK_FONT / 100})`,

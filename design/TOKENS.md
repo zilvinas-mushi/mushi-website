@@ -224,7 +224,7 @@ entirely. Rotation **+16.97°** (CSS; Figma's −16.97).
 | Part | Size |
 | --- | --- |
 | Arrow icon | 27 × 27, on a **60** × 60 `#222222` disc |
-| Label "Total Revenue (last 7 days)" | Poppins Medium 15 |
+| Label "Total Revenue (today)" | Poppins Medium 15 |
 | Figure "$6,240.28" | Poppins Medium 43 |
 | Figure's box → bottom edge | 32.6 |
 | "+2" badge | 50 × 30, Poppins **Regular** 25 |

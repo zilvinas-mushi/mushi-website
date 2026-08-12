@@ -21,18 +21,24 @@ const OMEGA = 11;
 /** The progress line never fully empties — this is its length at card one. */
 const PROGRESS_FLOOR = 0.03;
 
-/** Seconds of travel a flick carries past the release point. */
-const FLICK = 0.12;
-
 /**
  * The creatives rail: a finite, arrow-driven carousel.
  *
- * Nothing moves on its own — the track only travels when the viewer asks it
- * to, via the prev/next discs or by dragging. It runs from the first card to
- * the last and stops there; there is no wrap, so the arrow that would push
- * past an end is disabled while the rail sits at that end. Both discs share
- * one enabled treatment and one disabled treatment, so their look is always a
- * readout of where the rail actually is rather than a fixed decoration.
+ * THE ARROWS ARE THE ONLY WAY TO MOVE IT. Dragging was deliberately removed:
+ * the rail is meant to be stepped through card by card, in the order the
+ * design lays them out, and a drag lets the viewer stop halfway between two
+ * cards or skim past several without ever seeing them. The discs advance
+ * exactly one card, so every creative gets its turn in the intended sequence.
+ *
+ * That also means no flick/momentum handling — there is no gesture to carry
+ * speed over from. The spring below is now driven only by arrow clicks.
+ *
+ * Nothing moves on its own either; there is no autoplay. It runs from the
+ * first card to the last and stops there, with no wrap, so the arrow that
+ * would push past an end is disabled while the rail sits at that end. Both
+ * discs share one enabled treatment and one disabled treatment, so their look
+ * is always a readout of where the rail actually is rather than a fixed
+ * decoration.
  *
  * EVERYTHING THAT MOVES IS WRITTEN IMPERATIVELY, and this is the whole reason
  * the motion holds together. The track's transform, the progress line's scale
@@ -71,7 +77,6 @@ export function CreativesRail() {
   const target = useRef(0);
   const raf = useRef(0);
   const snap = useRef(false);
-  const drag = useRef<{ x: number; t: number; vx: number } | null>(null);
 
   const maxOffset = () => {
     const track = trackRef.current;
@@ -201,42 +206,6 @@ export function CreativesRail() {
   // clicks advance three cards instead of collapsing into one and a half.
   const nudge = (dir: 1 | -1) => goTo(target.current + dir * cardStep());
 
-  const onPointerDown = (e: React.PointerEvent) => {
-    if (!enhanced) return;
-    cancelAnimationFrame(raf.current);
-    raf.current = 0;
-    vel.current = 0;
-    drag.current = { x: e.clientX, t: performance.now(), vx: 0 };
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-  };
-
-  const onPointerMove = (e: React.PointerEvent) => {
-    const d = drag.current;
-    if (!d) return;
-    const now = performance.now();
-    const dx = e.clientX - d.x;
-    const dt = Math.max((now - d.t) / 1000, 1 / 1000);
-
-    // Smoothed so one jittery sample cannot dominate the flick on release.
-    d.vx = d.vx * 0.7 + (-dx / dt) * 0.3;
-    d.x = e.clientX;
-    d.t = now;
-
-    pos.current = Math.min(Math.max(pos.current + -dx, 0), maxOffset());
-    target.current = pos.current;
-    paint();
-  };
-
-  const onPointerUp = () => {
-    const d = drag.current;
-    drag.current = null;
-    if (!d) return;
-    // Hand the flick's speed to the spring so a throw coasts to a stop
-    // instead of dying under the finger.
-    vel.current = d.vx;
-    goTo(pos.current + d.vx * FLICK);
-  };
-
   // Module-constant data, so the cards are built once. Without this every
   // enabled/disabled flip would reconcile the whole rail.
   const cards = useMemo(
@@ -258,17 +227,14 @@ export function CreativesRail() {
     <div>
       {/* Full-bleed: the clip box is the screen, so cards cross the entire
           display instead of disappearing at the column's edge. */}
+      {/* No pointer handlers and no grab cursor — `overflow-hidden` is what
+          makes the arrows the only way through once JS is up. Note the two
+          modes: before hydration this is a plain overflow-x scroller so the
+          rail is not a dead box without JavaScript, and the moment React takes
+          over it becomes the clipped, transform-driven track. */}
       <div
         ref={viewRef}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-        className={
-          enhanced
-            ? "cursor-grab touch-pan-y overflow-hidden active:cursor-grabbing"
-            : "scroll-row overflow-x-auto"
-        }
+        className={enhanced ? "overflow-hidden" : "scroll-row overflow-x-auto"}
       >
         {/* The gutters put the track's two ends back on the shell's content
             edges: the first card starts under the heading, and the last one

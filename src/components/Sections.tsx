@@ -35,15 +35,23 @@ function Pill({
   // 56 here — the old 0.75 scale-down for a 1440 viewport — and is now the
   // design's 67 at lg. Below lg it still steps down; that is the phone pass.
   const base =
-    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-150 hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
+    "inline-flex h-[44px] items-center justify-center rounded-[15px] px-5 text-[14px] font-semibold uppercase leading-none transition-all duration-300 ease-out hover:-translate-y-[1px] md:h-[48px] md:px-6 md:text-[18px] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
   // so the change cross-fades rather than snapping.
+  //
+  // THE TWO GRADIENTS MUST HAVE THE SAME STOP COUNT AND THE SAME STOP
+  // POSITIONS, or the browser cannot interpolate between them and the fill
+  // jumps at the halfway point no matter what `transition` says. The primary's
+  // hover state used to be a 2-stop `#fff 0% -> #fff 100%` against a 3-stop
+  // rest state at 8/42/93 — which is exactly why this button snapped while the
+  // dark variant below (2 stops both sides) always cross-faded correctly.
+  // Repeating the SAME percentages in white is what makes it animate.
   const style =
     variant === "primary"
       ? // purple bg / white text  ->  white bg / purple text
-        "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)] hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] hover:shadow-[0_8px_26px_-12px_rgba(255,255,255,0.45)]"
+        "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_8px_26px_-10px_rgba(110,84,181,0.95)] hover:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] hover:shadow-[0_8px_26px_-12px_rgba(255,255,255,0.45)]"
       : // white bg / black text  ->  black bg / white text
         "bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] text-black hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white";
   return (
@@ -62,6 +70,10 @@ function Pill({
  * filled #6E54B5 with the Trustpilot-style star notched out of it in white,
  * running edge to edge. Inlined rather than <img> so the five tiles cost no
  * requests and the geometry stays exact at any rendered size.
+ *
+ * RENDERED AT 35, the asset's own size. It was drawn at 22 — the artwork was
+ * transcribed at full size but then scaled down in CSS, so the tiles read as
+ * small chips rather than the rating block the design uses.
  */
 function Stars({ count = 5 }: { count?: number }) {
   return (
@@ -75,7 +87,7 @@ function Stars({ count = 5 }: { count?: number }) {
           key={i}
           aria-hidden="true"
           viewBox="0 0 35 35"
-          className="size-[22px] shrink-0"
+          className="size-[35px] shrink-0"
         >
           <rect width="35" height="35" fill="#6E54B5" />
           <path
@@ -110,36 +122,102 @@ export function Hero() {
           a different treatment.
         */}
         {/*
-          Crisp pill, not a blur cloud: a vertical gradient — lavender rim into
-          a white core and back — gives the rolled-edge look of the reference.
+          The fill and the #6E54B5 loop live on .eyebrow-pill in globals.css —
+          see the note there for why the ring is inset shadows rather than a
+          gradient. What is here is only geometry.
 
-          It throws NOTHING outwards. The glow was a 30px-blur, 10px-spread
-          box-shadow in lavender, which bled a halo onto the tiles behind it;
-          it is now `inset`, so the only radiance is #6E54B5 creeping a little
-          way in from the rim.
+          HEIGHT IS EXPLICIT, not padding plus a line-box. The pill is 45 tall
+          in Figma; padding-derived it came out around 54, because the default
+          line-height added half a line above and below the 20px type. That
+          extra 9px is the "too bulky" — the pill was a fifth taller than the
+          design and the type sat in a slab of white rather than a band.
+
+          45 FLAT, not 0.45u. --hero-u only reaches 100 when the window is BOTH
+          1920 wide and ~1042 tall (it is capped at 9.6vh so the hero never
+          scrolls), so on a real 1920x1080 screen u is ~95 and the pill measured
+          43, not 45. Since this is checked against Figma with a ruler, the
+          literal number wins here. See the note on the type size below.
+
+          `h` + `items-center` also makes the height independent of the font's
+          metrics, so a fallback face while Poppins loads cannot resize it.
+
+          WIDTH IS NOT SET. Figma says 417, but that is just what the copy
+          happens to measure at 20px — pinning it would clip or gap the moment
+          the wording changes or a fallback face is showing, and it cannot work
+          on a phone at all. Padding drives it instead, so 417 falls out on its
+          own at the reference size.
+
+          Radius is the design's 50, written out rather than `rounded-full`.
+          At 45 tall the browser clamps it to a pill either way, but the number
+          is the one from the file and survives any change of height.
+
+          THE TYPE AND PADDING ARE PINNED TOO, and they have to be. Once the
+          box is a literal 45, a font-size that still scales off --hero-u would
+          shrink the type inside a fixed-height pill on any smaller window —
+          the proportions the design specifies would only be right at 1920.
+          Height, type and inset are one decision: all three literal, or all
+          three in u. So this is Poppins Medium 20 everywhere from md up, with
+          the 28 inset that makes the copy measure Figma's 417.
+
+          This is the ONE element on the page that opts out of the hero's
+          scaling. It is small enough that it reads fine at a fixed size in a
+          short window, which is not true of the headline or the stat panels —
+          do not take this as a precedent for them.
+
+          The text classes stay on THIS element: the ring is sized in `em` and
+          reads its font-size from here.
         */}
-        <span className="mb-7 inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#c3b2e9_0%,#ffffff_38%,#ffffff_62%,#bfa9e6_100%)] px-5 py-2 shadow-[inset_0_0_12px_rgba(110,84,181,0.5)] md:mb-[calc(var(--hero-u)*0.28)] md:px-[calc(var(--hero-u)*0.28)] md:py-[calc(var(--hero-u)*0.12)]">
-          <span className="text-[14px] font-medium text-black md:text-[length:calc(var(--hero-u)*0.2)]">
-            {HERO.eyebrow}
-          </span>
+        <span className="eyebrow-pill mb-7 inline-flex h-[34px] items-center justify-center rounded-[50px] px-5 text-[14px] font-medium text-black md:mb-[calc(var(--hero-u)*0.28)] md:h-[45px] md:rounded-[50px] md:px-7 md:text-[20px]">
+          {HERO.eyebrow}
         </span>
 
         {/* The only <h1> on the page. Poppins SemiBold 80 with letter-spacing
             0 — it carried `tracking-tight` (-0.025em), which at 80px pulled
             two full pixels out of every gap. Nothing above it sets tracking, so
             dropping the class leaves it at 0 rather than needing an override. */}
+        {/*
+          Poppins SemiBold 80 / 80 line-height, straight from Figma.
+
+          Literal px, not 0.8u, matching the eyebrow's 45: --hero-u is capped by
+          9.6vh as well as by 5.2083vw, so it only reaches 100 on a window that
+          is BOTH 1920 wide and ~1042 tall. 0.8u was rendering 63 on a 1512
+          screen, not 80.
+
+          `leading-[1]` IS the 80 line-height (80/80). It was 1.08.
+
+          The "massive" note was about the HEADER BAR, not this — see the
+          scale note in SiteHeader.tsx. Do not shrink this to match it.
+        */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] sm:text-6xl md:text-[length:calc(var(--hero-u)*0.8)]"
+          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1] sm:text-[48px] md:text-[80px]"
         >
           {HERO.heading}
         </h1>
 
         {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
             case from md up, and nothing above sets tracking. Below md it steps
-            down to 16, which the phone pass still has to confirm. */}
-        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:mt-[calc(var(--hero-u)*0.24)] md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
-          {HERO.sub}
+            down to 16, which the phone pass still has to confirm.
+
+            THE BREAK IS AUTHORED (see HERO_SUB_LINES). The browser was ending
+            line one on "and"; a hard <br> is the only thing that guarantees the
+            design's break at every width and while the fallback face is still
+            showing.
+
+            `md:max-w-none` goes with it. At 680 the second line is wider than
+            the box at 30px type, so it would simply re-wrap and the <br> would
+            have bought nothing. With the break authored there is no wrapping
+            left to constrain — SHELL's 1380 column is the only limit needed.
+
+            The <br> is md-and-up only. Below that the design is a different
+            frame with its own break, so the phone keeps flowing inside 680.
+            Note the trailing space: it is what keeps the two lines a normal
+            sentence once the <br> is display:none, and CSS drops it at the
+            start of a line when the break IS active, so it costs nothing. */}
+        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
+          {HERO.subLines[0]}
+          <br className="hidden md:inline" />{" "}
+          {HERO.subLines[1]}
         </p>
 
         {/* `isolate` keeps the glow's -z-10 inside this row's stacking
@@ -306,7 +384,7 @@ export function Creatives() {
           */}
           <a
             href={BOOKING_URL}
-            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[6px] text-[20px] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:w-[143px] md:justify-end md:gap-[18px] md:rounded-[30px] md:pl-0 md:pr-[7.5px] md:text-[30px] md:font-normal"
+            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[6px] text-[20px] font-semibold leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:w-[143px] md:justify-end md:gap-[18px] md:rounded-[30px] md:pl-0 md:pr-[7.5px] md:text-[30px] md:font-normal"
           >
             {CREATIVES.cta}
             <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[45px]">
@@ -364,13 +442,39 @@ export function CaseStudies() {
           rather than sitting in level rows. That offset is the design's
           rhythm — an aligned grid reads as a table by comparison.
         */}
-        <ul className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
-          {CASE_STUDIES.items.map((item, i) => (
+        {/*
+          TWO INDEPENDENT COLUMNS, not a 2-column grid.
+
+          A grid was wrong here and no gap value could have fixed it: grid rows
+          span both columns, so every row is as tall as its TALLEST cell. With
+          the right column pushed down 150px to stagger it, that offset inflated
+          the shared row height and the left column inherited the slack as dead
+          space under its tags — the huge gaps in the report. Setting `gap-y`
+          only changed the small part of the distance that was actually gap.
+
+          As two flex columns each card sits directly under the one above it, so
+          the 45 IS the whole distance from a card's tag row to the next card's
+          top edge. The stagger is then just a top margin on the right column.
+
+          Cards alternate L, R, L, R to keep the design's reading order — the
+          same reason TestimonialColumns splits its list by index rather than
+          using CSS multicol.
+        */}
+        <div className="mt-12 grid gap-x-10 sm:grid-cols-2">
+          {[0, 1].map((col) => (
+            <ul
+              key={col}
+              className={`flex flex-col gap-8 md:gap-[45px] ${
+                // Figma puts the left column at y 2461/3358 and the right at
+                // 2611/3508 — a 150px drop, not the ~88px guessed before.
+                col === 1 ? "sm:mt-[150px]" : ""
+              }`}
+            >
+              {CASE_STUDIES.items
+                .filter((_, i) => i % 2 === col)
+                .map((item) => (
             <li
               key={item.brand}
-              // Figma puts the left column at y 2461/3358 and the right at
-              // 2611/3508 — a 150px drop, not the ~88px guessed before.
-              className={i % 2 === 1 ? "sm:mt-[150px]" : undefined}
             >
               <article className="relative flex h-full flex-col">
                 {/* 680x680 Mask group filling its column — a square, not a
@@ -418,10 +522,12 @@ export function CaseStudies() {
                   />
                 </div>
 
-                {/* On phones Holo's revenue line runs 2px larger than the
-                    other three cards' — a deliberate emphasis, not drift. */}
+                {/* Poppins Medium 30 from md up — it was 22. On phones Holo's
+                    line still runs 2px larger than the other three cards' — a
+                    deliberate emphasis, not drift — but from md every card's
+                    result line is the same 30. */}
                 <h3
-                  className={`mt-4 font-medium leading-[1.25] text-white md:mt-5 md:text-[22px] ${
+                  className={`mt-4 font-medium leading-[1.25] text-white md:mt-5 md:text-[30px] ${
                     item.brand === "Holo" ? "text-[22px]" : "text-[20px]"
                   }`}
                 >
@@ -432,7 +538,11 @@ export function CaseStudies() {
                   {item.tags.map((tag) => (
                     <li
                       key={tag}
-                      className="rounded-[6px] bg-white/[0.08] px-2.5 py-1 text-[10px] font-medium tracking-wide text-white/55"
+                      /* 20 from md up, per Figma. The 10px base is the PHONE
+                         value and stays — 20 in a phone card would wrap the
+                         tag row onto several lines. Desktop only, deliberately:
+                         do not collapse these two into one size. */
+                      className="rounded-[6px] bg-white/[0.08] px-2.5 py-1 text-[10px] font-medium tracking-wide text-white/55 md:text-[20px]"
                     >
                       {tag}
                     </li>
@@ -440,8 +550,10 @@ export function CaseStudies() {
                 </ul>
               </article>
             </li>
+                ))}
+            </ul>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );
@@ -451,23 +563,31 @@ export function CaseStudies() {
 
 function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
   return (
-    <article className="rounded-[20px] bg-[#161519] p-7">
+    /* #181818 at radius 20, both from Figma. The fill was #161519, an
+       eyeballed near-black. NOTE this is NOT the same grey as the
+       "Trusted by 100+ brands" pill below the grid, which is #222222 — the two
+       were briefly conflated. Card is darker than the control sitting on it. */
+    <article className="rounded-[20px] bg-[#181818] p-7">
       {/* Title and avatar share the top row; the avatar is right-aligned. */}
       <div className="flex items-start justify-between gap-5">
         <h3 className="text-[30px] font-semibold leading-snug text-white">
           {t.title}
         </h3>
+        {/* 80 x 80, per Figma — photo and initials disc alike. It was 52, which
+            is what made the 35px initials look oversized: the type was right
+            and the circle around it was three quarters the size it should be.
+            Change the two together, never one on its own. */}
         {t.avatar ? (
           <Img
             src={t.avatar}
             alt=""
-            width={52}
-            className="size-[52px] shrink-0 rounded-full object-cover"
+            width={80}
+            className="size-[80px] shrink-0 rounded-full object-cover"
           />
         ) : (
           <span
             aria-hidden="true"
-            className="flex size-[52px] shrink-0 items-center justify-center rounded-full bg-white/10 text-[13px] font-medium"
+            className="flex size-[80px] shrink-0 items-center justify-center rounded-full bg-white/10 text-[35px] font-medium leading-none"
           >
             {t.initials}
           </span>
@@ -560,7 +680,11 @@ export function Testimonials() {
           the first grid left a block of dead space before the second began.
           One continuous flow has no seam, and no duplicated cards either.
         */}
-        <div className="relative mt-12 [&:has(details[open])_.testi-clip]:max-h-none [&:has(details[open])_.testi-fade]:hidden">
+        {/* The open state is wired in globals.css (.testi-wrap :has rules) so
+            the height and the fade can TRANSITION. As Tailwind variants they
+            could only toggle `max-h-none` / `hidden`, which are both discrete —
+            the reveal snapped in one frame. */}
+        <div className="testi-wrap relative mt-12">
           {/*
             The collapsed height is tuned so the first card in each column is
             whole and the second is cut near its middle — two full cards and
@@ -573,7 +697,9 @@ export function Testimonials() {
             Re-measure if the testimonial copy changes — the numbers come from
             the text's own wrapping.
           */}
-          <div className="testi-clip relative max-h-[1170px] overflow-hidden lg:max-h-[840px] xl:max-h-[740px]">
+          {/* Heights and overflow live on .testi-clip in globals.css now — they
+              have to sit beside the transition that animates them. */}
+          <div className="testi-clip relative">
             <TestimonialColumns list={items} />
             <div
               aria-hidden="true"
@@ -582,10 +708,24 @@ export function Testimonials() {
           </div>
 
           <details className="group">
-            {/* 594 × 62 from the design, fixed from md up so the pill matches
-                the measured box rather than hugging its content. Phones keep
-                the content-width pill — 594 would overflow a 375 viewport. */}
-            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center justify-center gap-2.5 rounded-[var(--radius-pill)] border border-white/10 bg-[#1b1a1f] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] transition-colors duration-150 hover:bg-white group-open:static group-open:mt-8 md:h-[62px] md:w-[594px] md:gap-4 md:py-0 [&::-webkit-details-marker]:hidden">
+            {/*
+              594 × 62 from the design, fixed from md up so the pill matches
+              the measured box rather than hugging its content. Phones keep the
+              content-width pill — 594 would overflow a 375 viewport.
+
+              Figma's three fills for this control, verbatim: #222222 for the
+              pill, #FFFFFF for the type, #FFFFFF at 50% for the divider. The
+              pill was #1b1a1f and the divider white/15, both eyeballed.
+
+              NO COLOUR INVERSION ON HOVER — a deliberate exception to the rule
+              in CLAUDE.md, recorded there too. Every other button on the site
+              trades its foreground and background on hover; this one does not,
+              because at 594 wide it is a section control rather than a call to
+              action and flipping that much area to white flashes the whole
+              block. Only the "View More" cluster responds, and only by a small
+              fade. Do not reinstate `hover:bg-white` here.
+            */}
+            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center justify-center gap-2.5 rounded-[var(--radius-pill)] border border-white/10 bg-[#222222] py-2.5 pl-3 pr-3 shadow-[0_20px_50px_-16px_rgba(0,0,0,0.9)] group-open:static group-open:mt-8 md:h-[62px] md:w-[594px] md:gap-4 md:py-0 [&::-webkit-details-marker]:hidden">
               <span aria-hidden="true" className="flex -space-x-3">
                 {items
                   .filter((t) => t.avatar)
@@ -596,24 +736,28 @@ export function Testimonials() {
                       src={t.avatar as string}
                       alt=""
                       width={40}
-                      className="size-[40px] rounded-full object-cover ring-2 ring-[#1b1a1f]"
+                      className="size-[40px] rounded-full object-cover ring-2 ring-[#222222]"
                     />
                   ))}
               </span>
 
-              <span className="whitespace-nowrap text-[15px] font-medium leading-[30px] text-white transition-colors group-hover/pill:text-black md:text-[21px]">
+              <span className="whitespace-nowrap text-[15px] font-medium leading-[30px] text-white md:text-[21px]">
                 {TESTIMONIALS.trustLine}
               </span>
 
-              <span aria-hidden="true" className="h-5 w-px bg-white/15 transition-colors group-hover/pill:bg-black/20 md:h-[30px]" />
+              {/* #FFFFFF at 50%, per Figma. */}
+              <span aria-hidden="true" className="h-5 w-px bg-white/50 md:h-[30px]" />
 
               {/* Phones drop the "View More" label so the pill stays one line
                   — avatars, trust line, divider, the +/− disc — per the phone
                   design. The label returns from md up. */}
-              <span className="flex items-center gap-2.5 text-[15px] font-medium leading-[30px] text-white transition-colors group-hover/pill:text-black md:text-[21px]">
+              {/* The one thing that reacts to hover, and only barely: a short
+                  fade on this cluster. The label and the disc move together
+                  because they read as a single affordance. */}
+              <span className="flex items-center gap-2.5 text-[15px] font-medium leading-[30px] text-white transition-opacity duration-500 ease-out group-hover/pill:opacity-70 md:text-[21px]">
                 <span className="hidden md:inline md:group-open:hidden">{TESTIMONIALS.moreLabel}</span>
                 <span className="hidden md:group-open:inline">View Less</span>
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[16px] leading-none text-black transition-colors group-hover/pill:bg-black group-hover/pill:text-white md:size-[30px] md:text-[18px]">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[16px] leading-none text-black md:size-[30px] md:text-[18px]">
                   <span className="group-open:hidden">+</span>
                   <span className="hidden leading-none group-open:inline">−</span>
                 </span>
@@ -706,7 +850,7 @@ export function FinalCta() {
             */}
             <a
               href={BOOKING_URL}
-              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:gap-[15px] md:rounded-[36px] md:pl-[25px] md:pr-[10px] md:text-[26px]"
+              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:gap-[15px] md:rounded-[36px] md:pl-[25px] md:pr-[10px] md:text-[26px]"
             >
               {FINAL_CTA.cta}
               <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[40px]">

@@ -75,7 +75,18 @@ export function HeroFloaters() {
                 height: `calc(var(--hero-u) * ${0.5 / f.ink})`,
               }}
             >
-              <Img src={f.image} alt="" width={50} className="h-full w-full" />
+              {/*
+                `priority` — these are ABOVE THE FOLD. Without it Img ships
+                loading="lazy" + decoding="async", so on every refresh the four
+                tiles rendered as empty dark squares and the marks popped in a
+                beat later. CLAUDE.md's rule is lazy below the fold, EAGER for
+                the hero, and these sit in the hero.
+
+                Being decorative does not make them lazy-able: nothing here is
+                offscreen, so lazy buys no bytes — it only defers bytes the page
+                needs immediately, which is pure flicker for no saving.
+              */}
+              <Img src={f.image} alt="" width={50} priority className="h-full w-full" />
             </span>
           </span>
         </span>

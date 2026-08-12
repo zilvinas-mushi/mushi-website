@@ -52,22 +52,58 @@ export function SiteHeader() {
       >
         <nav
           aria-label="Primary"
-          // Single flex row with justify-between so every gap is equal —
-          // wordmark, the three links and the CTA all distribute together. The
-          // bar is a FIXED 13.86u x 1u box, not a max-width, because the design
-          // specifies both dimensions; the free space inside it is what
-          // justify-between spreads.
+          // THREE COLUMNS: logo | links | CTA, with the outer two as equal
+          // 1fr. That is what puts the link group on the bar's true centre.
           //
-          // Padding: 0.15u right and top/bottom, which is exactly the inset
-          // that leaves the 0.70u-tall CTA centred in the 1u bar. The left side
-          // gets 0.30u so the wordmark is not jammed against the corner radius.
+          // It was one flex row with justify-between, which spreads the free
+          // space equally across the four gaps — NOT the same thing. That only
+          // centres the middle group if the logo and the CTA are the same
+          // width, and they are not (1.5u vs 2.42u), and the bar's padding is
+          // deliberately asymmetric too (0.3u left, 0.15u right). Measured in
+          // the browser at 1512 wide, the group's centre sat 29.6px LEFT of the
+          // bar's. Equal gaps, off-centre group — which is what read as "not
+          // centred".
+          //
+          // Grid rather than an absolutely-positioned centred list: the links
+          // stay in normal flow, so they cannot ride over the logo or the CTA
+          // if the copy grows or the bar gets narrow. The two 1fr columns have
+          // ~250px to fill ~190px of content at every width down to the md
+          // floor, so they stay equal and the middle column stays centred.
+          //
+          // The bar is a FIXED 13.86u x 1u box, not a max-width, because the
+          // design specifies both dimensions.
+          //
+          // THE INSETS ARE MARGINS ON THE LOGO AND CTA, NOT PADDING ON THE BAR,
+          // and that is load-bearing for the centring above. A grid centres its
+          // middle column in the CONTENT box; padding of 0.3u left and 0.15u
+          // right moves that box's centre (0.3 - 0.15) / 2 = 0.075u right of
+          // the bar's own centre, which measured as a 5.9px residual error
+          // after the switch to grid. Hanging the same insets off the outer two
+          // items instead makes the content box the border box, so the middle
+          // column centres on the bar itself. Do not move them back.
+          //
+          // The values are unchanged: 0.15u on the right, which is exactly the
+          // inset that leaves the 0.70u-tall CTA centred in the 1u bar, and
+          // 0.30u on the left so the wordmark is not jammed into the radius.
           // The 15px radius scales with `--u` like everything else here.
           // Commit 8b07942 found this independently at the old fixed 1440
           // scale: a flat 15 rounded a third of the CTA's height and read as a
           // half-pill against the reference. 0.15u is 15 at 1920 and 11 at
           // 1440, which is the value that commit landed on.
-          className="mx-auto flex items-center justify-between rounded-[calc(var(--u)*0.15)] bg-[#181818]"
+          className="mx-auto grid grid-cols-[1fr_auto_1fr] items-center rounded-[calc(var(--u)*0.15)] bg-[#181818]"
           style={{
+            /*
+              Back to the design's own 13.86u, so the ENTIRE bar — width,
+              height and type — sits at one scale. With u at 80 (globals.css)
+              that is 1109 wide at 1920, i.e. the same 80% as everything else.
+
+              It was briefly pinned to the original 1386 while only the height
+              came down, to keep the bar aligned with the 1380 content column.
+              That alignment is not worth a bar that reads too wide for its
+              height; one uniform scale is both simpler and what was asked for.
+
+              maxWidth below still guards the gutters at the md breakpoint.
+            */
             width: "calc(var(--u) * 13.86)",
             // Belt and braces: the 53.1px floor on `--u` is set so the bar is
             // 736px at the 768px breakpoint, which is exactly the space inside
@@ -75,11 +111,9 @@ export function SiteHeader() {
             // pushing the bar out past them.
             maxWidth: "100%",
             height: "var(--u)",
-            paddingLeft: "calc(var(--u) * 0.3)",
-            paddingRight: "calc(var(--u) * 0.15)",
           }}
         >
-          <Link href="/" aria-label={`${SITE_NAME} home`} className="flex shrink-0 items-center">
+          <Link href="/" aria-label={`${SITE_NAME} home`} className="ml-[calc(var(--u)*0.3)] flex shrink-0 items-center justify-self-start">
             {/*
               Figma 3803:1570: the wordmark measures 150 x 45. It is live text,
               so that box is not set on the element — it is produced by the font
@@ -98,16 +132,42 @@ export function SiteHeader() {
             <Logo className="text-[length:calc(var(--u)*0.59)]" />
           </Link>
 
-          {/* `contents` dissolves the list box so the three links become direct
-              flex children of the bar and share its even distribution, while the
-              markup stays a real list for assistive tech. */}
-          <ul className="contents">
+          {/* A real box now, not `contents`. It used to dissolve itself so the
+              three links became direct flex children and joined the bar's
+              justify-between distribution — which is exactly what pulled the
+              group off-centre. As the grid's middle column it is centred as a
+              unit instead.
+
+              1.19u is the gap justify-between was producing, kept deliberately
+              so this change only MOVES the group and does not respace it. It is
+              a constant in u, not a coincidence of one viewport: every part of
+              this bar (width, padding, logo, type, CTA) is expressed in u, so
+              the leftover space was always the same fraction of it. */}
+          <ul className="flex items-center gap-[calc(var(--u)*1.19)]">
             {NAV.map((item) => (
-              <li key={item.label}>
+              // `flex` is load-bearing — it fixes the labels sitting ~1px high.
+              //
+              // As a plain block, the <li> lays out a LINE box, and a line box
+              // is sized by the strut (the li's own inherited 16px/1.5 font)
+              // unioned with the inline <a> inside it. The strut contributes
+              // 6.4px of descender space below the baseline; the 28px UPPERCASE
+              // label has no descender ink to put there. So the box grew
+              // downward while the ink did not, `items-center` centred that
+              // taller box, and the letters were left above true centre.
+              //
+              // Making the <li> a flex container blockifies the <a> and stops
+              // any strut being generated, so the box is exactly the label's
+              // own line box. Poppins then centres itself: its ascent minus
+              // descent (1.05 - 0.35em) equals its cap height (0.7em), so with
+              // `leading-none` the cap-to-baseline ink lands dead centre.
+              //
+              // Do NOT "fix" this with a top/bottom nudge — the error scales
+              // with --u, so a fixed px offset is only right at one width.
+              <li key={item.label} className="flex">
                 <a
                   href={item.href}
                   // Figma 3803:1571/1572/1573: Poppins SemiBold 28px = 0.28u.
-                  className="text-[length:calc(var(--u)*0.28)] font-semibold uppercase leading-none tracking-[0.01em] text-white/85 transition-colors hover:text-white"
+                  className="cap-centered text-[length:calc(var(--u)*0.28)] font-semibold uppercase leading-none tracking-[0.01em] text-white/85 transition-colors hover:text-white"
                 >
                   {item.label}
                 </a>
@@ -139,7 +199,7 @@ export function SiteHeader() {
           */}
           <a
             href={BOOKING_URL}
-            className="inline-flex shrink-0 items-center justify-center rounded-[calc(var(--u)*0.15)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] font-semibold leading-none text-white transition-all duration-150 hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_98.13%)] hover:text-[#6e54b5]"
+            className="mr-[calc(var(--u)*0.15)] inline-flex shrink-0 items-center justify-center justify-self-end rounded-[calc(var(--u)*0.15)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] font-semibold leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5]"
             style={{
               width: "calc(var(--u) * 2.42)",
               height: "calc(var(--u) * 0.7)",

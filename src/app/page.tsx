@@ -48,23 +48,24 @@ export default function Home() {
             aria-hidden="true"
             className="hero-grid pointer-events-none absolute inset-0"
           />
-          {/* The centre light, over the tiles. Unmasked, so it does not pick up
-              the grid's bottom fade. */}
+          {/*
+            The light sits BEHIND the artwork. One layer, not several: the
+            export is the entire lighting group, centre pool included.
+            Decorative and inert.
+
+            It was tried on top, at z-4 above HeroPanels and HeroFloaters, which
+            is how the group is stacked in Figma — the light there falls across
+            the Instagram and TikTok marks rather than behind them. It is the
+            more faithful stack and it does give the marks depth, but the price
+            is that the vignette's dark corners swallow the very elements the
+            hero is selling: the platform icons and the ad panels went nearly
+            black wherever they sat away from the centre. Not worth it. If it
+            comes back, the light needs a hole cut for the marks (a mask driven
+            off their positions) rather than a flat z-bump.
+          */}
           <div
             aria-hidden="true"
             className="hero-light pointer-events-none absolute inset-0"
-          />
-          {/* The broad top-left source, over the vignette so it can add light
-              back. See .hero-glow — it must stay below .hero-rays. */}
-          <div
-            aria-hidden="true"
-            className="hero-glow pointer-events-none absolute inset-0"
-          />
-          {/* Light-streak burst, over the tiles so it lights them rather than
-              sitting behind. Decorative only. */}
-          <div
-            aria-hidden="true"
-            className="hero-rays pointer-events-none absolute inset-0"
           />
           <HeroPanels />
           {/* Mounted against the whole field, not the hero section: the lower

@@ -6,13 +6,71 @@ then optimized. All live in `public/images/`.
 **Figma asset URLs expire ~7 days after export.** These files are the durable copy —
 re-exporting costs Figma MCP calls, and the budget is 6/month. Do not delete them.
 
-| | count | size |
-| --- | --- | --- |
-| WebP (converted from PNG/JPEG) | 46 | 2.08 MB |
-| SVG (passthrough) | 46 | 78 KB |
+## `hero-light.webp` — hand-exported 2026-08-12, not part of the 92
 
-Original PNG/JPEG total was **24.4 MB**; WebP conversion at q80 (max width 1600px)
-brought it to **2.16 MB**, a 91% reduction. CLAUDE.md requires WebP sources.
+The hero's entire lighting group: the top-left source, the diagonal shafts, the
+vignette and the centre pool, in one RGBA image. Exported from the Figma UI (no
+MCP call spent) with the tile layer hidden. Used by `.hero-light`.
+
+This is the export the first attempt lacked. `effects-layer.webp` is the same
+group flattened *with* the tiles, which is why it came back a featureless purple
+blur with no rays in it — a note in `globals.css` blamed the technique when the
+asset was the problem. If you need to redo this: **hide the tiles, export the
+light alone, and export at 4x.**
+
+- Source `~/Documents/Tiles background.png` at 4x, 10080 x 7124. The frame is the
+  inner **7680 x 4320 at offset (1200, 1200)**; everything outside that is the
+  group's blur bounds — a noise staircase and offset rounded-rect ghosts. Crop
+  it off. (A 1x export of the same group put the frame at 1920x1080 offset
+  300,300 — the bleed scales with the export.)
+- Shipped at **1920 x 1080, q90, 260 KB**, Lanczos from the 4x crop. The 16:1
+  downsample averages away the export's dither and is why this is clean where
+  the first pass was not.
+- **Do not shrink it on the strength of an error metric.** A 768px version
+  measured identically — error is genuinely flat from 1920 down to 384 because
+  the layer is pure blur — and looked bad in use, because the metric was
+  computed at 1920 while a retina display stretches this across ~4000 device
+  pixels. Banding is not the constraint either: steps between plateaus are ~1
+  level, max 2.
+- Corners are opaque black and the centre is alpha 37 — the vignette and the
+  tile show-through are both baked in. Composite it normally, no blend mode.
+- **The centre light is already in it.** Figma keeps that ellipse as a separate
+  layer (`~/Documents/Center light.png`) but it is composited into this export;
+  adding it on top too washes the middle out to lavender. If it is ever wanted
+  alone it is a plain CSS gradient — a farthest-side ellipse centred in the
+  frame, solid `#2D1940` to r=10.5% then linear to zero at the edge, which
+  rebuilds the PNG to within 1.8/255 at its worst pixel. Not worth shipping.
+- **It goes behind HeroPanels and HeroFloaters.** Figma stacks the lighting
+  group above them and that version was built — it does read better for depth —
+  but the dark corners swallowed the platform marks and the ad panels, which are
+  the things the hero exists to show. Putting it back on top needs a mask with
+  holes cut for those elements, not a flat z-bump.
+
+The tiles stay in CSS and must not become a raster: their 215px pitch is fixed
+regardless of viewport, and `background-position: center 171.5px` is what lands
+`.cta-tile` on a column instead of a gutter. See `.hero-grid`.
+
+## `hero-light-mobile.webp` — hand-exported 2026-08-12
+
+The phone frame's lighting group, same idea as the desktop file. Used by
+`.hero-light` inside `@media (max-width: 767px)`. The desktop image cannot be
+reused: it is a 16:9 frame, and stretched into a tall hero its vignette closes
+in from the sides and chokes the copy.
+
+- Source `~/Documents/Mobile lightning.png`, 1724 x 3608. **The frame is only
+  the left 1500 x 3608** (= 375 x 902 at 4x); the right 224px is transparent
+  spill. Find the edge from the ALPHA profile, not brightness: alpha is a clean
+  U centred on x=750 and falls off a cliff at x=1499.
+- That spill contains loud magenta/blue speckle, which looks alarming in a
+  viewer but is **entirely in pixels with alpha 0** — 194 stray magenta pixels
+  land inside the crop and every one is invisible. Nothing to repair. Do zero
+  the RGB of fully-transparent pixels before encoding, so lossy WebP cannot
+  bleed that garbage inward as a halo.
+- Shipped at **640 x 1539, 175 KB**, q88 with a 1.2px pre-blur. Heavier per
+  pixel than the desktop file because the phone export carries visible grain,
+  which is exactly what lossy WebP cannot compress.
+- Error is flat from 750px down to 432px. **540px halves the weight for no
+  measurable loss** if mobile bytes ever matter more than the safety margin.
 
 ## Largest images
 

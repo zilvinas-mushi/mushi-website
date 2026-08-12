@@ -37,9 +37,14 @@ strings above supply exactly two of them:
 | 2 | Growth Performance Analysis | Optimized for the Quarter | Refined, Delivered & Measured |
 Panels 3 and 4 have different shapes. Panel 3:
 
+The label reads **"(today)"** where the Figma frame says "(last 7 days)". That
+is a deliberate change, not a transcription slip: a weekly figure invites the
+reader to divide it down and conclude the client is small, where a daily one
+does not. Keep it unless the frame is updated to match.
+
 | | |
 | --- | --- |
-| Label | Total Revenue (last 7 days) |
+| Label | Total Revenue (today) |
 | Figure | $6,240.28 |
 | Badge | +2 |
 

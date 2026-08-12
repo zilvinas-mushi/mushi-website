@@ -73,18 +73,32 @@ export function TrustBadges() {
             alt=""
             width={64}
             height={64}
-            loading="lazy"
-            decoding="async"
+            /* Eager: this row sits in the hero, above the fold. Lazy meant the
+               three marks popped in a beat after everything else on every
+               refresh — the same flicker the platform floaters had. */
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
             className="size-16 shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
           />
-          {/* Both lines are Poppins 16 — the award name and the "Winner 2025"
-              line under it are the same size, not a heading over smaller meta.
-              Only the colour separates them. */}
+          {/* Both lines are Poppins MEDIUM 16 — the award name and the
+              "Winner 2025" line under it are the same size AND the same weight,
+              not a heading over lighter meta. Only the colour separates them.
+
+              The weight was `font-normal`, which is what made these read as
+              spindly next to everything else on the page; nothing else in the
+              hero is set in Regular.
+
+              16 is literal, not `0.16u`. --hero-u is capped by 9.6vh as well as
+              by width, so the fluid version was rendering ~12.6 on a 1512
+              screen — a quarter under spec, which is the other half of why the
+              row looked thin. Same reasoning as the eyebrow's 45 and the h1's
+              80. */}
           <span className="text-center md:text-left">
-            <span className="block text-[16px] font-normal leading-snug text-white md:text-[length:calc(var(--hero-u)*0.16)]">
+            <span className="block text-[16px] font-medium leading-snug text-white">
               {title}
             </span>
-            <span className="flex items-center justify-center gap-1.5 text-[16px] text-zinc-500 md:justify-start md:text-[length:calc(var(--hero-u)*0.16)]">
+            <span className="flex items-center justify-center gap-1.5 text-[16px] font-medium text-zinc-500 md:justify-start">
               <Laurel flip />
               {meta}
               <Laurel />

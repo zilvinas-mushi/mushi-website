@@ -21,6 +21,10 @@ Static marketing site for mushi.agency. Deployed to Cloudflare Pages.
   Applies to every button on the site, including the header CTA. Always
   transition the change so it cross-fades rather than snapping; keep a
   gradient background layer on both states so the fill can animate.
+- **One exception: the "Trusted by 100+ brands" pill** in the testimonials
+  section does NOT invert. At 594 × 62 it is a section control rather than a
+  call to action, and flipping that much area to white flashes the whole block.
+  Only its "View More" cluster reacts, and only with a small opacity fade.
 
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.
