@@ -79,26 +79,26 @@ export function TrustBadges() {
             loading="eager"
             decoding="sync"
             fetchPriority="high"
-            className="size-16 shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
+            // The phone row is three columns of ~110, so the desktop badge
+            // scales down with the text rather than keeping its 64.
+            className="size-10 shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
           />
-          {/* Both lines are Poppins MEDIUM 16 — the award name and the
-              "Winner 2025" line under it are the same size AND the same weight,
-              not a heading over lighter meta. Only the colour separates them.
+          {/* On the phone the two lines differ: the award name is Poppins
+              medium 14 on a tight 16 line, the "Winner 2025" line under it
+              medium 12.
 
-              The weight was `font-normal`, which is what made these read as
-              spindly next to everything else on the page; nothing else in the
-              hero is set in Regular.
-
-              16 is literal, not `0.16u`. --hero-u is capped by 9.6vh as well as
-              by width, so the fluid version was rendering ~12.6 on a 1512
-              screen — a quarter under spec, which is the other half of why the
-              row looked thin. Same reasoning as the eyebrow's 45 and the h1's
-              80. */}
+              From md up they go back to being the same size AND the same
+              weight — both Poppins MEDIUM 16, separated only by colour. Two
+              corrections there: the weight was `md:font-normal`, which is what
+              made the row read spindly (nothing else in the hero is Regular),
+              and the size was `0.16u`, which rendered ~12.6 on a 1512 screen
+              because --hero-u is capped by 9.6vh as well as by width. Literal
+              16, same reasoning as the eyebrow's 45 and the h1's 80. */}
           <span className="text-center md:text-left">
-            <span className="block text-[16px] font-medium leading-snug text-white">
+            <span className="block text-[14px] font-medium leading-4 text-white md:text-[16px] md:leading-snug">
               {title}
             </span>
-            <span className="flex items-center justify-center gap-1.5 text-[16px] font-medium text-zinc-500 md:justify-start">
+            <span className="flex items-center justify-center gap-1.5 text-[12px] font-medium text-zinc-500 md:justify-start md:text-[16px]">
               <Laurel flip />
               {meta}
               <Laurel />

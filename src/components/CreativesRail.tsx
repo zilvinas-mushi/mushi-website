@@ -264,7 +264,10 @@ export function CreativesRail() {
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* 50 between the two discs from md up, per Figma. `gap-3` is the phone
+            value and stays — 50 between them on a 375 viewport would push the
+            pair off the progress line. */}
+        <div className="flex items-center gap-3 md:gap-[50px]">
           <button
             type="button"
             onClick={() => nudge(-1)}

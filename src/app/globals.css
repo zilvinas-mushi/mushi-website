@@ -108,6 +108,18 @@
   --radius-card: 15px;
   --radius-chip: 5px;
   --radius-pill: 100px;
+
+  /* Side gutter: 15 on phones (Žilvinas 2026-08-11), the design's measured 20
+     from md up. A token rather than a literal because the creatives rail is
+     full-bleed and has to reproduce this exact edge to line its first card up
+     with the headings — see src/lib/layout.ts. Two literals would drift. */
+  --gutter: 15px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 20px;
+  }
 }
 
 /* Clicking a nav item eases to the section instead of jumping. `scroll-padding`
@@ -652,6 +664,36 @@ body {
 */
 .cap-centered {
   text-box: trim-both cap alphabetic;
+}
+
+/* Phone: the card's 1px inside stroke is a gradient, not a flat colour —
+   #6E54B5 solid along the TOP edge, fading to nothing by the bottom. Note it
+   runs the opposite way to the fill above, whose light rises from the bottom;
+   the two crossing ramps are what give the phone card its shape.
+
+   Painted as a masked ring because border-color cannot hold a gradient and
+   border-image breaks on rounded corners — the same technique as
+   .fade-border. From md up the flat violet border on the element takes over
+   and this is switched off. */
+@media (max-width: 767px) {
+  .cta-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      180deg,
+      #6e54b5 0%,
+      rgba(110, 84, 181, 0) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
 }
 
 /* Partial border that fades away from the top-left and is gone by the

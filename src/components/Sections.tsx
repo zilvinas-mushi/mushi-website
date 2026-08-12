@@ -190,31 +190,38 @@ export function Hero() {
         */}
         <h1
           id="hero-heading"
-          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1] sm:text-[48px] md:text-[80px]"
+          // Poppins SemiBold 32 on phones, per Žilvinas 2026-08-11. The old
+          // sm:text-6xl step jumped it to 60px between 640 and 767px — still
+          // phone width — so 32 now holds all the way to md.
+          //
+          // Desktop is a LITERAL 80 with an 80 line-height, not 0.8u: --hero-u
+          // is capped by 9.6vh as well as by width, so 0.8u rendered 63 on a
+          // 1512 screen. leading-[1] is Figma's 80/80; the phone keeps 1.08.
+          className="mx-auto max-w-4xl text-balance text-[32px] font-semibold leading-[1.08] md:text-[80px] md:leading-[1]"
         >
           {HERO.heading}
         </h1>
 
         {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
             case from md up, and nothing above sets tracking. Below md it steps
-            down to 16, which the phone pass still has to confirm.
+            down to 16, which the phone pass has now set.
 
-            THE BREAK IS AUTHORED (see HERO_SUB_LINES). The browser was ending
-            line one on "and"; a hard <br> is the only thing that guarantees the
-            design's break at every width and while the fallback face is still
-            showing.
+            THE DESKTOP BREAK IS AUTHORED (see HERO_SUB_LINES). The browser was
+            ending line one on "and"; a hard <br> is the only thing that
+            guarantees the design's break at every width and while the fallback
+            face is still showing. It is md-and-up only — the phone frame is a
+            different design and keeps flowing inside 680 on its own 16/20.
 
-            `md:max-w-none` goes with it. At 680 the second line is wider than
-            the box at 30px type, so it would simply re-wrap and the <br> would
-            have bought nothing. With the break authored there is no wrapping
-            left to constrain — SHELL's 1380 column is the only limit needed.
+            `md:max-w-none` goes with it: at 680 the second line is wider than
+            the box at 30px type, so it would re-wrap and the <br> would have
+            bought nothing.
 
-            The <br> is md-and-up only. Below that the design is a different
-            frame with its own break, so the phone keeps flowing inside 680.
-            Note the trailing space: it is what keeps the two lines a normal
-            sentence once the <br> is display:none, and CSS drops it at the
-            start of a line when the break IS active, so it costs nothing. */}
-        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[1.33] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
+            Note the trailing space — it keeps the two lines a normal sentence
+            once the <br> is display:none, and CSS drops it at the start of a
+            line when the break IS active, so it costs nothing. */}
+        {/* Phones: Poppins Regular 16 on a flat 20px line — Žilvinas
+            2026-08-11. Desktop keeps its measured --hero-u scaling. */}
+        <p className="mx-auto mt-6 max-w-[680px] text-pretty text-[16px] font-normal leading-[20px] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
           {HERO.subLines[0]}
           <br className="hidden md:inline" />{" "}
           {HERO.subLines[1]}
@@ -268,12 +275,20 @@ export function SocialProof() {
     // sitting at a flat 192: it is empty space, but the stat panels are
     // positioned as a percentage of this whole field, so a fixed tail pushed
     // them further down the page the smaller the window got.
-    <section aria-labelledby="proof-heading" className="relative pb-48 pt-2 md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
+    // On phones that tail was 192px, and the next section adds 80 on top of
+    // it — nearly 270px of empty screen between the logo strip and "Want
+    // Creatives This Premium?". Halved to 96; the ramp still has room to
+    // dissolve. Desktop keeps its --hero-u scaling.
+    <section aria-labelledby="proof-heading" className="relative pb-[37.5px] pt-2 md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         {/* The design's own divider ornament — a gradient line running into a
             four-pointed star — flanks the headline, mirrored on the left. */}
-        <div className="flex items-center justify-center gap-3">
+        {/* On the phone this row alone breaks out of SHELL's 20px gutter, so
+            the two ornaments run to the screen edges instead of stopping at
+            the content column. It also hands them the 40px they need to show
+            the star at full size beside the headline. */}
+        <div className="-mx-[var(--gutter)] flex items-center justify-center gap-2 md:mx-0 md:gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/creatives/icons/divider-left.svg"
@@ -283,13 +298,19 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[21px] w-auto md:h-[calc(var(--hero-u)*0.21)]"
+            // On the phone there is no room for all 161 of the ornament, so the
+            // box flexes into the space the headline leaves and object-cover
+            // crops the fading tail of the line off its open end. The star sits
+            // at the headline end of the artwork, so it survives at full size —
+            // scaling the whole SVG down instead shrank it to a speck.
+            className="h-[21px] min-w-0 flex-1 object-cover object-right md:h-[calc(var(--hero-u)*0.21)] md:w-auto md:flex-none"
           />
-          {/* Poppins Regular 20 at every width — it was 14 stepping up to 15
-              Medium, so both the size and the weight were off. */}
+          {/* Poppins Regular — 20 from md up, 14 on the phone so the line still
+              fits on one row at 375. The dividers flanking it flex into
+              whatever width is left over. */}
           <h2
             id="proof-heading"
-            className="whitespace-nowrap text-center text-[20px] font-normal text-white md:text-[length:calc(var(--hero-u)*0.2)]"
+            className="whitespace-nowrap text-center text-[14px] font-normal text-white md:text-[length:calc(var(--hero-u)*0.2)]"
           >
             {SOCIAL_PROOF.headline}
           </h2>
@@ -302,7 +323,7 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[21px] w-auto -scale-x-100 md:h-[calc(var(--hero-u)*0.21)]"
+            className="h-[21px] min-w-0 flex-1 -scale-x-100 object-cover object-right md:h-[calc(var(--hero-u)*0.21)] md:w-auto md:flex-none"
           />
         </div>
 
@@ -353,7 +374,7 @@ export function SocialProof() {
 
 export function Creatives() {
   return (
-    <section id="templates" aria-labelledby="creatives-heading" className="py-20">
+    <section id="templates" aria-labelledby="creatives-heading" className="py-[37.5px] md:py-20">
       <div className={SHELL}>
         <div className="flex items-center justify-between gap-6">
           <h2
@@ -384,7 +405,14 @@ export function Creatives() {
           */}
           <a
             href={BOOKING_URL}
-            className="group inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[6px] text-[20px] font-semibold leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:w-[143px] md:justify-end md:gap-[18px] md:rounded-[30px] md:pl-0 md:pr-[7.5px] md:text-[30px] md:font-normal"
+            // mr-3 on phones only: at the shell's 20px gutter the pill read as
+            // jammed into the right edge, so it is pulled in a little. Desktop
+            // keeps the measured alignment.
+            //
+            // The hover gradient repeats the rest state's THREE stop positions
+            // in white. A 2-stop hover against a 3-stop rest cannot interpolate,
+            // so the fill snapped no matter what the transition said.
+            className="group mr-3 inline-flex h-[45px] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[6px] text-[20px] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:mr-0 md:h-[60px] md:w-[143px] md:justify-end md:gap-[18px] md:rounded-[30px] md:pl-0 md:pr-[7.5px] md:text-[30px]"
           >
             {CREATIVES.cta}
             <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[45px]">
@@ -428,7 +456,7 @@ export function Creatives() {
 
 export function CaseStudies() {
   return (
-    <section id="case-studies" aria-labelledby="cases-heading" className="py-20">
+    <section id="case-studies" aria-labelledby="cases-heading" className="py-[37.5px] md:py-20">
       <div className={SHELL}>
         <h2
           id="cases-heading"
@@ -441,38 +469,33 @@ export function CaseStudies() {
           Two columns, with the right one pushed down so the cards stagger
           rather than sitting in level rows. That offset is the design's
           rhythm — an aligned grid reads as a table by comparison.
+
+          Each column is its OWN list rather than a two-column grid. A grid
+          sizes each row to its tallest cell, so the right column's 140px drop
+          was silently inflating the left column's vertical gap to 138px —
+          the spacing could not be set, only fought. Separate columns make the
+          70px between a card's badges and the next card's artwork exact.
         */}
         {/*
-          TWO INDEPENDENT COLUMNS, not a 2-column grid.
+          TWO INDEPENDENT COLUMNS, not a 2-column grid — and that distinction
+          is load-bearing. Grid rows span both columns, so every row is as tall
+          as its TALLEST cell; with the right column pushed down to stagger it,
+          that offset inflated the shared row height and the left column
+          inherited the slack as dead space under its tags. No gap value can fix
+          that, because most of the distance was not gap.
 
-          A grid was wrong here and no gap value could have fixed it: grid rows
-          span both columns, so every row is as tall as its TALLEST cell. With
-          the right column pushed down 150px to stagger it, that offset inflated
-          the shared row height and the left column inherited the slack as dead
-          space under its tags — the huge gaps in the report. Setting `gap-y`
-          only changed the small part of the distance that was actually gap.
-
-          As two flex columns each card sits directly under the one above it, so
-          the 45 IS the whole distance from a card's tag row to the next card's
-          top edge. The stagger is then just a top margin on the right column.
-
-          Cards alternate L, R, L, R to keep the design's reading order — the
-          same reason TestimonialColumns splits its list by index rather than
-          using CSS multicol.
+          Gap is 70 on phones and 45 from md up: 45 is the design's figure for
+          the space between a card's tag row and the next card's top edge.
         */}
-        <div className="mt-12 grid gap-x-10 sm:grid-cols-2">
+        <div className="mt-12 flex flex-col gap-y-[70px] sm:flex-row sm:gap-x-[18px] sm:gap-y-0">
           {[0, 1].map((col) => (
             <ul
               key={col}
-              className={`flex flex-col gap-8 md:gap-[45px] ${
-                // Figma puts the left column at y 2461/3358 and the right at
-                // 2611/3508 — a 150px drop, not the ~88px guessed before.
-                col === 1 ? "sm:mt-[150px]" : ""
+              className={`flex flex-1 flex-col gap-y-[70px] md:gap-y-[45px] ${
+                col === 1 ? "sm:mt-[140px]" : ""
               }`}
             >
-              {CASE_STUDIES.items
-                .filter((_, i) => i % 2 === col)
-                .map((item) => (
+              {CASE_STUDIES.items.filter((_, i) => i % 2 === col).map((item) => (
             <li
               key={item.brand}
             >
@@ -507,42 +530,33 @@ export function CaseStudies() {
                     alt={`${item.brand} campaign work by Mushi`}
                     className="size-full object-cover object-center"
                   />
-                  {/* The exports are OPAQUE — Figma baked their dark
-                      backgrounds in — so the brand colour is screen-blended
-                      over the image: it lights the dark areas behind the
-                      device and leaves the bright screenshot faces alone. */}
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 mix-blend-screen"
-                    // Each brand's wash has its own position and strength,
-                    // tuned to the reference: Breezit hugs the top-left,
-                    // Holo spreads broad, eany sits low by the phones,
-                    // we interiors centres behind the laptop.
-                    style={{ background: item.glow }}
-                  />
+                  {/* Nothing sits over the artwork. Figma bakes a flat plate
+                      into these exports, and an earlier build screen-blended
+                      the brand colour on top to get any colour back — which
+                      lit the device up along with the plate. All four are now
+                      keyed to real alpha, so the gradient is simply behind
+                      them and the devices are untouched. */}
                 </div>
 
-                {/* Poppins Medium 30 from md up — it was 22. On phones Holo's
-                    line still runs 2px larger than the other three cards' — a
-                    deliberate emphasis, not drift — but from md every card's
-                    result line is the same 30. */}
-                <h3
-                  className={`mt-4 font-medium leading-[1.25] text-white md:mt-5 md:text-[30px] ${
-                    item.brand === "Holo" ? "text-[22px]" : "text-[20px]"
-                  }`}
-                >
+                {/* Poppins Medium 30 at every width, per Žilvinas 2026-08-11.
+                    `whitespace-pre-line` is what makes the \n in each result
+                    bind: the break sits at a fixed word in the copy deck, so
+                    it must land there at any card width rather than falling
+                    wherever the line happens to run out. */}
+                <h3 className="mt-4 whitespace-pre-line text-[20px] font-medium leading-[1.25] text-white md:mt-5 md:text-[30px]">
                   {item.result}
                 </h3>
 
+                {/* Žilvinas 2026-08-11: Poppins Regular 20 / #9E9E9E on
+                    #191919, always caps. 20 at EVERY width — asked for twice,
+                    so it is deliberately not stepped down on phones. The fill
+                    and text colour are literal rather than white-at-an-opacity,
+                    so they no longer shift with whatever sits behind. */}
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {item.tags.map((tag) => (
                     <li
                       key={tag}
-                      /* 20 from md up, per Figma. The 10px base is the PHONE
-                         value and stays — 20 in a phone card would wrap the
-                         tag row onto several lines. Desktop only, deliberately:
-                         do not collapse these two into one size. */
-                      className="rounded-[6px] bg-white/[0.08] px-2.5 py-1 text-[10px] font-medium tracking-wide text-white/55 md:text-[20px]"
+                      className="rounded-[6px] bg-[#191919] px-2.5 py-1 text-[14px] font-normal uppercase tracking-wide text-[#9e9e9e] md:px-3.5 md:py-1.5 md:text-[20px]"
                     >
                       {tag}
                     </li>
@@ -550,7 +564,7 @@ export function CaseStudies() {
                 </ul>
               </article>
             </li>
-                ))}
+              ))}
             </ul>
           ))}
         </div>
@@ -570,7 +584,9 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
     <article className="rounded-[20px] bg-[#181818] p-7">
       {/* Title and avatar share the top row; the avatar is right-aligned. */}
       <div className="flex items-start justify-between gap-5">
-        <h3 className="text-[30px] font-semibold leading-snug text-white">
+        {/* 16/16 on the phone — the line-height equals the size, so a title
+            that wraps sits as a tight two-line block. 30 from md up. */}
+        <h3 className="text-[16px] font-semibold leading-4 text-white md:text-[30px] md:leading-snug">
           {t.title}
         </h3>
         {/* 80 x 80, per Figma — photo and initials disc alike. It was 52, which
@@ -600,13 +616,15 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
 
       <div className="mt-4 space-y-4">
         {t.body.map((para, i) => (
-          <p key={i} className="text-[21px] font-normal leading-relaxed text-white/50">
+          <p key={i} className="text-[14px] font-normal leading-relaxed text-white/50 md:text-[21px]">
             {para}
           </p>
         ))}
       </div>
 
-      <footer className="mt-6 text-[21px] font-light text-white/40">
+      {/* The byline is a touch dimmer than the quote from md up; on the phone
+          the design puts both at 50%. */}
+      <footer className="mt-6 text-[14px] font-light text-white/50 md:text-[21px] md:text-white/40">
         <time dateTime={t.iso}>{t.date}</time>
         {"  •  "}
         <span>{t.author}</span>
@@ -653,7 +671,7 @@ export function Testimonials() {
   const { items } = TESTIMONIALS;
 
   return (
-    <section id="agency" aria-labelledby="testimonials-heading" className="py-20">
+    <section id="agency" aria-labelledby="testimonials-heading" className="py-[37.5px] md:py-20">
       <div className={SHELL}>
         {/* 48/48 from the design — line-height equals the size, so the two
             sentences sit tight on top of each other. Each sentence is its own
@@ -793,7 +811,7 @@ export function FinalCta() {
         The reference has it about 9px above centre; that is inside the error
         of reading a screenshot, so it does not earn a hardcoded offset.
       */}
-      <div className="cta-card relative mx-auto flex min-h-[320px] w-[345px] max-w-full items-center justify-center overflow-hidden rounded-[24px] border border-transparent px-6 py-8 text-center md:h-[842px] md:min-h-0 md:w-full md:max-w-[1380px] md:border-[#8a5cf6]/45 md:px-5 md:py-0">
+      <div className="cta-card relative mx-auto flex h-[320px] w-[345px] max-w-full items-center justify-center overflow-hidden rounded-[15px] border border-transparent px-6 text-center md:h-[842px] md:w-full md:max-w-[1380px] md:rounded-[24px] md:border-[#8a5cf6]/45 md:px-5">
         {/* No centre glow: the design's card is black through the middle,
             with its only light rising from the bottom edge (see .cta-card). */}
         {/* The streaks live in the card background itself now — the design's
@@ -818,9 +836,13 @@ export function FinalCta() {
           {/* 24/30 Regular, white at 50%. mt-6 is the measured 24 from the
               heading's last line box. */}
           <p className="mt-6 text-[14px] font-normal leading-[19px] text-white/50 md:text-[24px] md:leading-[30px]">
-            {FINAL_CTA.subLines.map((line) => (
-              <span key={line} className="block">
+            {/* Three lines on the phone, one sentence each. From md up the
+                first two go inline and share a line, which is the reference's
+                desktop break — the trailing space only shows once they do. */}
+            {FINAL_CTA.subLines.map((line, i) => (
+              <span key={line} className={i < 2 ? "block md:inline" : "block"}>
                 {line}
+                {i === 0 ? " " : ""}
               </span>
             ))}
           </p>
@@ -850,7 +872,9 @@ export function FinalCta() {
             */}
             <a
               href={BOOKING_URL}
-              className="group inline-flex h-[45px] items-center gap-2 rounded-full bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:gap-[15px] md:rounded-[36px] md:pl-[25px] md:pr-[10px] md:text-[26px]"
+              // Hover repeats the rest state's three stop positions in white so
+              // the fill can interpolate instead of snapping at the halfway point.
+              className="group inline-flex h-[42px] items-center gap-2 rounded-[36px] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[6px] text-[16px] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[60px] md:gap-[15px] md:pl-[25px] md:pr-[10px] md:text-[26px]"
             >
               {FINAL_CTA.cta}
               <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[40px]">
