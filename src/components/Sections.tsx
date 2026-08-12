@@ -87,7 +87,9 @@ function Stars({ count = 5 }: { count?: number }) {
           key={i}
           aria-hidden="true"
           viewBox="0 0 35 35"
-          className="size-[35px] shrink-0"
+          /* 18 on phones, 35 from md up. The artwork is drawn at 35, so the
+             phone value is a scale-down, not a different asset. */
+          className="size-[18px] shrink-0 md:size-[35px]"
         >
           <rect width="35" height="35" fill="#6E54B5" />
           <path
@@ -582,13 +584,28 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
        "Trusted by 100+ brands" pill below the grid, which is #222222 — the two
        were briefly conflated. Card is darker than the control sitting on it. */
     <article className="rounded-[20px] bg-[#181818] p-7">
-      {/* Title and avatar share the top row; the avatar is right-aligned. */}
+      {/* TITLE AND STARS ARE ONE COLUMN, with the avatar beside them.
+          The stars used to be a sibling BELOW this row, which made the space
+          under the title depend on the avatar: the row is as tall as its
+          tallest item, and at 40 the avatar beats a one-line 16px title by 24
+          — so single-line titles got a visibly bigger gap than a title that
+          wrapped to two lines. Kovger's looked right only because his wraps.
+          Inside the column the gap is whatever mt-3 says, every time. */}
       <div className="flex items-start justify-between gap-5">
+        <div>
         {/* 16/16 on the phone — the line-height equals the size, so a title
             that wraps sits as a tight two-line block. 30 from md up. */}
         <h3 className="text-[16px] font-semibold leading-4 text-white md:text-[30px] md:leading-snug">
           {t.title}
-        </h3>
+          </h3>
+          {/* 12 at every width. It was 8 on phones, which read tight once the
+             stars moved into this column and the gap became a true 8 rather
+             than 8 plus whatever the avatar left over. Same value both sides,
+             so no md variant to drift. */}
+          <div className="mt-3">
+            <Stars />
+          </div>
+        </div>
         {/* 80 x 80, per Figma — photo and initials disc alike. It was 52, which
             is what made the 35px initials look oversized: the type was right
             and the circle around it was three quarters the size it should be.
@@ -598,23 +615,25 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
             src={t.avatar}
             alt=""
             width={80}
-            className="size-[80px] shrink-0 rounded-full object-cover"
+            className="size-[40px] shrink-0 rounded-full object-cover md:size-[80px]"
           />
         ) : (
           <span
             aria-hidden="true"
-            className="flex size-[80px] shrink-0 items-center justify-center rounded-full bg-white/10 text-[35px] font-medium leading-none"
+            className="flex size-[40px] shrink-0 items-center justify-center rounded-full bg-white/10 text-[18px] font-medium leading-none md:size-[80px] md:text-[35px]"
           >
             {t.initials}
           </span>
         )}
       </div>
 
-      <div className="mt-3">
-        <Stars />
-      </div>
-
-      <div className="mt-4 space-y-4">
+      {/* Phone rhythm is tighter than desktop's throughout this card: 12 to
+          the quote, 12 between paragraphs and 16 to the byline. The md values
+          are the design's and are unchanged. */}
+      {/* 16 from the stars to the quote at every width — it was 12 on phones.
+         The 12 BETWEEN paragraphs stays a phone value; only the gap under the
+         stars opened up. */}
+      <div className="mt-4 space-y-3 md:space-y-4">
         {t.body.map((para, i) => (
           <p key={i} className="text-[14px] font-normal leading-relaxed text-white/50 md:text-[21px]">
             {para}
@@ -624,7 +643,7 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
 
       {/* The byline is a touch dimmer than the quote from md up; on the phone
           the design puts both at 50%. */}
-      <footer className="mt-6 text-[14px] font-light text-white/50 md:text-[21px] md:text-white/40">
+      <footer className="mt-4 text-[14px] font-light text-white/50 md:mt-6 md:text-[21px] md:text-white/40">
         <time dateTime={t.iso}>{t.date}</time>
         {"  •  "}
         <span>{t.author}</span>
@@ -797,21 +816,33 @@ export function FinalCta() {
     <section
       id={BOOKING_ANCHOR}
       aria-labelledby="cta-heading"
-      className="scroll-mt-28 px-[15px] pb-24 pt-8 md:px-5"
+      className="scroll-mt-28 pb-24 pt-8"
     >
+      {/*
+        IN THE SHELL, like every other section. It used to carry its own
+        `px-5` + `md:max-w-[1380px]`, which was the same thing as the shell
+        only while the column was a flat 1380. Now that the column is a
+        proportion of the window (lib/layout.ts), a hardcoded 1380 here made
+        this card wider than everything above it — it visibly overhung the
+        testimonials on both sides. Read the width from SHELL so the two can
+        never disagree again.
+      */}
+      <div className={SHELL}>
       {/*
         Phone frame: 345x320 card on a light-to-dark wash (see .cta-card).
 
-        Desktop is the measured card: 1380 x 842 — the full content column
-        wide (see lib/layout.ts) and a FIXED height rather than a padding
-        budget. The design gives the panel's box, and letting the type set the
-        height drifts it by tens of pixels every time the copy changes.
+        Desktop is the measured card: 1380 x 842. The height is expressed as
+        that RATIO rather than a flat 842, for the same reason as the width —
+        at a 1087-wide column an 842 card is proportionally far taller than the
+        design's, and the copy would sit in a slab of empty space. An aspect
+        ratio still gives the panel a box the type cannot drift, which is the
+        point of not letting the content set the height.
 
-        The content block is centred in it, which leaves 272 above and below.
-        The reference has it about 9px above centre; that is inside the error
-        of reading a screenshot, so it does not earn a hardcoded offset.
+        The content block is centred in it. The reference has it about 9px
+        above centre; that is inside the error of reading a screenshot, so it
+        does not earn a hardcoded offset.
       */}
-      <div className="cta-card relative mx-auto flex h-[320px] w-[345px] max-w-full items-center justify-center overflow-hidden rounded-[15px] border border-transparent px-6 text-center md:h-[842px] md:w-full md:max-w-[1380px] md:rounded-[24px] md:border-[#8a5cf6]/45 md:px-5">
+      <div className="cta-card relative mx-auto flex h-[320px] w-[345px] max-w-full items-center justify-center overflow-hidden rounded-[15px] border border-transparent px-6 text-center md:h-auto md:w-full md:aspect-[1380/842] md:rounded-[24px] md:border-[#8a5cf6]/45 md:px-5">
         {/* No centre glow: the design's card is black through the middle,
             with its only light rising from the bottom edge (see .cta-card). */}
         {/* The streaks live in the card background itself now — the design's
@@ -905,6 +936,7 @@ export function FinalCta() {
             </span>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

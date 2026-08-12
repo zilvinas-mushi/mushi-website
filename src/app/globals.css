@@ -754,7 +754,11 @@ body {
   overflow: hidden;
   /* The collapsed heights are the measured ones — two full cards and two
      halves, so it is visibly cut off rather than looking like the end. */
-  max-height: 1170px;
+  /* Phones show TWO cards, not three-and-a-bit. A phone card runs ~330 with
+     the tighter rhythm, and the column gap is 24, so 700 lands just past the
+     second card and the pill sits under it. It was 1170, which cleared three
+     and left the pill a long way down the page. */
+  max-height: 700px;
   /* 1100ms, up from 700. On a block that grows ~1100px the shorter curve still
      covered a lot of distance per frame early on and read as a snap with a
      tail rather than a reveal. */
