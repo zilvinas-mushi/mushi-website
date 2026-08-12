@@ -487,7 +487,14 @@ export const CASE_STUDIES = {
       // Breezit and Holo take the plain path: alpha is READ from the export's
       // own antialiasing rather than redrawn, which is what finally stopped
       // the edges stair-stepping.
-      image: "case-breezit-cut.webp",
+      //
+      // SUPERSEDED for the same reason as the other three: 1000 square into a
+      // 650px slot is 1.5x, so the site copy on the laptop was soft. Žilvinas
+      // supplied this one already composed at 2720 — one render, whole canvas,
+      // nothing to arrange:
+      //
+      //   python3 scripts/build-case-cards.py breezit
+      image: "case-breezit-v2.webp",
       logo: "breezit.svg",
       logoW: 98,
       // Figma's fill with the device deleted: ONE radial ramp, #C5611E out of
@@ -513,7 +520,13 @@ export const CASE_STUDIES = {
       result: "From $0k/month to $117k/month\nin 7 months",
       tags: ["AI", "MARKETING", "GENERATOR"],
       // #8A5CF6 is the purple this card already wore as its wash, kept as-is.
-      image: "case-holo-cut.webp",
+      // SUPERSEDED, same 1.5x softness. Two renders this time — the phone and
+      // the workspace laptop — which register onto the old artwork at scale
+      // 0.3676 and rotation 0.00, so they are crops of one 2720 canvas and only
+      // have to be re-seated on it:
+      //
+      //   python3 scripts/build-case-cards.py holo
+      image: "case-holo-v2.webp",
       logo: "holo.svg",
       logoW: 62,
       // Same ramp as Breezit, same 27% near-black share of the square — only
@@ -535,7 +548,24 @@ export const CASE_STUDIES = {
       //
       //   python3 scripts/key-case-artwork.py case-eany.webp \
       //     case-eany-cut.webp --silhouette iphone21.webp,iphone11.webp
-      image: "case-eany-cut.webp",
+      //
+      // SUPERSEDED, same complaint as we interiors: every pixel of that came
+      // from a 1000-square export driving a 650px slot, so the screen copy on
+      // the phones was soft at dpr 2 and mush at dpr 3. Žilvinas supplied the
+      // two phones as separate transparent PNGs at native resolution, which
+      // register onto the old card at scale 0.3676 (= 1000/2720) and rotation
+      // 0.00 — i.e. they are two crops of the SAME 2720 canvas and only have
+      // to be re-seated on it, not re-fitted. Framing is unchanged; an edge
+      // match against Figma puts old and new within 2px of each other.
+      //
+      // Built once WITHOUT the renders' shadows, on the theory that the other
+      // cards had none. Wrong: what the old cards lack is a BAKED shadow that
+      // keying could not lift, and dropping the real one here cost the wash
+      // phone A casts over phone B — the two stopped reading as a stacked pair
+      // and the card no longer matched Figma. Shadows stay.
+      //
+      //   python3 scripts/build-case-cards.py eany
+      image: "case-eany-v2.webp",
       logo: "eany.svg",
       logoW: 96,
       // The only fill here read straight off Figma's own gradient panel rather
