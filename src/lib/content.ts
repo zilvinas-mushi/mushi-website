@@ -629,6 +629,19 @@ export const TESTIMONIALS = {
   moreLabel: "View More",
   /** First three render immediately; the rest sit behind the disclosure. */
   visibleCount: 3,
+  /**
+   * Whose photos the trust pill shows, by `author`. The faces there are
+   * decorative — the span is aria-hidden and no name sits beside them — so
+   * which three appear is a design choice, unlike the card avatars, which are
+   * bound to the person quoted and must never be swapped.
+   *
+   * Named explicitly rather than taken as "the first three with an avatar":
+   * that rule made the set a side effect of `items` order, and reordering the
+   * testimonials silently changed the pill.
+   *
+   * Each entry must match an `author` below that has an `avatar`.
+   */
+  pillAvatars: ["Hana Skomra", "Akvilė Želnytė", "Erika Zakarevičiūtė"],
   items: [
     {
       title: "Other marketers ask us who cooks our ads",

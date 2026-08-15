@@ -74,11 +74,85 @@
     together, which is the trade for never scrolling.
   */
   --hero-u: clamp(66px, min(5.2083vw, 9.6vh), 100px);
+
+  /*
+    The hero's TYPE scale — u without the height cap.
+
+    Same 5.2083vw and the same floor, so at any given width it agrees with
+    --hero-u exactly UNLESS the window is short enough for the 9.6vh term to
+    bite. That difference is the whole point:
+
+      1920 x 937   u = 90.0   w = 100    a 1920 laptop: type at its drawn size
+      1440 x 860   u = 75.0   w = 75.0   identical, width-bound
+      1440 x 700   u = 67.2   w = 75.0   artwork tightens, type holds
+
+    The hero's ARTWORK (panels, platform marks, the vertical rhythm) stays on
+    u so the section still fits a short window without scrolling — squeezing
+    is what it is for. But applying that squeeze to the headline as well means
+    the type at 1920x1080 comes out at 72 against Figma's 80, and 1920 is the
+    reference the design is checked against. Type on w, boxes on u.
+
+    This is what the h1, the eyebrow pill and the awards row were pinned to
+    literal px for. Pinning got 1920 right and every other width wrong; w gets
+    both, and — unlike a literal — it still shrinks in proportion to the
+    marks it sits between.
+  */
+  --hero-w: clamp(66px, 5.2083vw, 100px);
 }
 
 @media (min-width: 768px) {
   :root {
     --header-h: var(--header-u);
+  }
+}
+
+/*
+  ONE SCALE FOR EVERY DESKTOP WIDTH.
+
+  The design is a single 1920 frame (design/README.md), and every number in it
+  — type, padding, card sizes, radii — is a 1920 number. The page's COLUMN was
+  already proportional (SHELL was 71.875%, i.e. 1380/1920) but its CONTENTS were
+  literal px, so the two drifted apart the moment the window was not 1920:
+
+    1920   column 1380   30px card headline   the design
+    1440   column 1035   30px card headline   type 33% too big for its column
+
+  That mismatch is what showed up as the hero's platform marks landing on the
+  awards row, case-card headlines breaking to three lines where the design says
+  two, and the next section pushing into the fold on a laptop. Nothing was
+  individually wrong; the type simply was not shrinking with the frame.
+
+  So the root font-size becomes the scale, and everything downstream is
+  expressed in rem: 1rem = 16 design px, exactly as at 1920. 0.8333vw is
+  16/1920, so the page is the Figma frame zoomed to whatever width it is in.
+  Tailwind's own spacing scale is rem-derived (--spacing: 0.25rem), so p-7,
+  mt-12, gap-4 and friends come along for free — that is most of the page's
+  rhythm with no per-value edit.
+
+  RANGE, and why it is clamped at both ends:
+    - 16px ceiling: at and above 1920 the design is at its drawn size. Wider
+      monitors get bigger margins, not bigger type. The shell is 86.25rem —
+      1380 in this unit — so that cap now falls out of the same clamp
+      (lib/layout.ts) instead of being a second number to keep in step.
+    - 10.5px floor: a pure zoom to 768 would put body copy at 8px. The floor
+      bites below ~1260, where the layout stops shrinking and starts to be
+      merely tight — the same trade --hero-u and --header-u already make.
+
+      1920 -> 16.00   1512 -> 12.60   1280 -> 10.67
+      1680 -> 14.00   1440 -> 12.00   1024 -> 10.50 (floor)
+
+  Below 768 this does not apply at all: the phone frame is its own design with
+  its own measured values, and it must not be scaled off a desktop reference.
+
+  THE COROLLARY, and it is the important one: on desktop, DO NOT write a length
+  in px unless you mean a physical pixel that must not scale — a hairline
+  border, a 1px nudge. Everything else is rem (or a --hero-u multiple inside
+  the hero). A px value here is a value that will be wrong at every width but
+  one.
+*/
+@media (min-width: 768px) {
+  html {
+    font-size: clamp(10.5px, 0.83333vw, 16px);
   }
 }
 
@@ -118,7 +192,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --gutter: 20px;
+    --gutter: 1.25rem;
   }
 }
 
@@ -153,13 +227,47 @@ html {
    little air. --header-h already tracks the bar's height per breakpoint. */
 @media (min-width: 768px) {
   html {
-    scroll-padding-top: calc(var(--header-h) + 40px);
+    scroll-padding-top: calc(var(--header-h) + 2.5rem);
   }
 }
 
 body {
   background: var(--bg);
   color: var(--text);
+}
+
+/*
+  BIG SCREENS ONLY: centre the hero in the field.
+
+  The field is min-h-svh (page.tsx) so the next section can never peek in on
+  first load, and the hero's own height comes from the window's WIDTH — so on a
+  tall window there is slack, and left to itself all of it collects at the
+  bottom. On a 2560x1352 that is ~340px of empty ramp under the logo strip with
+  the copy pinned to the top, which reads as the section having fallen short
+  rather than as air.
+
+  Centring is a NO-OP wherever the content is at least as tall as the field
+  (the box is then content-height and there is nothing to distribute), so the
+  height gate is not what makes this safe — it is what keeps it from firing on
+  the mid-size windows where the slack is only ~100px and the design's own top
+  rhythm under the header should win. 900px of viewport is about where the gap
+  starts reading as a gap. Per Žilvinas 2026-08-15: big screens only.
+
+  It centres inside the PADDING box, i.e. the space below the header, since the
+  field carries padding-top: var(--header-h). The bar is not air the hero can
+  sit in.
+
+  display:flex is declared inside the query rather than on the element so that
+  below this size the field's layout is byte-for-byte what it was. The absolute
+  children (grid, light, panels, floaters) are out of flow and unaffected;
+  the two sections stretch to full width as flex items exactly as blocks did.
+*/
+@media (min-width: 768px) and (min-height: 900px) {
+  .hero-bg {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }
 
 /* Hero lighting.
@@ -269,8 +377,8 @@ body {
    core alpha is what keeps it a glow rather than a beam. */
 .cta-glow {
   /* Candle-like: a touch brighter at the heart, gone sooner at the rim. */
-  width: min(780px, 94vw);
-  height: 470px;
+  width: min(48.75rem, 94vw);
+  height: 29.375rem;
   background: radial-gradient(
     ellipse closest-side,
     rgba(214, 188, 255, 0.16) 0%,
@@ -773,13 +881,13 @@ body {
 
 @media (min-width: 1024px) {
   .testi-clip {
-    max-height: 840px;
+    max-height: 52.5rem;
   }
 }
 
 @media (min-width: 1280px) {
   .testi-clip {
-    max-height: 740px;
+    max-height: 46.25rem;
   }
 }
 

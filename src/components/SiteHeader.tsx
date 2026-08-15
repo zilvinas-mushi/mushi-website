@@ -47,7 +47,7 @@ export function SiteHeader() {
       <MobileHeader />
 
       <header
-        className="sticky top-[22px] z-50 hidden px-4 md:block"
+        className="sticky top-[1.375rem] z-50 hidden px-4 md:block"
         style={SCALE}
       >
         <nav

@@ -4,7 +4,7 @@ import { BOOKING_URL, SITE_NAME, SOCIALS } from "@/lib/site";
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/5 bg-bg-alt">
-      <div className="mx-auto w-full max-w-[1380px] px-5 py-16">
+      <div className="mx-auto w-full max-w-[86.25rem] px-5 py-16">
         <div className="grid gap-12 md:grid-cols-[1.2fr_2fr]">
           <div>
             <p className="text-lg font-medium">{FOOTER.giftHeading}</p>

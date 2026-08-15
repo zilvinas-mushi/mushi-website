@@ -26,7 +26,11 @@ function Laurel({ flip = false }: { flip?: boolean }) {
       viewBox="0 0 7 15"
       fill="none"
       aria-hidden="true"
-      className={`shrink-0 ${flip ? "-scale-x-100" : ""}`}
+      /* Sized in `em` off the meta line it flanks, so it tracks that text at
+         every width. The attributes alone are 7 x 15 PHYSICAL px — the one
+         thing in the hero that did not scale with anything, which showed as
+         sprigs that grew relative to their own words as the window narrowed. */
+      className={`h-[0.9375em] w-auto shrink-0 ${flip ? "-scale-x-100" : ""}`}
     >
       <path
         d="M2.0054 2.62579C2.24039 3.73805 3.13463 4.45998 3.55238 4.6819C3.33699 5.19104 3.06285 6.44429 3.68948 7.38423C2.78087 8.12051 2.57983 9.25105 2.61246 9.71449C1.75086 9.71449 1.01327 10.2497 0.752173 10.5174C0.0472202 11.379 -0.0311079 12.1818 0.00805616 12.4756C0.027638 12.6518 0.156879 13.1962 0.908829 13.8855C1.21965 14.1704 1.46959 14.325 1.71169 14.2967C2.20171 14.2393 2.47772 13.6388 1.88793 13.298C1.18298 12.8907 1.0459 12.3189 1.06549 12.0839C2.77304 13.2588 4.4597 12.1427 5.06022 11.4181C5.13854 11.3333 5.25604 11.1087 5.09938 10.8894C4.94272 10.6701 4.44665 10.3411 4.21819 10.204C6.35263 9.75365 6.86176 7.89336 6.88135 7.59963C6.90093 7.3059 6.86176 7.20799 6.62678 7.07092C6.43879 6.96126 5.85655 6.88162 5.58892 6.85551C6.07847 6.42471 6.25472 6.01349 6.41137 5.60226C6.56803 5.19104 6.45053 3.62448 6.29387 3.40908C6.13721 3.19368 6.07847 3.19368 5.86307 3.17409C5.59333 3.14957 5.11242 3.37644 4.84479 3.48741C4.98839 3.31117 5.20902 2.75504 4.9427 1.94043C4.60981 0.922162 3.59154 0.197623 3.33698 0.0605486C3.13333 -0.0491107 2.95187 0.0148572 2.88659 0.0605486C2.49495 0.452189 1.77042 1.51353 2.0054 2.62579Z"
@@ -88,17 +92,26 @@ export function TrustBadges() {
               medium 12.
 
               From md up they go back to being the same size AND the same
-              weight — both Poppins MEDIUM 16, separated only by colour. Two
-              corrections there: the weight was `md:font-normal`, which is what
-              made the row read spindly (nothing else in the hero is Regular),
-              and the size was `0.16u`, which rendered ~12.6 on a 1512 screen
-              because --hero-u is capped by 9.6vh as well as by width. Literal
-              16, same reasoning as the eyebrow's 45 and the h1's 80. */}
+              weight — both Poppins MEDIUM 16, separated only by colour. The
+              weight was `md:font-normal`, which is what made the row read
+              spindly (nothing else in the hero is Regular).
+
+              0.16 of --hero-w, not a literal 16. It was pinned because 0.16u
+              renders ~12.6 at 1512 — but this row sits between the two lower
+              platform floaters, which ARE sized and placed in u, and type that
+              does not shrink with them is type that grows into them: at 1440
+              the TikTok mark landed on "Foreplay Best Ad Award" (reported
+              2026-08-15). The badge marks beside it are already 0.64u, so
+              pinning the words broke the badge's own proportions too.
+
+              w rather than u so 1920 still reads a true 16; the marks stay on
+              u because shrinking THEM in a short window is free, where
+              shrinking the words is not. */}
           <span className="text-center md:text-left">
-            <span className="block text-[14px] font-medium leading-4 text-white md:text-[16px] md:leading-snug">
+            <span className="block text-[0.875rem] font-medium leading-4 text-white md:text-[length:calc(var(--hero-w)*0.16)] md:leading-snug">
               {title}
             </span>
-            <span className="flex items-center justify-center gap-1.5 text-[12px] font-medium text-zinc-500 md:justify-start md:text-[16px]">
+            <span className="flex items-center justify-center gap-1.5 text-[0.75rem] font-medium text-zinc-500 md:justify-start md:text-[length:calc(var(--hero-w)*0.16)]">
               <Laurel flip />
               {meta}
               <Laurel />

@@ -23,7 +23,7 @@ function Verified() {
       height={21}
       loading="eager"
       decoding="async"
-      className="size-[15px] shrink-0"
+      className="size-[0.9375rem] shrink-0"
     />
   );
 }
@@ -46,7 +46,7 @@ function ActionIcon({ name, w, h }: { name: string; w: number; h: number }) {
       height={h}
       loading="eager"
       decoding="async"
-      className="h-[32px] w-auto"
+      className="h-[2rem] w-auto"
       aria-hidden="true"
     />
   );
@@ -59,7 +59,7 @@ const Bookmark = () => <ActionIcon name="save" w={46} h={42} />;
 
 export function CreativeCard({ item }: { item: Creative }) {
   return (
-    <article className="w-[280px] shrink-0 snap-start overflow-hidden rounded-[15px] bg-white sm:w-[300px]">
+    <article className="w-[17.5rem] shrink-0 snap-start overflow-hidden rounded-[0.9375rem] bg-white sm:w-[18.75rem]">
       <header className="flex items-center gap-2.5 px-3 py-2.5">
         {item.avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -77,18 +77,22 @@ export function CreativeCard({ item }: { item: Creative }) {
           // with the handle's initial, never a stand-in photo.
           <span
             aria-hidden="true"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px] font-semibold text-zinc-600"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[0.8125rem] font-semibold text-zinc-600"
           >
             {item.handle.charAt(0).toUpperCase()}
           </span>
         )}
 
         <div className="min-w-0">
-          <p className="flex items-center gap-1 text-[13px] font-semibold leading-tight text-black">
+          <p className="flex items-center gap-1 text-[0.8125rem] font-semibold leading-tight text-black">
             <span className="truncate">{item.handle}</span>
             {item.verified && <Verified />}
           </p>
-          <h3 className="truncate text-[12px] leading-tight text-black/70">
+          {/* Solid #000 at full opacity, per Figma — NOT a muted black. It was
+              black/70, an eyeballed step down from the handle above it. In the
+              design the two lines differ by weight and size only, so the
+              caption reads as the same ink as the handle, not a faded one. */}
+          <h3 className="truncate text-[0.75rem] leading-tight text-black">
             {item.caption}
           </h3>
         </div>

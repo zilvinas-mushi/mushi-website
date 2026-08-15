@@ -37,8 +37,29 @@ export default function Home() {
           the shortfall showed as a black band across the top. Anything pinned
           to the header's height has to move with it.
         */}
+        {/*
+          THE FIELD OWNS THE FIRST SCREEN — min-h-svh from md up.
+
+          Its CONTENT is proportional to the window's WIDTH (--hero-u), so its
+          height follows the width: the hero measures about 9.75u, which is
+          ~1083 at 1920 and ~940 at 1660. A window is only that tall in the
+          same proportion if it is 16:9. Anything squarer — a 1660x1040 laptop,
+          a 2560x1440 monitor — leaves the field short of the fold, and what
+          fills the gap is the next section's heading peeking in on first load.
+
+          Scaling the hero UP to fill a tall window is the wrong fix: the type
+          would pass its drawn size and 1920 is the reference. So the field
+          simply never ends above the fold, and the slack goes where the design
+          already fades to black — the bottom of the ramp, below the logo
+          strip. The hero's own rhythm from the header down is untouched.
+
+          `svh`, not `vh`: on a phone `vh` is the tallest state, which leaves a
+          gap under the field while the URL bar is showing. It is md-and-up
+          anyway, where the two are the same, so this is only future-proofing
+          if the rule ever moves down a breakpoint.
+        */}
         <div
-          className="hero-bg relative overflow-hidden"
+          className="hero-bg relative overflow-hidden md:min-h-svh"
           style={{
             marginTop: "calc(var(--header-h) * -1)",
             paddingTop: "var(--header-h)",

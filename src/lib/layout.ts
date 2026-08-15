@@ -18,28 +18,44 @@
  * is only correct on an element whose parent spans the viewport.
  */
 /**
- * THE COLUMN IS A PROPORTION, not a fixed 1380, and that is what makes the
- * sections cut at the same place as the Figma frame at every window size.
+ * THE COLUMN IS 1380 DESIGN PIXELS — expressed in the page's own scale unit,
+ * so it is the design's column at every width rather than at one width.
  *
- * 1380 of 1920 is 71.875%, leaving 14.06% of margin on each side. Capped at
- * 1380px it is unchanged at the reference width, but below it the margins now
- * scale with the window instead of collapsing:
+ * 86.25rem IS 1380: 1rem is 16 design px on desktop (see the scale note in
+ * globals.css), so this tracks the type and the boxes exactly. That equality is
+ * the whole point — column and contents move together or the contents look
+ * wrong for the column.
+ *
+ * It used to be `w-[71.875%] max-w-[1380px]`, which is 1380/1920 as a
+ * percentage of the WINDOW. That agrees with the scale — while the scale is a
+ * pure function of the window. It is not: the root font-size clamps at 10.5px
+ * so copy stays legible on a small laptop, and below that crossover (~1260) the
+ * column kept shrinking while the contents stopped:
+ *
+ *   1920   column 1380   scale 1.000   contents/column  in proportion
+ *   1440   column 1035   scale 0.750   in proportion
+ *   1260   column  906   scale 0.656   in proportion (the crossover)
+ *   1100   column  791   scale 0.656   contents 14.5% oversized  <- the bug
+ *
+ * That 14.5% is what read as "the arrows, the chips, the CTA buttons and the
+ * cards are all massive" (Žilvinas 2026-08-15). Nothing was wrong with any of
+ * those elements; every one of them was being measured against a column that
+ * had shrunk past them. In rem the two cannot come apart.
  *
  *   1920   column 1380   margin 270 each side   (the design, exactly)
  *   1512   column 1087   margin 213
  *   1280   column  920   margin 180
+ *   1100   column  906   margin  97   (margins give way, not the contents)
  *
- * It used to be a flat `max-w-[1380px]`, so at 1512 the column still took 1380
- * and left only 66px each side — 91% of the window, against the design's 72%.
- * That is why the sections read as oversized live and why the artwork ran
- * almost edge to edge: nothing was wrong with the cards, the column around them
- * was too wide.
+ * Above 1920 the root font-size is capped at 16px, so 86.25rem stops at a flat
+ * 1380 and wider monitors get wider margins — which is what the old
+ * `max-w-[1380px]` did, now falling out of the same expression instead of
+ * needing its own.
  *
- * Phones keep `w-full`; the percentage only applies from md up, where there is
- * enough width for a margin to be worth having.
+ * Phones are unaffected: below 768 the root is 16px, so 86.25rem is 1380 and
+ * `w-full` wins on any phone.
  */
-export const SHELL =
-  "mx-auto w-full max-w-[1380px] px-[var(--gutter)] md:w-[71.875%]";
+export const SHELL = "mx-auto w-full max-w-[86.25rem] px-[var(--gutter)]";
 
 /**
  * Distance from the viewport edge to the shell's content edge.
@@ -48,4 +64,4 @@ export const SHELL =
  * the rail cannot drift out of step with the shell at any breakpoint.
  */
 export const RAIL_GUTTER =
-  "max(var(--gutter), calc((100% - min(1380px, 71.875%)) / 2 + var(--gutter)))";
+  "max(var(--gutter), calc((100% - min(86.25rem, 100%)) / 2 + var(--gutter)))";

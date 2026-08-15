@@ -227,7 +227,7 @@ export function CreativesRail() {
   // Disc and gap are ONE setting; changing either alone breaks the ratio again.
   // `size-12` (48) stays as the phone value.
   const ARROW =
-    "flex size-12 items-center justify-center rounded-full bg-white/25 text-white transition-[background-color,color,transform] duration-200 ease-out hover:bg-white hover:text-black active:scale-90 disabled:pointer-events-none disabled:bg-white/[0.06] disabled:text-white/25 md:size-[75px]";
+    "flex size-12 items-center justify-center rounded-full bg-white/25 text-white transition-[background-color,color,transform] duration-200 ease-out hover:bg-white hover:text-black active:scale-90 disabled:pointer-events-none disabled:bg-white/[0.06] disabled:text-white/25 md:size-[4.6875rem]";
 
   return (
     <div>
@@ -273,7 +273,7 @@ export function CreativesRail() {
         {/* 50 between the two discs from md up, per Figma. `gap-3` is the phone
             value and stays — 50 between them on a 375 viewport would push the
             pair off the progress line. */}
-        <div className="flex items-center gap-3 md:gap-[50px]">
+        <div className="flex items-center gap-3 md:gap-[3.125rem]">
           <button
             type="button"
             onClick={() => nudge(-1)}
@@ -281,7 +281,7 @@ export function CreativesRail() {
             aria-label="Previous creatives"
             className={ARROW}
           >
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-6 stroke-current md:size-[38px]" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-6 stroke-current md:size-[2.375rem]" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -292,7 +292,7 @@ export function CreativesRail() {
             aria-label="Next creatives"
             className={ARROW}
           >
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-6 stroke-current md:size-[38px]" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="size-6 stroke-current md:size-[2.375rem]" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>
