@@ -223,9 +223,13 @@ export function Hero() {
             Note the trailing space — it keeps the two lines a normal sentence
             once the <br> is display:none, and CSS drops it at the start of a
             line when the break IS active, so it costs nothing. */}
-        {/* Phones: Poppins Regular 16 on a flat 20px line — Žilvinas
-            2026-08-11. Desktop keeps its measured --hero-u scaling. */}
-        <p className="mx-auto mt-[calc(var(--pu)*24)] max-w-[42.5rem] text-pretty text-[length:calc(var(--pu)*16)] font-normal leading-[calc(var(--pu)*20)] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
+        {/* Phones: Poppins Regular 16 on a FLAT 20px line — Žilvinas
+            2026-08-11, restated 2026-08-19. The leading is deliberately outside
+            --pu: the phone unit shrinks the whole first screen to fit short
+            viewports, and quoting the line height through it took the sub to
+            17.9 on a 725-tall window. Everything else here still scales.
+            Desktop keeps its measured --hero-u scaling. */}
+        <p className="mx-auto mt-[calc(var(--pu)*24)] max-w-[42.5rem] text-pretty text-[length:calc(var(--pu)*16)] font-normal leading-[20px] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
           {HERO.subLines[0]}
           <br className="hidden md:inline" />{" "}
           {HERO.subLines[1]}
@@ -478,7 +482,11 @@ export function CaseStudies() {
       <div className={SHELL}>
         <h2
           id="cases-heading"
-          className="text-[1.5rem] font-semibold tracking-tight md:text-[3rem]"
+          // 24/24 on the phone, same as the creatives headline — the default
+          // 1.5 body leading spread the two lines. Desktop keeps the inherited
+          // 1.5. No cap-centered here: this copy has descenders (the comma,
+          // the J), which that utility clips out of the box.
+          className="text-[1.5rem] font-semibold leading-[1.5rem] tracking-tight md:text-[3rem] md:leading-normal"
         >
           {CASE_STUDIES.heading}
         </h2>
