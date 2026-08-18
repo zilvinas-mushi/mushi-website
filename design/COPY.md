@@ -147,11 +147,18 @@ wider than the card, so breaking there wrapped it onto a third line and left
 
 ## Footer
 
-- Want a welcome gift? *(email capture — must post to a third-party email
-  provider; there is no server. See CLAUDE.md.)*
-- Columns: PRODUCT (SEO Tools, Templates · Agency Services) · LEGAL (Privacy
-  Policy · Terms & Conditions · Refund Policy · Money Back Guarantee) ·
-  COMPANY (Case Studies)
-- Trustpilot 4.0 · 100+ reviews
-- Social: LinkedIn · TikTok · Facebook · Instagram
-- Copyright 2026 © Mushi Agency
+Updated from the desktop reference of 2026-08-19. The heading, the CONTACT
+column and the bottom bar are all new; the old PRODUCT/LEGAL/COMPANY split is
+gone — legal moved into the bottom bar and Trustpilot now reads 4.9, matching
+the awards row.
+
+- Want a mystery gift? *(email capture — placeholder "Enter your email\*",
+  button "Redeem". Must post to a third-party provider; there is no server.
+  See CLAUDE.md and SECTIONS.md.)*
+- Trustpilot 4.9
+- PRODUCTS: 500+ Static Templates · Agency Services
+- COMPANY: Case Studies
+- CONTACT: support@mushi.agency, then the social row — Instagram · LinkedIn ·
+  TikTok · Facebook, in that left-to-right order
+- Bottom bar: Copyright © 2026 All Rights Reserved · Privacy Policy ·
+  Terms & Conditions · Refund Policy · Money-Back Guarantee

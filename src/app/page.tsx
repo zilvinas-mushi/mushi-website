@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { HeroPanels } from "@/components/HeroPanels";
 import { HeroFloaters } from "@/components/HeroFloaters";
+import { SiteFooter } from "@/components/SiteFooter";
 import {
   Hero,
   SocialProof,
@@ -101,8 +102,7 @@ export default function Home() {
         <Testimonials />
         <FinalCta />
       </main>
-      {/* Footer intentionally removed — a new one is being designed. The
-          SiteFooter component stays in the repo for when it returns. */}
+      <SiteFooter />
     </>
   );
 }

@@ -328,11 +328,25 @@ export const SOCIAL_PROOF = {
 export type Creative = {
   handle: string;
   caption: string;
+  /**
+   * Always present. On a video card this is the poster frame — a real frame
+   * lifted from the ad itself, not a separate still, so nothing shifts when
+   * playback starts.
+   */
   image: string;
   w: number;
   h: number;
   avatar?: string;
   verified?: boolean;
+  /**
+   * Filename in /public/videos. Present only on the cards whose ad is a film;
+   * the rest stay plain stills. Sources are 1080x1920 masters at 8-15 Mbps,
+   * transcoded to 720x1280 / ~1 Mbps H.264 (330MB -> 25MB across the four).
+   * 720 wide is ~2.4x the card's rendered width, which keeps the ads crisp on
+   * a 2x display — this section's whole claim is that the work is premium, so
+   * it is the one place not to compress to mush.
+   */
+  video?: string;
 };
 
 export const CREATIVES = {
@@ -355,9 +369,10 @@ export const CREATIVES = {
       handle: "sintra.ai",
       caption: "AI Agents Comparison Video Ad",
       image: "sintra-soshie-ad.webp",
+      video: "sintra-soshie-ad.mp4",
       w: 1320,
       h: 2340,
-      avatar: "sintra-logo.svg",
+      avatar: "sintra-logo.webp",
       verified: true,
     },
     {
@@ -372,6 +387,7 @@ export const CREATIVES = {
       handle: "tryholo.ai",
       caption: "AI Marketing UGC Video Ad",
       image: "tryholo-10x.webp",
+      video: "tryholo-10x.mp4",
       w: 1320,
       h: 2340,
       avatar: "tryholo-logo.svg",
@@ -422,6 +438,7 @@ export const CREATIVES = {
       handle: "celemi",
       caption: "Serum Product Video Ad",
       image: "celemi-serum.webp",
+      video: "celemi-serum.mp4",
       w: 1320,
       h: 2340,
       avatar: "celemi-logo.webp",
@@ -439,6 +456,7 @@ export const CREATIVES = {
       handle: "PersyBooths",
       caption: "Booth Storytelling Video Ad",
       image: "used-by-10000.webp",
+      video: "used-by-10000.mp4",
       w: 1320,
       h: 2340,
       avatar: "persybooths-logo.svg",
@@ -450,7 +468,7 @@ export const CREATIVES = {
       image: "sintra-soshie.webp",
       w: 1320,
       h: 2340,
-      avatar: "sintra-logo.svg",
+      avatar: "sintra-logo.webp",
       verified: true,
     },
   ] satisfies Creative[],
@@ -776,29 +794,23 @@ export const FINAL_CTA = {
   scarcity: "2/10 client spots left for 2026",
 } as const;
 
+/**
+ * Footer, measured off the desktop reference (Žilvinas 2026-08-19).
+ *
+ * The CONTACT column is not a link list like the other two — it is an address
+ * plus the social row — so it is modelled separately rather than being forced
+ * into `columns` with an empty `links`.
+ */
 export const FOOTER = {
-  giftHeading: "Want a welcome gift?",
-  /**
-   * No email provider has been chosen and there is no server to post to, so
-   * the capture input is deliberately not rendered — a form that silently
-   * discards submissions is worse than none. See design/SECTIONS.md.
-   */
-  giftCta: "15 Minute Fit-Check",
+  giftHeading: "Want a mystery gift?",
+  emailPlaceholder: "Enter your email*",
+  emailCta: "Redeem",
   columns: [
     {
-      title: "Product",
+      title: "Products",
       links: [
-        { label: "SEO Tools, Templates", href: "#templates" },
+        { label: "500+ Static Templates", href: "#templates" },
         { label: "Agency Services", href: "#agency" },
-      ],
-    },
-    {
-      title: "Legal",
-      links: [
-        { label: "Privacy Policy", href: "#privacy" },
-        { label: "Terms & Conditions", href: "#terms" },
-        { label: "Refund Policy", href: "#refund" },
-        { label: "Money Back Guarantee", href: "#guarantee" },
       ],
     },
     {
@@ -806,6 +818,15 @@ export const FOOTER = {
       links: [{ label: "Case Studies", href: "#case-studies" }],
     },
   ],
-  trustpilot: { score: "4.0", reviews: "100+ reviews" },
-  copyright: "Copyright 2026 © Mushi Agency",
+  contactTitle: "Contact",
+  /** 4.9 is the score the awards row already carries — see TrustBadges. */
+  trustpilot: { label: "Trustpilot", score: "4.9" },
+  /** The bottom bar. Right-aligned as a cluster, per the reference. */
+  legal: [
+    { label: "Privacy Policy", href: "#privacy" },
+    { label: "Terms & Conditions", href: "#terms" },
+    { label: "Refund Policy", href: "#refund" },
+    { label: "Money-Back Guarantee", href: "#guarantee" },
+  ],
+  copyright: "Copyright \u00a9 2026 All Rights Reserved",
 } as const;

@@ -34,12 +34,32 @@ export const BOOKING_URL = "#book-a-call";
  */
 export const BOOKING_ANCHOR = "book-a-call";
 
+/**
+ * Order is the footer's, left to right — Instagram, LinkedIn, TikTok, Facebook
+ * (design reference 2026-08-19). layout.tsx also feeds this to the
+ * Organization schema's `sameAs`, where order carries no meaning.
+ */
 export const SOCIALS = [
+  { label: "Instagram", href: "https://www.instagram.com/mushi.agency" },
   { label: "LinkedIn", href: "https://www.linkedin.com/company/mushi-agency" },
   { label: "TikTok", href: "https://www.tiktok.com/@mushi.agency" },
   { label: "Facebook", href: "https://www.facebook.com/mushi.agency" },
-  { label: "Instagram", href: "https://www.instagram.com/mushi.agency" },
 ] as const;
+
+/** The address in the footer's CONTACT column. */
+export const CONTACT_EMAIL = "support@mushi.agency";
+
+/**
+ * Where the footer's "mystery gift" capture posts.
+ *
+ * There is no server (CLAUDE.md), so this must be an email provider's own
+ * hosted form endpoint — Mailchimp, ConvertKit, Beehiiv, Loops. Until one is
+ * chosen this stays null and the footer renders the same control as a link to
+ * the booking anchor instead of a submit button, so nobody can type an address
+ * into a form that would silently drop it. Set the URL and it becomes a real
+ * POST with no other change. See design/SECTIONS.md.
+ */
+export const NEWSLETTER_ACTION: string | null = null;
 
 /**
  * The webapp. It is a separate repo (CLAUDE.md) — this site only links to it.
