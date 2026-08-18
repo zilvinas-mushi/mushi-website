@@ -933,8 +933,10 @@ export function FinalCta() {
 
               Phone leading is 15 on 14 — tighter than the type is tall, so the
               three lines read as one block against the heading above them
-              rather than as three separate sentences. */}
-          <p className="mt-6 text-[0.875rem] font-normal leading-[0.9375rem] text-white/50 md:text-[1.5rem] md:leading-[1.875rem]">
+              rather than as three separate sentences. The phone gap to the
+              heading is 25, and it is quoted separately from the desktop 24
+              because the two were only ever the same by coincidence. */}
+          <p className="mt-[1.5625rem] text-[0.875rem] font-normal leading-[0.9375rem] text-white/50 md:mt-6 md:text-[1.5rem] md:leading-[1.875rem]">
             {/* Three lines on the phone, one sentence each. From md up the
                 first two go inline and share a line, which is the reference's
                 desktop break — the trailing space only shows once they do. */}
@@ -956,7 +958,10 @@ export function FinalCta() {
             and 28 + text + 28 to 422.5 — against the ~342 and ~422 the
             reference measures.
           */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 md:mt-11 md:gap-[1.75rem]">
+          {/* 24 from the sub to the first pill on phones, per the artboard —
+              the 32 that stood here left the two CTAs floating away from the
+              copy they answer. Desktop keeps its measured 44. */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 md:mt-11 md:gap-[1.75rem]">
             {/*
               The creatives "Yes" pill's fill verbatim — the header's "Book a
               Call" gradient — so every primary CTA on the page reads as the
