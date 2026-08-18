@@ -91,7 +91,10 @@ export function SiteFooter() {
       the three column titles land at 25.1-26.1. That agreement is what makes
       these sizes trustworthy rather than a reading off a screenshot.
     */
-    <footer className="bg-bg">
+    /* Phone: #121212, the artboard's own fill for the footer plate — a shade
+       off the page's black, which is what separates it from the CTA section
+       above. Desktop keeps var(--bg): its reference has no plate. */
+    <footer className="bg-[#121212] md:bg-bg">
       <div
         className={`${SHELL} pb-[3.25rem] pt-12 md:pb-[3.5rem] md:pt-[4.3125rem]`}
       >
