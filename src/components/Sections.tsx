@@ -601,7 +601,13 @@ export function CaseStudies() {
                     card is 678 and 5.7cqi is 38.6, so the design's 30 wins.
                     It only engages below a ~526 card, which no desktop width
                     reaches. Nothing changes at the reference. */}
-                <h3 className="mt-4 whitespace-pre-line text-[length:min(1.25rem,5.7cqi)] font-medium leading-[1.25] text-white md:mt-5 md:text-[length:min(1.875rem,5.7cqi)]">
+                {/* Phone size is 18, NOT the deck's 20 — a deliberate break
+                    from Figma (Žilvinas 2026-08-19). At 20 it sits only 4px
+                    under the section heading's 24 and the two read as the same
+                    level, so the heading stopped announcing the section. 18
+                    puts the result at 0.75 of the heading; desktop already
+                    runs 30 against 48, which is 0.625. */}
+                <h3 className="mt-4 whitespace-pre-line text-[length:min(1.125rem,5.7cqi)] font-medium leading-[1.25] text-white md:mt-5 md:text-[length:min(1.875rem,5.7cqi)]">
                   {item.result}
                 </h3>
 
