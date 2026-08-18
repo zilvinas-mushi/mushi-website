@@ -383,10 +383,17 @@ export function Creatives() {
         <div className="flex items-center justify-between gap-6">
           <h2
             id="creatives-heading"
-            // 24/20 on the phone, straight off the design — the default 1.5
+            // 24/24 on the phone, straight off the design — the default 1.5
             // body leading pushed the two lines apart. Desktop keeps the
             // inherited 1.5 it was already rendering with.
-            className="text-[1.5rem] font-semibold leading-[1.25rem] tracking-tight md:text-[3rem] md:leading-normal"
+            //
+            // cap-centered so the row's `items-center` centres the "Yes" pill
+            // on the LETTERS rather than on the line box: the box carries
+            // ascent above the caps and descent below the last baseline, and
+            // this headline puts ink in neither (no g/y/p), so the pill was
+            // riding low against the two lines. Safe here for that same
+            // reason — nothing in the copy descends.
+            className="cap-centered text-[1.5rem] font-semibold leading-[1.5rem] tracking-tight md:text-[3rem] md:leading-normal"
           >
             {CREATIVES.heading}
           </h2>
