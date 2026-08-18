@@ -35,7 +35,7 @@ function Pill({
   // 56 here — the old 0.75 scale-down for a 1440 viewport — and is now the
   // design's 67 at lg. Below lg it still steps down; that is the phone pass.
   const base =
-    "inline-flex h-[2.75rem] items-center justify-center rounded-[0.9375rem] px-5 text-[0.875rem] font-semibold uppercase leading-none transition-all duration-300 ease-out hover:-translate-y-[1px] md:h-[3rem] md:px-6 md:text-[1.125rem] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
+    "inline-flex h-[calc(var(--pu)*44)] items-center justify-center rounded-[0.9375rem] px-5 text-[length:calc(var(--pu)*14)] font-semibold uppercase leading-none transition-all duration-300 ease-out hover:-translate-y-[1px] md:h-[3rem] md:px-6 md:text-[1.125rem] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
@@ -112,7 +112,7 @@ function Stars({ count = 5 }: { count?: number }) {
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
-      <div className={`${SHELL} relative pb-14 pt-5 text-center md:pb-[calc(var(--hero-u)*0.56)] md:pt-[calc(var(--hero-u)*0.8)]`}>
+      <div className={`${SHELL} relative pb-[calc(var(--pu)*56)] pt-[calc(var(--pu)*20)] text-center md:pb-[calc(var(--hero-u)*0.56)] md:pt-[calc(var(--hero-u)*0.8)]`}>
         {/*
           Figma nodes 3803:1591/1593/1594: a frosted white pill — a blurred
           white fill under a 50px-radius container — carrying BLACK Poppins
@@ -168,7 +168,7 @@ export function Hero() {
           The text classes stay on THIS element: the ring is sized in `em` and
           reads its font-size from here.
         */}
-        <span className="eyebrow-pill mb-7 inline-flex h-[2.125rem] items-center justify-center rounded-[3.125rem] px-5 text-[0.875rem] font-medium text-black md:mb-[calc(var(--hero-u)*0.28)] md:h-[calc(var(--hero-w)*0.45)] md:rounded-[calc(var(--hero-w)*0.5)] md:px-[calc(var(--hero-w)*0.28)] md:text-[length:calc(var(--hero-w)*0.2)]">
+        <span className="eyebrow-pill mb-[calc(var(--pu)*28)] inline-flex h-[calc(var(--pu)*34)] items-center justify-center rounded-[3.125rem] px-5 text-[length:calc(var(--pu)*14)] font-medium text-black md:mb-[calc(var(--hero-u)*0.28)] md:h-[calc(var(--hero-w)*0.45)] md:rounded-[calc(var(--hero-w)*0.5)] md:px-[calc(var(--hero-w)*0.28)] md:text-[length:calc(var(--hero-w)*0.2)]">
           {HERO.eyebrow}
         </span>
 
@@ -201,7 +201,7 @@ export function Hero() {
           //
           // Desktop is 0.8u — Figma's 80 at 1920, in proportion below it.
           // leading-[1] is Figma's 80/80; the phone keeps 1.08.
-          className="mx-auto max-w-4xl text-balance text-[2rem] font-semibold leading-[1.08] md:text-[length:calc(var(--hero-w)*0.8)] md:leading-[1]"
+          className="mx-auto max-w-4xl text-balance text-[length:calc(var(--pu)*32)] font-semibold leading-[1.08] md:text-[length:calc(var(--hero-w)*0.8)] md:leading-[1]"
         >
           {HERO.heading}
         </h1>
@@ -225,7 +225,7 @@ export function Hero() {
             line when the break IS active, so it costs nothing. */}
         {/* Phones: Poppins Regular 16 on a flat 20px line — Žilvinas
             2026-08-11. Desktop keeps its measured --hero-u scaling. */}
-        <p className="mx-auto mt-6 max-w-[42.5rem] text-pretty text-[1rem] font-normal leading-[1.25rem] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
+        <p className="mx-auto mt-[calc(var(--pu)*24)] max-w-[42.5rem] text-pretty text-[length:calc(var(--pu)*16)] font-normal leading-[calc(var(--pu)*20)] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
           {HERO.subLines[0]}
           <br className="hidden md:inline" />{" "}
           {HERO.subLines[1]}
@@ -234,7 +234,7 @@ export function Hero() {
         {/* `isolate` keeps the glow's -z-10 inside this row's stacking
             context — without it the glow would drop behind .hero-bg's
             background and vanish. */}
-        <div className="relative isolate mt-10 flex items-center justify-center gap-2.5 sm:gap-4 md:mt-[calc(var(--hero-u)*0.4)]">
+        <div className="relative isolate mt-[calc(var(--pu)*40)] flex items-center justify-center gap-2.5 sm:gap-4 md:mt-[calc(var(--hero-u)*0.4)]">
           <span
             aria-hidden="true"
             className="cta-glow pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2"
@@ -283,7 +283,7 @@ export function SocialProof() {
     // it — nearly 270px of empty screen between the logo strip and "Want
     // Creatives This Premium?". Halved to 96; the ramp still has room to
     // dissolve. Desktop keeps its --hero-u scaling.
-    <section aria-labelledby="proof-heading" className="relative pb-[2.34375rem] pt-2 md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
+    <section aria-labelledby="proof-heading" className="relative pb-[calc(var(--pu)*37.5)] pt-[calc(var(--pu)*8)] md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         {/* The design's own divider ornament — a gradient line running into a
@@ -307,14 +307,14 @@ export function SocialProof() {
             // crops the fading tail of the line off its open end. The star sits
             // at the headline end of the artwork, so it survives at full size —
             // scaling the whole SVG down instead shrank it to a speck.
-            className="h-[1.3125rem] min-w-0 flex-1 object-cover object-right md:h-[calc(var(--hero-u)*0.21)] md:w-auto md:flex-none"
+            className="h-[calc(var(--pu)*21)] min-w-0 flex-1 object-cover object-right md:h-[calc(var(--hero-u)*0.21)] md:w-auto md:flex-none"
           />
           {/* Poppins Regular — 20 from md up, 14 on the phone so the line still
               fits on one row at 375. The dividers flanking it flex into
               whatever width is left over. */}
           <h2
             id="proof-heading"
-            className="whitespace-nowrap text-center text-[0.875rem] font-normal text-white md:text-[length:calc(var(--hero-u)*0.2)]"
+            className="whitespace-nowrap text-center text-[length:calc(var(--pu)*14)] font-normal text-white md:text-[length:calc(var(--hero-u)*0.2)]"
           >
             {SOCIAL_PROOF.headline}
           </h2>
@@ -327,14 +327,14 @@ export function SocialProof() {
             loading="lazy"
             decoding="async"
             aria-hidden="true"
-            className="h-[1.3125rem] min-w-0 flex-1 -scale-x-100 object-cover object-right md:h-[calc(var(--hero-u)*0.21)] md:w-auto md:flex-none"
+            className="h-[calc(var(--pu)*21)] min-w-0 flex-1 -scale-x-100 object-cover object-right md:h-[calc(var(--hero-u)*0.21)] md:w-auto md:flex-none"
           />
         </div>
 
         {/* Official client logotypes from /public/logos. Each keeps its own
             viewBox width so relative sizing matches the design; only
             "we interiors" has no supplied SVG and falls back to text. */}
-        <div className="mx-auto mt-10 max-w-3xl space-y-4 md:mt-[calc(var(--hero-u)*0.4)] md:space-y-[calc(var(--hero-u)*0.24)]">
+        <div className="mx-auto mt-[calc(var(--pu)*40)] max-w-3xl space-y-[calc(var(--pu)*16)] md:mt-[calc(var(--hero-u)*0.4)] md:space-y-[calc(var(--hero-u)*0.24)]">
           {/*
             The design stacks the brands as a centred pyramid — four, three,
             two, one — not a width-driven wrap, which broke rows in different
@@ -357,10 +357,10 @@ export function SocialProof() {
                       height={brand.h}
                       loading="lazy"
                       decoding="async"
-                      className="h-[1.1875rem] w-auto opacity-95 md:h-[calc(var(--hero-u)*0.26)]"
+                      className="h-[calc(var(--pu)*19)] w-auto opacity-95 md:h-[calc(var(--hero-u)*0.26)]"
                     />
                   ) : (
-                    <span className="text-[1.375rem] font-medium tracking-tight text-white/90">
+                    <span className="text-[length:calc(var(--pu)*22)] font-medium tracking-tight text-white/90">
                       {brand.name}
                     </span>
                   )}
@@ -404,7 +404,9 @@ export function Creatives() {
             Desktop is measured, not eyeballed: 143 x 60, radius 30 on all four
             corners, a 45x45 #222222 disc inset 7.5px from the right edge (the
             same inset as the 7.5px it gets top and bottom from 60 - 45), and
-            exactly 18px between the end of "Yes" and the start of the disc.
+            24px between the end of "Yes" and the start of the disc — the
+            measured 18 read as the word leaning on the disc, and the pill has
+            the slack because the leftover falls on the left of "Yes".
             `justify-end` is what holds both of those at once — the content is
             packed against the right edge, so the 18px gap and the 7.5px inset
             are both literal and the leftover space falls on the left of "Yes"
@@ -426,20 +428,22 @@ export function Creatives() {
             // The hover gradient repeats the rest state's THREE stop positions
             // in white. A 2-stop hover against a 3-stop rest cannot interpolate,
             // so the fill snapped no matter what the transition said.
-            className="group mr-3 inline-flex h-[2.8125rem] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[0.375rem] text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:justify-end md:gap-[1.125rem] md:rounded-[1.875rem] md:pl-0 md:pr-[0.46875rem] md:text-[1.875rem]"
+            className="group mr-3 inline-flex h-[2.8125rem] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[0.375rem] text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:justify-end md:gap-6 md:rounded-[1.875rem] md:pl-0 md:pr-[0.46875rem] md:text-[1.875rem]"
           >
             {CREATIVES.cta}
             <span className="flex size-[2.125rem] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[2.8125rem]">
-              {/* ~/Documents/arrow icon.svg, inlined. Its 17-unit viewBox is
-                  the 15-unit arrow plus the 1-unit stroke overhang on each
-                  side, so the box has to render at 17 for the drawn arrow to
-                  measure the 15 it is specified at. Rendering the box itself
-                  at 15 shrank the arrow to 13.2. */}
+              {/* ~/Documents/arrow icon.svg, inlined. The path draws a
+                  15-unit arrow; the viewBox has to add the stroke's overhang
+                  on every side or the ends clip, so at stroke 3 it is 15 + 1.5
+                  + 1.5 = 18 offset to -0.5. The rendered size carries the same
+                  18/15 factor, which is why it is 18px and not 15 — rendering
+                  the box at 15 shrinks the drawn arrow instead. Stroke 3, not
+                  the original 2: the design's arrow is the bold weight. */}
               <svg
-                viewBox="0 0 17 17"
+                viewBox="-0.5 -0.5 18 18"
                 fill="none"
-                className="size-[0.8125rem] stroke-current md:size-[1.0625rem]"
-                strokeWidth="2"
+                className="size-[0.86rem] stroke-current md:size-[1.125rem]"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
