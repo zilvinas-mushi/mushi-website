@@ -9,6 +9,13 @@
      a lighter panel sitting on black, which is the point. */
   --bg: #000000;
   --bg-alt: #0d0b13;
+
+  /* The phone unit, at its ceiling. Every phone-side vertical measure is
+     written as calc(var(--pu) * <the design's px>), so at 1px the numbers read
+     exactly as the artboard's. The phone media query re-declares it against
+     svh; see the note there. Declared here as well so those same classes stay
+     valid above md, where nothing has re-declared it. */
+  --pu: 1px;
   --surface: #1c1a24;
   --bar: #181818;
   --accent-purple: #6e54b5;
