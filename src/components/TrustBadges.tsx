@@ -68,9 +68,9 @@ export function TrustBadges() {
     // This top margin IS the gap between the hero's two CTAs and the awards —
     // nothing sits between them — so the design's 50 lives here. Below md it
     // stays at 24 until the phone pass sets its own value.
-    <ul className="mt-6 grid grid-cols-3 gap-2 md:mt-[calc(var(--hero-u)*0.5)] md:flex md:flex-wrap md:items-center md:justify-center md:gap-x-8 md:gap-y-4">
+    <ul className="mt-[calc(var(--pu)*24)] grid grid-cols-3 gap-[calc(var(--pu)*8)] md:mt-[calc(var(--hero-u)*0.5)] md:flex md:flex-wrap md:items-center md:justify-center md:gap-x-8 md:gap-y-4">
       {BADGES.map(({ title, meta, logo }) => (
-        <li key={title} className="flex flex-col items-center gap-2 text-center md:flex-row md:gap-3 md:text-left">
+        <li key={title} className="flex flex-col items-center gap-[calc(var(--pu)*8)] text-center md:flex-row md:gap-3 md:text-left">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logo}
@@ -85,7 +85,7 @@ export function TrustBadges() {
             fetchPriority="high"
             // The phone row is three columns of ~110, so the desktop badge
             // scales down with the text rather than keeping its 64.
-            className="size-10 shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
+            className="size-[calc(var(--pu)*40)] shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
           />
           {/* On the phone the two lines differ: the award name is Poppins
               medium 14 on a tight 16 line, the "Winner 2025" line under it
@@ -108,10 +108,10 @@ export function TrustBadges() {
               u because shrinking THEM in a short window is free, where
               shrinking the words is not. */}
           <span className="text-center md:text-left">
-            <span className="block text-[0.875rem] font-medium leading-4 text-white md:text-[length:calc(var(--hero-w)*0.16)] md:leading-snug">
+            <span className="block text-[length:calc(var(--pu)*14)] font-medium leading-[calc(var(--pu)*16)] text-white md:text-[length:calc(var(--hero-w)*0.16)] md:leading-snug">
               {title}
             </span>
-            <span className="flex items-center justify-center gap-1.5 text-[0.75rem] font-medium text-zinc-500 md:justify-start md:text-[length:calc(var(--hero-w)*0.16)]">
+            <span className="flex items-center justify-center gap-1.5 text-[length:calc(var(--pu)*12)] font-medium text-zinc-500 md:justify-start md:text-[length:calc(var(--hero-w)*0.16)]">
               <Laurel flip />
               {meta}
               <Laurel />

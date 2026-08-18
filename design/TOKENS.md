@@ -128,6 +128,14 @@ When in doubt use **15px**. Pills use **100px**.
   [ASSETS.md](ASSETS.md) and the memory note on the 6-calls/month limit).
   Sections stack in the same order; build mobile-first with Tailwind
   breakpoints and check against the mobile artboard in Figma by eye.
+- **The phone's first screen is scaled off one unit, `--pu`** (globals.css).
+  Everything above the fold — bar, pill, headline, sub, both CTAs, the award
+  row, the proof line and all four logo rows down to Kiloverse — is quoted as
+  `calc(var(--pu) * <design px>)` against an 812-tall frame, where the block
+  measures 765. `--pu` is `clamp(0.62px, 0.12315svh, 1px)`, so the whole thing
+  stays at ~94% of whatever height the browser actually leaves and the fold
+  always lands after the last logo. `--pu` is 1px at :root, which is what keeps
+  those same classes correct above md. Horizontal measures are NOT in it.
 
 ## Header bar
 

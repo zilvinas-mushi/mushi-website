@@ -472,7 +472,9 @@ export function Creatives() {
         with its own padding, so the first card still starts directly under the
         "W" of the heading. See CreativesRail.
       */}
-      <div className="mt-10">
+      {/* 26 between the heading and the rail on phones, per the artboard.
+          Desktop keeps its 40. */}
+      <div className="mt-[1.625rem] md:mt-10">
         <CreativesRail />
       </div>
     </section>
@@ -493,7 +495,13 @@ export function CaseStudies() {
           // the J), which that utility clips out of the box.
           className="text-[1.5rem] font-semibold leading-[1.5rem] tracking-tight md:text-[3rem] md:leading-normal"
         >
-          {CASE_STUDIES.heading}
+          {/* Authored break, phone only — see CASE_STUDIES.headingLines. The
+              trailing space keeps the two halves one sentence once the <br> is
+              display:none, and CSS drops it at the head of a line while the
+              break is active, so it costs nothing either way. */}
+          {CASE_STUDIES.headingLines[0]}
+          <br className="md:hidden" />{" "}
+          {CASE_STUDIES.headingLines[1]}
         </h2>
 
         {/*
@@ -515,14 +523,19 @@ export function CaseStudies() {
           inherited the slack as dead space under its tags. No gap value can fix
           that, because most of the distance was not gap.
 
-          Gap is 70 on phones and 45 from md up: 45 is the design's figure for
-          the space between a card's tag row and the next card's top edge.
+          Gap is 40 on phones — measured off the phone artboard, tag row to
+          the next card's top edge — 70 in the 640-767 band this was tuned at,
+          and 45 from md up, which is the design's desktop figure for the same
+          distance.
         */}
-        <div className="mt-12 flex flex-col gap-y-[4.375rem] sm:flex-row sm:gap-x-[1.125rem] sm:gap-y-0">
+        <div className="case-columns mt-[1.625rem] flex flex-col gap-y-[2.5rem] sm:gap-y-0 sm:flex-row sm:gap-x-[1.125rem] md:mt-12">
           {[0, 1].map((col) => (
             <ul
               key={col}
-              className={`flex flex-1 flex-col gap-y-[4.375rem] md:gap-y-[2.8125rem] ${
+              // Explicit: below sm this <ul> is display:contents (globals.css),
+              // which drops the implicit list role in some engines.
+              role="list"
+              className={`flex flex-1 flex-col gap-y-[2.5rem] sm:gap-y-[4.375rem] md:gap-y-[2.8125rem] ${
                 col === 1 ? "sm:mt-[8.75rem]" : ""
               }`}
             >
@@ -531,6 +544,9 @@ export function CaseStudies() {
                width rather than the window's — see the note on the h3. */
             <li
               key={item.brand}
+              // The phone's reading order. Inert on desktop — see the note on
+              // CASE_STUDIES.phoneOrder in content.ts.
+              style={{ order: item.phoneOrder }}
               className="@container"
             >
               <article className="relative flex h-full flex-col">
@@ -645,7 +661,12 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
        eyeballed near-black. NOTE this is NOT the same grey as the
        "Trusted by 100+ brands" pill below the grid, which is #222222 — the two
        were briefly conflated. Card is darker than the control sitting on it. */
-    <article className="rounded-[1.25rem] bg-[#181818] p-7">
+    /* Phone padding is the artboard's, and it is not uniform: 20 left and
+       right (the desktop 28 left the stars and the quote too far in on a 375
+       screen), 28 on top, and 35 under the byline — the same 35 that sits
+       between the quote and the byline, so the footer reads as its own band
+       rather than as the end of the last paragraph. Desktop stays even. */
+    <article className="rounded-[1.25rem] bg-[#181818] px-5 pb-[2.1875rem] pt-7 md:p-7">
       {/* TITLE AND STARS ARE ONE COLUMN, with the avatar beside them.
           The stars used to be a sibling BELOW this row, which made the space
           under the title depend on the avatar: the row is as tall as its
@@ -660,11 +681,17 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
         <h3 className="text-[1rem] font-semibold leading-4 text-white md:text-[1.875rem] md:leading-snug">
           {t.title}
           </h3>
-          {/* 12 at every width. It was 8 on phones, which read tight once the
-             stars moved into this column and the gap became a true 8 rather
-             than 8 plus whatever the avatar left over. Same value both sides,
-             so no md variant to drift. */}
-          <div className="mt-3">
+          {/* 15 to the stars on the phone, off the artboard; desktop keeps
+             its 12.
+
+             `flex` is load-bearing, not cosmetic. The stars are an inline-flex
+             span, so as the only thing on a LINE this box was 24.5 tall for
+             18px of artwork — the row's line-height, with the slack hanging
+             below the stars. That slack then added itself to whatever margin
+             came next, which is why the gap under the stars measured 22.5
+             against a 16 margin. As a flex container there is no line box and
+             both gaps are exactly what they say. */}
+          <div className="mt-[0.9375rem] flex md:mt-3">
             <Stars />
           </div>
         </div>
@@ -692,10 +719,10 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
       {/* Phone rhythm is tighter than desktop's throughout this card: 12 to
           the quote, 12 between paragraphs and 16 to the byline. The md values
           are the design's and are unchanged. */}
-      {/* 16 from the stars to the quote at every width — it was 12 on phones.
-         The 12 BETWEEN paragraphs stays a phone value; only the gap under the
-         stars opened up. */}
-      <div className="mt-4 space-y-3 md:space-y-4">
+      {/* 20 from the stars to the quote on the phone, off the artboard —
+         and a true 20 now that the stars' line box is gone (see above).
+         Desktop keeps 16. The 12 BETWEEN paragraphs is unchanged. */}
+      <div className="mt-5 space-y-3 md:mt-4 md:space-y-4">
         {t.body.map((para, i) => (
           <p key={i} className="text-[0.875rem] font-normal leading-relaxed text-white/50 md:text-[1.3125rem]">
             {para}
@@ -703,9 +730,13 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
         ))}
       </div>
 
-      {/* The byline is a touch dimmer than the quote from md up; on the phone
+      {/* 35 under the quote on the phone, off the artboard — it was 16, and
+          the byline read as part of the last paragraph rather than a footer.
+          Desktop keeps its 24.
+
+          The byline is a touch dimmer than the quote from md up; on the phone
           the design puts both at 50%. */}
-      <footer className="mt-4 text-[0.875rem] font-light text-white/50 md:mt-6 md:text-[1.3125rem] md:text-white/40">
+      <footer className="mt-[2.1875rem] text-[0.875rem] font-light text-white/50 md:mt-6 md:text-[1.3125rem] md:text-white/40">
         <time dateTime={t.iso}>{t.date}</time>
         {"  •  "}
         <span>{t.author}</span>
@@ -783,7 +814,7 @@ export function Testimonials() {
             the height and the fade can TRANSITION. As Tailwind variants they
             could only toggle `max-h-none` / `hidden`, which are both discrete —
             the reveal snapped in one frame. */}
-        <div className="testi-wrap relative mt-12">
+        <div className="testi-wrap relative mt-[1.625rem] md:mt-12">
           {/*
             The collapsed height is tuned so the first card in each column is
             whole and the second is cut near its middle — two full cards and
@@ -824,7 +855,25 @@ export function Testimonials() {
               block. Only the "View More" cluster responds, and only by a small
               fade. Do not reinstate `hover:bg-white` here.
             */}
-            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex w-fit cursor-pointer list-none items-center justify-center gap-2.5 rounded-[var(--radius-pill)] border border-white/10 bg-[#222222] py-2.5 pl-3 pr-3 shadow-[0_1.25rem_3.125rem_-1rem_rgba(0,0,0,0.9)] group-open:static group-open:mt-8 md:h-[3.875rem] md:w-[37.125rem] md:gap-4 md:py-0 [&::-webkit-details-marker]:hidden">
+            {/*
+              THE PILL NEVER CHANGES POSITIONING SCHEME. It used to flip from
+              `absolute` to `static` on open, which is a discrete change no
+              transition can touch: at t=0 it teleported ~100px — over the fade
+              one frame, below the block the next — and the eye read the whole
+              reveal as a jump followed by a slide.
+
+              It is absolute in both states, anchored to the BOTTOM of
+              .testi-wrap, and the room it needs when open comes from that
+              wrapper's padding-bottom, which animates on the same curve and
+              duration as the clip's height (globals.css). The pill therefore
+              rides the growth continuously and lands exactly where
+              `static + mt-8` used to put it: --pill-h + 2.5rem of padding, less
+              the 0.5rem it sits above the wrapper's edge.
+
+              Its height is explicit at every width, not just from md, because
+              that padding is calculated from it.
+            */}
+            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex h-[3.875rem] w-fit cursor-pointer list-none items-center justify-center gap-2.5 rounded-[var(--radius-pill)] bg-[#222222] py-0 pl-3 pr-3 shadow-[0_1.25rem_3.125rem_-1rem_rgba(0,0,0,0.9)] md:w-[37.125rem] md:gap-4 [&::-webkit-details-marker]:hidden">
               {/* Named in TESTIMONIALS.pillAvatars, not sliced off the top of
                   `items` — see the note there. */}
               <span aria-hidden="true" className="flex -space-x-3">
@@ -856,11 +905,53 @@ export function Testimonials() {
                   fade on this cluster. The label and the disc move together
                   because they read as a single affordance. */}
               <span className="flex items-center gap-2.5 text-[0.9375rem] font-medium leading-[1.875rem] text-white transition-opacity duration-500 ease-out group-hover/pill:opacity-70 md:text-[1.3125rem]">
-                <span className="hidden md:inline md:group-open:hidden">{TESTIMONIALS.moreLabel}</span>
-                <span className="hidden md:group-open:inline">View Less</span>
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[1rem] leading-none text-black md:size-[1.875rem] md:text-[1.125rem]">
-                  <span className="group-open:hidden">+</span>
-                  <span className="hidden leading-none group-open:inline">−</span>
+                {/* Both labels and both glyphs are always in the DOM, stacked
+                    in one grid cell and cross-faded. Swapping `hidden` for
+                    `inline` is discrete — the word and the sign changed in a
+                    single frame while the block was still travelling, which is
+                    the other half of what made this control feel abrupt.
+                    Stacking also keeps the pill's width off the label, so
+                    nothing reflows mid-transition. */}
+                <span className="hidden md:grid">
+                  <span className="col-start-1 row-start-1 whitespace-nowrap transition-opacity duration-500 ease-out group-open:opacity-0">
+                    {TESTIMONIALS.moreLabel}
+                  </span>
+                  <span className="col-start-1 row-start-1 whitespace-nowrap opacity-0 transition-opacity duration-500 ease-out group-open:opacity-100">
+                    View Less
+                  </span>
+                </span>
+                {/* DRAWN, not typed. The glyphs were the characters "+" and
+                    "−", which put the sign wherever the font's metrics happen
+                    to place it in the line box — off-centre in the disc, at
+                    the font's own weight, with square ends. This is the
+                    artboard's mark: 12 x 12, 2px strokes, round caps, and dead
+                    centre because the SVG box is what the grid centres.
+
+                    size-3 is 12px on the phone and 9 above md, where the root
+                    scales to 12px — the same fraction of the disc at both. */}
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-black md:size-[1.875rem]">
+                  <svg
+                    viewBox="0 0 12 12"
+                    aria-hidden="true"
+                    className="col-start-1 row-start-1 size-3 transition-opacity duration-500 ease-out group-open:opacity-0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M6 1.5v9M1.5 6h9" />
+                  </svg>
+                  <svg
+                    viewBox="0 0 12 12"
+                    aria-hidden="true"
+                    className="col-start-1 row-start-1 size-3 opacity-0 transition-opacity duration-500 ease-out group-open:opacity-100"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M1.5 6h9" />
+                  </svg>
                 </span>
               </span>
             </summary>

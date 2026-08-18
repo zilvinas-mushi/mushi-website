@@ -472,11 +472,32 @@ export const CREATIVES = {
  * and no gradient, which is why the cards looked unfinished. The mockups
  * export with transparency, so the gradient is reproduced by `bg` below.
  */
+/*
+ * `phoneOrder` is the ONE-COLUMN reading order, which is not the order the two
+ * desktop columns produce. Desktop reads down the left column then the right —
+ * Breezit, eany | Holo, we interiors — so stacking those two lists gives
+ * Breezit, eany, Holo, we interiors on a phone. The phone artboard wants
+ * Holo, Breezit, eany, we interiors, which interleaves them.
+ *
+ * The numbers are set as a CSS `order` on each card. Within a desktop column
+ * they are already ascending (2 < 3 and 1 < 4), so they change nothing there;
+ * below sm the two <ul>s become `display: contents` (globals.css) and the four
+ * cards order themselves against each other.
+ */
 export const CASE_STUDIES = {
   heading: "Not Just Pretty, but Profitable.",
+  /**
+   * The phone artboard breaks after the comma and sets the pair on two 24px
+   * lines (Figma box 236 x 52). Left to itself the line fits — 342px inside a
+   * 345px column at 375 wide — so the break has to be authored or it never
+   * happens. Desktop is one line, which is what the reference shows there.
+   */
+  headingLines: ["Not Just Pretty,", "but Profitable."],
   items: [
     {
       brand: "Breezit",
+      /** Phone stacking position — see CASE_STUDIES' note on phoneOrder. */
+      phoneOrder: 2,
       result: "Generated 700 sales calls & 1500\nleads in 8 months.",
       tags: ["AI", "SALES", "VENUES"],
       // All four artworks have their plate keyed to alpha, so `bg` sits BEHIND
@@ -517,6 +538,8 @@ export const CASE_STUDIES = {
     },
     {
       brand: "Holo",
+      /** Phone stacking position — see CASE_STUDIES' note on phoneOrder. */
+      phoneOrder: 1,
       result: "From $0k/month to $117k/month\nin 7 months",
       tags: ["AI", "MARKETING", "GENERATOR"],
       // #8A5CF6 is the purple this card already wore as its wash, kept as-is.
@@ -535,6 +558,8 @@ export const CASE_STUDIES = {
     },
     {
       brand: "eany.io",
+      /** Phone stacking position — see CASE_STUDIES' note on phoneOrder. */
+      phoneOrder: 3,
       result: "Helped find 3 evergreen ads for\nan 8 figure company.",
       tags: ["B2B", "MARKETPLACE", "RESELLERS"],
       // This export has a DROP SHADOW baked onto its plate, at values darker
@@ -582,6 +607,8 @@ export const CASE_STUDIES = {
     },
     {
       brand: "we interiors",
+      /** Phone stacking position — see CASE_STUDIES' note on phoneOrder. */
+      phoneOrder: 4,
       result: "From $13k/month to $75k/month\nin 3 months.",
       tags: ["ECOM", "FURNITURE", "HOME"],
       // The one card NOT keyed out of its export. Alone among the four, that

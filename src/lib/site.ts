@@ -40,3 +40,13 @@ export const SOCIALS = [
   { label: "Facebook", href: "https://www.facebook.com/mushi.agency" },
   { label: "Instagram", href: "https://www.instagram.com/mushi.agency" },
 ] as const;
+
+/**
+ * The webapp. It is a separate repo (CLAUDE.md) — this site only links to it.
+ *
+ * The phone drawer's "Buy now" and "Login" both land there: buying a template
+ * and signing in are app concerns, and there is no server here to host either.
+ */
+export const APP_URL = "https://app.mushi.agency";
+export const APP_BUY_URL = `${APP_URL}/templates`;
+export const APP_LOGIN_URL = `${APP_URL}/login`;

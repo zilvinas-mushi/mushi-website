@@ -627,6 +627,29 @@ body {
   }
 }
 
+/* Case studies, phone only: the two desktop columns stop generating boxes, so
+   their four cards become direct children of the one flex column and can order
+   themselves against each other.
+
+   Stacking the two lists as lists cannot produce the artboard's phone order —
+   that order interleaves them (Holo, Breezit, eany, we interiors, against
+   desktop's Breezit, eany | Holo, we interiors). `display: contents` is what
+   makes the `order` on each card (set from CASE_STUDIES.phoneOrder) apply
+   across both, and the 40px gap on the container then falls between all four
+   rather than only between the two lists.
+
+   The explicit role="list" in the markup is deliberate: `display: contents`
+   drops the implicit list semantics in some engines, and the role puts them
+   back.
+
+   Ends at 639.98px — from sm up the two columns are side by side and must keep
+   their boxes, their own gaps and the right column's stagger. */
+@media (max-width: 639.98px) {
+  .case-columns > ul {
+    display: contents;
+  }
+}
+
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a
    static export and the row must work with no hydration. */
 .scroll-row {
@@ -716,6 +739,47 @@ body {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   animation: gradient-x 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* The mobile drawer's "Book an agency call" ring. NOT a flat white border: the
+   artboard lights the stroke at the top-left corner and, more faintly, at the
+   bottom-right, and leaves the middle of every edge unpainted.
+
+   The stops are read off the artboard rather than eyeballed — sampling the
+   button's whole perimeter and projecting each sample onto a 135deg axis
+   collapses both long edges onto one curve: ~0.75 white at the start, down to
+   nothing by 27%, dark until 70%, then back up to ~0.42 at the far corner. The
+   decay is faster than linear, hence the intermediate stops.
+
+   Same masked-pseudo-element trick as .animated-gradient-border above (a
+   border-color cannot hold a gradient), but static — this ring does not pan. */
+.corner-lit-ring {
+  position: relative;
+}
+.corner-lit-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 255, 255, 0.5) 6%,
+    rgba(255, 255, 255, 0.28) 12%,
+    rgba(255, 255, 255, 0.12) 18%,
+    rgba(255, 255, 255, 0) 27%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.1) 82%,
+    rgba(255, 255, 255, 0.25) 91%,
+    rgba(255, 255, 255, 0.42) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   pointer-events: none;
 }
 
@@ -905,11 +969,18 @@ body {
   overflow: hidden;
   /* The collapsed heights are the measured ones — two full cards and two
      halves, so it is visibly cut off rather than looking like the end. */
-  /* Phones show TWO cards, not three-and-a-bit. A phone card runs ~330 with
-     the tighter rhythm, and the column gap is 24, so 700 lands just past the
-     second card and the pill sits under it. It was 1170, which cleared three
-     and left the pill a long way down the page. */
-  max-height: 700px;
+  /* TWO AND A HALF CARDS on phones, which is what the artboard shows: two
+     whole ones and the third cut through its middle, so the block reads as
+     continuing rather than ending.
+
+     956 is measured, not guessed. At 375 the first three cards sit at 0 (375
+     tall), 399 (382) and 805 (302) — a 24 gap — so half of the third is
+     805 + 151. It was 700, which cut the SECOND card at three quarters.
+
+     Re-measure if the testimonial copy changes; the cards are content-sized
+     and this number is the only thing holding the cut where the design puts
+     it. */
+  max-height: 956px;
   /* 1100ms, up from 700. On a block that grows ~1100px the shorter curve still
      covered a lot of distance per frame early on and read as a snap with a
      tail rather than a reveal. */
@@ -943,6 +1014,32 @@ body {
 
 .testi-wrap:has(details[open]) .testi-fade {
   opacity: 0;
+}
+
+/*
+  THE PILL'S ROOM, ANIMATED.
+
+  The pill is absolutely positioned against this wrapper at every width and in
+  both states (see the note in Sections.tsx). Collapsed, it floats over the
+  bottom of the clipped block; open, it has to sit clear of the last card. That
+  clearance is this padding, and because padding is animatable on the SAME
+  curve and duration as the clip's height, the pill glides down with the growth
+  instead of teleporting the way the old `static` switch made it.
+
+  --pill-h is the pill's own height, set once and used by both. In rem, so it
+  tracks the root scale-down above md exactly as the pill itself does.
+
+  2.5rem = the 0.5rem the pill sits above this box's bottom edge plus the 2rem
+  that used to be `mt-8`, so the open position is unchanged to the pixel.
+*/
+.testi-wrap {
+  --pill-h: 3.875rem;
+  padding-bottom: 0;
+  transition: padding-bottom 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.testi-wrap:has(details[open]) {
+  padding-bottom: calc(var(--pill-h) + 2.5rem);
 }
 
 /* Tailwind v4 preflight sets cursor:default on buttons; restore the pointer. */
