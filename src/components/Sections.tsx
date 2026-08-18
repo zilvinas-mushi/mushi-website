@@ -429,10 +429,15 @@ export function Creatives() {
             // jammed into the right edge, so it is pulled in a little. Desktop
             // keeps the measured alignment.
             //
+            // Phone gap is 15px between "Yes" and the disc. The phone pill has
+            // no fixed width — it is pl-5 + text + gap + disc + pr-1.5 — so
+            // widening the gap grows the button rather than squeezing the
+            // word, which is the intended reading.
+            //
             // The hover gradient repeats the rest state's THREE stop positions
             // in white. A 2-stop hover against a 3-stop rest cannot interpolate,
             // so the fill snapped no matter what the transition said.
-            className="group mr-3 inline-flex h-[2.8125rem] shrink-0 items-center gap-2 rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[0.375rem] text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:justify-end md:gap-6 md:rounded-[1.875rem] md:pl-0 md:pr-[0.46875rem] md:text-[1.875rem]"
+            className="group mr-3 inline-flex h-[2.8125rem] shrink-0 items-center gap-[0.9375rem] rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[0.375rem] text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:justify-end md:gap-6 md:rounded-[1.875rem] md:pl-0 md:pr-[0.46875rem] md:text-[1.875rem]"
           >
             {CREATIVES.cta}
             <span className="flex size-[2.125rem] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[2.8125rem]">
