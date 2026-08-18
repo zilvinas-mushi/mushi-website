@@ -887,7 +887,9 @@ export function Testimonials() {
                       src={t.avatar}
                       alt=""
                       width={40}
-                      className="size-[2.5rem] rounded-full object-cover ring-2 ring-[#222222]"
+                      // 28 on the phone, off the artboard; the 2.5rem returns
+                      // from md, where the root scale makes it 30.
+                      className="size-7 rounded-full object-cover ring-2 ring-[#222222] md:size-[2.5rem]"
                     />
                   ) : null;
                 })}
@@ -931,7 +933,7 @@ export function Testimonials() {
 
                     size-3 is 12px on the phone and 9 above md, where the root
                     scales to 12px — the same fraction of the disc at both. */}
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-black md:size-[1.875rem]">
+                <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white text-black md:size-[1.875rem]">
                   <svg
                     viewBox="0 0 12 12"
                     aria-hidden="true"
@@ -1076,11 +1078,14 @@ export function FinalCta() {
               href={BOOKING_URL}
               // Hover repeats the rest state's three stop positions in white so
               // the fill can interpolate instead of snapping at the halfway point.
-              className="group inline-flex h-[2.625rem] items-center justify-between gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
+              className="group inline-flex h-[2.625rem] items-center justify-center gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] px-6 text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
             >
               {FINAL_CTA.cta}
-              {/* 30 across on the phone, inset 6 from the pill's right edge —
-                  which is the same 6 it gets top and bottom from 42 - 30. */}
+              {/* 30 across on the phone. It travels WITH the label — the pair
+                  is centred as one group, 15 apart — rather than being pinned
+                  to the pill's right edge: the pill is stretched to the
+                  scarcity line's width now, so pinning it left a canyon
+                  between the two. */}
               <span className="flex size-[1.875rem] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[2.5rem]">
                 {/* The house arrow (see the creatives pill): a 15-unit arrow
                     in a 17-unit viewBox, the extra unit each side being the
