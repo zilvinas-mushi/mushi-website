@@ -72,6 +72,46 @@ in from the sides and chokes the copy.
 - Error is flat from 750px down to 432px. **540px halves the weight for no
   measurable loss** if mobile bytes ever matter more than the safety margin.
 
+### 2026-08-19: swapped to `lightning 1.png`, then reverted the same day
+
+A ray-less render (`lightning 1.png`, 375 x 901 — the same vignette with the
+shafts taken out, 61 KB at q80) shipped briefly and was **reverted on request**:
+the phone frame has the rays raking in from the top-left and they are wanted.
+`Mobile lightning.png` stays the source. Do not re-drop them for the weight.
+
+What the ray-less pass measured is still true and still applies:
+
+- RGB is inert in both renders. The artwork is black-with-alpha everywhere that
+  alpha matters, so the encoder gets a flat colour plane — zero all three
+  channels before saving.
+- **WHERE THE CENTRE LIGHT IS: dead centre, 48% / 50%.** Not the top-left
+  corner — the rays come from there, the clear oval does not. An
+  earlier note here claimed the phone light was a corner source and that a
+  centred ellipse was "a light source the artwork does not have" — that is
+  backwards, and it is measurable in ten lines: plot `255 - alpha` of either
+  PNG and the clear oval is in the middle of the frame in both. The corner
+  radial that claim produced dimmed exactly the tiles the design leaves lit.
+- `.hero-grid` now carries **no lighting mask at all** on phones, only the base
+  rule's bottom hand-off. This file IS the vignette — opaque black at the edges,
+  open in the middle — so anything the grid adds is the same light painted
+  twice. Same reasoning that already applies on desktop.
+- Still true from the earlier pass: `.hero-bg` is a ramp and nothing else, and
+  `.cta-glow` is off at ≤767px (the phone frame measures under 8/255 there).
+
+## `tile.png` — the phone grid tile, 84 x 84
+
+Not shipped as a file: it is transcribed into the repeating SVG on `.hero-grid`
+inside `@media (max-width: 767px)`. Source `~/Documents/tile.png`.
+
+- Interior alpha **89/255 = 35%** across the whole face (min 88, max 90) — the
+  phone tile was drawn at 50% before this was measured.
+- The three Figma stops (`A08ADE` / `7C54B5` at 40% / `6E54B5`) on a handle that
+  is **much flatter than the desktop tile's 45deg**: fitting the export (rms
+  0.035 over 6186 px) gives objectBoundingBox `-0.011,0.326 -> 1.031,0.681`,
+  i.e. ~19deg below horizontal.
+- Square corners, 84 on a 90px unit — the 1px black frame in the PNG is the
+  export's edge, not a stroke.
+
 ## Largest images
 
 These dominate page weight — lazy-load any that sit below the fold, and give every

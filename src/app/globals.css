@@ -501,86 +501,122 @@ body {
    Only the geometry differs: ~90px pitch, square corners, per the phone
    frame's grid. */
 @media (max-width: 767px) {
-  /* The phone frame's own lighting export, replacing the gradient vignette that
-     stood in for it. The desktop image cannot be reused here: it is a 16:9
-     frame, and stretched into a tall hero its vignette closes in from the left
-     and right and chokes the copy.
+  /*
+    THE PHONE UNIT. One number that makes the whole first screen fit one screen.
 
-     640 x 1539, from a 4x export of the 375 x 902 phone frame. Sized for a
-     ~430px-wide phone at DPR 3 (~1290 device px), a 2x upscale of a pure blur.
+    Everything above the fold on a phone — the bar, the pill, the headline, the
+    sub, the two CTAs, the award row, the proof line and the four logo rows
+    down to Kiloverse — is authored at the design's px against an 812-tall
+    frame, where it measures 765. That fits the LAYOUT viewport on most phones
+    and misses the VISIBLE one on nearly all of them: Safari's chrome takes
+    ~100px off a 14/15, and an SE is only ~553 tall with the bars showing.
 
-     Heavier than the desktop file relative to what it covers (175 KB) because
-     the phone export carries visible grain, which is what lossy WebP cannot
-     compress. Error is flat from 750px down to 432px if it ever needs to shed
-     weight — 540px halves it for no measurable loss. */
+    So the vertical rhythm is quoted in `--pu` instead of px: 1px at 812svh and
+    proportionally less below it, which keeps the block at a constant 94% of
+    whatever height the browser actually leaves. `svh` (small viewport height)
+    is the state with the chrome SHOWING — the conservative one — so the fold
+    lands after Kiloverse even before the URL bar collapses.
+
+    Capped at 1px so tall phones get the design's own numbers rather than
+    inflated ones, and floored so a freak short window degrades instead of
+    collapsing to nothing.
+
+    Horizontal measures are NOT in this unit — the gutter, the logo pitch and
+    the pill padding all key off width, which svh knows nothing about.
+  */
+  :root {
+    --pu: clamp(0.62px, 0.12315svh, 1px);
+  }
+
+  /* One screen, exactly: the block ends where the phone's visible area does. */
+  .hero-bg {
+    min-height: 100svh;
+  }
+
+  /* The phone frame's own lighting export. The desktop image cannot be reused
+     here: it is a 16:9 frame, and stretched into a tall hero its vignette
+     closes in from the left and right and chokes the copy.
+
+     Built from `~/Documents/Mobile lightning.png` (640 x 1539, 175 KB): a black
+     vignette whose clear oval sits dead centre, PLUS the shafts of light
+     raking down from the top-left corner. Both belong to the phone frame.
+
+     A pass on 2026-08-19 swapped in a ray-less render (`lightning 1.png`) and
+     was reverted the same day — the rays are wanted. Do not re-drop them. The
+     heavier file is the price of that export's grain, which is exactly what
+     lossy WebP cannot compress. */
   .hero-light {
     background-image: url("/images/hero-light-mobile.webp");
   }
 
   .hero-grid {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='84' height='84' fill='url(%23g)' fill-opacity='0.5'/></svg>");
+    /* ONE TILE, exported from the phone frame (tile.png, 84 x 84 on the 90px
+       unit). Everything here is read off that file rather than reused from the
+       desktop tile:
+
+         fill      35% opacity, not 50% — the export's interior sits at
+                   alpha 89/255 across its whole face (min 88, max 90).
+         gradient  the same three Figma stops, but the handle is NOT the
+                   desktop's corner-to-corner 45deg. Fitting the exported tile
+                   (rms 0.035 over 6186 px) puts it at ~19deg below horizontal,
+                   entering at 33% height on the left and leaving at 68% on the
+                   right — a much flatter sweep, which is why the desktop
+                   vector read too dark down the left edge here.
+         corners   square. */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><defs><linearGradient id='g' x1='-0.011' y1='0.326' x2='1.031' y2='0.681'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='84' height='84' fill='url(%23g)' fill-opacity='0.35'/></svg>");
     background-size: 90px 90px;
-    /* Tile brightness follows the LIGHT, not the pattern: a third mask layer
-       lets the middle tiles (behind the hero copy) show at full strength and
-       dims the outer columns and corners toward black, per the phone frame —
-       a uniform fill read as a wall of equally-bright squares. */
-    /* THE GRID READS ACROSS THE WHOLE PHONE FRAME, not just behind the copy.
-       The radial used to fall to 12% by 72% out and 3% at the edge, so every
-       tile except the middle few was effectively erased and the field looked
-       flat. It now bottoms out at 45%, and the side feather is 6% instead of
-       12%, so the outer columns survive. Only the bottom ramp still goes to
-       nothing — that one is the hand-off to the next section, not lighting. */
-    -webkit-mask-image:
-      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
-      linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%),
-      radial-gradient(ellipse 88% 55% at 50% 32%, #000 0%, rgba(0, 0, 0, 0.85) 45%, rgba(0, 0, 0, 0.6) 72%, rgba(0, 0, 0, 0.45) 100%);
-    -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
-    -webkit-mask-size: 100% 100%, 100% 100%, 100% 100%;
-    -webkit-mask-position: 0 0, 0 0, 0 0;
-    -webkit-mask-composite: source-in, source-in;
-    mask-image:
-      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
-      linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%),
-      radial-gradient(ellipse 88% 55% at 50% 32%, #000 0%, rgba(0, 0, 0, 0.85) 45%, rgba(0, 0, 0, 0.6) 72%, rgba(0, 0, 0, 0.45) 100%);
-    mask-repeat: no-repeat, no-repeat, no-repeat;
-    mask-size: 100% 100%, 100% 100%, 100% 100%;
-    mask-position: 0 0, 0 0, 0 0;
-    mask-composite: intersect;
+    /* No lighting mask on the phone grid — it inherits the base rule's bottom
+       hand-off ramp and nothing else.
+
+       The three-layer mask that stood here (a vertical ramp, a side feather
+       and a radial "source") was painting light onto the tiles a second time.
+       The export above them already IS the vignette: opaque black at the
+       edges, open in the middle. Measured on lightning 1.png, its clear
+       centre sits dead centre (48% / 50%) — the corner-anchored radial that
+       was here traced a light the artwork does not have, and dimmed exactly
+       the tiles the design leaves lit. Desktop has worked this way all along;
+       this is the phone catching up. */
   }
 
-  /* Phone hero-bg: the desktop sources at the same darkness, but NO vignette
-     and the ramp's last stop is the page colour exactly — the vignette pushed
-     the hero's bottom edge below var(--bg) and the hand-off to the next
-     section showed as a hard line (an earlier, reported bug on phones). */
+  /* Phone hero-bg: A RAMP AND NOTHING ELSE.
+     The two radials that used to sit on top of it — a corner source and a
+     lift behind the headline — were hand-built stand-ins from the days before
+     hero-light-mobile.webp existed. Once the export went in they were
+     double-counting it: the same light, painted twice, at roughly twice the
+     strength the phone frame has. The corner one is why the top half of the
+     hero came back lavender rather than near-black.
+
+     The export is now the ONLY source on phones. Anything that emits light
+     here has to be in Mobile lightning.png, or it is inventing a light the
+     design does not have.
+
+     Still no vignette, and the ramp's last stop is the page colour exactly —
+     the vignette pushed the hero's bottom edge below var(--bg) and the
+     hand-off to the next section showed as a hard line (an earlier, reported
+     bug on phones). The ramp itself is darker than it was for the same reason
+     as the radials: the export carries the colour now. */
   .hero-bg {
-    background:
-      radial-gradient(
-        ellipse 62% 58% at 2% -10%,
-        rgba(214, 186, 255, 0.3) 0%,
-        rgba(166, 130, 246, 0.17) 24%,
-        rgba(120, 92, 196, 0.08) 48%,
-        transparent 76%
-      ),
-      radial-gradient(
-        ellipse 50% 32% at 50% 27%,
-        rgba(160, 124, 248, 0.1) 0%,
-        rgba(130, 98, 212, 0.05) 48%,
-        transparent 76%
-      ),
-      /* Darker ramp than desktop's: phones carry no vignette (see above), so
-         the base itself must sit near-black to match the phone frame. */
-      linear-gradient(
-        180deg,
-        #191234 0%,
-        #171031 12%,
-        #150e2c 24%,
-        #120c26 38%,
-        #0f0a1e 52%,
-        #0d0918 66%,
-        #0b0912 80%,
-        #000000 92%,
-        #000000 100%
-      );
+    background: linear-gradient(
+      180deg,
+      #0d0a1c 0%,
+      #0b0817 14%,
+      #090614 28%,
+      #070511 44%,
+      #05040c 60%,
+      #030207 78%,
+      #000000 92%,
+      #000000 100%
+    );
+  }
+
+  /* No centre pool on phones. .cta-glow is a 470px screen-blended ellipse
+     behind the CTA row — on a 400px-wide phone that is most of the field, and
+     the phone frame has nothing there: measured across Mobile lightning.png,
+     the whole lower half sits under 8/255 with no local maximum anywhere near
+     the buttons. The desktop frame does have that pool (it is composited into
+     hero-light.webp), which is why this is a phone-only removal. */
+  .cta-glow {
+    display: none;
   }
 }
 
