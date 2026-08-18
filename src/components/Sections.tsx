@@ -1054,7 +1054,12 @@ export function FinalCta() {
           {/* 24 from the sub to the first pill on phones, per the artboard —
               the 32 that stood here left the two CTAs floating away from the
               copy they answer. Desktop keeps its measured 44. */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 md:mt-11 md:gap-[1.75rem]">
+          {/* ONE TO ONE on phones: the two pills stack in a stretch column, so
+              they take the same width off the card rather than each sizing to
+              its own label — the scarcity line is much longer than the CTA and
+              the pair read as mismatched. From md up they go back to a centred
+              wrapping row, where each is content-sized. */}
+          <div className="mt-6 flex flex-col items-stretch gap-3 md:mt-11 md:flex-row md:flex-wrap md:items-center md:justify-center md:gap-[1.75rem]">
             {/*
               The creatives "Yes" pill's fill verbatim — the header's "Book a
               Call" gradient — so every primary CTA on the page reads as the
@@ -1071,19 +1076,22 @@ export function FinalCta() {
               href={BOOKING_URL}
               // Hover repeats the rest state's three stop positions in white so
               // the fill can interpolate instead of snapping at the halfway point.
-              className="group inline-flex h-[2.625rem] items-center gap-2 rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
+              className="group inline-flex h-[2.625rem] items-center justify-between gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
             >
               {FINAL_CTA.cta}
-              <span className="flex size-[2.125rem] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[2.5rem]">
+              {/* 30 across on the phone, inset 6 from the pill's right edge —
+                  which is the same 6 it gets top and bottom from 42 - 30. */}
+              <span className="flex size-[1.875rem] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[2.5rem]">
                 {/* The house arrow (see the creatives pill): a 15-unit arrow
                     in a 17-unit viewBox, the extra unit each side being the
                     stroke's overhang. So the box has to render at 17/15 of the
-                    size the arrow is specified at — 14 x 17/15 = 15.87 here.
-                    Rendering the box itself at 14 would draw a 12.4 arrow. */}
+                    size the arrow is specified at — the phone's 10 x 10 arrow
+                    needs an 11.33 box, desktop's 14 needs 15.87. Rendering the
+                    box at the arrow's own size draws it 12% short. */}
                 <svg
                   viewBox="0 0 17 17"
                   fill="none"
-                  className="size-[0.8125rem] stroke-current md:size-[0.991875rem]"
+                  className="size-[0.70833rem] stroke-current md:size-[0.991875rem]"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -1097,7 +1105,7 @@ export function FinalCta() {
             {/* Flat white at 20% over the card — no border and no tinted fill
                 of its own. Same 60 tall and radius 36 as the primary, label
                 Poppins Regular 26. */}
-            <span className="inline-flex h-[2.8125rem] items-center rounded-full bg-white/20 px-6 text-[1rem] font-normal text-white md:h-[3.75rem] md:rounded-[2.25rem] md:px-[1.75rem] md:text-[1.625rem]">
+            <span className="inline-flex h-[2.625rem] items-center justify-center rounded-full bg-white/20 px-6 text-[1rem] font-normal text-white md:h-[3.75rem] md:rounded-[2.25rem] md:px-[1.75rem] md:text-[1.625rem]">
               {FINAL_CTA.scarcity}
             </span>
           </div>
