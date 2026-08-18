@@ -190,6 +190,14 @@
   --radius-chip: 5px;
   --radius-pill: 100px;
 
+  /* The testimonials reveal, in one place so the clip, the pill's clearance
+     and the fade cannot drift apart. Opening is the long easeOutExpo settle;
+     closing is shorter and firmer. See .testi-clip. */
+  --testi-open: 1500ms;
+  --testi-open-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --testi-close: 900ms;
+  --testi-close-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
   /* Side gutter: 15 on phones (Žilvinas 2026-08-11), the design's measured 20
      from md up. A token rather than a literal because the creatives rail is
      full-bleed and has to reproduce this exact edge to line its first card up
@@ -981,10 +989,11 @@ body {
      and this number is the only thing holding the cut where the design puts
      it. */
   max-height: 956px;
-  /* 1100ms, up from 700. On a block that grows ~1100px the shorter curve still
-     covered a lot of distance per frame early on and read as a snap with a
-     tail rather than a reveal. */
-  transition: max-height 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* The BASE rule's transition is the one that runs on the way back, because a
+     transition is read off the state being moved TO. Closing wants to be a
+     touch quicker and more decisive than opening — a long settle on the way
+     down reads as the section sagging. */
+  transition: max-height var(--testi-close) var(--testi-close-ease);
 }
 
 @media (min-width: 1024px) {
@@ -1003,13 +1012,27 @@ body {
    settling — the copy underneath is readable while the container is still
    moving, which is what stops the reveal feeling like it lags. */
 .testi-fade {
-  transition: opacity 650ms ease-out;
+  transition: opacity 700ms var(--testi-close-ease);
+}
+
+.testi-wrap:has(details[open]) .testi-fade {
+  /* Still shorter than the growth, so the copy underneath is readable while
+     the container is finishing its settle — that is what stops the reveal
+     feeling like it lags — but on the opening curve, so the two start
+     together rather than the fade jumping ahead. */
+  transition: opacity 900ms var(--testi-open-ease);
 }
 
 /* `:has` on the wrapper, so the open state reaches back up to a sibling the
    <details> does not contain. No JS, no state, no hydration. */
 .testi-wrap:has(details[open]) .testi-clip {
   max-height: max-content;
+  /* Opening: 1500ms on an easeOutExpo. Almost all of the distance is covered
+     in the first third and the rest is a long, slowing settle, which is what
+     makes a block this tall read as unfolding rather than as a jump with a
+     tail. Everything that moves with it — the wrapper's padding, the fade —
+     runs on this same pair so nothing arrives early or drifts. */
+  transition: max-height var(--testi-open) var(--testi-open-ease);
 }
 
 .testi-wrap:has(details[open]) .testi-fade {
@@ -1033,13 +1056,20 @@ body {
   that used to be `mt-8`, so the open position is unchanged to the pixel.
 */
 .testi-wrap {
-  --pill-h: 3.875rem;
+  --pill-h: 3rem;
   padding-bottom: 0;
-  transition: padding-bottom 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: padding-bottom var(--testi-close) var(--testi-close-ease);
+}
+
+@media (min-width: 768px) {
+  .testi-wrap {
+    --pill-h: 3.875rem;
+  }
 }
 
 .testi-wrap:has(details[open]) {
   padding-bottom: calc(var(--pill-h) + 2.5rem);
+  transition: padding-bottom var(--testi-open) var(--testi-open-ease);
 }
 
 /* Tailwind v4 preflight sets cursor:default on buttons; restore the pointer. */

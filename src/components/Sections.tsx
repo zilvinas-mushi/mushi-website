@@ -871,9 +871,11 @@ export function Testimonials() {
               the 0.5rem it sits above the wrapper's edge.
 
               Its height is explicit at every width, not just from md, because
-              that padding is calculated from it.
+              that padding is calculated from it: 48 on the phone (the
+              artboard's 293 x 48) and the desktop's own 3.875rem above md.
+              --pill-h in globals.css carries the same two values.
             */}
-            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex h-[3.875rem] w-fit cursor-pointer list-none items-center justify-center gap-2.5 rounded-[var(--radius-pill)] bg-[#222222] py-0 pl-3 pr-3 shadow-[0_1.25rem_3.125rem_-1rem_rgba(0,0,0,0.9)] md:w-[37.125rem] md:gap-4 [&::-webkit-details-marker]:hidden">
+            <summary className="group/pill absolute inset-x-0 bottom-2 z-10 mx-auto flex h-12 w-fit cursor-pointer list-none items-center justify-center gap-2.5 rounded-[var(--radius-pill)] bg-[#222222] py-0 pl-3 pr-3 shadow-[0_1.25rem_3.125rem_-1rem_rgba(0,0,0,0.9)] md:h-[3.875rem] md:w-[37.125rem] md:gap-4 [&::-webkit-details-marker]:hidden">
               {/* Named in TESTIMONIALS.pillAvatars, not sliced off the top of
                   `items` — see the note there. */}
               <span aria-hidden="true" className="flex -space-x-3">
