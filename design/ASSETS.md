@@ -112,6 +112,29 @@ inside `@media (max-width: 767px)`. Source `~/Documents/tile.png`.
 - Square corners, 84 on a 90px unit — the 1px black frame in the PNG is the
   export's edge, not a stroke.
 
+## `cta-card-phone.webp` — hand-exported 2026-08-19
+
+The whole face of the final-CTA card on phones, as one image: the #1E0A38 fill
+ramp, the streaks, the light at the bottom edge and the violet edge stroke.
+Used by `.cta-card` inside `@media (max-width: 767px)`, which no longer builds
+any of that in CSS — the `::after` ring went with it. Desktop still uses the
+CSS build (`cta-streaks.svg` over a #1d0937 ramp) and its own flat border.
+
+- Source `~/Documents/phone last section background.png`, 1380 x 1280 RGBA =
+  **4x the 345 x 320 phone card**.
+- **Shipped flat, composited over #000, no alpha.** The card only ever sits on
+  the page's black, so the baked rounded corners come out black on black and
+  the encoder gets no alpha plane to bleed. The source is semi-transparent
+  almost everywhere (mean alpha 131) — the fill is #1E0A38 at ~50% and the
+  ramp lives in the ALPHA, not the colour, so do not read the RGB alone.
+- **1380 x 1280 at q92, 19 KB.** Smooth ramps and soft streaks are cheap, so
+  full size costs nothing worth trading; rms error against the source is 1.1.
+  The worst pixel (40/255) is on the antialiased corner where the ring meets
+  transparency, which lands on black either way.
+- The source's top edge carries a band of RGB noise. It is all in pixels of
+  alpha 1-8, so over black it is a handful of levels and disappears in the
+  encode. Nothing to repair.
+
 ## Largest images
 
 These dominate page weight — lazy-load any that sit below the fold, and give every

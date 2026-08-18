@@ -823,33 +823,27 @@ body {
   text-box: trim-both cap alphabetic;
 }
 
-/* Phone: the card's 1px inside stroke is a gradient, not a flat colour —
-   #6E54B5 solid along the TOP edge, fading to nothing by the bottom. Note it
-   runs the opposite way to the fill above, whose light rises from the bottom;
-   the two crossing ramps are what give the phone card its shape.
+/* Phone: the whole card face is ONE exported image rather than a stack of CSS
+   layers — `~/Documents/phone last section background.png`, the artboard's own
+   render. Fill ramp, streaks, the light pooling at the bottom and the violet
+   edge stroke are all in it, and they no longer have to be reproduced (and
+   kept in sync) three different ways.
 
-   Painted as a masked ring because border-color cannot hold a gradient and
-   border-image breaks on rounded corners — the same technique as
-   .fade-border. From md up the flat violet border on the element takes over
-   and this is switched off. */
+   It replaces the CSS build that stood here: the streak SVG + #1d0937 ramp
+   from the base rule, and a masked 1px ring drawn as ::after because
+   border-color cannot hold a gradient. That ring is baked into the artwork
+   now, so the pseudo-element is gone with it. Desktop is untouched — it keeps
+   the CSS build and its own flat violet border.
+
+   Shipped FLAT, no alpha: the card only ever sits on the page's black, so the
+   export is composited over #000 and its rounded corners come out black on
+   black. 1380 x 1280 (4x the 345 x 320 card) at q92, 19 KB — the artwork is
+   smooth ramps plus soft streaks, which is cheap to encode at full size, so
+   there was no reason to hand a retina phone anything less. */
 @media (max-width: 767px) {
-  .cta-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      180deg,
-      #6e54b5 0%,
-      rgba(110, 84, 181, 0) 100%
-    );
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+  .cta-card {
+    background: url("/images/cta-card-phone.webp") center / 100% 100% no-repeat,
+      var(--bg);
   }
 }
 

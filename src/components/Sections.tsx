@@ -929,8 +929,12 @@ export function FinalCta() {
           </h2>
 
           {/* 24/30 Regular, white at 50%. mt-6 is the measured 24 from the
-              heading's last line box. */}
-          <p className="mt-6 text-[0.875rem] font-normal leading-[1.1875rem] text-white/50 md:text-[1.5rem] md:leading-[1.875rem]">
+              heading's last line box.
+
+              Phone leading is 15 on 14 — tighter than the type is tall, so the
+              three lines read as one block against the heading above them
+              rather than as three separate sentences. */}
+          <p className="mt-6 text-[0.875rem] font-normal leading-[0.9375rem] text-white/50 md:text-[1.5rem] md:leading-[1.875rem]">
             {/* Three lines on the phone, one sentence each. From md up the
                 first two go inline and share a line, which is the reference's
                 desktop break — the trailing space only shows once they do. */}
