@@ -383,7 +383,10 @@ export function Creatives() {
         <div className="flex items-center justify-between gap-6">
           <h2
             id="creatives-heading"
-            className="text-[1.5rem] font-semibold tracking-tight md:text-[3rem]"
+            // 24/20 on the phone, straight off the design — the default 1.5
+            // body leading pushed the two lines apart. Desktop keeps the
+            // inherited 1.5 it was already rendering with.
+            className="text-[1.5rem] font-semibold leading-[1.25rem] tracking-tight md:text-[3rem] md:leading-normal"
           >
             {CREATIVES.heading}
           </h2>
