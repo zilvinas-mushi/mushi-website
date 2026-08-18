@@ -1056,12 +1056,13 @@ export function FinalCta() {
           {/* 24 from the sub to the first pill on phones, per the artboard —
               the 32 that stood here left the two CTAs floating away from the
               copy they answer. Desktop keeps its measured 44. */}
-          {/* ONE TO ONE on phones: the two pills stack in a stretch column, so
-              they take the same width off the card rather than each sizing to
-              its own label — the scarcity line is much longer than the CTA and
-              the pair read as mismatched. From md up they go back to a centred
-              wrapping row, where each is content-sized. */}
-          <div className="mt-6 flex flex-col items-stretch gap-3 md:mt-11 md:flex-row md:flex-wrap md:items-center md:justify-center md:gap-[1.75rem]">
+          {/* Phones stack the two pills in a centred column; each is sized by
+              its own label, so the fit-check pill comes out a little narrower
+              than the scarcity line, which is the artboard. Stretching both to
+              one width was tried and is wrong — it blows the CTA out to the
+              longest string on the card. From md up they go back to a centred
+              wrapping row. */}
+          <div className="mt-6 flex flex-col items-center gap-3 md:mt-11 md:flex-row md:flex-wrap md:justify-center md:gap-[1.75rem]">
             {/*
               The creatives "Yes" pill's fill verbatim — the header's "Book a
               Call" gradient — so every primary CTA on the page reads as the
@@ -1078,14 +1079,13 @@ export function FinalCta() {
               href={BOOKING_URL}
               // Hover repeats the rest state's three stop positions in white so
               // the fill can interpolate instead of snapping at the halfway point.
-              className="group inline-flex h-[2.625rem] items-center justify-center gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] px-6 text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
+              className="group inline-flex h-[2.625rem] items-center gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
             >
               {FINAL_CTA.cta}
-              {/* 30 across on the phone. It travels WITH the label — the pair
-                  is centred as one group, 15 apart — rather than being pinned
-                  to the pill's right edge: the pill is stretched to the
-                  scarcity line's width now, so pinning it left a canyon
-                  between the two. */}
+              {/* 30 across on the phone, 15 after the label, inset 6 from the
+                  pill's right edge — the same 6 it gets top and bottom from
+                  42 - 30. The pill is content-sized, so those three numbers
+                  are all there is to its width. */}
               <span className="flex size-[1.875rem] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[2.5rem]">
                 {/* The house arrow (see the creatives pill): a 15-unit arrow
                     in a 17-unit viewBox, the extra unit each side being the
