@@ -166,27 +166,40 @@ export function CreativeVideo({
 
       // TWO thresholds, not one, and they are deliberately not the same number.
       //
-      // Starting needs 0.55: a card half-clipped at the edge of the rail is
-      // not something anyone is watching, and arming it would spend bandwidth
-      // on a creative that is about to slide back out.
+      // Starting needs 0.35. It was 0.55, which meant a card scrolling up
+      // from below the fold had to be more than half past it before anything
+      // moved — you were already looking at a still. A third of the card is
+      // enough to mean "this is on screen" while still excluding the slivers
+      // at the rail's edges.
       //
       // STOPPING, though, waits until the card is completely gone. With a
-      // single 0.55 threshold the card stops the instant it dips below
-      // 55% — so unmuting an ad and then nudging the page a little killed the
+      // single shared threshold the card stops the instant it dips below
+      // it — so unmuting an ad and then nudging the page a little killed the
       // sound, which reads as "the sound button does not work" rather than as
       // a scroll side effect. These cards are ~530px tall; on a laptop a small
       // scroll crosses 55% easily. Hysteresis is the fix: loud and playing is
       // a state you have to scroll fully past to leave.
-      // WARM: arm the card before it arrives. Same "nothing on page load"
-      // guarantee — this still fires only from scroll position, never at
-      // load — but it buys the file a head start of roughly one card, which
-      // is the difference between stepping onto moving video and stepping
-      // onto a poster that has not started downloading yet.
+      // WARM: arm the card well before it arrives.
+      //
+      // The vertical margin is a viewport and a half, not a token 200px. The
+      // rail sits far down the page, so the meaningful head start is measured
+      // in SCREENS of scrolling, not pixels: at ~1 Mbps a card needs a second
+      // or two of lead to have its opening buffered, and 200px of warning is
+      // a fraction of one flick of the wheel. This is what makes the ads
+      // already be moving when the section arrives rather than starting to
+      // fetch as you land on it.
+      //
+      // It stays honest about page load — the observer fires from scroll
+      // position, never at load, and the section is nowhere near the first
+      // screen. It also cannot run away horizontally: the rail is
+      // overflow-hidden, so the only cards this can reach are the two or
+      // three actually inside the clip box. The rest still wait their turn
+      // in the sequence.
       warm = new IntersectionObserver(
         (entries) => {
           if (entries[entries.length - 1].isIntersecting) arm();
         },
-        { rootMargin: "200px 400px" },
+        { rootMargin: "150% 400px" },
       );
       warm.observe(el);
 
@@ -195,7 +208,7 @@ export function CreativeVideo({
           const v = ref.current;
           if (!v) return;
           const ratio = entries[entries.length - 1].intersectionRatio;
-          if (ratio >= 0.55) {
+          if (ratio >= 0.35) {
             arm();
             void v.play().catch(() => {});
           } else if (ratio <= 0) {
@@ -203,7 +216,7 @@ export function CreativeVideo({
             if (audible === token.current) claimAudio(null);
           }
         },
-        { threshold: [0, 0.55] },
+        { threshold: [0, 0.35] },
       );
       io.observe(el);
     });
