@@ -556,6 +556,27 @@ box therefore renders at 17/15 of the size the arrow is specified at — 14 ×
 17/15 = **15.87** here. Rendering the box itself at 14 would draw a 12.4 arrow,
 the same trap the creatives pill documents.
 
+## Footer band
+
+From Figma node `4167:280` ("Footer desktop", 1920 × 425), pulled 2026-08-19.
+Two values here are new to this file and are **not** in the palette above:
+
+| Token | Hex | Use |
+| --- | --- | --- |
+| footer band | `#121212` | The 1920 × 425 plate behind the whole footer, on both frames |
+| footer rule | `#808080` | The 1380-wide hairline over the bottom bar |
+
+`#121212` is a shade off the page's `#000000` — that separation is the point,
+so do not collapse it into `--bg`. The footer's tiles and field reuse `#222222`,
+the same tone as the hero panels' inner boxes.
+
+The footer's radii are **10** (field, button, social tiles), which is not one of
+the house values above — it is the one-off this frame uses throughout, so it is
+consistent within the footer even though it is inconsistent with the site.
+
+Full spec, including every measured position, is in
+[SECTIONS.md](SECTIONS.md#footer--desktop).
+
 ## Open questions
 
 - Client logo SVGs (Holo especially) — see "Client logotypes".

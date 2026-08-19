@@ -286,7 +286,12 @@ export function SiteFooter() {
                  links' #808080, which is the artboard's own distinction, so
                  this one cannot share LINK's colour. */
               href={`mailto:${CONTACT_EMAIL}`}
-              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-dim mt-[1.53125rem] block text-[1.125rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
+              /* The phone artboard sets the address #8E8E8E, a step lighter
+                 than its column links; the DESKTOP node `4134:617` sets it
+                 #808080, the same as everything else in its columns. Two
+                 frames, two values — hence the md: override rather than one
+                 shared colour. */
+              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-muted mt-[1.53125rem] block text-[1.125rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
             >
               {CONTACT_EMAIL}
             </a>
