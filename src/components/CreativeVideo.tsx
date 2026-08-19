@@ -115,22 +115,33 @@ export function CreativeVideo({
       const el = ref.current;
       if (!el) return;
 
-      // Threshold rather than any-sliver: a card half-clipped at the edge of
-      // the rail is not something anyone is watching, and arming it would
-      // spend bandwidth on a creative that is about to slide back out.
+      // TWO thresholds, not one, and they are deliberately not the same number.
+      //
+      // Starting needs 0.55: a card half-clipped at the edge of the rail is
+      // not something anyone is watching, and arming it would spend bandwidth
+      // on a creative that is about to slide back out.
+      //
+      // STOPPING, though, waits until the card is completely gone. With a
+      // single 0.55 threshold the card stops the instant it dips below
+      // 55% — so unmuting an ad and then nudging the page a little killed the
+      // sound, which reads as "the sound button does not work" rather than as
+      // a scroll side effect. These cards are ~530px tall; on a laptop a small
+      // scroll crosses 55% easily. Hysteresis is the fix: loud and playing is
+      // a state you have to scroll fully past to leave.
       io = new IntersectionObserver(
-        ([entry]) => {
+        (entries) => {
           const v = ref.current;
           if (!v) return;
-          if (entry.isIntersecting) {
+          const ratio = entries[entries.length - 1].intersectionRatio;
+          if (ratio >= 0.55) {
             arm();
             void v.play().catch(() => {});
-          } else {
+          } else if (ratio <= 0) {
             v.pause();
             if (audible === token.current) claimAudio(null);
           }
         },
-        { threshold: 0.55 },
+        { threshold: [0, 0.55] },
       );
       io.observe(el);
     });
@@ -153,9 +164,33 @@ export function CreativeVideo({
   const toggleSound = () => {
     const v = arm();
     if (!v) return;
-    claimAudio(audible === token.current ? null : token.current);
-    // Unmuting a card the observer has paused should also resume it.
-    if (v.paused) void v.play().catch(() => {});
+    const wantSound = audible !== token.current;
+    claimAudio(wantSound ? token.current : null);
+    if (!wantSound) return;
+
+    // Order matters: unmute FIRST (done by claimAudio above), then play.
+    // A browser that dislikes a muted-autoplay stream turning audible refuses
+    // by PAUSING the element, so the resume has to come after the unmute, and
+    // it has to happen inside this click — the click is the user activation
+    // that makes it legal. Asking in the other order just gets paused again.
+    //
+    // If it is refused anyway, hand the token back rather than leaving a
+    // speaker icon on a silent card. The play promise is the signal for that,
+    // not a rAF probe: rAF callbacks are frozen in a background tab, which is
+    // exactly a case where playback will not start.
+    void v.play().then(
+      () => {},
+      (err: DOMException) => {
+        // ONLY a refusal costs the card its sound. An AbortError means some
+        // other play()/pause() overtook this one — the observer arming this
+        // very element does exactly that — and treating it as a refusal would
+        // silently undo the tap the visitor just made, which is worse than
+        // the lying icon this guard exists to prevent.
+        if (err?.name === "NotAllowedError" && audible === token.current) {
+          claimAudio(null);
+        }
+      },
+    );
   };
 
   const showPlay = manual && !started;
@@ -196,40 +231,63 @@ export function CreativeVideo({
         }`}
       />
 
-      {showPlay ? (
-        <button
-          type="button"
-          onClick={start}
-          aria-label={`Play ${alt}`}
-          className="absolute inset-0 grid place-items-center focus-visible:outline-none"
-        >
-          <span className="grid size-14 place-items-center rounded-full bg-black/55 text-white backdrop-blur-sm transition duration-200 ease-out hover:bg-black hover:scale-105 active:scale-95">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="size-6 translate-x-px" aria-hidden="true">
-              <path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14Z" />
-            </svg>
+      {/*
+        ONE control, and it is the whole ad — not a disc in the corner.
+        Tapping the video is how sound is turned on everywhere this card is
+        pretending to be (Instagram, TikTok, Reels), so it is the gesture
+        people actually try first. A 32px target in the corner was the entire
+        control before, and missing it is indistinguishable from the sound
+        being broken.
+
+        The disc below is therefore an INDICATOR that happens to sit inside
+        the button, not a button of its own — nesting a second button inside
+        this one would be invalid markup, and giving it its own handler would
+        leave two hit areas that disagree about what a tap means.
+      */}
+      <button
+        type="button"
+        onClick={showPlay ? start : toggleSound}
+        aria-label={
+          showPlay
+            ? `Play ${alt}`
+            : sound
+              ? `Turn sound off — ${alt}`
+              : `Turn sound on — ${alt}`
+        }
+        aria-pressed={showPlay ? undefined : sound}
+        className="group absolute inset-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
+      >
+        {showPlay ? (
+          <span className="absolute inset-0 grid place-items-center">
+            <span className="grid size-14 place-items-center rounded-full bg-black/55 text-white backdrop-blur-sm transition duration-200 ease-out hover:bg-black hover:scale-105">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="size-6 translate-x-px" aria-hidden="true">
+                <path d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.29-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14Z" />
+              </svg>
+            </span>
           </span>
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={toggleSound}
-          aria-label={sound ? `Mute ${alt}` : `Unmute ${alt}`}
-          aria-pressed={sound}
-          className="absolute bottom-2.5 right-2.5 grid size-8 place-items-center rounded-full bg-black/45 text-white backdrop-blur-sm transition duration-200 ease-out hover:bg-black active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-        >
-          {sound ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="size-4" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 8.5H3v7h3.5L11 19V5Z" />
-              <path strokeLinecap="round" d="M15 9.5a3.5 3.5 0 0 1 0 5M17.8 7a7 7 0 0 1 0 10" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="size-4" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 8.5H3v7h3.5L11 19V5Z" />
-              <path strokeLinecap="round" d="m15.5 9.5 5 5m0-5-5 5" />
-            </svg>
-          )}
-        </button>
-      )}
+        ) : (
+          // Bigger and darker than the first pass: this sits over ad footage
+          // that is frequently light, and at 32px on black/45 it disappeared
+          // into whatever was behind it.
+          <span
+            aria-hidden="true"
+            className="absolute bottom-2.5 right-2.5 grid size-9 place-items-center rounded-full bg-black/60 text-white shadow-sm ring-1 ring-white/20 backdrop-blur-sm transition duration-200 ease-out group-hover:bg-black"
+          >
+            {sound ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="size-[1.125rem]" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 8.5H3v7h3.5L11 19V5Z" />
+                <path strokeLinecap="round" d="M15 9.5a3.5 3.5 0 0 1 0 5M17.8 7a7 7 0 0 1 0 10" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="size-[1.125rem]" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 8.5H3v7h3.5L11 19V5Z" />
+                <path strokeLinecap="round" d="m15.5 9.5 5 5m0-5-5 5" />
+              </svg>
+            )}
+          </span>
+        )}
+      </button>
+
     </div>
   );
 }

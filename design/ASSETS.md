@@ -135,6 +135,50 @@ CSS build (`cta-streaks.svg` over a #1d0937 ramp) and its own flat border.
   alpha 1-8, so over black it is a handful of levels and disappears in the
   encode. Nothing to repair.
 
+## `public/videos/` — the four film creatives, added 2026-08-19
+
+Five of the ten creatives in the rail are films, not stills. The masters came
+from the client as 1080 x 1920 delivery files at 8-15 Mbps; those are 381 MB
+across the five and cannot ship. They are transcoded to **720 x 1280, H.264
+CRF 28, 30 fps, AAC 96k, `+faststart`** — 29 MB across the five, a 92% cut,
+at roughly 1 Mbps each, which is about what Instagram itself serves.
+
+| file | poster (`public/images/`) | card | source master |
+| --- | --- | --- | --- |
+| `sintra-soshie-ad.mp4` | `sintra-soshie-ad.webp` | sintra.ai — AI Agents Comparison | `TOF_502_SocialMedia_FounderEcommerce_Non-UGC_VAR3_...mp4` |
+| `tryholo-10x.mp4` | `tryholo-10x.webp` | tryholo.ai — AI Marketing UGC | `030_EN_Video_AIUGC_FireYourAgencyIteration_...Var3.mp4` |
+| `celemi-serum.mp4` | `celemi-serum.webp` | celemi — Serum Product | `EN Celemi Advertisment 001 (be modelio).mp4` |
+| `used-by-10000.mp4` | `used-by-10000.webp` | PersyBooths — Booth Storytelling | `001_Video_WhatMakesAnOfficeGreat__PersyONE_Var1.mp4` |
+| `dogfood-real-results.mp4` | `dogfood-real-results.webp` | SuperiorCarePet — Dog Food Voiceover | `001_Video_Care_Aistė&Danielis_Var1.mp4` |
+
+**Every pairing was verified by rendering frames out of the master and matching
+them against the poster**, not inferred from the filenames — the two `sintra.ai`
+cards and the two `celemi` cards are each other's obvious mis-assignment, and
+the file names do not distinguish them. The Soshie laptop shot is a real frame
+of `TOF_502` at ~4 s; the Celemi card is the *serum* one (`FACE AND NECK
+HYDRATION`), not the pouch.
+
+**720 wide is deliberate and is not padding.** The card renders ~300 CSS px, so
+this is 2.4x — enough that a 2x display still has pixels to spare. The section
+asks "Want Creatives This Premium?", so it is the one place where compressing
+until the small type in an ad goes soft would undercut the copy. A frame check
+at 720 keeps the Sintra nav bar (`Helpers / Pricing / Add-ons / Support`)
+legible and the flat purple gradient free of banding.
+
+`+faststart` matters as much as the size: the `moov` atom sits ahead of `mdat`
+in all five, so the browser streams only the part it plays. A visitor who
+watches four seconds costs four seconds of video, not the whole file — which is
+what makes autoplay-on-scroll affordable. See `CreativeVideo.tsx` for why
+nothing is fetched at all until a card is on screen.
+
+To re-encode from a new master:
+
+```sh
+ffmpeg -i IN.mp4 -vf "scale=720:1280:flags=lanczos" -r 30 \
+  -c:v libx264 -profile:v high -crf 28 -preset slow -pix_fmt yuv420p \
+  -c:a aac -b:a 96k -movflags +faststart -y public/videos/OUT.mp4
+```
+
 ## Largest images
 
 These dominate page weight — lazy-load any that sit below the fold, and give every
