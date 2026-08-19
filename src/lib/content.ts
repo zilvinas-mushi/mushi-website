@@ -807,7 +807,7 @@ export const FOOTER = {
   emailCta: "Redeem",
   columns: [
     {
-      title: "Products",
+      title: "Product",
       links: [
         { label: "500+ Static Templates", href: "#templates" },
         { label: "Agency Services", href: "#agency" },
@@ -822,11 +822,17 @@ export const FOOTER = {
   /** 4.9 is the score the awards row already carries — see TrustBadges. */
   trustpilot: { label: "Trustpilot", score: "4.9" },
   /** The bottom bar. Right-aligned as a cluster, per the reference. */
+  /**
+   * Artboard order (phone node 4167:278), which the desktop bottom bar shares:
+   * the two render the same array, so this sequence is the one that shows in
+   * both places. Money-Back first is deliberate, not a sort.
+   */
   legal: [
-    { label: "Privacy Policy", href: "#privacy" },
+    { label: "Money-Back Guarantee", href: "#guarantee" },
     { label: "Terms & Conditions", href: "#terms" },
     { label: "Refund Policy", href: "#refund" },
-    { label: "Money-Back Guarantee", href: "#guarantee" },
+    { label: "Privacy Policy", href: "#privacy" },
   ],
-  copyright: "Copyright \u00a9 2026 All Rights Reserved",
+  /** Verbatim from the phone artboard — comma, no (c). */
+  copyright: "Copyright 2026, All Rights Reserved",
 } as const;

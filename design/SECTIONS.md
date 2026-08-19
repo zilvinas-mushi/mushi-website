@@ -215,12 +215,11 @@ share of the TILE height so each keeps its own aspect ratio. Facebook is the one
 with a knockout — a disc in `currentColor` with the "f" cut out of it in
 `var(--tile)` — so the letter survives the inversion either way round.
 
-Two knowing differences from the artboard, both content rather than layout:
-
-- The artboard's legal order is Money-Back / Terms / Refund / Privacy; the deck
-  (`FOOTER.legal`) is the reverse-ish order the desktop bar uses. One array
-  feeds both, so the phone group follows the deck.
-- The artboard says PRODUCT, the deck says PRODUCTS.
+The deck now matches the artboard verbatim (Žilvinas 2026-08-19): the group is
+PRODUCT not PRODUCTS, the legal order is Money-Back / Terms / Refund / Privacy,
+and the copyright reads "Copyright 2026, All Rights Reserved" — comma, no (c).
+The desktop bottom bar renders the same `FOOTER.legal` array, so it took the
+phone's order with it.
 
 The legal links are rendered TWICE — a `md:hidden` group in the column stack for
 the phone, and the `hidden md:block` cluster in the desktop bottom bar. They sit
