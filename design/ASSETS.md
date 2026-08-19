@@ -168,8 +168,15 @@ legible and the flat purple gradient free of banding.
 `+faststart` matters as much as the size: the `moov` atom sits ahead of `mdat`
 in all five, so the browser streams only the part it plays. A visitor who
 watches four seconds costs four seconds of video, not the whole file — which is
-what makes autoplay-on-scroll affordable. See `CreativeVideo.tsx` for why
-nothing is fetched at all until a card is on screen.
+what makes autoplay-on-scroll affordable.
+
+Nothing is fetched at page load; a card fetches when the visitor nears it, and
+each playing card hands a head start to the NEXT film in the rail. That
+one-card lookahead is not decoration — without it the later cards began
+downloading at the exact moment you stepped onto them, so they sat on their
+poster long enough to look broken. It cannot be done with `rootMargin`, because
+the rail is `overflow-hidden` and the spec clips intersection by ancestor
+overflow no matter how wide the margin. See `CreativeVideo.tsx`.
 
 To re-encode from a new master:
 

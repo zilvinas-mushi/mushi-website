@@ -20,6 +20,19 @@ type Token = symbol | null;
 const listeners = new Set<(t: Token) => void>();
 let audible: Token = null;
 
+/**
+ * The film cards in rail order, each entry its own `arm`. Effects run in tree
+ * order, so pushing on mount produces the sequence the visitor walks through.
+ *
+ * This exists because the rail CLIPS. `rootMargin` on an IntersectionObserver
+ * widens the root, but the spec still clips the intersection by every ancestor
+ * overflow — and the rail is `overflow-hidden` — so a card parked off to the
+ * right reports zero intersection no matter how generous the margin. Warming
+ * the next card therefore cannot come from geometry; it has to come from the
+ * sequence itself.
+ */
+const sequence: Array<() => void> = [];
+
 function claimAudio(next: Token) {
   audible = next;
   for (const notify of listeners) notify(next);
@@ -72,13 +85,48 @@ export function CreativeVideo({
   const [manual, setManual] = useState(false);
   const [started, setStarted] = useState(false);
 
-  /** Attaches the source on first use. Until this runs, nothing is fetched. */
+  /**
+   * Attaches the source and starts buffering. Until this runs, nothing is
+   * fetched at all — which is the whole reason `preload` starts at "none".
+   *
+   * It is lifted to "auto" HERE rather than left alone, because a src on a
+   * preload="none" element still downloads nothing; the bytes only start
+   * moving on play(). That is what made the cards late in the rail look
+   * broken: each one began downloading at the exact moment you arrived at it,
+   * so you sat watching a poster while it fetched from cold. Arming early
+   * (see the warm observer) plus preload="auto" is what turns that into video
+   * that is already playable when the card lands.
+   */
   const arm = useCallback(() => {
     const v = ref.current;
     if (!v) return null;
-    if (!v.getAttribute("src")) v.setAttribute("src", `/videos/${video}`);
+    if (!v.getAttribute("src")) {
+      v.setAttribute("src", `/videos/${video}`);
+      v.preload = "auto";
+      v.load();
+    }
     return v;
   }, [video]);
+
+  // Position in the rail, so this card can hand a head start to the next one.
+  useEffect(() => {
+    sequence.push(arm);
+    return () => {
+      const i = sequence.indexOf(arm);
+      if (i >= 0) sequence.splice(i, 1);
+    };
+  }, [arm]);
+
+  /**
+   * Give the NEXT film card its bytes. Called when this one actually starts
+   * playing — not when it merely arms — so the lookahead follows the visitor
+   * one card at a time instead of chaining through the whole rail and
+   * prefetching every film at once.
+   */
+  const warmNext = useCallback(() => {
+    const i = sequence.indexOf(arm);
+    if (i >= 0 && i + 1 < sequence.length) sequence[i + 1]();
+  }, [arm]);
 
   // Sound subscription: one card holds the token, every other card mutes.
   useEffect(() => {
@@ -102,6 +150,7 @@ export function CreativeVideo({
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let io: IntersectionObserver | undefined;
+    let warm: IntersectionObserver | undefined;
 
     // Deferred a frame for the same reason CreativesRail defers its own
     // enhancement flag: setting state synchronously in an effect body trips
@@ -128,6 +177,19 @@ export function CreativeVideo({
       // a scroll side effect. These cards are ~530px tall; on a laptop a small
       // scroll crosses 55% easily. Hysteresis is the fix: loud and playing is
       // a state you have to scroll fully past to leave.
+      // WARM: arm the card before it arrives. Same "nothing on page load"
+      // guarantee — this still fires only from scroll position, never at
+      // load — but it buys the file a head start of roughly one card, which
+      // is the difference between stepping onto moving video and stepping
+      // onto a poster that has not started downloading yet.
+      warm = new IntersectionObserver(
+        (entries) => {
+          if (entries[entries.length - 1].isIntersecting) arm();
+        },
+        { rootMargin: "200px 400px" },
+      );
+      warm.observe(el);
+
       io = new IntersectionObserver(
         (entries) => {
           const v = ref.current;
@@ -149,6 +211,7 @@ export function CreativeVideo({
     return () => {
       cancelAnimationFrame(enable);
       io?.disconnect();
+      warm?.disconnect();
     };
   }, [arm]);
 
@@ -225,7 +288,10 @@ export function CreativeVideo({
         // No `controls`: this is an ad standing in for an Instagram post, and
         // a scrubber across the bottom would break that read.
         aria-label={alt}
-        onPlaying={() => setPlaying(true)}
+        onPlaying={() => {
+          setPlaying(true);
+          warmNext();
+        }}
         className={`absolute inset-0 size-full object-cover transition-opacity duration-500 ease-out ${
           playing ? "opacity-100" : "opacity-0"
         }`}
