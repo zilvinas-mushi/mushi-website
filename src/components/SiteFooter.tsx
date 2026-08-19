@@ -282,8 +282,11 @@ export function SiteFooter() {
               {FOOTER.contactTitle}
             </h2>
             <a
+              /* #8E8E8E on the phone — two levels lighter than the column
+                 links' #808080, which is the artboard's own distinction, so
+                 this one cannot share LINK's colour. */
               href={`mailto:${CONTACT_EMAIL}`}
-              className={`${LINK} mt-[1.53125rem] block text-[1.125rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
+              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-dim mt-[1.53125rem] block text-[1.125rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
             >
               {CONTACT_EMAIL}
             </a>

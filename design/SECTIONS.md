@@ -67,63 +67,98 @@ the DOM so they are crawlable, and toggle with CSS/details rather than fetching.
 **Final CTA** — full-width panel with purple gradient. Repeats the fit-check
 CTA and the scarcity line.
 
-**Footer — desktop.** Measured off the reference screenshot supplied by
-Žilvinas on 2026-08-19 (1366 wide, so 1366/1920 = 0.7115 to design px).
-Implemented in `src/components/SiteFooter.tsx`. Its column heads read
-PRODUCTS · COMPANY · CONTACT and the gift line is now "Want a **mystery**
-gift?" — the older "welcome gift" wording and the PRODUCT/LEGAL/COMPANY split
-below are superseded. COPY.md carries the current strings.
+**Footer — desktop.** Pulled from Figma node **`4167:280`** ("Footer desktop",
+1920 × 425) on 2026-08-19 and implemented in `src/components/SiteFooter.tsx`.
+Every number below is the export's own, so **this section replaces the earlier
+screenshot reading** — that pass was close but wrong in six places, listed at
+the end. COPY.md carries the strings.
 
-The scale reading is self-checking: the shot's content starts at 191 (the
-design's 270 side margin) and its rule spans 973 (1380, i.e. the content
-column). Both fall out of the same 0.7115.
+The column heads read PRODUCTS · COMPANY · CONTACT, the gift line is "Want a
+mystery gift?", and the legal links live in the bottom bar. The older
+PRODUCT/LEGAL/COMPANY split is gone.
 
-### Type — solved, not eyeballed
+### Type
 
-Each string's measured width was divided by that same string's advance width in
-the real Poppins at 100px (canvas `measureText`, all five weights loaded). The
-clusters agree, and that agreement is what makes them trustworthy:
+All of it Poppins. The export gives centre lines, not boxes, so the build sets
+`leading-none` and derives each gap as `centre distance − (size a + size b) / 2`.
 
-| Role | Strings measured | Solved | Taken as |
+| Role | Size | Weight | Colour |
 | --- | --- | --- | --- |
-| Bottom bar — copyright + 4 legal links | 5 | 17.9–18.2 | **18** Regular |
-| Column links + the contact address | 4 | 20.6–21.1 | **21** Regular |
-| Column heads PRODUCTS/COMPANY/CONTACT | 3 | 25.1–26.1 | **25** SemiBold |
-| "Want a mystery gift?" | 1 | 23.9 | **24** SemiBold |
-| "Redeem" | 1 | ~24 | **24** Medium |
-| Placeholder, "Trustpilot", the score | 3 | 19.1 / 19.5 / 20.7 | 20 / 20 / **21** |
+| "Want a mystery gift?" | 26 | Medium | white |
+| Column heads | 26 | Medium | white |
+| Column links, the address | 21 | Regular | `#808080` |
+| Placeholder | 21 | Regular | white 50% |
+| "Redeem" | 24 | Medium | white |
+| "Trustpilot" | 20 | Regular | white |
+| The score "4.9" | 24 | SemiBold | white |
+| Copyright | 18 | Regular | white 50% |
+| Legal links | 18 | Regular | `#808080` |
 
 ### Boxes
 
-| Part | Size at 1920 |
-| --- | --- |
-| Email input | 285 × 52, radius 8, transparent on a 1px white-20% edge |
-| Input → button | 16 |
-| Redeem button | 138 × 52, radius 8, the house CTA gradient |
-| Trustpilot star | 21, `#6E54B5`, then 8 to the word, 14 to the score |
-| Social tile | 42 × 42, radius 12, `#222222`, holding a 25 glyph |
-| Tile pitch | 66 (42 + a 24 gap), four of them = 240 |
-| Rule | 1px white at 20%, the full content column |
+| Part | Node | Size at 1920 |
+| --- | --- | --- |
+| The band | `4134:616` | 1920 × 425, `#121212` |
+| Email field | `4134:619` | 284 × 60, radius 10, `#222222`, no border, text inset 22 |
+| Field → button | | 15 |
+| Redeem button | `4134:621` | 143 × 60, radius 10, **flat** `#6E54B5` |
+| Trustpilot star | `4134:637` | 27.37 square, `#6E54B5`, then 5.5 to the word, 6 to the score |
+| Social group | `4134:653` | 246 × 46 — four 46 tiles, radius 10, `#222222`, at x 0 / 67 / 133 / 200 |
+| Rule | `4134:634` | 1px `#808080`, 1380 wide |
 
 ### Grid
 
-The four columns are the design's own tab stops, not a gap: 0 / 592 / 904 /
-1112 from the content edge, i.e. widths **592 / 312 / 208 / 268**.
+The columns are the export's own x positions: 270 / 869 / 1182 / 1395 on a
+1920 frame, i.e. **0 / 599 / 912 / 1125** from the content edge, so widths
+**599 / 313 / 213 / 255**. The legal cluster starts on the 599 stop and its last
+label ends at 1650 — the column's right edge.
 
-They are declared in `fr`, not rem, for two reasons. Below the ~1260 crossover
-the shell is capped by the window rather than by 86.25rem (globals.css), and
-fixed columns leave the last one under the social row's 240 — the fourth tile
-then hangs off the side of the page. And `SHELL` puts a 20 gutter *inside* its
-1380, so the real content box is 1340: in `fr` the stops land at 575 / 878 /
-1080, the design's proportions inside the site's actual column. That is a
-deliberate 2.9% compression — the alternative is a footer whose text starts 20
-left of every section above it, which reads as a mistake at a glance.
+They are declared in `fr`, not rem. Two reasons, and the second is the
+important one:
+
+1. Below the ~1260 crossover the shell is capped by the window rather than by
+   86.25rem (globals.css). Fixed columns leave the last one narrower than the
+   social row's 246 and the fourth tile hangs off the side of the page.
+2. `SHELL` puts a 20 gutter **inside** its 1380, so the site's real content box
+   is 1340. In `fr` the stops land at 580 / 883 / 1089 — the design's
+   proportions inside the site's actual column. That 2.9% compression is
+   deliberate: the alternative is a footer whose text starts 20 left of every
+   section above it, which reads as a mistake at a glance.
+
+The bottom bar is its own two-region grid, `599fr 781fr`, with the legal links
+`justify-between` inside the second. That is what holds **both** of the design's
+alignments at once — type does not compress with the column, so a fixed 48 gap
+could only keep one end flush. Here the gaps absorb the difference.
 
 ### Vertical rhythm
 
-Top edge → 69 → the head row · input at 125 · trust row at 205 · rule at 291 ·
-bottom bar 56 under it · 56 to the bottom edge. Total **429**, and the built
-footer measures 431 — that agreement is the check on the whole stack.
+Centre lines from the export: heads at 74.5 · field top 109 (60 tall) · star
+top 191 · **rule at 281.25** · bottom bar centre 353.5 · bottom edge **425**.
+Link rows step 48 (128.5, 176.5). The built footer measures 425.2 with its bar
+centred on 353.7 — that agreement is the check on the whole stack.
+
+Watch the `<li>` strut: `leading-none` on a link alone does not shrink its row,
+because the list item's own line-height sets the line box. The legal row stood
+27 tall instead of 18 and pushed both the bar's centre and the footer's bottom
+edge 9 low until `leading-none` went on the `<ul>`.
+
+### What the screenshot pass got wrong
+
+Kept as a record of how far a careful reading of a JPEG actually gets — close
+enough to look right, wrong in every value that matters:
+
+| | Read off the shot | Figma |
+| --- | --- | --- |
+| Band | the page's black | `#121212` |
+| Heads / gift line | 25 / 24 SemiBold | **26 Medium**, both |
+| Field | 285 × 52, radius 8, transparent + a white-20% border | 284 × 60, radius 10, filled `#222222` |
+| Button | 138 × 52, the three-stop house gradient | 143 × 60, **flat** `#6E54B5` |
+| Link colour | `#9E9E9E` | `#808080` |
+| Rule | white at 20%, y 291 | `#808080`, y 281.25 |
+| Social tiles | 42, radius 12, gap 24 | 46, radius 10, gap 20.67 |
+
+The type sizes solved from advance widths held up better than the boxes: 18 and
+21 were exact, 25-for-26 and 24-for-26 the only misses.
 
 ### The capture still has no provider
 
@@ -131,11 +166,11 @@ footer measures 431 — that agreement is the check on the whole stack.
 server to post to. A form that silently discards submissions is worse than no
 form: visitors believe they subscribed and never hear back.
 
-So the design's input and button are both rendered — the reference shows them,
-and this is the desktop's 1:1 — but with `NEWSLETTER_ACTION` (`src/lib/site.ts`)
-still null the form carries no `action` and the Redeem control is a **link to
-the booking anchor** rather than a submit button. Identical to look at; it
-simply cannot swallow an address.
+So the design's field and button are both rendered — the design has them, and
+this is a 1:1 — but with `NEWSLETTER_ACTION` (`src/lib/site.ts`) still null the
+form carries no `action` and the Redeem control is a **link to the booking
+anchor** rather than a submit button. Identical to look at; it simply cannot
+swallow an address.
 
 Set `NEWSLETTER_ACTION` to the provider's own hosted form URL (Mailchimp /
 ConvertKit / Beehiiv / Loops) and the same markup becomes a real POST with no
@@ -167,10 +202,18 @@ out 45 instead of 37.
 | Trustpilot row | star 22.66 **#6E54B5**, ~10 gap, "Trustpilot" 16 Regular, ~15 gap, score 22 SemiBold — row top **201** |
 | Group titles | 18 Medium white, upper-case: PRODUCT **279.5**, COMPANY **421.5**, LEGAL **526.5**, CONTACT **742.5** (centres) |
 | Group links | 16 Regular **#808080**. Title→first link **42.5**, link→link **37**, last link→next title **62.5** (centres) |
-| Contact address | 18 Regular **#8E8E8E**, centre **785** |
+| Contact address | 18 Regular **#8E8E8E** — deliberately NOT the links' #808080 — centre **785** |
 | Socials | four 42-squares, radius 12 on #222222, **20** apart, row top **846** |
 | Copyright | 14 Regular white 50%, centre **918**. **No rule above it** on the phone |
 | Frame | ends at **977** |
+
+Icons are the supplied vectors, not redrawn: `~/Documents/{instagram,linkedin,
+tik tok,facebook} logo.svg` (28x28, 24x23, 23x28, 28x28) and `trustpilot
+star.svg` (23 square, #6E54B5). They are inlined in `SiteFooter` with
+`currentColor` so the tile's hover inversion carries the glyph, and sized by a
+share of the TILE height so each keeps its own aspect ratio. Facebook is the one
+with a knockout — a disc in `currentColor` with the "f" cut out of it in
+`var(--tile)` — so the letter survives the inversion either way round.
 
 Two knowing differences from the artboard, both content rather than layout:
 
