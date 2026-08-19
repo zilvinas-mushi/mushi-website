@@ -113,22 +113,75 @@ The columns are the export's own x positions: 270 / 869 / 1182 / 1395 on a
 **599 / 313 / 213 / 255**. The legal cluster starts on the 599 stop and its last
 label ends at 1650 — the column's right edge.
 
-They are declared in `fr`, not rem. Two reasons, and the second is the
-important one:
+They are declared in `fr`, so they hold that ratio at any width: below the
+~1260 crossover the shell is capped by the window rather than by 86.25rem
+(globals.css), and fixed columns would leave the last one narrower than the
+social row's 246 with the fourth tile hanging off the side of the page.
 
-1. Below the ~1260 crossover the shell is capped by the window rather than by
-   86.25rem (globals.css). Fixed columns leave the last one narrower than the
-   social row's 246 and the fourth tile hangs off the side of the page.
-2. `SHELL` puts a 20 gutter **inside** its 1380, so the site's real content box
-   is 1340. In `fr` the stops land at 580 / 883 / 1089 — the design's
-   proportions inside the site's actual column. That 2.9% compression is
-   deliberate: the alternative is a footer whose text starts 20 left of every
-   section above it, which reads as a mistake at a glance.
+**The footer does not use `SHELL`.** Every section above puts a 20 gutter
+*inside* its 1380, so its text runs 290..1630 — 1340 of content. This frame does
+not: it runs 270..1650, the full 1380, and its 1380-wide rule proves it. Forcing
+it into SHELL compressed every horizontal stop by 1340/1380 = 2.9%, which showed
+up as the legal row's gaps landing at 42.2 instead of 48. The box is therefore
+`86.25rem + 2 * var(--gutter)` wide with the gutter as padding: 1380 of content,
+and the gutter still protecting the window edge below the crossover.
 
-The bottom bar is its own two-region grid, `599fr 781fr`, with the legal links
-`justify-between` inside the second. That is what holds **both** of the design's
-alignments at once — type does not compress with the column, so a fixed 48 gap
-could only keep one end flush. Here the gaps absorb the difference.
+That also lines the footer up with the **header bar** rather than with the
+section text — the bar is a fixed 1386 at 1920 (`SiteHeader`), i.e. 267..1653,
+so the design's footer sits 3px inside it. The two agree; it is the sections in
+between that are inset.
+
+### Rows built on stops, not gaps
+
+The trust row and the legal row both place their items on the export's own x
+positions rather than spacing them:
+
+| Row | Stops from the content edge |
+| --- | --- |
+| Trustpilot | star 0 · "Trustpilot" 32.89 · the score 134 |
+| Legal | 599 · 770 · 994 · 1164, in tracks of 171 / 224 / 170 / 216 |
+
+This matters because **Figma's text boxes are wider than the rendered
+advances** — its box for "Trustpilot" is 95.1 where Poppins sets it 92.3, about
+2.8 of trailing air the glyphs do not fill. Measure a gap from the box edge and
+the next item lands ~2.6 right of the design; measure from the ink and the box
+numbers stop agreeing. Stops sidestep it: every item starts exactly where the
+design starts it, and the leftover shows up in the gaps instead (the legal row
+renders 49.5 / 48.6 / 50.1 against the design's 48 / 48 / 49, with its last
+label ending on 1378.9 against 1380).
+
+The legal links carry `whitespace-nowrap`. The last track is the tightest — 216
+for a label that sets 214.9 — and a wrap there is not a small error: it doubles
+the row and takes the whole footer from 425 to 443.
+
+### Line height
+
+Figma reports each text layer's height as its **ink** box, not its line box:
+21px Regular comes back 15 tall, 26px Medium 19, 18px 13, 24px 17 — all ≈0.71em,
+which is Poppins' cap height. So the export's `top` values are cap-box centres.
+
+The build sets `leading-none` everywhere, making each box exactly its font-size
+tall, and centres that on the design's number. Measured against the real font
+(canvas `TextMetrics`), the ink centre then sits **0.15–0.49px above** the line
+box centre at 1920 scale — so centring the line box puts the ink within half a
+pixel of the design. That is why gaps derived by subtracting box edges disagree
+with the design while the centres match exactly: an inline element's rect is the
+font's em box (~1.39em in Poppins), which is neither the line box nor the ink.
+
+### Two things that differ between the frames
+
+Not variants of one value — the artboards genuinely disagree, so both are stored
+and each frame renders its own (`src/lib/content.ts`):
+
+| | Phone `4167:278` | Desktop `4167:280` |
+| --- | --- | --- |
+| Legal order | Money-Back · Terms · Refund · Privacy | Privacy · Terms · Refund · Money-Back |
+| Copyright | "Copyright 2026, All Rights Reserved" | "Copyright © 2026 All Rights Reserved" |
+| Address colour | `#8E8E8E` | `#808080` |
+
+The desktop order is not an inference: it is that node's x positions, 869 / 1040
+/ 1264 / 1434, and the reference screenshot reads the same way. Both orders index
+the SAME link objects, so copy and href changes land in both.
 
 ### Vertical rhythm
 
@@ -159,6 +212,12 @@ enough to look right, wrong in every value that matters:
 
 The type sizes solved from advance widths held up better than the boxes: 18 and
 21 were exact, 25-for-26 and 24-for-26 the only misses.
+
+Two more were found only after the first Figma pass, by measuring the built
+footer's **gaps** rather than its positions: the legal row was 42.2 where the
+design says 48 (the SHELL compression above), and the score sat 2.6 right of its
+stop (the text-box-vs-advance gap above). Positions agreeing does not prove gaps
+agree — check both.
 
 ### The capture still has no provider
 

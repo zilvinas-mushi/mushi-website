@@ -420,6 +420,7 @@ export const CREATIVES = {
       handle: "SuperiorCarePet",
       caption: "Dog Food Voiceover Video Ad",
       image: "dogfood-real-results.webp",
+      video: "dogfood-real-results.mp4",
       w: 1320,
       h: 2340,
       avatar: "superiorcarepet-logo.svg",
@@ -794,6 +795,14 @@ export const FINAL_CTA = {
   scarcity: "2/10 client spots left for 2026",
 } as const;
 
+/** The bottom bar's links, declared once and ordered per frame below. */
+const LEGAL = {
+  privacy: { label: "Privacy Policy", href: "#privacy" },
+  terms: { label: "Terms & Conditions", href: "#terms" },
+  refund: { label: "Refund Policy", href: "#refund" },
+  guarantee: { label: "Money-Back Guarantee", href: "#guarantee" },
+} as const;
+
 /**
  * Footer, measured off the desktop reference (Žilvinas 2026-08-19).
  *
@@ -821,18 +830,25 @@ export const FOOTER = {
   contactTitle: "Contact",
   /** 4.9 is the score the awards row already carries — see TrustBadges. */
   trustpilot: { label: "Trustpilot", score: "4.9" },
-  /** The bottom bar. Right-aligned as a cluster, per the reference. */
   /**
-   * Artboard order (phone node 4167:278), which the desktop bottom bar shares:
-   * the two render the same array, so this sequence is the one that shows in
-   * both places. Money-Back first is deliberate, not a sort.
+   * The bottom bar's four links. The two frames list them in DIFFERENT orders,
+   * so the sequence cannot be shared even though the entries are:
+   *
+   *   phone  (node `4167:278`)  Money-Back · Terms · Refund · Privacy
+   *   desktop (node `4167:280`) Privacy · Terms · Refund · Money-Back
+   *
+   * The desktop order is not an assumption — it is that node's own x positions,
+   * 869 / 1040 / 1264 / 1434, and the reference screenshot reads the same way.
+   * Both arrays hold the SAME objects, so a copy or href change lands in both
+   * and the two can never drift into being different links.
    */
-  legal: [
-    { label: "Money-Back Guarantee", href: "#guarantee" },
-    { label: "Terms & Conditions", href: "#terms" },
-    { label: "Refund Policy", href: "#refund" },
-    { label: "Privacy Policy", href: "#privacy" },
-  ],
-  /** Verbatim from the phone artboard — comma, no (c). */
+  legal: [LEGAL.guarantee, LEGAL.terms, LEGAL.refund, LEGAL.privacy],
+  legalDesktop: [LEGAL.privacy, LEGAL.terms, LEGAL.refund, LEGAL.guarantee],
+  /**
+   * Also per frame: the phone artboard sets a comma and no symbol, the desktop
+   * node `4134:633` sets "Copyright © 2026 All Rights Reserved". Verbatim from
+   * each, rather than one of them applied to both.
+   */
   copyright: "Copyright 2026, All Rights Reserved",
+  copyrightDesktop: "Copyright \u00a9 2026 All Rights Reserved",
 } as const;

@@ -1,5 +1,4 @@
 import { FOOTER } from "@/lib/content";
-import { SHELL } from "@/lib/layout";
 import {
   BOOKING_URL,
   CONTACT_EMAIL,
@@ -119,7 +118,7 @@ export function SiteFooter() {
       2026-08-19) and converted to design px against the 1920 frame — the shot
       is 1366 wide, so 1366/1920 = 0.7115 is the scale, confirmed by its content
       starting at 191 (= the design's 270 side margin) and the column measuring
-      973 (= 1380, i.e. SHELL).
+      973 (= 1380, the design's content column).
 
       Every number below is therefore a 1920 number in rem, per the scale note
       in globals.css: 1rem is 16 design px on desktop.
@@ -138,7 +137,22 @@ export function SiteFooter() {
        page's black, which is what separates it from the CTA section above. */
     <footer className="bg-[#121212]">
       <div
-        className={`${SHELL} pb-[3.25rem] pt-12 md:pb-[3.90625rem] md:pt-[3.84375rem]`}
+        /*
+          NOT `SHELL`. Every section above puts a 20 gutter INSIDE its 1380, so
+          its text runs 290..1630 — 1340 of content. The footer's frame does
+          not: node `4167:280` runs its content 270..1650, the full 1380, and
+          the rule is 1380 wide to prove it. Squeezing it into SHELL compressed
+          every horizontal stop by 1340/1380 = 2.9%, which is what put the
+          legal row's gaps at 42.2 instead of 48.
+
+          So the box is SHELL's, plus the gutter back: `86.25rem + 2 * gutter`
+          outside, 1380 of content inside. That also lines the footer up with
+          the HEADER BAR rather than with the section text — the bar is a fixed
+          1386 at 1920 (SiteHeader), i.e. 267..1653, so the design's own footer
+          sits 3px inside it. The 20 gutter stays on the padding, so below the
+          crossover the content still cannot touch the window edge.
+        */
+        className="mx-auto w-full max-w-[calc(86.25rem+2*var(--gutter))] px-[var(--gutter)] pb-[3.25rem] pt-12 md:pb-[3.90625rem] md:pt-[3.84375rem]"
       >
         {/*
           Four columns, and their widths ARE their measured x positions: the
@@ -223,12 +237,23 @@ export function SiteFooter() {
             {/* leading-none so the row is exactly as tall as the star, 21.
                 Left to the score's own 1.5 line-height it stands 31.5 tall,
                 which is what pushed the rule 10 below its measured 291. */}
-            <p className="mt-[1.125rem] flex items-center justify-center gap-2.5 leading-none md:mt-[1.375rem] md:justify-start md:gap-[0.345rem]">
+            {/*
+              Desktop is a grid on the export's own x stops — star at 0,
+              "Trustpilot" at 32.89, the score at 134 — rather than three gaps.
+              Gaps put the score 2.6 right of where the design has it, because
+              Figma's text box for "Trustpilot" is 95.1 wide where the rendered
+              advance is 92.3: the box carries ~2.8 of trailing air the glyphs
+              do not fill, so measuring a gap from the box's edge and measuring
+              it from the ink are two different numbers. Stops sidestep that —
+              each element starts exactly where the design starts it, whatever
+              the type does in between. Same technique as the columns above.
+            */}
+            <p className="mt-[1.125rem] flex items-center justify-center gap-2.5 leading-none md:mt-[1.375rem] md:grid md:grid-cols-[2.0556rem_6.3194rem_auto] md:items-center md:justify-start md:gap-0">
               <TrustStar />
               <span className="text-[1rem] md:text-[1.25rem]">
                 {FOOTER.trustpilot.label}
               </span>
-              <span className="ml-[0.3125rem] text-[1.375rem] font-semibold md:ml-[0.375rem] md:text-[1.5rem]">
+              <span className="ml-[0.3125rem] text-[1.375rem] font-semibold md:ml-0 md:text-[1.5rem]">
                 {FOOTER.trustpilot.score}
               </span>
             </p>
@@ -361,7 +386,11 @@ export function SiteFooter() {
               gap can only keep one end flush. Here the gaps absorb it. */}
           <div className="flex flex-col gap-5 text-center text-[0.875rem] md:grid md:grid-cols-[599fr_781fr] md:items-center md:gap-0 md:text-left md:text-[1.125rem]">
             <p className="leading-none text-white/50 md:leading-none">
-              {FOOTER.copyright}
+              {/* One line per frame — the strings differ (see content.ts).
+                  Only one is ever in the a11y tree: the other is
+                  display:none, not merely invisible. */}
+              <span className="md:hidden">{FOOTER.copyright}</span>
+              <span className="hidden md:inline">{FOOTER.copyrightDesktop}</span>
             </p>
             {/* Right-aligned cluster with a 48 gap — the export's four x
                 positions difference to 48 / 48 / 49, and its last label ends
@@ -377,14 +406,28 @@ export function SiteFooter() {
               {/* leading-none on the LIST, not just on the links: an <li>'s own
                   strut sets its line box, so links set solo still sat in 27
                   tall rows and pushed the bar's centre 4.7 low. */}
-              <ul className="flex justify-between leading-none">
-                {FOOTER.legal.map((link) => (
+              {/* The export's four stops — 599 / 770 / 994 / 1164 from the
+                  content edge, so widths 171 / 224 / 170 / 216 inside this
+                  781-wide region. Positioning each label rather than spacing
+                  them is what makes the row exact: rendered advances are a
+                  few px narrower than Figma's text boxes, so any single gap
+                  value lands one end right and the other end wrong. */}
+              <ul className="grid grid-cols-[171fr_224fr_170fr_216fr] leading-none">
+                {FOOTER.legalDesktop.map((link) => (
                   <li key={link.label}>
                     {/* leading-none, so the bar is exactly its own 18 tall.
                         Left at the browser's 1.5 it stood 27, which pushed
                         both this row's centre and the footer's bottom edge 9
-                        below the design's 353.5 and 425. */}
-                    <a href={link.href} className={`${LINK} leading-none`}>
+                        below the design's 353.5 and 425.
+
+                        nowrap because the last stop is the tightest: 216 of
+                        track for a label that sets 214.9. A wrap there is not
+                        a small error — it doubles the row and takes the whole
+                        footer to 443. */}
+                    <a
+                      href={link.href}
+                      className={`${LINK} whitespace-nowrap leading-none`}
+                    >
                       {link.label}
                     </a>
                   </li>
