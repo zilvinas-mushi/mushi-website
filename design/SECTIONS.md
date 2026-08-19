@@ -175,9 +175,16 @@ and each frame renders its own (`src/lib/content.ts`):
 
 | | Phone `4167:278` | Desktop `4167:280` |
 | --- | --- | --- |
+| First column head | PRODUCT | **PRODUCTS** (node `4134:627`) |
 | Legal order | Money-Back · Terms · Refund · Privacy | Privacy · Terms · Refund · Money-Back |
 | Copyright | "Copyright 2026, All Rights Reserved" | "Copyright © 2026 All Rights Reserved" |
 | Address colour | `#8E8E8E` | `#808080` |
+
+Everything else was checked element by element against the export — every font
+size, weight and colour in the desktop footer matches it — so this table is the
+complete list, not a sample. The social marks are the one thing shared: the
+supplied vectors sit 30.67 tall in a 46 tile where the desktop group has them
+30, a 2% difference that is not worth a second copy of the artwork.
 
 The desktop order is not an inference: it is that node's x positions, 869 / 1040
 / 1264 / 1434, and the reference screenshot reads the same way. Both orders index

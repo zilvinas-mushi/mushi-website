@@ -816,7 +816,13 @@ export const FOOTER = {
   emailCta: "Redeem",
   columns: [
     {
+      /**
+       * Singular on the phone artboard, PLURAL on the desktop node — its head
+       * `4134:627` sets "PRODUCTS", 143 wide. The frames disagree, so each
+       * renders its own rather than one being applied to both.
+       */
       title: "Product",
+      titleDesktop: "Products",
       links: [
         { label: "500+ Static Templates", href: "#templates" },
         { label: "Agency Services", href: "#agency" },
@@ -824,6 +830,7 @@ export const FOOTER = {
     },
     {
       title: "Company",
+      titleDesktop: "Company",
       links: [{ label: "Case Studies", href: "#case-studies" }],
     },
   ],

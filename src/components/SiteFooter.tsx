@@ -265,7 +265,12 @@ export function SiteFooter() {
           {FOOTER.columns.map((col) => (
             <nav key={col.title} aria-label={col.title}>
               <h2 className="text-[1.125rem] font-medium uppercase leading-none md:text-[1.625rem] md:leading-[1.625rem]">
-                {col.title}
+                {/* One head per frame — PRODUCT on the phone, PRODUCTS on the
+                    desktop (see content.ts). The hidden one is display:none,
+                    so only ever one is in the a11y tree and only one supplies
+                    the heading's accessible name. */}
+                <span className="md:hidden">{col.title}</span>
+                <span className="hidden md:inline">{col.titleDesktop}</span>
               </h2>
               <ul className="mt-[1.59375rem] space-y-[1.3125rem] leading-none md:mt-[1.90625rem] md:space-y-[1.6875rem]">
                 {col.links.map((link) => (
