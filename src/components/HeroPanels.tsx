@@ -31,8 +31,9 @@ import { Img } from "./Img";
  *
  * The clamp itself is --hero-u on :root, shared with the platform tiles in
  * Sections.tsx. Its 66px floor is where a card is 330 wide — about as small as
- * the 15px line can go and stay legible. That only bites below 1267px, and the
- * panels are hidden below xl (1280) anyway.
+ * the 15px line can go and stay legible. That bites below 1267px, which these
+ * panels now see: they show from lg (1024), so between 1024 and 1267 the cards
+ * hold 330 and the window crops more of them instead.
  */
 const SCALE = { "--k": "var(--hero-u)" } as CSSProperties;
 
@@ -81,7 +82,20 @@ export function HeroPanels() {
     // stacking context.
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-[2] hidden xl:block"
+      // FROM lg (1024), not xl (1280). A 14" MacBook is 1512 logical and a
+      // 13" Air 1470, so both clear xl on paper — but Chrome at 125% zoom, or
+      // macOS at a "Larger Text" scale, puts the CSS viewport at ~1210, and
+      // the whole hero artwork simply vanished on the machines it was drawn
+      // for (Žilvinas 2026-08-20). The floaters have always been lg; this puts
+      // the panels on the same line.
+      //
+      // Checked rather than assumed: with the panels on at 1210, 1152 and
+      // 1024, the intersection between every card and every line box of the
+      // hero copy — pill, headline, sub, CTA row, award row, all 26 of them —
+      // is zero at each width. The cards stop shrinking at --hero-u's 66px
+      // floor (330 wide) below 1267, so what changes as the window narrows is
+      // how much of each is cropped, not whether it reaches the copy.
+      className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
       style={SCALE}
     >
       {HERO_PANELS.map((p, i) => (
