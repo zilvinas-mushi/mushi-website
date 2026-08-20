@@ -330,9 +330,17 @@ export const SOCIAL_PROOF = {
      * in this row is real geometry and stayed crisp, which is what made this
      * one stand out.
      *
-     * So it ships as what it always was — a bitmap — at its full 528x183 with
-     * the mask baked into white pixels: 10 KB lossless WebP, ~6.8x the pixels
-     * it is ever drawn at (26 CSS px tall at 1920, DPR 3).
+     * Shipping it as a better bitmap did not fix it, because the problem is
+     * not resolution — it is that a bitmap cannot survive a pinch-zoom next to
+     * eight logos that can. Zoomed in on a phone this one turned to mush while
+     * Breezit and self.co beside it stayed razor sharp.
+     *
+     * So it is now REAL GEOMETRY, traced from the 528x183 mask: contours at 4x
+     * with OpenCV, simplified to 0.25 source px, 23 subpaths, even-odd fill.
+     * 9 KB against the original 101 KB of embedded PNG, and the reconstruction
+     * differs from the bitmap by 0.9/255 averaged over the size it actually
+     * draws at. Being geometry, it now re-rasterises at whatever zoom the
+     * phone is at, like every other mark in the row.
      */
     /**
      * `tall` marks a TWO-LINE lockup. The row draws every mark at one height,
@@ -341,7 +349,7 @@ export const SOCIAL_PROOF = {
      * about 8px of cap height against their 14-19, and it reads as mush rather
      * than as a logo. It draws a quarter taller.
      */
-    { name: "superior care.pet", logo: "superior-care.webp", w: 528, h: 183, tall: true },
+    { name: "superior care.pet", logo: "superior-care.svg", w: 528, h: 183, tall: true },
     { name: "Holo", logo: "holo.svg", w: 62, h: 25 },
     { name: "we interiors", logo: "we-interiors.webp", w: 849, h: 153 },
     { name: "Breezit", logo: "breezit.svg", w: 98, h: 25 },
