@@ -271,13 +271,21 @@ export function Hero() {
         */}
         <h1
           id="hero-heading"
-          // Poppins SemiBold 32 on phones, per Žilvinas 2026-08-11. The old
-          // sm:text-6xl step jumped it to 60px between 640 and 767px — still
-          // phone width — so 32 now holds all the way to md.
+          // Poppins SemiBold 32 on phones, per Žilvinas 2026-08-11 and again
+          // 2026-08-20. The old sm:text-6xl step jumped it to 60px between 640
+          // and 767px — still phone width — so 32 holds all the way to md.
+          //
+          // A FLAT 32, deliberately outside --pu. Everything else above the
+          // fold shrinks with the viewport's height so the block always fits
+          // one screen (see the note on --pu in globals.css); the headline is
+          // the one thing that does not. It is the page's first statement and
+          // 32 is what the artboard sets, so a short window may now spend a
+          // few pixels more than it has rather than quietly setting the
+          // headline at 22.
           //
           // Desktop is 0.8u — Figma's 80 at 1920, in proportion below it.
           // leading-[1] is Figma's 80/80; the phone keeps 1.08.
-          className="mx-auto max-w-4xl text-balance text-[length:calc(var(--pu)*32)] font-semibold leading-[1.08] md:text-[length:calc(var(--hero-w)*0.8)] md:leading-[1]"
+          className="mx-auto max-w-4xl text-balance text-[2rem] font-semibold leading-[1.08] md:text-[length:calc(var(--hero-w)*0.8)] md:leading-[1]"
         >
           {HERO.heading}
         </h1>
