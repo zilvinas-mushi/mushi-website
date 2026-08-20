@@ -317,7 +317,31 @@ export const SOCIAL_PROOF = {
    */
   brands: [
     { name: "Sintra", logo: "sintra.svg", w: 80, h: 25 },
-    { name: "superior care.pet", logo: "superior-care.svg", w: 73, h: 25 },
+    /**
+     * The ONE brand mark that is not a vector, and the only one that looked
+     * soft on a phone.
+     *
+     * superior-care.svg is an SVG in name only: no <path> anywhere, just two
+     * copies of a 528x183 PNG used as an alpha mask with a white rect painted
+     * through it — Figma's export shape for a rastered layer. Inside a
+     * <pattern> with objectBoundingBox units, the bitmap gets rasterised
+     * against the 73x25 user space rather than the device, so on a DPR-3
+     * screen it was being blown back up from 73px of detail. Every other logo
+     * in this row is real geometry and stayed crisp, which is what made this
+     * one stand out.
+     *
+     * So it ships as what it always was — a bitmap — at its full 528x183 with
+     * the mask baked into white pixels: 10 KB lossless WebP, ~6.8x the pixels
+     * it is ever drawn at (26 CSS px tall at 1920, DPR 3).
+     */
+    /**
+     * `tall` marks a TWO-LINE lockup. The row draws every mark at one height,
+     * which is right for the single-word logotypes either side of it and wrong
+     * for this one: at 19px total, "superior" over "care pet" leaves each word
+     * about 8px of cap height against their 14-19, and it reads as mush rather
+     * than as a logo. It draws a quarter taller.
+     */
+    { name: "superior care.pet", logo: "superior-care.webp", w: 528, h: 183, tall: true },
     { name: "Holo", logo: "holo.svg", w: 62, h: 25 },
     { name: "we interiors", logo: "we-interiors.webp", w: 849, h: 153 },
     { name: "Breezit", logo: "breezit.svg", w: 98, h: 25 },

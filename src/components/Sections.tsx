@@ -429,7 +429,11 @@ export function SocialProof() {
           {[[0, 4], [4, 7], [7, 9], [9, 10]].map(([from, to]) => (
             <ul
               key={from}
-              className="flex flex-nowrap items-center justify-center gap-x-6 md:gap-x-12"
+              // 20 between marks on the phone, not 24: the first row is
+              // Sintra + superior care.pet + Holo + we interiors, which at 24
+              // left 5px of slack in the 345 column — no room to draw the
+              // two-line lockup at the size it needs. Desktop is unchanged.
+              className="flex flex-nowrap items-center justify-center gap-x-5 md:gap-x-12"
             >
               {SOCIAL_PROOF.brands.slice(from, to).map((brand) => (
                 <li key={brand.name} className="flex items-center">
@@ -442,7 +446,11 @@ export function SocialProof() {
                       height={brand.h}
                       loading="lazy"
                       decoding="async"
-                      className="h-[calc(var(--pu)*19)] w-auto opacity-95 md:h-[calc(var(--hero-u)*0.26)]"
+                      className={`w-auto opacity-95 ${
+                        "tall" in brand && brand.tall
+                          ? "h-[calc(var(--pu)*24)] md:h-[calc(var(--hero-u)*0.325)]"
+                          : "h-[calc(var(--pu)*19)] md:h-[calc(var(--hero-u)*0.26)]"
+                      }`}
                     />
                   ) : (
                     <span className="text-[length:calc(var(--pu)*22)] font-medium tracking-tight text-white/90">
