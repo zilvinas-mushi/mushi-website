@@ -838,6 +838,14 @@ const LEGAL = {
  * into `columns` with an empty `links`.
  */
 export const FOOTER = {
+  /**
+   * OFF for now (Žilvinas 2026-08-20). The heading, the field and the Redeem
+   * button all stay in SiteFooter behind this flag, along with the
+   * NEWSLETTER_ACTION wiring that turns the control back into a real POST —
+   * flip it to true and the block returns exactly as it was. There is nothing
+   * to redeem yet, and a capture that goes nowhere is worse than no capture.
+   */
+  giftEnabled: false,
   giftHeading: "Want a mystery gift?",
   emailPlaceholder: "Enter your email*",
   emailCta: "Redeem",

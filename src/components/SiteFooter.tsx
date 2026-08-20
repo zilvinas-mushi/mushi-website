@@ -220,6 +220,10 @@ export function SiteFooter() {
         */}
         <div className="mx-auto grid w-full max-w-[18.3125rem] gap-[2.84375rem] text-center md:mx-0 md:max-w-none md:grid-cols-[599fr_313fr_213fr_255fr] md:gap-0 md:text-left">
           <div>
+            {/* Behind FOOTER.giftEnabled — see content.ts. The whole capture
+                is kept, not deleted, so bringing it back is one boolean. */}
+            {FOOTER.giftEnabled ? (
+              <>
             <h2 className="text-[1.375rem] font-medium leading-none md:text-[1.625rem] md:leading-[1.625rem]">
               {FOOTER.giftHeading}
             </h2>
@@ -267,6 +271,8 @@ export function SiteFooter() {
                 </a>
               )}
             </form>
+              </>
+            ) : null}
 
             {/* 22 under the field. The star is 27.37 on the column's own
                 left edge, then 5.5 to "Trustpilot" at 20 Regular, then 6 to
@@ -286,7 +292,7 @@ export function SiteFooter() {
               each element starts exactly where the design starts it, whatever
               the type does in between. Same technique as the columns above.
             */}
-            <p className="mt-[1.125rem] flex items-center justify-center gap-2.5 leading-none md:mt-[1.375rem] md:grid md:grid-cols-[2.0556rem_6.3194rem_auto] md:items-center md:justify-start md:gap-0">
+            <p className={`${FOOTER.giftEnabled ? "mt-[1.125rem] md:mt-[1.375rem]" : ""} flex items-center justify-center gap-2.5 leading-none md:grid md:grid-cols-[2.0556rem_6.3194rem_auto] md:items-center md:justify-start md:gap-0`}>
               <TrustStar />
               <span className="text-[1rem] md:text-[1.25rem]">
                 {FOOTER.trustpilot.label}
