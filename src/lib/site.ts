@@ -22,10 +22,12 @@ export const abs = (path: string) =>
  * Booking destination for every fit-check CTA.
  *
  * There is no server, so scheduling has to be an external link or embed
- * (CLAUDE.md). Point this at the real scheduler when it exists; every CTA
- * reads from here so it is a one-line change.
+ * (CLAUDE.md). This is the real scheduler — iClosed's "Introduction Call", 30
+ * minutes — and every CTA on the site reads from here: the header's Book a
+ * Call, the hero's fit-check, the creatives "Yes", the final card's pill and
+ * the footer's Redeem. One line changes all of them.
  */
-export const BOOKING_URL = "#book-a-call";
+export const BOOKING_URL = "https://app.iclosed.io/e/mushi/introduction";
 
 /**
  * Anchor the booking CTAs land on until BOOKING_URL points at a real
@@ -41,7 +43,7 @@ export const BOOKING_ANCHOR = "book-a-call";
  */
 export const SOCIALS = [
   { label: "Instagram", href: "https://www.instagram.com/mushi.agency" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/company/mushi-agency" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/mushiagency/" },
   { label: "TikTok", href: "https://www.tiktok.com/@mushi.agency" },
   { label: "Facebook", href: "https://www.facebook.com/mushi.agency" },
 ] as const;

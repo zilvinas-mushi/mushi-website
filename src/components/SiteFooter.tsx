@@ -111,6 +111,44 @@ const REDEEM =
 const LINK =
   "text-muted transition-colors duration-200 hover:text-white";
 
+/**
+ * A footer entry renders as a LINK only if it has somewhere to go.
+ *
+ * Everything in the legal group, plus 500+ Static Templates and Case Studies,
+ * is a page that does not exist yet (see content.ts). Those render as plain
+ * text with NO hover transition — the hover is the thing that promises
+ * something will happen when you click, so removing it is most of the signal —
+ * and no pointer, out of the tab order, `aria-disabled` for screen readers.
+ * They keep the same muted colour as a resting link rather than dimming
+ * further: this footer is already at 60% and a second knock-down would read as
+ * broken rather than as pending.
+ */
+function FooterLink({
+  href,
+  className = "",
+  children,
+}: {
+  href: string | null;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  if (!href) {
+    return (
+      <span
+        aria-disabled="true"
+        className={`text-muted cursor-default select-none ${className}`}
+      >
+        {children}
+      </span>
+    );
+  }
+  return (
+    <a href={href} className={`${LINK} ${className}`}>
+      {children}
+    </a>
+  );
+}
+
 export function SiteFooter() {
   return (
     /*
@@ -275,12 +313,12 @@ export function SiteFooter() {
               <ul className="mt-[1.59375rem] space-y-[1.3125rem] leading-none md:mt-[1.90625rem] md:space-y-[1.6875rem]">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a
+                    <FooterLink
                       href={link.href}
-                      className={`${LINK} text-[1rem] leading-none md:text-[1.3125rem] md:leading-none`}
+                      className="text-[1rem] leading-none md:text-[1.3125rem] md:leading-none"
                     >
                       {link.label}
-                    </a>
+                    </FooterLink>
                   </li>
                 ))}
               </ul>
@@ -297,9 +335,9 @@ export function SiteFooter() {
             <ul className="mt-[1.59375rem] space-y-[1.3125rem] leading-none">
               {FOOTER.legal.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className={`${LINK} text-[1rem] leading-none`}>
+                  <FooterLink href={link.href} className="text-[1rem] leading-none">
                     {link.label}
-                  </a>
+                  </FooterLink>
                 </li>
               ))}
             </ul>
@@ -429,12 +467,12 @@ export function SiteFooter() {
                         track for a label that sets 214.9. A wrap there is not
                         a small error — it doubles the row and takes the whole
                         footer to 443. */}
-                    <a
+                    <FooterLink
                       href={link.href}
-                      className={`${LINK} whitespace-nowrap leading-none`}
+                      className="whitespace-nowrap leading-none"
                     >
                       {link.label}
-                    </a>
+                    </FooterLink>
                   </li>
                 ))}
               </ul>

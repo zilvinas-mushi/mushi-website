@@ -9,10 +9,24 @@
  * words; do not silently correct them.
  */
 
+/**
+ * Header nav.
+ *
+ * `href: null` means THE PAGE DOES NOT EXIST YET. Those entries render as
+ * plain text at half strength with no hover and no pointer, rather than as
+ * links to an anchor that only pretends to be a destination — a live-looking
+ * link that goes nowhere is the worse failure. Give one an href and it becomes
+ * a link again with no other change (Žilvinas / Noah 2026-08-19).
+ *
+ * Agency is this page, so it goes to the site root rather than to #agency: the
+ * section it used to target IS the top of the home page.
+ */
+import { BOOKING_ANCHOR } from "@/lib/site";
+
 export const NAV = [
-  { label: "Agency", href: "#agency" },
-  { label: "Case Studies", href: "#case-studies" },
-  { label: "Templates", href: "#templates" },
+  { label: "Agency", href: "/" },
+  { label: "Case Studies", href: null },
+  { label: "Templates", href: null },
 ] as const;
 
 /**
@@ -265,6 +279,13 @@ export const HERO = {
   sub: HERO_SUB_LINES.join(" "),
   primaryCta: "15 Minute Fit-Check",
   secondaryCta: "Steal Our Secrets",
+  /**
+   * OFF while there is nothing behind it (Noah 2026-08-19). The copy and the
+   * markup both stay — flip this to true and the second pill is back, with its
+   * label, its dark variant and its place in the row unchanged. Deleting the
+   * pill outright is what would make bringing it back a rebuild.
+   */
+  secondaryCtaEnabled: false,
   /** Floating proof chips around the hero visual. */
   chips: [
     "Performance Score",
@@ -796,11 +817,17 @@ export const FINAL_CTA = {
 } as const;
 
 /** The bottom bar's links, declared once and ordered per frame below. */
+/**
+ * None of these documents exist yet, so every one carries `href: null` and the
+ * footer renders it as text rather than as a link — see the note on NAV. The
+ * hrefs they used to carry (#privacy, #terms, ...) pointed at anchors that are
+ * nowhere on the page.
+ */
 const LEGAL = {
-  privacy: { label: "Privacy Policy", href: "#privacy" },
-  terms: { label: "Terms & Conditions", href: "#terms" },
-  refund: { label: "Refund Policy", href: "#refund" },
-  guarantee: { label: "Money-Back Guarantee", href: "#guarantee" },
+  privacy: { label: "Privacy Policy", href: null },
+  terms: { label: "Terms & Conditions", href: null },
+  refund: { label: "Refund Policy", href: null },
+  guarantee: { label: "Money-Back Guarantee", href: null },
 } as const;
 
 /**
@@ -824,14 +851,20 @@ export const FOOTER = {
       title: "Product",
       titleDesktop: "Products",
       links: [
-        { label: "500+ Static Templates", href: "#templates" },
-        { label: "Agency Services", href: "#agency" },
+        { label: "500+ Static Templates", href: null },
+        /**
+         * Agency Services IS this page, so from here it goes to the final
+         * card — the "You scrolled so far" one — rather than nowhere. From any
+         * other page it will simply load the home page, which is the same
+         * behaviour by another name.
+         */
+        { label: "Agency Services", href: `#${BOOKING_ANCHOR}` },
       ],
     },
     {
       title: "Company",
       titleDesktop: "Company",
-      links: [{ label: "Case Studies", href: "#case-studies" }],
+      links: [{ label: "Case Studies", href: null }],
     },
   ],
   contactTitle: "Contact",

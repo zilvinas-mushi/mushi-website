@@ -252,7 +252,7 @@ body {
 }
 
 /*
-  BIG SCREENS ONLY: centre the hero in the field.
+  DESKTOP: centre the hero in the field.
 
   The field is min-h-svh (page.tsx) so the next section can never peek in on
   first load, and the hero's own height comes from the window's WIDTH — so on a
@@ -261,12 +261,16 @@ body {
   the copy pinned to the top, which reads as the section having fallen short
   rather than as air.
 
-  Centring is a NO-OP wherever the content is at least as tall as the field
-  (the box is then content-height and there is nothing to distribute), so the
-  height gate is not what makes this safe — it is what keeps it from firing on
-  the mid-size windows where the slack is only ~100px and the design's own top
-  rhythm under the header should win. 900px of viewport is about where the gap
-  starts reading as a gap. Per Žilvinas 2026-08-15: big screens only.
+  Centring is a NO-OP wherever the content is at least as tall as the field —
+  the box is then content-height and there is nothing to distribute — which is
+  what makes it safe to apply at every desktop height.
+
+  It used to be gated at min-height 900 so that mid-size windows kept the
+  design's top rhythm under the header. That is exactly the case this was then
+  reported on: a browser that is not full screen leaves ~100-200px of slack, all
+  of it collected under the logo strip, and the copy reads as having drifted up
+  (Noah 2026-08-19, on a windowed Arc). Equal air above and below is what is
+  wanted at every height, so the gate is gone.
 
   It centres inside the PADDING box, i.e. the space below the header, since the
   field carries padding-top: var(--header-h). The bar is not air the hero can
@@ -277,7 +281,7 @@ body {
   children (grid, light, panels, floaters) are out of flow and unaffected;
   the two sections stretch to full width as flex items exactly as blocks did.
 */
-@media (min-width: 768px) and (min-height: 900px) {
+@media (min-width: 768px) {
   .hero-bg {
     display: flex;
     flex-direction: column;

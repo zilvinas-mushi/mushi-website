@@ -121,6 +121,20 @@ export function MobileHeader() {
           >
             {NAV.map((item) => {
               const active = item.label === ACTIVE_NAV;
+              // No href means the page does not exist yet — half strength, no
+              // hover, no pointer, not focusable. Same treatment as the
+              // desktop bar; see the note on NAV in content.ts.
+              if (!item.href) {
+                return (
+                  <span
+                    key={item.label}
+                    aria-disabled="true"
+                    className="flex h-[3.25rem] cursor-default select-none items-center justify-center rounded-[0.4375rem] text-[1.0625rem] font-semibold uppercase text-white/40"
+                  >
+                    {item.label}
+                  </span>
+                );
+              }
               return (
                 <a
                   key={item.label}

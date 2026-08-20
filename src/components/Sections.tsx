@@ -16,6 +16,82 @@ import { SHELL } from "@/lib/layout";
  * CTA pill. Label is uppercased with tracking to match the design — the
  * buttons read as small-caps chips, not sentence-case links.
  */
+/**
+ * The disc at the right-hand end of a primary CTA, and the two things it does
+ * on hover.
+ *
+ * ## The inversion
+ *
+ * These CTAs do NOT invert the way every other button on the site does — they
+ * do not go white. The purple and the disc's grey trade places instead: on
+ * hover the whole button takes the disc's #222222 and the disc takes the
+ * button's violet, so the same two colours are still on screen in the same
+ * amounts, just swapped (Noah 2026-08-19; recorded in CLAUDE.md as the second
+ * exception to the inversion rule). The label and the arrow stay white
+ * throughout, which is what keeps both readable at both ends of the swap.
+ *
+ * BOTH fills are three-stop gradients at the same three positions, even the
+ * flat greys. A two-stop fill against a three-stop one cannot interpolate and
+ * the browser snaps at the halfway point no matter what the transition says —
+ * the same trap the rest of this file's hover states document.
+ *
+ * ## The arrow
+ *
+ * On hover the arrow leaves along its own diagonal and a second one arrives
+ * from behind it. Two copies of the same glyph in one grid cell: the first
+ * starts at rest and exits up-and-right, the second starts down-and-left and
+ * lands at rest. 180% of the box carries each one clear of a disc that is
+ * barely wider than the glyph, and `overflow-hidden` on the disc is what makes
+ * them appear and disappear at its edge rather than beyond it.
+ *
+ * The incoming one is held back 75ms so the two read as a relay rather than as
+ * one arrow sliding across.
+ */
+function ArrowDisc({
+  disc,
+  arrow,
+  viewBox,
+  strokeWidth,
+}: {
+  disc: string;
+  arrow: string;
+  viewBox: string;
+  strokeWidth: number;
+}) {
+  const glyph = (
+    <path d="M0.999888 15.9999L15.9998 1M15.9998 14.1708L15.9998 1L2.82898 1" />
+  );
+  const shared = `${arrow} col-start-1 row-start-1 stroke-current transition-transform duration-300 ease-out`;
+  return (
+    <span
+      className={`${disc} relative grid shrink-0 place-items-center overflow-hidden rounded-full bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] text-white transition-all duration-300 ease-out group-hover:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)]`}
+    >
+      <svg
+        viewBox={viewBox}
+        fill="none"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className={`${shared} group-hover:-translate-y-[180%] group-hover:translate-x-[180%]`}
+      >
+        {glyph}
+      </svg>
+      <svg
+        viewBox={viewBox}
+        fill="none"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className={`${shared} -translate-x-[180%] translate-y-[180%] delay-75 group-hover:translate-x-0 group-hover:translate-y-0`}
+      >
+        {glyph}
+      </svg>
+    </span>
+  );
+}
+
 function Pill({
   href,
   children,
@@ -244,9 +320,14 @@ export function Hero() {
             className="cta-glow pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2"
           />
           <Pill href={BOOKING_URL}>{HERO.primaryCta}</Pill>
-          <Pill href="#case-studies" variant="dark">
-            {HERO.secondaryCta}
-          </Pill>
+          {/* Behind a flag rather than deleted — see HERO.secondaryCtaEnabled.
+              It used to point at #case-studies, which is not what this button
+              is for anyway. */}
+          {HERO.secondaryCtaEnabled ? (
+            <Pill href="#case-studies" variant="dark">
+              {HERO.secondaryCta}
+            </Pill>
+          ) : null}
         </div>
 
         {/* Real badge artwork and laurel sprigs, ported from mushi-app rather
@@ -408,9 +489,12 @@ export function Creatives() {
             Desktop is measured, not eyeballed: 143 x 60, radius 30 on all four
             corners, a 45x45 #222222 disc inset 7.5px from the right edge (the
             same inset as the 7.5px it gets top and bottom from 60 - 45), and
-            24px between the end of "Yes" and the start of the disc — the
-            measured 18 read as the word leaning on the disc, and the pill has
-            the slack because the leftover falls on the left of "Yes".
+            18px between the end of "Yes" and the start of the disc, which is
+            Figma's own figure. It was briefly opened to 24 because the word
+            read as leaning on the disc; that space has to come from somewhere
+            in a fixed 143 box, and where it came from was the left of "Yes" —
+            which is what then read as the word being jammed against the pill's
+            left edge (Noah 2026-08-19). At 18 the leftover on the left is 25.5.
             `justify-end` is what holds both of those at once — the content is
             packed against the right edge, so the 18px gap and the 7.5px inset
             are both literal and the leftover space falls on the left of "Yes"
@@ -418,10 +502,9 @@ export function Creatives() {
             the text's width.
 
             The fill is the header's "Book a Call" gradient verbatim so the two
-            CTAs read as the same button. Hover inverts fill and text per
-            CLAUDE.md, keeping a gradient on both states so it cross-fades; the
-            disc stays dark through the inversion so the arrow never disappears
-            against the white fill.
+            CTAs read as the same button. Hover swaps the violet with the disc's
+            grey rather than going white — see ArrowDisc, which carries the
+            whole behaviour including the arrow relay.
           */}
           <a
             href={BOOKING_URL}
@@ -437,29 +520,22 @@ export function Creatives() {
             // The hover gradient repeats the rest state's THREE stop positions
             // in white. A 2-stop hover against a 3-stop rest cannot interpolate,
             // so the fill snapped no matter what the transition said.
-            className="group mr-3 inline-flex h-[2.8125rem] shrink-0 items-center gap-[0.9375rem] rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[0.375rem] text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:justify-end md:gap-6 md:rounded-[1.875rem] md:pl-0 md:pr-[0.46875rem] md:text-[1.875rem]"
+            className="group mr-3 inline-flex h-[2.8125rem] shrink-0 items-center gap-[0.9375rem] rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[0.375rem] text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:justify-end md:gap-[1.125rem] md:rounded-[1.875rem] md:pl-0 md:pr-[0.46875rem] md:text-[1.875rem]"
           >
             {CREATIVES.cta}
-            <span className="flex size-[2.125rem] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[2.8125rem]">
-              {/* ~/Documents/arrow icon.svg, inlined. The path draws a
-                  15-unit arrow; the viewBox has to add the stroke's overhang
-                  on every side or the ends clip, so at stroke 3 it is 15 + 1.5
-                  + 1.5 = 18 offset to -0.5. The rendered size carries the same
-                  18/15 factor, which is why it is 18px and not 15 — rendering
-                  the box at 15 shrinks the drawn arrow instead. Stroke 3, not
-                  the original 2: the design's arrow is the bold weight. */}
-              <svg
-                viewBox="-0.5 -0.5 18 18"
-                fill="none"
-                className="size-[0.86rem] stroke-current md:size-[1.125rem]"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M0.999888 15.9999L15.9998 1M15.9998 14.1708L15.9998 1L2.82898 1" />
-              </svg>
-            </span>
+            {/* ~/Documents/arrow icon.svg, inlined in ArrowDisc. The path
+                draws a 15-unit arrow; the viewBox has to add the stroke's
+                overhang on every side or the ends clip, so at stroke 3 it is
+                15 + 1.5 + 1.5 = 18 offset to -0.5. The rendered size carries
+                the same 18/15 factor, which is why it is 18px and not 15 —
+                rendering the box at 15 shrinks the drawn arrow instead. Stroke
+                3, not the original 2: the design's arrow is the bold weight. */}
+            <ArrowDisc
+              disc="size-[2.125rem] md:size-[2.8125rem]"
+              arrow="size-[0.86rem] md:size-[1.125rem]"
+              viewBox="-0.5 -0.5 18 18"
+              strokeWidth={3}
+            />
           </a>
         </div>
       </div>
@@ -573,7 +649,13 @@ export function CaseStudies() {
                       height={25}
                       loading="lazy"
                       decoding="async"
-                      className="absolute left-6 top-5 z-10 h-[1.5rem] w-auto drop-shadow-[0_2px_0.5rem_rgba(0,0,0,0.6)]"
+                      // Desktop carries the artboard's logo, which is a good
+                      // deal bigger than the phone's and sits further off the
+                      // corner: 3.25rem is ~39px at 1440 against the 18 this
+                      // used to draw, and the inset goes 18/15 -> 30/30
+                      // (Noah 2026-08-19). The phone keeps its own smaller
+                      // mark — the card there is 343 wide, not 600.
+                      className="absolute left-6 top-5 z-10 h-[1.5rem] w-auto drop-shadow-[0_2px_0.5rem_rgba(0,0,0,0.6)] md:left-10 md:top-10 md:h-[3.25rem]"
                     />
                   <Img
                     src={item.image}
@@ -975,7 +1057,17 @@ export function FinalCta() {
     <section
       id={BOOKING_ANCHOR}
       aria-labelledby="cta-heading"
-      className="scroll-mt-28 pb-24 pt-8"
+      // EQUAL AIR EITHER SIDE OF THE CARD on desktop, and a little more of it
+      // (Noah 2026-08-19). It measured 90 above and 72 below at 1440, which is
+      // what read as the top being bigger.
+      //
+      // The two are not symmetrical to write, because only the lower one is
+      // this section's alone: below the card there is just pb, while above it
+      // there is the testimonials' own 60 of bottom padding plus the 8 the
+      // trust pill floats above its block. So 108 of air is pb-36 below, and
+      // 3.3333rem on top of 60 + 8 above. Phones keep the artboard's own
+      // spacing until that frame is done.
+      className="scroll-mt-28 pb-24 pt-8 md:pb-36 md:pt-[3.3333rem]"
     >
       {/*
         IN THE SHELL, like every other section. It used to carry its own
@@ -1070,41 +1162,35 @@ export function FinalCta() {
               #222222 disc inset 10 from the right edge, which is the same 10
               it gets top and bottom from 60 - 40.
 
-              Hover inverts fill and text per CLAUDE.md, keeping a gradient on
-              both states so the fill cross-fades instead of snapping; the disc
-              stays #222222 through the inversion so the arrow never
-              disappears against the white.
+              Hover swaps the violet with the disc's grey rather than going
+              white, and the arrow flies out and is replaced — see ArrowDisc.
             */}
             <a
               href={BOOKING_URL}
               // Hover repeats the rest state's three stop positions in white so
               // the fill can interpolate instead of snapping at the halfway point.
-              className="group inline-flex h-[2.625rem] items-center gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
+              className="group inline-flex h-[2.625rem] items-center gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
             >
               {FINAL_CTA.cta}
               {/* 30 across on the phone, 15 after the label, inset 6 from the
                   pill's right edge — the same 6 it gets top and bottom from
                   42 - 30. The pill is content-sized, so those three numbers
                   are all there is to its width. */}
-              <span className="flex size-[1.875rem] shrink-0 items-center justify-center rounded-full bg-[#222222] text-white md:size-[2.5rem]">
-                {/* The house arrow (see the creatives pill): a 15-unit arrow
-                    in a 17-unit viewBox, the extra unit each side being the
-                    stroke's overhang. So the box has to render at 17/15 of the
-                    size the arrow is specified at — the phone's 10 x 10 arrow
-                    needs an 11.33 box, desktop's 14 needs 15.87. Rendering the
-                    box at the arrow's own size draws it 12% short. */}
-                <svg
-                  viewBox="0 0 17 17"
-                  fill="none"
-                  className="size-[0.70833rem] stroke-current md:size-[0.991875rem]"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M0.999888 15.9999L15.9998 1M15.9998 14.1708L15.9998 1L2.82898 1" />
-                </svg>
-              </span>
+              {/* The house arrow (see the creatives pill): a 15-unit arrow in
+                  a 17-unit viewBox, the extra unit each side being the
+                  stroke's overhang. So the box has to render at 17/15 of the
+                  size the arrow is specified at — the phone's 10 x 10 arrow
+                  needs an 11.33 box, desktop's 14 needs 15.87. Rendering the
+                  box at the arrow's own size draws it 12% short.
+
+                  Same disc, same swap and same arrow relay as the creatives
+                  "Yes" pill, which is what was asked for. */}
+              <ArrowDisc
+                disc="size-[1.875rem] md:size-[2.5rem]"
+                arrow="size-[0.70833rem] md:size-[0.991875rem]"
+                viewBox="0 0 17 17"
+                strokeWidth={2}
+              />
             </a>
 
             {/* Flat white at 20% over the card — no border and no tinted fill
