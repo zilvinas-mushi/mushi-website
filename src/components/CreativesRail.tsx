@@ -24,14 +24,27 @@ const PROGRESS_FLOOR = 0.03;
 /**
  * The creatives rail: a finite, arrow-driven carousel.
  *
- * THE ARROWS ARE THE ONLY WAY TO MOVE IT. Dragging was deliberately removed:
- * the rail is meant to be stepped through card by card, in the order the
- * design lays them out, and a drag lets the viewer stop halfway between two
- * cards or skim past several without ever seeing them. The discs advance
- * exactly one card, so every creative gets its turn in the intended sequence.
+ * ON A POINTER, THE ARROWS ARE THE ONLY WAY TO MOVE IT. Dragging was
+ * deliberately removed: the rail is meant to be stepped through card by card,
+ * in the order the design lays them out, and a drag lets the viewer stop
+ * halfway between two cards or skim past several without ever seeing them. The
+ * discs advance exactly one card, so every creative gets its turn in the
+ * intended sequence.
  *
- * That also means no flick/momentum handling — there is no gesture to carry
- * speed over from. The spring below is now driven only by arrow clicks.
+ * ON A PHONE IT SWIPES (Žilvinas 2026-08-25). Below md the rail hands the
+ * offset back to the browser: a real overflow-x scroller with scroll-snap, so
+ * a thumb flick moves it with the platform's own momentum and rubber-banding
+ * and every card still comes to rest on its own edge. Nothing here tries to
+ * reimplement that from pointer events — a JS drag on a touch screen fights
+ * the compositor, loses the vertical-scroll handoff, and gets none of the
+ * momentum for free. The arrows stay, and in this mode they call scrollBy
+ * instead of the spring; the progress line reads scrollLeft back rather than
+ * driving it.
+ *
+ * The desktop path is untouched by any of that — it is still the clipped,
+ * transform-driven track, and the spring below is driven only by arrow clicks
+ * there. There is no flick/momentum handling in it because there is no gesture
+ * to carry speed over from.
  *
  * Nothing moves on its own either; there is no autoplay. It runs from the
  * first card to the last and stops there, with no wrap, so the arrow that
@@ -64,6 +77,13 @@ export function CreativesRail() {
   const trackRef = useRef<HTMLUListElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
   const [enhanced, setEnhanced] = useState(false);
+  /**
+   * Phone mode: the browser owns the offset. Mirrored into a ref because
+   * `paint` runs on scroll and inside rAF, where reading the state variable
+   * would close over a stale value.
+   */
+  const [native, setNative] = useState(false);
+  const nativeRef = useRef(false);
 
   // The rail starts against its left end, so that is the state the server
   // renders: prev already disabled, next live. After mount these are derived
@@ -88,11 +108,16 @@ export function CreativesRail() {
   /** The one place the DOM is written. Reads pos.current, paints, nothing else. */
   const paint = useCallback(() => {
     const track = trackRef.current;
-    if (!track) return;
+    const view = viewRef.current;
+    if (!track || !view) return;
     const max = maxOffset();
-    const at = pos.current;
+    // Phone: READ the offset the browser already has. Desktop: write our own.
+    // Everything below this line — the progress line, the two discs — is the
+    // same readout of the same number either way, which is why the swipe mode
+    // needed no second copy of it.
+    const at = nativeRef.current ? view.scrollLeft : pos.current;
 
-    track.style.transform = `translate3d(${-at}px,0,0)`;
+    if (!nativeRef.current) track.style.transform = `translate3d(${-at}px,0,0)`;
 
     // scaleX, not width: a width change is layout on every frame, a scale is a
     // compositor transform on the same frame budget as the track itself. That
@@ -167,28 +192,82 @@ export function CreativesRail() {
   useEffect(() => {
     snap.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    /**
+     * Swap between the swipe scroller and the transform track, and hand the
+     * current offset across so the rail does not jump when a phone is turned
+     * on its side.
+     *
+     * The handover has to be explicit in BOTH directions: a transform left on
+     * the track would slide it out from under its own scrollbar, and a
+     * scrollLeft left on the view would offset a track that is also being
+     * translated — either way the rail ends up somewhere neither mode meant.
+     */
+    const phone = window.matchMedia("(max-width: 767px)");
+    const applyMode = () => {
+      const view = viewRef.current;
+      const track = trackRef.current;
+      if (!view || !track) return;
+      nativeRef.current = phone.matches;
+      setNative(phone.matches);
+
+      if (phone.matches) {
+        cancelAnimationFrame(raf.current);
+        raf.current = 0;
+        vel.current = 0;
+        track.style.transform = "";
+        view.scrollLeft = pos.current;
+      } else {
+        pos.current = view.scrollLeft;
+        target.current = pos.current;
+        view.scrollLeft = 0;
+      }
+      paint();
+    };
+
     // Deferred a frame: flipping to the transform-driven mode synchronously
     // inside the effect trips react-hooks/set-state-in-effect.
     const enable = requestAnimationFrame(() => {
       setEnhanced(true);
-      paint();
+      applyMode();
     });
+    phone.addEventListener("change", applyMode);
+
+    // Phone mode's only input. rAF-throttled because `paint` measures the
+    // track, and a forced reflow per scroll event is exactly what makes a
+    // momentum flick stutter.
+    let ticking = 0;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = requestAnimationFrame(() => {
+        ticking = 0;
+        paint();
+      });
+    };
+    viewRef.current?.addEventListener("scroll", onScroll, { passive: true });
 
     // Card art loads lazily and the shell is fluid, so the track's width is
     // not final at mount. Re-clamping on every size change keeps the rail
     // inside its ends and refreshes which arrows are live.
     const ro = new ResizeObserver(() => {
-      const max = maxOffset();
-      target.current = Math.min(target.current, max);
-      pos.current = Math.min(pos.current, max);
+      // In phone mode the browser clamps its own scrollLeft, so there is
+      // nothing to re-clamp — only the readout to refresh.
+      if (!nativeRef.current) {
+        const max = maxOffset();
+        target.current = Math.min(target.current, max);
+        pos.current = Math.min(pos.current, max);
+      }
       paint();
     });
     if (trackRef.current) ro.observe(trackRef.current);
     if (viewRef.current) ro.observe(viewRef.current);
 
+    const view = viewRef.current;
     return () => {
       cancelAnimationFrame(enable);
       cancelAnimationFrame(raf.current);
+      cancelAnimationFrame(ticking);
+      phone.removeEventListener("change", applyMode);
+      view?.removeEventListener("scroll", onScroll);
       ro.disconnect();
     };
   }, [paint]);
@@ -204,14 +283,28 @@ export function CreativesRail() {
 
   // Steps from the TARGET, not from the current position, so three quick
   // clicks advance three cards instead of collapsing into one and a half.
-  const nudge = (dir: 1 | -1) => goTo(target.current + dir * cardStep());
+  //
+  // In phone mode the browser is the one moving, so the step goes through
+  // scrollBy — which is relative to where the scroller actually IS, and lands
+  // on a snap point because the step is exactly one card plus one gap.
+  const nudge = (dir: 1 | -1) => {
+    const view = viewRef.current;
+    if (nativeRef.current && view) {
+      view.scrollBy({
+        left: dir * cardStep(),
+        behavior: snap.current ? "auto" : "smooth",
+      });
+      return;
+    }
+    goTo(target.current + dir * cardStep());
+  };
 
   // Module-constant data, so the cards are built once. Without this every
   // enabled/disabled flip would reconcile the whole rail.
   const cards = useMemo(
     () =>
       CREATIVES.items.map((item) => (
-        <li key={`${item.handle}-${item.caption}`} className="flex">
+        <li key={`${item.handle}-${item.caption}`} className="flex snap-start">
           <CreativeCard item={item} />
         </li>
       )),
@@ -238,9 +331,24 @@ export function CreativesRail() {
           modes: before hydration this is a plain overflow-x scroller so the
           rail is not a dead box without JavaScript, and the moment React takes
           over it becomes the clipped, transform-driven track. */}
+      {/* Two modes, and the pre-hydration render is the same box as the phone
+          one: a plain snap scroller, so the rail is never a dead box without
+          JavaScript and a phone simply keeps it. Only a pointer viewport swaps
+          to the clipped, transform-driven track once React takes over.
+
+          `scroll-pl` puts the snap positions on the CONTENT column rather than
+          the screen edge — the track's own left gutter is padding, so without
+          it every card would come to rest a gutter to the left of where the
+          heading above it starts. `overscroll-x-contain` keeps a flick that
+          runs off the end from turning into a browser back-swipe. */}
       <div
         ref={viewRef}
-        className={enhanced ? "overflow-hidden" : "scroll-row overflow-x-auto"}
+        style={{ scrollPaddingLeft: RAIL_GUTTER }}
+        className={
+          enhanced && !native
+            ? "overflow-hidden"
+            : "scroll-row snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+        }
       >
         {/* The gutters put the track's two ends back on the shell's content
             edges: the first card starts under the heading, and the last one
