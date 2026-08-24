@@ -253,29 +253,49 @@ export const HERO_PANELS: HeroPanel[] = [
 ];
 
 /**
- * The hero sub breaks in ONE specific place in the design:
+ * The hero sub breaks in ONE specific place per frame, and the two frames do
+ * not agree:
  *
- *   Paid ads, banger creatives, landing pages,
- *   and strategy - all led by us, under one roof.
+ *   desktop (2 lines)          phone (3 lines)
+ *   Paid ads, banger           Paid ads, banger creatives, landing
+ *   creatives, landing pages,  pages, and strategy - all led by us,
+ *   and strategy - all led     under one roof.
+ *   by us, under one roof.
  *
- * Left to the browser it put "and" at the end of the first line, which is what
- * was reported against the live page. No width can be trusted to produce the
- * right break — it shifts with the viewport, and again while the fallback face
- * is showing before Poppins loads — so the break is authored, not tuned.
+ * Left to the browser neither one comes out right: desktop put "and" at the
+ * end of line one, and a 375-wide phone fits "pages," on line one, which is
+ * the design's line two. No width can be trusted to produce either break — it
+ * shifts with the viewport, and again while the fallback face is showing
+ * before Poppins loads — so both breaks are authored, not tuned.
  *
- * Hence LINES, with `sub` joined from them rather than typed twice: the flat
- * string is still what any single-string consumer wants, and the two can never
- * drift apart.
+ * PARTS, not lines, because the phone breaks INSIDE the desktop's first line
+ * ("...landing / pages, and..."). Cut at every point either frame breaks at
+ * and the two orders are the same four pieces with different <br>s between
+ * them; a per-frame list of whole lines would repeat the copy twice and let
+ * the two drift apart.
+ *
+ *   desktop:  a b / c d        phone:  a / b c / d
+ *
+ * `lines` and `sub` are still assembled from the parts, so any consumer that
+ * wants the flat sentence gets it without the copy being typed again.
  */
+const HERO_SUB_PARTS = {
+  a: "Paid ads, banger creatives, landing",
+  b: "pages,",
+  c: "and strategy - all led by us,",
+  d: "under one roof.",
+} as const;
+
 const HERO_SUB_LINES = [
-  "Paid ads, banger creatives, landing pages,",
-  "and strategy - all led by us, under one roof.",
+  `${HERO_SUB_PARTS.a} ${HERO_SUB_PARTS.b}`,
+  `${HERO_SUB_PARTS.c} ${HERO_SUB_PARTS.d}`,
 ] as const;
 
 export const HERO = {
   eyebrow: "Growth Partner for eCom & AI brands",
   heading: "Your Path to $100M.",
   subLines: HERO_SUB_LINES,
+  subParts: HERO_SUB_PARTS,
   sub: HERO_SUB_LINES.join(" "),
   primaryCta: "15 Minute Fit-Check",
   secondaryCta: "Steal Our Secrets",

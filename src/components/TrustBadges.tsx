@@ -8,7 +8,15 @@
  */
 
 type Badge = {
-  title: string;
+  /**
+   * The award's name, cut where the PHONE frame breaks it. Authored rather
+   * than left to the column width: at 375 the three columns are ~110 wide and
+   * every title wraps on its own, but a 430-wide phone gives ~128 — enough for
+   * "Trustpilot Reviews" to sit on ONE line, which is not the design (Žilvinas
+   * 2026-08-25: Reviews is always on the second line). The break is phone-only;
+   * from md up the two halves rejoin into a normal string.
+   */
+  titleLines: [string, string];
   meta: string;
   logo: string;
 };
@@ -47,17 +55,17 @@ function Laurel({ flip = false }: { flip?: boolean }) {
 
 const BADGES: Badge[] = [
   {
-    title: "Foreplay Best Ad Award",
+    titleLines: ["Foreplay Best", "Ad Award"],
     meta: "Winner 2025",
     logo: "/badges/firstpick.svg",
   },
   {
-    title: "Trustpilot Reviews",
+    titleLines: ["Trustpilot", "Reviews"],
     meta: "Rated 4.9",
     logo: "/badges/trustpilot.svg",
   },
   {
-    title: "FirstPick's VC Mentors",
+    titleLines: ["FirstPick's VC", "Mentors"],
     meta: "AI Accelerator",
     logo: "/badges/foreplay.svg",
   },
@@ -66,11 +74,14 @@ const BADGES: Badge[] = [
 export function TrustBadges() {
   return (
     // This top margin IS the gap between the hero's two CTAs and the awards —
-    // nothing sits between them — so the design's 50 lives here. Below md it
-    // stays at 24 until the phone pass sets its own value.
-    <ul className="mt-[calc(var(--pu)*24)] grid grid-cols-3 gap-[calc(var(--pu)*8)] md:mt-[calc(var(--hero-u)*0.5)] md:flex md:flex-wrap md:items-center md:justify-center md:gap-x-8 md:gap-y-4">
-      {BADGES.map(({ title, meta, logo }) => (
-        <li key={title} className="flex flex-col items-center gap-[calc(var(--pu)*8)] text-center md:flex-row md:gap-3 md:text-left">
+    // nothing sits between them — so the design's 50 lives here. The phone
+    // frame's own number is 36 (Žilvinas 2026-08-25), flat rather than through
+    // --pu for the same reason as the sub and the CTA row above it: the
+    // headline is a flat 32 and this whole stack has to keep the design's
+    // spacing next to it on a short window.
+    <ul className="mt-9 grid grid-cols-3 gap-[calc(var(--pu)*8)] md:mt-[calc(var(--hero-u)*0.5)] md:flex md:flex-wrap md:items-center md:justify-center md:gap-x-8 md:gap-y-4">
+      {BADGES.map(({ titleLines, meta, logo }) => (
+        <li key={titleLines.join(" ")} className="flex flex-col items-center gap-[calc(var(--pu)*8)] text-center md:flex-row md:gap-3 md:text-left">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logo}
@@ -88,8 +99,10 @@ export function TrustBadges() {
             className="size-[calc(var(--pu)*40)] shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
           />
           {/* On the phone the two lines differ: the award name is Poppins
-              medium 14 on a tight 16 line, the "Winner 2025" line under it
-              medium 12.
+              medium 14 on a FLAT 16 line — flat for the same reason as the
+              hero sub above it (Žilvinas 2026-08-25); through --pu a short
+              window set it at 12.6/14.4. The "Winner 2025" line under it stays
+              medium 12 on --pu.
 
               From md up they go back to being the same size AND the same
               weight — both Poppins MEDIUM 16, separated only by colour. The
@@ -108,8 +121,10 @@ export function TrustBadges() {
               u because shrinking THEM in a short window is free, where
               shrinking the words is not. */}
           <span className="text-center md:text-left">
-            <span className="block text-[length:calc(var(--pu)*14)] font-medium leading-[calc(var(--pu)*16)] text-white md:text-[length:calc(var(--hero-w)*0.16)] md:leading-snug">
-              {title}
+            <span className="block text-[0.875rem] font-medium leading-[16px] text-white md:text-[length:calc(var(--hero-w)*0.16)] md:leading-snug">
+              {titleLines[0]}
+              <br className="md:hidden" />{" "}
+              {titleLines[1]}
             </span>
             <span className="flex items-center justify-center gap-1.5 text-[length:calc(var(--pu)*12)] font-medium text-zinc-500 md:justify-start md:text-[length:calc(var(--hero-w)*0.16)]">
               <Laurel flip />

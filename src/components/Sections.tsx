@@ -110,8 +110,15 @@ function Pill({
   // header CTA independently. The height was
   // 56 here — the old 0.75 scale-down for a 1440 viewport — and is now the
   // design's 67 at lg. Below lg it still steps down; that is the phone pass.
+  // Phone radius is 10, not the desktop 15 (Žilvinas 2026-08-25): at 44 tall
+  // the same 15 read as a half-pill on a button a third the desktop width.
+  //
+  // 10 EITHER SIDE OF THE LABEL on phones, same day — so the button is the
+  // words plus 20 and nothing more. It was 20 a side, which on a 375 screen
+  // spent a tenth of the width on air. Desktop keeps its measured
+  // 0.32u padding.
   const base =
-    "inline-flex h-[calc(var(--pu)*44)] items-center justify-center rounded-[0.9375rem] px-5 text-[length:calc(var(--pu)*14)] font-semibold uppercase leading-none transition-all duration-300 ease-out hover:-translate-y-[1px] md:h-[3rem] md:px-6 md:text-[1.125rem] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
+    "inline-flex h-[calc(var(--pu)*44)] items-center justify-center rounded-[0.625rem] px-[0.625rem] text-[length:calc(var(--pu)*14)] font-semibold uppercase leading-none transition-all duration-300 ease-out hover:-translate-y-[1px] md:h-[3rem] md:px-6 md:text-[1.125rem] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
@@ -291,38 +298,57 @@ export function Hero() {
         </h1>
 
         {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
-            case from md up, and nothing above sets tracking. Below md it steps
-            down to 16, which the phone pass has now set.
+            case from md up, and nothing above sets tracking. Below md it is
+            Poppins Regular 16 on a flat 20 line.
 
-            THE DESKTOP BREAK IS AUTHORED (see HERO_SUB_LINES). The browser was
-            ending line one on "and"; a hard <br> is the only thing that
-            guarantees the design's break at every width and while the fallback
-            face is still showing. It is md-and-up only — the phone frame is a
-            different design and keeps flowing inside 680 on its own 16/20.
+            BOTH BREAKS ARE AUTHORED (see HERO_SUB_PARTS): two lines from md
+            up, THREE on every phone. The browser gets neither right on its
+            own — it ended the desktop line one on "and", and a 375-wide
+            viewport pulls "pages," up onto phone line one, which is the
+            design's line two. A hard <br> per frame is the only thing that
+            holds either break at every width and while the fallback face is
+            still showing.
 
-            `md:max-w-none` goes with it: at 680 the second line is wider than
-            the box at 30px type, so it would re-wrap and the <br> would have
-            bought nothing.
+            The two <br>s are mutually exclusive: `md:hidden` for the phone's
+            two, `hidden md:inline` for the desktop's one, around parts cut at
+            every point either frame breaks at.
 
-            Note the trailing space — it keeps the two lines a normal sentence
-            once the <br> is display:none, and CSS drops it at the start of a
-            line when the break IS active, so it costs nothing. */}
-        {/* Phones: Poppins Regular 16 on a FLAT 20px line — Žilvinas
-            2026-08-11, restated 2026-08-19. The leading is deliberately outside
-            --pu: the phone unit shrinks the whole first screen to fit short
-            viewports, and quoting the line height through it took the sub to
-            17.9 on a 725-tall window. Everything else here still scales.
-            Desktop keeps its measured --hero-u scaling. */}
-        <p className="mx-auto mt-[calc(var(--pu)*24)] max-w-[42.5rem] text-pretty text-[length:calc(var(--pu)*16)] font-normal leading-[20px] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
-          {HERO.subLines[0]}
+            `md:max-w-none` goes with the desktop one: at 680 the second line
+            is wider than the box at 30px type, so it would re-wrap and the
+            <br> would have bought nothing.
+
+            Note the trailing space after each <br> — it keeps the parts a
+            normal sentence while that break is display:none, and CSS drops it
+            at the start of a line when the break IS active, so it costs
+            nothing.
+
+            SIZE, LEADING AND THE GAP ABOVE ARE ALL FLAT PX ON THE PHONE —
+            16 / 20, and mt-3 for the design's 12 under the headline (Žilvinas
+            2026-08-25). Deliberately outside --pu, like the headline above:
+            the phone unit shrinks the first screen to fit short viewports, and
+            through it a 725-tall window rendered the sub at 14.3/17.9 and the
+            gap at 10.7. The headline is already a flat 32, so the block under
+            it is quoted the same way or the two drift apart on exactly the
+            windows --pu exists for. Desktop keeps its measured --hero-u
+            scaling. */}
+        <p className="mx-auto mt-3 max-w-[42.5rem] text-[1rem] font-normal leading-[20px] text-white md:mt-[calc(var(--hero-u)*0.24)] md:max-w-none md:text-[length:calc(var(--hero-u)*0.3)] md:leading-[calc(var(--hero-u)*0.4)]">
+          {HERO.subParts.a}
+          <br className="md:hidden" />{" "}
+          {HERO.subParts.b}
           <br className="hidden md:inline" />{" "}
-          {HERO.subLines[1]}
+          {HERO.subParts.c}
+          <br className="md:hidden" />{" "}
+          {HERO.subParts.d}
         </p>
 
         {/* `isolate` keeps the glow's -z-10 inside this row's stacking
             context — without it the glow would drop behind .hero-bg's
-            background and vanish. */}
-        <div className="relative isolate mt-[calc(var(--pu)*40)] flex items-center justify-center gap-2.5 sm:gap-4 md:mt-[calc(var(--hero-u)*0.4)]">
+            background and vanish.
+
+            25 under the sub on phones (Žilvinas 2026-08-25), flat like the
+            block above it — see the note on the sub for why the phone side of
+            this stack is no longer quoted through --pu. */}
+        <div className="relative isolate mt-[25px] flex items-center justify-center gap-2.5 sm:gap-4 md:mt-[calc(var(--hero-u)*0.4)]">
           <span
             aria-hidden="true"
             className="cta-glow pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2"
@@ -528,15 +554,23 @@ export function Creatives() {
             // jammed into the right edge, so it is pulled in a little. Desktop
             // keeps the measured alignment.
             //
-            // Phone gap is 15px between "Yes" and the disc. The phone pill has
-            // no fixed width — it is pl-5 + text + gap + disc + pr-1.5 — so
-            // widening the gap grows the button rather than squeezing the
-            // word, which is the intended reading.
+            // THE PHONE PILL IS MEASURED TOO, as of 2026-08-25: 100 x 42,
+            // radius 100 (which is --radius-pill already), 15 between "Yes"
+            // and the disc, and the 34 disc inset 4 from the right — the same
+            // 4 it gets top and bottom from 42 - 34.
+            //
+            // It used to have no fixed width: pl-5 + text + gap + disc + pr,
+            // so the left padding was a number of its own and the leftover
+            // fell wherever the word happened to end. `justify-end` with a
+            // fixed 100 is the desktop's arrangement at the phone's size —
+            // content packed right, so the 15 and the 4 are literal and the
+            // remaining ~12 lands to the left of "Yes" instead of being a
+            // second padding value to keep in sync with the word's width.
             //
             // The hover gradient repeats the rest state's THREE stop positions
             // in white. A 2-stop hover against a 3-stop rest cannot interpolate,
             // so the fill snapped no matter what the transition said.
-            className="group mr-3 inline-flex h-[2.8125rem] shrink-0 items-center gap-[0.9375rem] rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-5 pr-[0.375rem] text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:justify-end md:gap-[1.125rem] md:rounded-[1.875rem] md:pl-0 md:pr-[0.46875rem] md:text-[1.875rem]"
+            className="group mr-3 inline-flex h-[2.625rem] w-[6.25rem] shrink-0 items-center justify-end gap-[0.9375rem] rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pr-1 text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:gap-[1.125rem] md:rounded-[1.875rem] md:pr-[0.46875rem] md:text-[1.875rem]"
           >
             {CREATIVES.cta}
             {/* ~/Documents/arrow icon.svg, inlined in ArrowDisc. The path
@@ -753,7 +787,14 @@ export function CaseStudies() {
 
 /* -------------------------------------------------------- testimonials --- */
 
-function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
+function TestimonialCard({
+  t,
+  style,
+}: {
+  t: (typeof TESTIMONIALS.items)[number];
+  /** Carries the phone reading order — see TestimonialColumns. */
+  style?: React.CSSProperties;
+}) {
   return (
     /* #181818 at radius 20, both from Figma. The fill was #161519, an
        eyeballed near-black. NOTE this is NOT the same grey as the
@@ -764,7 +805,7 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
        screen), 28 on top, and 35 under the byline — the same 35 that sits
        between the quote and the byline, so the footer reads as its own band
        rather than as the end of the last paragraph. Desktop stays even. */
-    <article className="rounded-[1.25rem] bg-[#181818] px-5 pb-[2.1875rem] pt-7 md:p-7">
+    <article style={style} className="rounded-[1.25rem] bg-[#181818] px-5 pb-[2.1875rem] pt-7 md:p-7">
       {/* TITLE AND STARS ARE ONE COLUMN, with the avatar beside them.
           The stars used to be a sibling BELOW this row, which made the space
           under the title depend on the avatar: the row is as tall as its
@@ -817,10 +858,13 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
       {/* Phone rhythm is tighter than desktop's throughout this card: 12 to
           the quote, 12 between paragraphs and 16 to the byline. The md values
           are the design's and are unchanged. */}
-      {/* 20 from the stars to the quote on the phone, off the artboard —
-         and a true 20 now that the stars' line box is gone (see above).
-         Desktop keeps 16. The 12 BETWEEN paragraphs is unchanged. */}
-      <div className="mt-5 space-y-3 md:mt-4 md:space-y-4">
+      {/* 15 from the stars to the quote on the phone — the SAME 15 that sits
+         above the stars (Žilvinas 2026-08-25), so the row is evenly spaced
+         between the title and the quote rather than sitting closer to the
+         title. It was 20. Both are true numbers now that the stars' line box
+         is gone (see above). Desktop keeps 16, and the 12 BETWEEN paragraphs
+         is unchanged. */}
+      <div className="mt-[0.9375rem] space-y-3 md:mt-4 md:space-y-4">
         {t.body.map((para, i) => (
           <p key={i} className="text-[0.875rem] font-normal leading-relaxed text-white/50 md:text-[1.3125rem]">
             {para}
@@ -850,6 +894,22 @@ function TestimonialCard({ t }: { t: (typeof TESTIMONIALS.items)[number] }) {
  * design. CSS multicol fills the whole first column before the second, which
  * is not the design's order. `flip` continues the global alternation into the
  * hidden set so an odd shown-count does not restart the pattern on the left.
+ *
+ * ON A PHONE THERE IS ONLY ONE COLUMN, and it reads in `items` order —
+ * Kovger, Skomra, Želnytė, ... (Žilvinas 2026-08-25). That is NOT what
+ * stacking the two column <div>s gives: they concatenate, so the whole left
+ * column came first and the phone read Kovger, Želnytė, Juzėnas, Semetaitė,
+ * THEN Skomra — the alternation, which only means anything while there are two
+ * columns to alternate between, flattened into a shuffle.
+ *
+ * The fix is `display: contents` on the two columns below md, which dissolves
+ * them so all seven cards become items of the one-column grid, plus each
+ * card's own index as its CSS `order` to put them back in reading order. The
+ * DOM stays exactly as desktop needs it — one list, no duplicated cards.
+ *
+ * `md:space-y-6` rather than `space-y-6`: while the columns are dissolved the
+ * grid's own `gap-6` spaces the cards, and a margin on top of that would
+ * double the gap for every card after the first in each column.
  */
 function TestimonialColumns({
   list,
@@ -858,21 +918,23 @@ function TestimonialColumns({
   list: readonly (typeof TESTIMONIALS.items)[number][];
   flip?: boolean;
 }) {
-  const L: (typeof TESTIMONIALS.items)[number][] = [];
-  const R: (typeof TESTIMONIALS.items)[number][] = [];
-  list.forEach((t, i) => ((i % 2 === 0) !== flip ? L : R).push(t));
+  type Placed = { t: (typeof TESTIMONIALS.items)[number]; i: number };
+  const L: Placed[] = [];
+  const R: Placed[] = [];
+  list.forEach((t, i) => ((i % 2 === 0) !== flip ? L : R).push({ t, i }));
+  const column = (cards: Placed[]) => (
+    <div className="contents md:block md:space-y-6">
+      {cards.map(({ t, i }) => (
+        // `order` only applies to a flex/grid item, so it is live exactly
+        // while the wrapper above is `display: contents` and inert from md up.
+        <TestimonialCard key={t.title} t={t} style={{ order: i }} />
+      ))}
+    </div>
+  );
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      <div className="space-y-6">
-        {L.map((t) => (
-          <TestimonialCard key={t.title} t={t} />
-        ))}
-      </div>
-      <div className="space-y-6">
-        {R.map((t) => (
-          <TestimonialCard key={t.title} t={t} />
-        ))}
-      </div>
+      {column(L)}
+      {column(R)}
     </div>
   );
 }
@@ -888,7 +950,11 @@ export function Testimonials() {
             block rather than a <br>, so the break survives any wrapping. */}
         <h2
           id="testimonials-heading"
-          className="text-[1.375rem] font-semibold leading-tight tracking-tight md:text-[3rem] md:leading-[3rem]"
+          // 22 on a flat 22 line on the phone (Žilvinas 2026-08-25) — the two
+          // sentences sit tight on top of each other, the same size-equals-
+          // leading the desktop 48/48 uses. `leading-tight` was 1.25, i.e.
+          // 27.5, which opened a gap between them the artboard does not have.
+          className="text-[1.375rem] font-semibold leading-[1.375rem] tracking-tight md:text-[3rem] md:leading-[3rem]"
         >
           {TESTIMONIALS.headingLines.map((line) => (
             <span key={line} className="block">
