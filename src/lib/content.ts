@@ -557,14 +557,14 @@ export const CREATIVES = {
  * cards order themselves against each other.
  */
 export const CASE_STUDIES = {
-  heading: "Not Just Pretty, but Profitable.",
+  heading: "Not Just Premium, but Profitable.",
   /**
    * The phone artboard breaks after the comma and sets the pair on two 24px
    * lines (Figma box 236 x 52). Left to itself the line fits — 342px inside a
    * 345px column at 375 wide — so the break has to be authored or it never
    * happens. Desktop is one line, which is what the reference shows there.
    */
-  headingLines: ["Not Just Pretty,", "but Profitable."],
+  headingLines: ["Not Just Premium,", "but Profitable."],
   items: [
     {
       brand: "Breezit",
