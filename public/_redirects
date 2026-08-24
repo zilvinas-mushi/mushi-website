@@ -1,0 +1,9 @@
+# Cloudflare Pages redirects. Copied verbatim into out/ at build time.
+#
+# The Shopify site that served mushi.agency until the cutover had three real
+# URLs; this site is a single "/" route, so without these they 404 and the
+# accumulated links rot. Templates now live in the webapp, so that one leaves
+# the site entirely rather than dumping the visitor on the home page.
+/pages/waitlist    /                                  301
+/blogs/news        /                                  301
+/pages/templates   https://app.mushi.agency/templates 301
