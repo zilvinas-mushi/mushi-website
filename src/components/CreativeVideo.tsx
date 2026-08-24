@@ -345,24 +345,19 @@ export function CreativeVideo({
             </span>
           </span>
         ) : (
-          // Bigger and darker than the first pass: this sits over ad footage
-          // that is frequently light, and at 32px on black/45 it disappeared
-          // into whatever was behind it.
+          // The design's control, both frames (Žilvinas 2026-08-25): 28 x 26,
+          // radius 19.5 — past half the height, so it renders as a full pill
+          // either way, but the number is the one from the file — on a flat
+          // #4F4F4F at 50%. No ring, no shadow, no backdrop blur: those were
+          // this component's own additions to hold a 32px disc against light
+          // footage, and the design answers that with the grey fill instead.
+          // Hover deepens the same grey rather than going black, so the
+          // control never changes colour, only weight.
           <span
             aria-hidden="true"
-            className="absolute bottom-2.5 right-2.5 grid size-9 place-items-center rounded-full bg-black/60 text-white shadow-sm ring-1 ring-white/20 backdrop-blur-sm transition duration-200 ease-out group-hover:bg-black"
+            className="absolute bottom-2.5 right-2.5 grid h-[26px] w-[28px] place-items-center rounded-[19.5px] bg-[#4F4F4F]/50 text-white transition duration-200 ease-out group-hover:bg-[#4F4F4F]/80"
           >
-            {sound ? (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="size-[1.125rem]" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 8.5H3v7h3.5L11 19V5Z" />
-                <path strokeLinecap="round" d="M15 9.5a3.5 3.5 0 0 1 0 5M17.8 7a7 7 0 0 1 0 10" />
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="size-[1.125rem]" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 8.5H3v7h3.5L11 19V5Z" />
-                <path strokeLinecap="round" d="m15.5 9.5 5 5m0-5-5 5" />
-              </svg>
-            )}
+            {sound ? <VolumeOn /> : <VolumeOff />}
           </span>
         )}
       </button>
@@ -370,3 +365,42 @@ export function CreativeVideo({
     </div>
   );
 }
+
+/**
+ * The two states of the sound control, as SOLID glyphs — a filled speaker with
+ * two waves, and the same speaker with a slash knocked through it.
+ *
+ * `VolumeOff` is the artwork Žilvinas supplied on 2026-08-25 ("sound close"),
+ * traced to a path rather than kept as it arrived: the export was a 16 x 16
+ * <svg> wrapping a 3000 x 3000 PNG, 1.3 MB of raster for an 18px icon, which
+ * is the whole page's image budget spent on one control and still blurry on a
+ * retina screen. The trace is within 1.5% of the original's coverage and is
+ * about a kilobyte.
+ *
+ * Note the slash is a knockout — the gap around the bar is what the disc's
+ * grey shows through — so the two subpaths are the glyph exactly as drawn, not
+ * a speaker with a line laid over it.
+ *
+ * `VolumeOn` is its counterpart in the same family (Material Symbols, filled,
+ * which is what the supplied glyph is): the same speaker and waves, no slash.
+ * Its own viewBox, so the artwork stays untouched; both are drawn at the same
+ * rendered size and the states never appear together anyway.
+ */
+function VolumeOff() {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" className={SOUND_ICON} aria-hidden="true">
+      <path d="M14.31 14.17 L13.83 14.19 L13.63 14.1 L3.56 4.04 L2.5 2.9 L2.45 2.75 L2.45 2.43 L2.55 2.22 L2.66 2.14 L2.79 2.11 L3.16 2.11 L3.3 2.16 L5.6 4.49 L5.83 4.63 L5.96 4.57 L8.23 2.29 L8.49 2.14 L8.68 2.22 L8.76 2.33 L8.78 2.46 L8.78 7.42 L8.81 7.65 L8.92 7.8 L10.31 9.19 L10.44 9.25 L10.55 9.2 L10.7 8.93 L10.75 8.75 L10.77 8.0 L10.75 7.48 L10.55 7.01 L10.1 6.36 L10.07 6.12 L10.13 5.92 L10.55 5.54 L10.76 5.52 L10.94 5.65 L11.25 6.02 L11.63 6.66 L11.81 7.12 L11.91 7.85 L11.81 9.13 L11.62 9.63 L11.37 10.07 L11.37 10.21 L11.47 10.37 L12.15 11.03 L12.29 11.11 L12.43 11.07 L12.56 10.91 L12.75 10.62 L13.1 9.89 L13.29 9.31 L13.42 8.44 L13.43 7.81 L13.28 6.9 L13.09 6.38 L12.73 5.68 L12.39 5.17 L11.96 4.63 L11.85 4.45 L11.84 4.33 L11.99 4.07 L12.3 3.8 L12.59 3.78 L12.76 3.84 L12.86 3.93 L13.46 4.64 L14.0 5.64 L14.35 6.62 L14.4 7.09 L14.51 7.55 L14.53 8.66 L14.35 9.72 L14.0 10.65 L13.65 11.3 L13.22 11.97 L13.36 12.22 L14.51 13.38 L14.53 13.91 L14.46 14.06Z M8.59 14.17 L8.43 14.15 L8.16 13.94 L5.05 10.84 L4.83 10.8 L2.82 10.8 L2.67 10.75 L2.5 10.6 L2.45 10.34 L2.45 5.92 L2.49 5.73 L2.65 5.57 L2.8 5.51 L2.98 5.52 L3.31 5.76 L8.73 11.19 L8.78 11.46 L8.78 13.89 L8.73 14.06Z" />
+    </svg>
+  );
+}
+
+function VolumeOn() {
+  return (
+    <svg viewBox="0 -960 960 960" fill="currentColor" className={SOUND_ICON} aria-hidden="true">
+      <path d="M560-131v-82q124-28 202-125.5T840-480q0-124-78-221.5T560-827v-82q158 29 259 151.5T920-480q0 155-101 277.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320Z" />
+    </svg>
+  );
+}
+
+/** One size for both states, so the disc's contents cannot drift apart. */
+const SOUND_ICON = "size-5";
