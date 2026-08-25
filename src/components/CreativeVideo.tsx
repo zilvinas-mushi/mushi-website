@@ -381,10 +381,27 @@ export function CreativeVideo({
  * grey shows through — so the two subpaths are the glyph exactly as drawn, not
  * a speaker with a line laid over it.
  *
- * `VolumeOn` is its counterpart in the same family (Material Symbols, filled,
- * which is what the supplied glyph is): the same speaker and waves, no slash.
- * Its own viewBox, so the artwork stays untouched; both are drawn at the same
- * rendered size and the states never appear together anyway.
+ * `VolumeOn` IS THE SAME ARTWORK WITH THE SLASH LIFTED OUT — not a glyph from
+ * some other set. It was briefly Material Symbols' `volume_up`, which is the
+ * wrong drawing: measured against the supplied glyph it fills 88% of its box
+ * against 76%, its speaker is 45% of the width against 52%, and its waves are
+ * half again as thick. Side by side the two states read as two different
+ * icons, which is exactly how it looked (Žilvinas 2026-08-25).
+ *
+ * Recovering it is possible because of two properties of the supplied file:
+ * the slash is a white BAR with a knockout gap either side (not a line drawn
+ * over the speaker), and the speaker with its waves is symmetric about the
+ * horizontal centre line. So: delete the bar, mirror what is left about that
+ * centre line, and union the two — the mirrored copy covers the diagonal gap,
+ * because the gap runs one way and its mirror runs the other. The only place
+ * that leaves is where the two gaps cross, a diamond in the middle of the
+ * cone, which is filled from the solid speaker around it and clipped at the
+ * cone's own right edge so nothing spills past it.
+ *
+ * The result is within a hundredth of a unit of the muted glyph's bounding box
+ * on all four sides, which is what makes the two states swap without the
+ * control appearing to change size. Both are traced the same way, so they
+ * carry the same corner rounding and the same wave thickness.
  */
 function VolumeOff() {
   return (
@@ -396,8 +413,8 @@ function VolumeOff() {
 
 function VolumeOn() {
   return (
-    <svg viewBox="0 -960 960 960" fill="currentColor" className={SOUND_ICON} aria-hidden="true">
-      <path d="M560-131v-82q124-28 202-125.5T840-480q0-124-78-221.5T560-827v-82q158 29 259 151.5T920-480q0 155-101 277.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320Z" />
+    <svg viewBox="0 0 16 16" fill="currentColor" className={SOUND_ICON} aria-hidden="true">
+      <path d="M8.57 14.17 L8.42 14.16 L8.18 13.98 L6.0 11.79 L5.78 11.64 L5.64 11.43 L5.16 10.96 L5.05 10.91 L4.88 10.94 L4.72 10.83 L4.58 10.8 L2.76 10.8 L2.64 10.75 L2.51 10.62 L2.45 10.37 L2.45 5.95 L2.51 5.7 L2.64 5.57 L2.79 5.51 L4.58 5.52 L4.72 5.49 L4.88 5.38 L5.05 5.41 L5.16 5.36 L5.64 4.89 L5.78 4.68 L6.0 4.53 L8.18 2.34 L8.39 2.17 L8.49 2.14 L8.7 2.22 L8.78 2.4 L8.78 6.56 L8.82 6.74 L8.92 6.9 L8.81 7.11 L8.78 7.36 L8.79 9.09 L8.83 9.26 L8.92 9.41 L8.82 9.58 L8.78 9.76 L8.78 13.89 L8.73 14.06Z M12.31 12.75 L11.73 12.21 L11.66 12.09 L12.22 11.37 L12.3 11.15 L12.45 11.03 L12.71 10.67 L13.08 9.93 L13.28 9.31 L13.41 8.48 L13.42 8.03 L13.28 6.98 L13.09 6.42 L12.92 6.03 L12.53 5.38 L12.3 5.17 L12.22 4.95 L11.66 4.23 L11.73 4.11 L12.3 3.57 L12.44 3.72 L12.79 3.87 L13.09 4.15 L13.29 4.16 L13.29 4.39 L13.83 5.3 L14.17 6.08 L14.36 6.66 L14.41 7.07 L14.51 7.46 L14.54 7.9 L14.53 8.74 L14.4 9.28 L14.36 9.66 L13.99 10.68 L13.64 11.37 L13.3 11.9 L13.27 12.0 L13.29 12.16 L13.09 12.17 L12.79 12.45 L12.44 12.6Z M10.54 10.97 L10.38 10.86 L9.89 10.35 L10.02 10.21 L10.12 9.92 L10.38 9.58 L10.44 9.3 L10.63 9.07 L10.74 8.77 L10.77 8.03 L10.72 7.46 L10.6 7.21 L10.44 7.02 L10.36 6.72 L10.12 6.4 L10.02 6.11 L9.89 5.98 L10.53 5.35 L10.94 5.65 L11.36 6.15 L11.8 7.11 L11.91 7.9 L11.91 8.48 L11.83 9.12 L11.62 9.65 L11.3 10.28 L10.92 10.68Z" />
     </svg>
   );
 }
