@@ -310,7 +310,7 @@ export function SiteFooter() {
           copyright stay centred; the four link groups set from the column's
           left edge.
         */}
-        <div className="grid w-full gap-9 md:grid-cols-[599fr_313fr_213fr_255fr] md:gap-0">
+        <div className="grid w-full gap-10 md:grid-cols-[599fr_313fr_213fr_255fr] md:gap-0">
           <div className="text-center md:text-left">
             {/* Behind FOOTER.giftEnabled — see content.ts. The whole capture
                 is kept, not deleted, so bringing it back is one boolean. */}
@@ -399,7 +399,26 @@ export function SiteFooter() {
               <span className="text-[1rem] md:text-[1.25rem]">
                 {FOOTER.trustpilot.label}
               </span>
-              <span className="text-[1.375rem] font-semibold md:text-[1.5rem]">
+              {/*
+                THE SCORE SITS ON THE LABEL'S BASELINE, and -2px is what puts
+                it there. `items-center` above centres the three BOXES, and two
+                boxes of different font-size centred on each other do not share
+                a baseline: with `leading-none` a box is its font-size tall and
+                the baseline sits ~0.85 down it, so the offset is
+                (22 - 16) x (0.85 - 0.5) = 2.1. Measured in the browser it is
+                exactly 2.0, and the frame sets both on one baseline.
+
+                A transform, so it moves the glyph without changing the row's
+                height or the 39 above it. Phone only — the desktop row is a
+                grid on the export's own stops and already agrees.
+
+                Boxes, not baselines, for the flex as a whole: `items-baseline`
+                would drag the STAR with it and put it ~2 too high. Its centre
+                currently sits 5.5 above the label's baseline, which is what
+                the frame measures (~5-6), so the star is the part that was
+                already right.
+              */}
+              <span className="-translate-y-[2px] text-[1.375rem] font-semibold md:translate-y-0 md:text-[1.5rem]">
                 {FOOTER.trustpilot.score}
               </span>
             </p>
