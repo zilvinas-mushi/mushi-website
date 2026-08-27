@@ -297,20 +297,40 @@ html {
 
   /*
     THE CANVAS — what the browser paints into the rubber-band area when you
-    overscroll past the top of the page.
+    overscroll past either end of the page.
 
-    The root element's background propagates to the canvas and tiles infinitely
-    beyond the document, whereas `body`'s only covers the document itself. So
-    without setting it here, overscrolling revealed whatever `body` happened to
-    be and the field looked like it had been cut off.
+    The root element's background becomes the canvas background, and its
+    painting area is the WHOLE canvas rather than the document: it is what
+    shows above the top and below the bottom while iOS is stretching the page.
+    `body`'s background only ever covers the document itself, so without
+    something here the overscroll revealed whatever `body` happened to be and
+    the field looked cut off.
 
-    It carried the tile pattern for a while, to read as more of the hero. That
-    is now WRONG: .hero-light's vignette takes the field to fully opaque black
-    at its top edge, so continuing violet tiles above the fold would clash with
-    the black they sit against rather than extend it. Plain black is the
-    continuation now. Revisit if the vignette ever stops reaching the top.
+    THE TWO ENDS WANT DIFFERENT COLOURS, and one background-color cannot give
+    that. Past the top the page continues into black — the hero's own ground,
+    and .hero-light's vignette takes the field to fully opaque black at its top
+    edge, so the tile pattern this once carried would now clash with the black
+    it sits against rather than extend it. Past the BOTTOM the last thing on
+    screen is the footer's #121212 plate, and stretching that into black reads
+    as the page having been cut off — which is exactly what it looked like on
+    an iPhone (Žilvinas 2026-08-28).
+
+    So the colour is the FOOTER's grey, which covers the bottom, and a black
+    image is laid over the 100vh directly ABOVE the document for the top. It is
+    positioned entirely outside the html box (`top -100vh` with a 100vh height)
+    so it cannot paint over anything in the page — within the document `body`
+    is opaque anyway, and the footer paints its own plate.
+
+    100vh because the rubber band never stretches more than about half a
+    viewport. If Safari ever declines to paint an image outside the box, the
+    top falls back to the same grey — which is the safe way round: the end
+    Žilvinas asked about is the one carried by the colour, not the image.
   */
-  background-color: #000000;
+  background-color: #121212;
+  background-image: linear-gradient(#000000, #000000);
+  background-repeat: no-repeat;
+  background-size: 100% 100vh;
+  background-position: left 0 top -100vh;
 }
 
 /* The landing point has to clear the sticky bar plus its 22px top gap and a
