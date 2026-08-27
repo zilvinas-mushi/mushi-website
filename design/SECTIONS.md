@@ -273,10 +273,10 @@ that scale, which is what makes the others trustworthy.
 | Group order | PRODUCT · **LEGAL** · COMPANY · CONTACT — legal moves up between the first two |
 | Legal fill | column-major: Money-Back / Terms down the left, Refund / Privacy down the right. `FOOTER.legal` is already in that order. |
 | Type | the white heads are Poppins **Medium 18**; ALL the small grey type — column links and the address alike — is Poppins **Regular 15**. The address was 18 on the earlier frame. |
-| Trustpilot row | "Trustpilot" **16 Regular**, the score **22 SemiBold** — unchanged |
+| Trustpilot row | "Trustpilot" **16 Regular**, the score **22 SemiBold**, and **5** between all three boxes — star → word → score. The frame's star-plus-word group measures **106.42** = 22.66 star + 5 + the word, which is what proves the 5 is box-to-box. It was 10 and 15. |
 | Copyright | Poppins **Regular 14**, centred, **20** under the social tiles |
 | Plate bottom | **20** under the copyright |
-| Title → first link | **20** (box gap at `leading-none`; 38 cap-top to cap-top) |
+| Title → first link | **25** — his direct read of the box gap, and it supersedes the 20 derived from the frame's 38 cap-top pitch. The two differ because Figma's text boxes are not font-size tall the way `leading-none` makes ours. Applies to CONTACT → the address as well. |
 | Link → link | **20** (36 cap-top to cap-top) |
 | Group → group | **36** (52 from the last link's cap-top to the next title's) |
 

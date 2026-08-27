@@ -175,6 +175,15 @@ function FooterLink({
  * The row template is an inline style because it is computed per group. It is
  * inert from md up, where the list is `display: block` and spaced by
  * `space-y` — the same single stack it has always been there.
+ *
+ * 25 FROM THE HEAD TO THE FIRST LINK, his figure off the frame (2026-08-28),
+ * and it overrides the 20 derived here earlier. That 20 came from the frame's
+ * cap-top pitch read at scale — 90 screenshot px over a 2.395 scale, which
+ * with `leading-none` boxes solves to 20 — so the two disagree by ~5. His is a
+ * direct read of the box gap and wins; the difference is Figma's text boxes,
+ * which are not font-size tall the way `leading-none` makes ours. If the row
+ * ever reads loose against the frame, that is the number to revisit and this
+ * is the arithmetic behind the alternative.
  */
 function LinkGroup({
   title,
@@ -198,7 +207,7 @@ function LinkGroup({
       </h2>
       <ul
         style={{ gridTemplateRows: `repeat(${Math.ceil(links.length / 2)}, auto)` }}
-        className="mt-5 grid grid-flow-col grid-cols-[215fr_130fr] gap-y-5 leading-none md:mt-[1.90625rem] md:block md:space-y-[1.6875rem]"
+        className="mt-[1.5625rem] grid grid-flow-col grid-cols-[215fr_130fr] gap-y-5 leading-none md:mt-[1.90625rem] md:block md:space-y-[1.6875rem]"
       >
         {links.map((link) => (
           <li key={link.label}>
@@ -375,12 +384,22 @@ export function SiteFooter() {
               each element starts exactly where the design starts it, whatever
               the type does in between. Same technique as the columns above.
             */}
-            <p className={`${FOOTER.giftEnabled ? "mt-[1.125rem] md:mt-[1.375rem]" : ""} flex items-center justify-center gap-2.5 leading-none md:grid md:grid-cols-[2.0556rem_6.3194rem_auto] md:items-center md:justify-start md:gap-0`}>
+            {/* THE PHONE'S ROW IS TWO 5s (Žilvinas 2026-08-28): 5 from the
+                star to "Trustpilot", 5 from "Trustpilot" to the score. It was
+                10 and 15. The frame's own group — star plus word — measures
+                106.42, which is the 22.66 star, the 5, and "Trustpilot" at 16
+                Regular: the three add up, so the 5 is between BOXES.
+
+                A flex gap here rather than the desktop's fixed stops. It puts
+                the score ~2 left of the frame, because a rendered advance is
+                a touch narrower than Figma's text box, and at this size that
+                is not worth a grid to correct. */}
+            <p className={`${FOOTER.giftEnabled ? "mt-[1.125rem] md:mt-[1.375rem]" : ""} flex items-center justify-center gap-[0.3125rem] leading-none md:grid md:grid-cols-[2.0556rem_6.3194rem_auto] md:items-center md:justify-start md:gap-0`}>
               <TrustStar />
               <span className="text-[1rem] md:text-[1.25rem]">
                 {FOOTER.trustpilot.label}
               </span>
-              <span className="ml-[0.3125rem] text-[1.375rem] font-semibold md:ml-0 md:text-[1.5rem]">
+              <span className="text-[1.375rem] font-semibold md:text-[1.5rem]">
                 {FOOTER.trustpilot.score}
               </span>
             </p>
@@ -431,7 +450,7 @@ export function SiteFooter() {
                  2026-08-28: the small grey type is all Poppins 15 Regular,
                  the white heads all Medium 18). It was 18 here, off the
                  earlier artboard. Desktop keeps its 21. */
-              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-muted mt-5 block text-[0.9375rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
+              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-muted mt-[1.5625rem] block text-[0.9375rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
             >
               {CONTACT_EMAIL}
             </a>
