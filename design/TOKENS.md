@@ -250,10 +250,23 @@ the card's far edge. `justify-between` left 156px of air between them (the
 figure is 208 wide in a 434 content box), which parked the badge on the right
 edge, exactly the part a right-side panel crops off-screen.
 
-**The arrow needs no rotation of its own.** Its raw shaft is 28° below
-horizontal; inside the card's +16.97° it lands at 45° on screen, which is what
-the reference shows. 28 = 45 − 16.97, so Figma exported this node in **local**
-coordinates and inheritance does the rest.
+**The arrow carries `rotate: -16.97deg`, undoing a baked rotation.** Figma
+exported it with the card's tilt already in the path data — the same trap as
+panel 4's icon, and it is provable from the node alone. Counter-rotate the four
+path points by 16.97° and their box lands on 27.00 × 27.00, exactly the W × H
+Figma reports for the node, with the shaft on a clean 45°. The raw export is
+1.386:1 (37.7 × 27.2 with the stroke), which is that square seen at −16.97°.
+
+The Rotation field showing −16.97° is the card's own figure, inherited — not an
+extra tilt on top of it. The selection box in Figma is tilted with the card, so
+the node has no rotation of its own relative to it.
+
+So: local 45°, plus the card's +16.97° clockwise, puts the arrow at **28° below
+horizontal on screen** — which is exactly what the raw export draws. Drawn as
+exported *inside* the rotated card it went to 11°, nearly flat. Note the sign:
+CSS's +16.97 is clockwise, so it makes a down-left arrow **shallower**, not
+steeper. An earlier reading of this had 28 + card = 45 and concluded the export
+was in local coordinates; the rotation is clockwise, so it is 28 − 16.97.
 
 > ### Check every exported icon for a baked rotation
 >
@@ -263,7 +276,7 @@ coordinates and inheritance does the rest.
 > | Node | Export | Fix |
 > | --- | --- | --- |
 > | Panel 1 emoji | rotation in a `transform` attribute | strip it |
-> | Panel 3 arrow | local coordinates (28 = 45 − 16.97) | nothing |
+> | Panel 3 arrow | **baked into the path data** (28 = 45 − 16.97) | counter-rotate |
 > | Panel 4 icon | **baked into the path data** | counter-rotate |
 >
 > Panel 4's icon had the card's −15 baked into its geometry: its outer square's
@@ -291,7 +304,8 @@ arrives, always check it against the artwork before trusting the sign.
 the divider, and drops everything else for a horizontal bar chart. Rotation
 **−15°** (Figma's 15). Confirmed against the reference: "Video 1/2/3" step
 *right* as they go down, which only happens under a counter-clockwise rotation.
-The icon inherits it and needs none of its own — same trap as panel 3's arrow.
+The icon's own export has that −15 baked in, so it counter-rotates by 15 — same
+trap as panel 3's arrow.
 
 | Part | Size |
 | --- | --- |

@@ -346,10 +346,24 @@ function RevenueBody({ p }: { p: Extract<HeroPanel, { variant: "revenue" }> }) {
 
             The two numbers below are the shaft-centred viewBox at that scale,
             so the centring above is untouched.
+
+            The -16.97deg undoes the CARD's rotation, which Figma baked into
+            this export — the same trap as panel 4's icon. That it is baked is
+            provable from the node alone: counter-rotate the four path points
+            by 16.97 and their box lands on 27.00 x 27.00, exactly the W x H
+            Figma reports, with the shaft on a clean 45. So the artwork as
+            exported already carries the tilt, and inheriting the card's 16.97
+            on top of it drew the arrow 11 off horizontal instead of 28 —
+            nearly flat.
+
+            CSS rotates about the element's box centre, and the viewBox above
+            put that ON the shaft midpoint, so the centring survives. The
+            counter-rotated ink is 30.8 square, well inside the 60 disc.
           */
           style={{
             width: "calc(var(--k) * 0.374336)",
             height: "calc(var(--k) * 0.322167)",
+            rotate: "-16.97deg",
           }}
         >
           <path
@@ -502,12 +516,12 @@ function TrendingBody({ p }: { p: Extract<HeroPanel, { variant: "trending" }> })
           28.5 x 28.5. The node's viewBox is square, so it scales without
           distortion — unlike panel 3's arrow.
 
-          The +15deg undoes a rotation baked into the ARTWORK. Unlike panel 3's
-          arrow, which Figma exported in local coordinates, this node came out
-          with the card's -15 already applied: its outer square's edge sits at
-          -15.00 from horizontal and all three bars at 15.00 from vertical, too
-          exact to be anything else. Inheriting the card's -15 on top of that
-          drew it at -30, twice the intended tilt.
+          The +15deg undoes a rotation baked into the ARTWORK. Like panel 3's
+          arrow, this node came out of Figma with the card's -15 already
+          applied: its outer square's edge sits at -15.00 from horizontal and
+          all three bars at 15.00 from vertical, too exact to be anything else.
+          Inheriting the card's -15 on top of that drew it at -30, twice the
+          intended tilt.
 
           Note this counter-rotation tracks the ARTWORK, not the card. If the
           card's rotation changes the bake does not, so this stays 15.
