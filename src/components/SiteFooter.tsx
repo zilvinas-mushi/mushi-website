@@ -401,25 +401,24 @@ export function SiteFooter() {
                 {FOOTER.trustpilot.label}
               </span>
               {/*
-                THE SCORE SITS ON THE LABEL'S BASELINE, and -2px is what puts
-                it there. `items-center` above centres the three BOXES, and two
-                boxes of different font-size centred on each other do not share
-                a baseline: with `leading-none` a box is its font-size tall and
-                the baseline sits ~0.85 down it, so the offset is
-                (22 - 16) x (0.85 - 0.5) = 2.1. Measured in the browser it is
-                exactly 2.0, and the frame sets both on one baseline.
+                NO NUDGE ON THE SCORE. `items-center` centres the three boxes,
+                and with `leading-none` a box is its font-size tall with the
+                cap band centred in it — 16 text has its caps at box_top+2.4
+                to +13.6, centre 8.0, which IS the box centre, and 22 does the
+                same at 11.0. So centring the boxes centres what the eye
+                actually reads, at both sizes, and the star lands on the same
+                axis as both words.
 
-                A transform, so it moves the glyph without changing the row's
-                height or the 39 above it. Phone only — the desktop row is a
-                grid on the export's own stops and already agrees.
-
-                Boxes, not baselines, for the flex as a whole: `items-baseline`
-                would drag the STAR with it and put it ~2 too high. Its centre
-                currently sits 5.5 above the label's baseline, which is what
-                the frame measures (~5-6), so the star is the part that was
-                already right.
+                It carried a -2px transform for a while, to put the score on
+                the label's BASELINE. That is a different alignment and it is
+                the wrong one here: sharing a baseline pushes the taller
+                number's cap band 2 above everything else, which is what made
+                the star look low next to it (Žilvinas 2026-08-28). The two
+                readings differ by ~2px and the frame's own numbers side with
+                centring — its score box is 35 x 17 at an 80% line height,
+                which is a 22 cap band centred in a 17 box, not a baseline.
               */}
-              <span className="-translate-y-[2px] text-[1.375rem] font-semibold md:translate-y-0 md:text-[1.5rem]">
+              <span className="text-[1.375rem] font-semibold md:text-[1.5rem]">
                 {FOOTER.trustpilot.score}
               </span>
             </p>

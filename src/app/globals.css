@@ -326,18 +326,26 @@ html {
   is opaque and covers the document, so this is only ever visible in the band
   iOS reveals past an end.
 
-  Black by default, which is right past the TOP: the hero's ground, and what
-  .hero-light's vignette fades to. CanvasTint sets `data-canvas="footer"` while
-  the footer is on screen — the only time you can overscroll the bottom — and
-  the plate's own #121212 continues out of the page instead of a black seam
-  under a grey block (Žilvinas 2026-08-28, on an iPhone).
+  CanvasTint sets `data-canvas="footer"` while the footer is on screen — the
+  only time you can overscroll the bottom — and the plate's own #121212
+  continues out of the page instead of a black seam under a grey block
+  (Žilvinas 2026-08-28, on an iPhone).
+
+  THE DEFAULT IS THE TOP'S COLOUR, and it is not black. It was, and black read
+  as a slab against the hero rather than as more of it — the field's top edge
+  is lit, not dark. The number is SAMPLED from the rendered page rather than
+  guessed: at 375 the first rows average #1C1927, at 1440 they average #17151E,
+  and both run the same way across — violet where the sun sits over the first
+  quarter, near-black the rest of the way. One flat colour cannot hold that
+  gradient, so this is the average of it, which is as close as a canvas colour
+  gets. Re-sample if the hero's lighting changes.
 
   A transition would be wrong here: the colour is invisible until the moment it
   is stretched into view, so there is nothing to ease, and a half-finished
   cross-fade is exactly what you would catch.
 */
 body {
-  background: var(--bg);
+  background: #1c1927;
   color: var(--text);
 }
 
