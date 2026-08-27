@@ -46,6 +46,17 @@ export const BOOKING_URL = "https://app.iclosed.io/e/mushi/introduction";
 export const BOOKING_ANCHOR = "book-a-call";
 
 /**
+ * DOM id on the creatives section's "Yes" pill.
+ *
+ * A CONSTANT rather than a literal in two files because it is a contract
+ * between components that never import each other: Sections.tsx puts it on the
+ * pill and MobileHeader.tsx watches for it to leave the top of the screen,
+ * which is what reveals the phone header's Schedule a Call button. A typo on
+ * either side is a button that silently never appears.
+ */
+export const CREATIVES_CTA_ID = "creatives-yes";
+
+/**
  * Order is the footer's, left to right — Instagram, LinkedIn, TikTok, Facebook
  * (design reference 2026-08-19). layout.tsx also feeds this to the
  * Organization schema's `sameAs`, where order carries no meaning.
@@ -75,8 +86,12 @@ export const NEWSLETTER_ACTION: string | null = null;
 /**
  * The webapp. It is a separate repo (CLAUDE.md) — this site only links to it.
  *
- * The phone drawer's "Buy now" and "Login" both land there: buying a template
- * and signing in are app concerns, and there is no server here to host either.
+ * NOTHING LINKS HERE RIGHT NOW. The phone drawer's "Buy now" and "Login" rows
+ * were the only two consumers and the 2026-08-26 redesign drops both — the
+ * drawer is the three nav rows and Schedule a Call, nothing else. Kept
+ * exported rather than deleted: the URLs are the answer to "where does the app
+ * live", and re-deriving them is the expensive half of putting either row
+ * back.
  */
 export const APP_URL = "https://app.mushi.agency";
 export const APP_BUY_URL = `${APP_URL}/templates`;

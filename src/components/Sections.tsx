@@ -9,7 +9,7 @@ import {
   TESTIMONIALS,
   FINAL_CTA,
 } from "@/lib/content";
-import { BOOKING_ANCHOR, BOOKING_URL } from "@/lib/site";
+import { BOOKING_ANCHOR, BOOKING_URL, CREATIVES_CTA_ID } from "@/lib/site";
 import { SHELL } from "@/lib/layout";
 
 /**
@@ -579,6 +579,9 @@ export function Creatives() {
           */}
           <a
             href={BOOKING_URL}
+            // Watched by the phone header — passing this pill is what reveals
+            // its Schedule a Call button. See CREATIVES_CTA_ID in site.ts.
+            id={CREATIVES_CTA_ID}
             // mr-3 on phones only: at the shell's 20px gutter the pill read as
             // jammed into the right edge, so it is pulled in a little. Desktop
             // keeps the measured alignment.

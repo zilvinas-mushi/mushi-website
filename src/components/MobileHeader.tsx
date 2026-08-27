@@ -1,15 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { Logo } from "./Logo";
 import { NAV } from "@/lib/content";
-import {
-  APP_BUY_URL,
-  APP_LOGIN_URL,
-  BOOKING_URL,
-  SITE_NAME,
-} from "@/lib/site";
+import { BOOKING_URL, CREATIVES_CTA_ID, SITE_NAME } from "@/lib/site";
 
 /**
  * Which drawer row reads as selected.
@@ -22,11 +17,38 @@ import {
  */
 const ACTIVE_NAV = "Agency";
 
+/**
+ * The phone's CTA label, which is NOT the desktop bar's "Book a Call" — the
+ * artboard sets this one as SCHEDULE A CALL and both spellings are in
+ * design/COPY.md. One string, used by the drawer and by the bar's own button,
+ * so the two can never disagree.
+ */
+const PHONE_CTA = "Schedule a Call";
+
+/**
+ * The violet fill, and the white it inverts to.
+ *
+ * The header CTA's three Figma stops verbatim. At 117.51deg the gradient line
+ * across a 345 x 52 box is 330 long and almost entirely horizontal, so the
+ * light pools at the LEFT edge and the last third sits flat at #6E54B5 —
+ * which is what the artboard shows for both of these buttons.
+ *
+ * Per CLAUDE.md the hover state repeats all THREE stop positions in white
+ * rather than being a flat colour: a 2-stop hover against a 3-stop rest cannot
+ * interpolate, so the fill would snap instead of cross-fading.
+ */
+const VIOLET_CTA =
+  "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] active:text-[#6e54b5]";
+
+/** 52 tall, radius 7, 17px semibold caps — the drawer's row box. */
+const CTA_BOX =
+  "flex h-[3.25rem] items-center justify-center rounded-[0.4375rem] text-[1.0625rem] font-semibold uppercase";
+
 function MenuIcon({ open }: { open: boolean }) {
   const bar =
     "block h-[0.1875rem] w-[1.875rem] rounded-full bg-white transition-all duration-200";
   return (
-    <span aria-hidden="true" className="flex flex-col items-start gap-[0.4375rem]">
+    <span aria-hidden="true" className="flex flex-col items-end gap-[0.4375rem]">
       <span className={`${bar} ${open ? "translate-y-[0.625rem] opacity-0" : ""}`} />
       <span className={bar} />
       <span className={`${bar} ${open ? "-translate-y-[0.625rem] opacity-0" : ""}`} />
@@ -35,20 +57,98 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 /**
+ * Reveals the bar's Schedule a Call button once the creatives "Yes" pill has
+ * gone under the header, and hides it again on the way back up (Žilvinas
+ * 2026-08-26). The CTA is not a permanent fixture of the bar — it arrives when
+ * the reader has been shown enough to be worth asking.
+ *
+ * WATCHES THE PILL, NOT A SCROLL DISTANCE. A hard `scrollY > n` would be a
+ * number that silently goes wrong every time anything above the creatives
+ * section changes height — and the hero alone changes height with the
+ * viewport, the copy and the font that happens to be loaded. The threshold is
+ * the element the design names, so it moves with it.
+ *
+ * The root is inset by the BAR'S OWN MEASURED HEIGHT so "past" means "under the
+ * bar" rather than "past the top of the window": the bar floats over the page,
+ * so a pill at y = 20 is already hidden behind it and reads as passed.
+ *
+ * Measured off the element, not read back from --header-h. That property is a
+ * plain custom property, so getPropertyValue hands back the SPECIFIED token
+ * stream rather than a resolved length — "92px" on a phone, but the literal
+ * string "clamp(42.48px, 4.16664vw, 80px)" from md up, which parseFloat turns
+ * into NaN. It happens not to matter today (the bar is hidden from md up, and
+ * the phone value is a bare 92px) but it is a parse that works by luck, and
+ * the element already knows its own height.
+ *
+ * IntersectionObserver rather than a scroll listener: it fires once per
+ * crossing instead of on every frame of the scroll, and it delivers an initial
+ * callback on observe, so a page loaded already scrolled past the pill (a
+ * refresh mid-page, a link to #templates) gets the right state without a
+ * separate measurement path.
+ */
+function usePassedCreativesCta(barRef: RefObject<HTMLDivElement | null>) {
+  const [passed, setPassed] = useState(false);
+
+  useEffect(() => {
+    const pill = document.getElementById(CREATIVES_CTA_ID);
+    if (!pill) return;
+
+    // 0 from md up, where the bar is display:none — the fallback covers that,
+    // and nothing is watching there anyway.
+    const headerH = Math.round(barRef.current?.getBoundingClientRect().height ?? 0) || 92;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        // Left the root by the TOP, not merely left it — scrolling the pill
+        // off the bottom of the screen is not passing it.
+        //
+        // Compared against headerH, not 0. `boundingClientRect` is in raw
+        // viewport coordinates while the root has been inset from the top by
+        // the bar's height, and mixing the two leaves a band the width of the
+        // bar where the pill has left the root but its rect has not yet
+        // crossed zero — and no further callback is coming to correct it,
+        // because the observer only fires on crossings of the INSET root. The
+        // button simply never appeared.
+        setPassed(!entry.isIntersecting && entry.boundingClientRect.bottom <= headerH);
+      },
+      { rootMargin: `-${headerH}px 0px 0px 0px`, threshold: 0 },
+    );
+    io.observe(pill);
+    return () => io.disconnect();
+  }, [barRef]);
+
+  return passed;
+}
+
+/**
  * Phone header, ported from mushi-app's components/app/mobile-header so both
  * properties share one motion: the hamburger's outer bars fade/slide into the
- * middle one while the drawer is open, and the drawer floats over the page
- * below the bar rather than pushing content down.
+ * middle one while the drawer is open — leaving the single rule the artboard
+ * draws in the open state — and the drawer floats over the page below the bar
+ * rather than pushing content down.
  *
- * Marketing-site adaptations: the avatar becomes the violet call button from
- * the design (this site has no accounts), the drawer lists the marketing nav
- * under it and closes the three CTAs the mobile artboard puts there, and —
- * since these are same-page anchor links, where the pathname never changes —
+ * REDESIGNED 2026-08-26 (Žilvinas). What changed from the port:
+ *
+ *   - The bar is wordmark LEFT, menu button RIGHT. It was menu / wordmark /
+ *     call-button across three columns.
+ *   - The violet phone-icon button is gone from the bar. The CTA it stood for
+ *     is now a full-width button BELOW the bar, and only past the "Yes" pill.
+ *   - The drawer is the three nav rows and one Schedule a Call button. The
+ *     half-and-half "Buy now" / "Login" row into the webapp is dropped, and so
+ *     is the separate "Book an agency call" beneath it. APP_BUY_URL and
+ *     APP_LOGIN_URL are still exported from site.ts if either comes back.
+ *
+ * Since these are same-page anchor links, where the pathname never changes,
  * the drawer closes on link tap instead of on route change.
  */
 export function MobileHeader() {
   const [open, setOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
+  const passedCta = usePassedCreativesCta(shellRef);
+
+  // The drawer carries its own copy of the CTA, so the bar's would be a second
+  // identical button 8px above it.
+  const showBarCta = passedCta && !open;
 
   // Tap-outside and Escape both dismiss the drawer — it floats over the page,
   // so there is no other affordance to close it besides the button itself.
@@ -71,18 +171,23 @@ export function MobileHeader() {
   }, [open]);
 
   return (
-    <div
-      ref={shellRef}
-      className="sticky top-0 z-50 px-4 pb-2 pt-3 md:hidden"
-    >
-      {/* relative: the drawer is absolutely positioned against this box so it
-          overlays the page instead of taking up layout space. */}
+    <div ref={shellRef} className="sticky top-0 z-50 px-4 pb-2 pt-3 md:hidden">
+      {/* relative: the drawer AND the bar's CTA are absolutely positioned
+          against this box so they overlay the page instead of taking up layout
+          space. That matters more than it looks — this div is in normal flow
+          and the hero is pulled up by exactly its height (--header-h, 92 on
+          phones), so a button that occupied flow space here would shove the
+          whole page down by 60px the moment it appeared. */}
       <div className="relative">
         {/* Radius 5, straight off the Figma frame (345 x 58, corner 5) — not
             the 16 this was ported with. The drawer below carries the same 5:
             fitting the artboard's corner arc gives ~12px at that screenshot's
             2.61x scale for both boxes. */}
-        <header className="grid grid-cols-[auto_1fr_auto] items-center gap-3 overflow-hidden rounded-[0.3125rem] bg-[#181818] px-4 py-3">
+        <header className="flex items-center justify-between overflow-hidden rounded-[0.3125rem] bg-[#181818] px-4 py-3">
+          <Link href="/" aria-label={`${SITE_NAME} home`}>
+            <Logo className="text-[2.375rem]" />
+          </Link>
+
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
@@ -93,26 +198,29 @@ export function MobileHeader() {
           >
             <MenuIcon open={open} />
           </button>
-
-          <Link
-            href="/"
-            aria-label={`${SITE_NAME} home`}
-            className="justify-self-center"
-          >
-            <Logo className="text-[2.375rem]" />
-          </Link>
-
-          {/* Violet call button where the webapp keeps its avatar. */}
-          <a
-            href={BOOKING_URL}
-            aria-label="Book a call"
-            className="grid h-12 w-12 place-items-center rounded-[0.4375rem] bg-[linear-gradient(140deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(140deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] active:bg-[linear-gradient(140deg,#fff_8%,#fff_42%,#fff_93%)] active:text-[#6e54b5]"
-          >
-            <svg viewBox="0 0 23 23" fill="none" strokeWidth="2" className="size-[1.5rem] stroke-current" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.12 5.00006C14.0967 5.19063 14.9944 5.66832 15.698 6.372C16.4017 7.07567 16.8794 7.97333 17.07 8.95006M13.12 1.00006C15.1492 1.2255 17.0416 2.13424 18.4862 3.57707C19.9309 5.0199 20.842 6.91107 21.07 8.94006M9.29695 12.8631C8.09537 11.6616 7.14659 10.3029 6.45059 8.85329C6.39072 8.7286 6.36079 8.66626 6.33779 8.58736C6.25607 8.30701 6.31477 7.96275 6.48478 7.72532C6.53262 7.65851 6.58978 7.60135 6.70409 7.48704C7.0537 7.13744 7.2285 6.96263 7.34278 6.78685C7.77378 6.12396 7.77378 5.26938 7.34279 4.60649C7.2285 4.43071 7.0537 4.25591 6.70409 3.90631L6.50922 3.71144C5.97778 3.17999 5.71206 2.91427 5.42668 2.76993C4.85912 2.48286 4.18885 2.48286 3.62129 2.76993C3.33591 2.91427 3.07019 3.17999 2.53874 3.71144L2.38111 3.86907C1.85149 4.39869 1.58668 4.66351 1.38443 5.02354C1.16001 5.42304 0.998645 6.04353 1.00001 6.50176C1.00124 6.9147 1.08134 7.19693 1.24155 7.76137C2.10252 10.7948 3.72699 13.6571 6.11497 16.0451C8.50295 18.4331 11.3653 20.0576 14.3987 20.9185C14.9632 21.0787 15.2454 21.1588 15.6583 21.1601C16.1165 21.1614 16.737 21.0001 17.1365 20.7757C17.4966 20.5734 17.7614 20.3086 18.291 19.779L18.4486 19.6213C18.9801 19.0899 19.2458 18.8242 19.3902 18.5388C19.6772 17.9712 19.6772 17.301 19.3902 16.7334C19.2458 16.448 18.9801 16.1823 18.4486 15.6509L18.2538 15.456C17.9042 15.1064 17.7294 14.9316 17.5536 14.8173C16.8907 14.3863 16.0361 14.3863 15.3732 14.8173C15.1975 14.9316 15.0226 15.1064 14.673 15.456C14.5587 15.5703 14.5016 15.6275 14.4348 15.6753C14.1973 15.8453 13.8531 15.904 13.5727 15.8223C13.4938 15.7993 13.4315 15.7694 13.3068 15.7095C11.8572 15.0135 10.4985 14.0647 9.29695 12.8631Z" />
-            </svg>
-          </a>
         </header>
+
+        {/*
+          The bar's own CTA. Always mounted so it can cross-fade in BOTH
+          directions — mounting it on `showBarCta` would pop it in and then
+          unmount it mid-transition on the way back up.
+
+          `pointer-events-none` alone would leave it tabbable and readable to a
+          screen reader while it is invisible, so the hidden state also carries
+          aria-hidden and takes the link out of the tab order.
+        */}
+        <a
+          href={BOOKING_URL}
+          aria-hidden={!showBarCta}
+          tabIndex={showBarCta ? undefined : -1}
+          className={`absolute inset-x-0 top-full mt-2 ${CTA_BOX} ${VIOLET_CTA} ${
+            showBarCta
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-1.5 opacity-0"
+          }`}
+        >
+          {PHONE_CTA}
+        </a>
 
         {open && (
           <nav
@@ -129,7 +237,7 @@ export function MobileHeader() {
                   <span
                     key={item.label}
                     aria-disabled="true"
-                    className="flex h-[3.25rem] cursor-default select-none items-center justify-center rounded-[0.4375rem] text-[1.0625rem] font-semibold uppercase text-white/40"
+                    className={`${CTA_BOX} cursor-default select-none text-white/40`}
                   >
                     {item.label}
                   </span>
@@ -147,7 +255,7 @@ export function MobileHeader() {
                   // the artboard's corner curve agrees (an 18px arc at the
                   // screenshot's 2.61x scale). Unselected rows sit at 70% white,
                   // which is the grey the artboard shows beside the lit row.
-                  className={`flex h-[3.25rem] items-center justify-center rounded-[0.4375rem] text-[1.0625rem] font-semibold uppercase transition ${
+                  className={`${CTA_BOX} transition ${
                     active
                       ? "bg-[#222222] text-white"
                       : "text-white/70 hover:bg-[#222222] hover:text-white"
@@ -158,48 +266,11 @@ export function MobileHeader() {
               );
             })}
 
-            {/*
-              The artboard's CTA block: a half-and-half Buy now / Login row,
-              then the agency call across the full width. Same 52 / 12 box as
-              the nav rows above, so the whole drawer is one rhythm.
-
-              Every one of them inverts on hover per CLAUDE.md — foreground and
-              background trade places, with a gradient kept on both states of
-              the violet button so the fill cross-fades rather than snapping.
-            */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <a
-                href={APP_BUY_URL}
-                onClick={() => setOpen(false)}
-                // The violet is the artboard's own fill, not the header CTA's: same three
-                // Figma stops (#A08ADE / #7C54B5 / #6E54B5) but this button is 157 x 50,
-                // so the handle projects onto a different line. Fitting the rendered
-                // button pixel-by-pixel puts it at 137deg with the stops at 7 / 33 / 71
-                // percent — the last third of the box sits flat at #6E54B5, which is what
-                // makes the light pool in the top-left corner rather than crossing the
-                // whole face. The header's 117.51deg numbers are for its 242 x 70 box.
-                className="flex h-[3.25rem] items-center justify-center rounded-[0.4375rem] bg-[linear-gradient(137deg,#a08ade_7%,#7c54b5_33%,#6e54b5_71%)] text-[1.0625rem] font-semibold uppercase text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(137deg,#fff_7%,#fff_33%,#fff_71%)] hover:text-[#6e54b5]"
-              >
-                Buy now
-              </a>
-              <a
-                href={APP_LOGIN_URL}
-                onClick={() => setOpen(false)}
-                className="flex h-[3.25rem] items-center justify-center rounded-[0.4375rem] border border-white bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] text-[1.0625rem] font-semibold uppercase text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-black"
-              >
-                Login
-              </a>
-            </div>
-
-            <a
-              href={BOOKING_URL}
-              onClick={() => setOpen(false)}
-              // corner-lit-ring, not a border: the artboard paints this stroke
-              // white only at the top-left and bottom-right corners and lets it
-              // fade out across the middle of every edge. See globals.css.
-              className="corner-lit-ring flex h-[3.25rem] items-center justify-center rounded-[0.4375rem] bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] text-[1.0625rem] font-semibold uppercase text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-black"
-            >
-              Book an agency call
+            {/* Same box and same fill as the bar's button above, so the CTA
+                does not change shape depending on which one you are looking
+                at. It inverts on hover per CLAUDE.md. */}
+            <a href={BOOKING_URL} onClick={() => setOpen(false)} className={`${CTA_BOX} ${VIOLET_CTA}`}>
+              {PHONE_CTA}
             </a>
           </nav>
         )}
