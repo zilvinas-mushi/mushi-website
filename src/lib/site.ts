@@ -57,6 +57,16 @@ export const BOOKING_ANCHOR = "book-a-call";
 export const CREATIVES_CTA_ID = "creatives-yes";
 
 /**
+ * DOM id on the footer's plate.
+ *
+ * Another contract between components that never import each other:
+ * SiteFooter puts it on the `<footer>` and CanvasTint watches for it to come
+ * on screen, which is what turns the rubber-band colour from black to the
+ * plate's own grey. See CanvasTint for why that cannot be CSS.
+ */
+export const FOOTER_PLATE_ID = "footer-plate";
+
+/**
  * Order is the footer's, left to right — Instagram, LinkedIn, TikTok, Facebook
  * (design reference 2026-08-19). layout.tsx also feeds this to the
  * Organization schema's `sameAs`, where order carries no meaning.

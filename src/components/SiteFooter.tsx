@@ -2,6 +2,7 @@ import { FOOTER } from "@/lib/content";
 import {
   BOOKING_URL,
   CONTACT_EMAIL,
+  FOOTER_PLATE_ID,
   NEWSLETTER_ACTION,
   SITE_NAME,
   SOCIALS,
@@ -253,7 +254,7 @@ export function SiteFooter() {
     /* #121212 on BOTH frames — the phone artboard's plate, and desktop node
        `4134:616`, a 1920 x 425 rect behind the whole footer. A shade off the
        page's black, which is what separates it from the CTA section above. */
-    <footer className="bg-[#121212]">
+    <footer id={FOOTER_PLATE_ID} className="bg-[#121212]">
       <div
         /*
           NOT `SHELL`. Every section above puts a 20 gutter INSIDE its 1380, so

@@ -296,41 +296,20 @@ html {
   scroll-padding-top: 110px;
 
   /*
-    THE CANVAS — what the browser paints into the rubber-band area when you
-    overscroll past either end of the page.
+    THE CANVAS — what the browser stretches into view when you rubber-band
+    past either end of the page.
 
-    The root element's background becomes the canvas background, and its
-    painting area is the WHOLE canvas rather than the document: it is what
-    shows above the top and below the bottom while iOS is stretching the page.
-    `body`'s background only ever covers the document itself, so without
-    something here the overscroll revealed whatever `body` happened to be and
-    the field looked cut off.
+    NOTHING HERE DECIDES IT. The spec says the root element's background
+    becomes the canvas and paints the whole thing, and that is not what WebKit
+    does: it derives one document background colour by blending html's with
+    body's, and an opaque `body` wins outright. `background-color: #121212`
+    here did nothing at all on an iPhone for that reason. The colour lives on
+    `body` below, and CanvasTint moves it as you scroll — black past the top,
+    the footer's grey past the bottom.
 
-    THE TWO ENDS WANT DIFFERENT COLOURS, and one background-color cannot give
-    that. Past the top the page continues into black — the hero's own ground,
-    and .hero-light's vignette takes the field to fully opaque black at its top
-    edge, so the tile pattern this once carried would now clash with the black
-    it sits against rather than extend it. Past the BOTTOM the last thing on
-    screen is the footer's #121212 plate, and stretching that into black reads
-    as the page having been cut off — which is exactly what it looked like on
-    an iPhone (Žilvinas 2026-08-28).
-
-    So the colour is the FOOTER's grey, which covers the bottom, and a black
-    image is laid over the 100vh directly ABOVE the document for the top. It is
-    positioned entirely outside the html box (`top -100vh` with a 100vh height)
-    so it cannot paint over anything in the page — within the document `body`
-    is opaque anyway, and the footer paints its own plate.
-
-    100vh because the rubber band never stretches more than about half a
-    viewport. If Safari ever declines to paint an image outside the box, the
-    top falls back to the same grey — which is the safe way round: the end
-    Žilvinas asked about is the one carried by the colour, not the image.
+    Left black as the sane default for anything that reads this instead.
   */
-  background-color: #121212;
-  background-image: linear-gradient(#000000, #000000);
-  background-repeat: no-repeat;
-  background-size: 100% 100vh;
-  background-position: left 0 top -100vh;
+  background-color: #000000;
 }
 
 /* The landing point has to clear the sticky bar plus its 22px top gap and a
@@ -341,9 +320,29 @@ html {
   }
 }
 
+/*
+  BODY'S BACKGROUND IS THE OVERSCROLL COLOUR, not the page's — see the canvas
+  note above and CanvasTint. The page's black is on layout.tsx's wrapper, which
+  is opaque and covers the document, so this is only ever visible in the band
+  iOS reveals past an end.
+
+  Black by default, which is right past the TOP: the hero's ground, and what
+  .hero-light's vignette fades to. CanvasTint sets `data-canvas="footer"` while
+  the footer is on screen — the only time you can overscroll the bottom — and
+  the plate's own #121212 continues out of the page instead of a black seam
+  under a grey block (Žilvinas 2026-08-28, on an iPhone).
+
+  A transition would be wrong here: the colour is invisible until the moment it
+  is stretched into view, so there is nothing to ease, and a half-finished
+  cross-fade is exactly what you would catch.
+*/
 body {
   background: var(--bg);
   color: var(--text);
+}
+
+html[data-canvas="footer"] body {
+  background: #121212;
 }
 
 /*

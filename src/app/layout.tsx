@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { CanvasTint } from "@/components/CanvasTint";
 import {
   SITE_URL,
   SITE_NAME,
@@ -123,13 +124,23 @@ export default function RootLayout({
       lang="en"
       className={`${poppins.variable} ${dutch801.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-bg font-sans text-white">
+      {/*
+        NO BACKGROUND ON `body` — it is set in globals.css, and it is not the
+        page's colour. It is the colour iOS stretches into view when you
+        rubber-band past an end, and CanvasTint moves it as you scroll. The
+        page's own black is on the wrapper below, which is opaque and covers
+        the whole document, so body's is never seen except in the overscroll.
+      */}
+      <body className="min-h-full flex flex-col font-sans text-white">
         <script
           type="application/ld+json"
           // Static, build-time constant — no user input reaches this.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {children}
+        {/* flex-1 and the same column as body, so `main`'s own flex-1 still
+            pushes the footer to the bottom on a short page. */}
+        <div className="flex min-h-full flex-1 flex-col bg-bg">{children}</div>
+        <CanvasTint />
       </body>
     </html>
   );
