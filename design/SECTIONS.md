@@ -253,6 +253,40 @@ off a reference screenshot; there is still no desktop footer FRAME in the file.
 One centred **293** column, i.e. a **41** gutter at 375. Everything is centred,
 including the link lists.
 
+### Revised 2026-08-28 (Žilvinas, from the updated frame)
+
+The block below supersedes the 293-column geometry above and the table rows it
+names. Everything else on that table still stands.
+
+The first four numbers are HIS, read off the frame; the rest are derived from
+the same screenshot by scale — the plate measures 898 screenshot px for the
+375 frame, so 1 design px is 2.395, and his 15 gutter comes back as 15.4 on
+that scale, which is what makes the others trustworthy.
+
+| | |
+|---|---|
+| Side gutter | **15** — the site's own `--gutter`, not the footer's old 41. The content column is **345**. |
+| Plate top → first block | **39** (his `pt`; the mystery-gift capture above it is off, so this is the gap to whatever leads) |
+| Social tile | **50** square, radius **12**, fill **#222222**, plus a **1px inside stroke**: linear, top to bottom, **#222222 0% → #666666 100%** |
+| Social glyphs | all **white** |
+| Link groups | **left-aligned**, and each is TWO columns. The second starts at **215** of the 345 — the same stop for every group, so it is a tab stop, not the width of what happens to sit left of it. |
+| Group order | PRODUCT · **LEGAL** · COMPANY · CONTACT — legal moves up between the first two |
+| Legal fill | column-major: Money-Back / Terms down the left, Refund / Privacy down the right. `FOOTER.legal` is already in that order. |
+| Title → first link | **20** (box gap at `leading-none`; 38 cap-top to cap-top) |
+| Link → link | **20** (36 cap-top to cap-top) |
+| Group → group | **36** (52 from the last link's cap-top to the next title's) |
+
+The gift block, the Trustpilot row, the social row and the copyright stay
+CENTRED. Only the four link groups set from the column's left edge.
+
+The right column is **130** for a label that sets ~122 ("Agency Services"), so
+the links carry `whitespace-nowrap` — the same guard the desktop legal row has.
+A wrap there is not cosmetic: the row doubles and every group below it drops 16.
+
+The 50-tile and its stroke are the PHONE's. Desktop node `4134:653` still draws
+46-squares at radius 10 with no stroke, so the ring is switched off from md up;
+if that frame gained the same treatment, one class in `SiteFooter` turns it on.
+
 The frame positions every string absolutely, so its numbers are CENTRE-to-CENTRE.
 The build rebuilds them as flow with `leading-none`, which makes a text box
 exactly its own font-size tall, so a gap is `centre_distance - (size_a + size_b)/2`.

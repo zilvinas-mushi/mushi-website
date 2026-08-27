@@ -149,6 +149,77 @@ function FooterLink({
   );
 }
 
+/**
+ * One footer link group: the head, then its links.
+ *
+ * TWO COLUMNS ON THE PHONE, ONE FROM md UP. The 2026-08-28 artboard sets the
+ * links in a pair of columns under each head — "500+ Static Templates" beside
+ * "Agency Services", "Money-Back Guarantee" beside "Refund Policy" — where the
+ * earlier one ran a single centred list.
+ *
+ * The second column's stop is 213 of the 345 content column, measured off the
+ * artboard and the SAME for every group: LEGAL's right column starts exactly
+ * where PRODUCT's does, so it is a tab stop rather than the width of whatever
+ * happens to sit in the left column. Expressed as `fr` for the reason the
+ * desktop columns are — the ratio holds at any column width, and the phone's
+ * is the window's below 375.
+ *
+ * COLUMN-MAJOR, which is what makes the order right without a second array.
+ * The artboard reads Money-Back / Terms down the left and Refund / Privacy
+ * down the right, and FOOTER.legal is already in that order (it is the phone's
+ * own sequence — desktop has its own). Row-major would interleave the two and
+ * put Terms opposite Money-Back. `grid-flow-col` with the row count pinned to
+ * ceil(n / 2) fills down-then-across for any length: 2 links land side by
+ * side, 4 land as two rows of two, 1 sits alone.
+ *
+ * The row template is an inline style because it is computed per group. It is
+ * inert from md up, where the list is `display: block` and spaced by
+ * `space-y` — the same single stack it has always been there.
+ */
+function LinkGroup({
+  title,
+  titleDesktop,
+  links,
+  className = "",
+}: {
+  title: string;
+  titleDesktop: string;
+  links: readonly { label: string; href: string | null }[];
+  className?: string;
+}) {
+  return (
+    <nav aria-label={title} className={className}>
+      <h2 className="text-[1.125rem] font-medium uppercase leading-none md:text-[1.625rem] md:leading-[1.625rem]">
+        {/* One head per frame — PRODUCT on the phone, PRODUCTS on the desktop
+            (see content.ts). The hidden one is display:none, so only ever one
+            is in the a11y tree and only one supplies the accessible name. */}
+        <span className="md:hidden">{title}</span>
+        <span className="hidden md:inline">{titleDesktop}</span>
+      </h2>
+      <ul
+        style={{ gridTemplateRows: `repeat(${Math.ceil(links.length / 2)}, auto)` }}
+        className="mt-5 grid grid-flow-col grid-cols-[215fr_130fr] gap-y-5 leading-none md:mt-[1.90625rem] md:block md:space-y-[1.6875rem]"
+      >
+        {links.map((link) => (
+          <li key={link.label}>
+            {/* nowrap for the reason the desktop legal row has it: the right
+                column is 130 for a label that sets ~122, and the margin is
+                thinner still while the fallback face is up before Poppins
+                lands. A wrap there is not a small error — the row doubles in
+                height and every group below it moves down by 16. */}
+            <FooterLink
+              href={link.href}
+              className="whitespace-nowrap text-[1rem] leading-none md:text-[1.3125rem] md:leading-none"
+            >
+              {link.label}
+            </FooterLink>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 export function SiteFooter() {
   return (
     /*
@@ -190,7 +261,7 @@ export function SiteFooter() {
           sits 3px inside it. The 20 gutter stays on the padding, so below the
           crossover the content still cannot touch the window edge.
         */
-        className="mx-auto w-full max-w-[calc(86.25rem+2*var(--gutter))] px-[var(--gutter)] pb-[3.25rem] pt-12 md:pb-[3.90625rem] md:pt-[3.84375rem]"
+        className="mx-auto w-full max-w-[calc(86.25rem+2*var(--gutter))] px-[var(--gutter)] pb-[3.25rem] pt-[2.4375rem] md:pb-[3.90625rem] md:pt-[3.84375rem]"
       >
         {/*
           Four columns, and their widths ARE their measured x positions: the
@@ -218,8 +289,20 @@ export function SiteFooter() {
           `centre_distance - (size_a + size_b) / 2`. That is where the odd
           values come from: they are derived, not eyeballed.
         */}
-        <div className="mx-auto grid w-full max-w-[18.3125rem] gap-[2.84375rem] text-center md:mx-0 md:max-w-none md:grid-cols-[599fr_313fr_213fr_255fr] md:gap-0 md:text-left">
-          <div>
+        {/*
+          THE PHONE COLUMN IS THE PAGE'S, not the footer's own (Žilvinas
+          2026-08-28). It used to be a centred 293 inside a 41 gutter, which is
+          what the earlier artboard drew; the new one runs the content to the
+          site's 15 gutter like every other section, so the field, the button
+          and the link stops all gain 26 of width. Nothing here sets that width
+          any more — the wrapper's `px-[var(--gutter)]` is the whole story.
+
+          Left-aligned, too. Only the gift block, the social row and the
+          copyright stay centred; the four link groups set from the column's
+          left edge.
+        */}
+        <div className="grid w-full gap-9 md:grid-cols-[599fr_313fr_213fr_255fr] md:gap-0">
+          <div className="text-center md:text-left">
             {/* Behind FOOTER.giftEnabled — see content.ts. The whole capture
                 is kept, not deleted, so bringing it back is one boolean. */}
             {FOOTER.giftEnabled ? (
@@ -303,51 +386,29 @@ export function SiteFooter() {
             </p>
           </div>
 
-          {/* PRODUCTS and COMPANY. Heads are Poppins Medium 26 on the same
-              74.5 centre as the gift line, 30.5 down to the first link, then a
-              48 row pitch — 21 type with leading-none, 27 between. */}
-          {FOOTER.columns.map((col) => (
-            <nav key={col.title} aria-label={col.title}>
-              <h2 className="text-[1.125rem] font-medium uppercase leading-none md:text-[1.625rem] md:leading-[1.625rem]">
-                {/* One head per frame — PRODUCT on the phone, PRODUCTS on the
-                    desktop (see content.ts). The hidden one is display:none,
-                    so only ever one is in the a11y tree and only one supplies
-                    the heading's accessible name. */}
-                <span className="md:hidden">{col.title}</span>
-                <span className="hidden md:inline">{col.titleDesktop}</span>
-              </h2>
-              <ul className="mt-[1.59375rem] space-y-[1.3125rem] leading-none md:mt-[1.90625rem] md:space-y-[1.6875rem]">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <FooterLink
-                      href={link.href}
-                      className="text-[1rem] leading-none md:text-[1.3125rem] md:leading-none"
-                    >
-                      {link.label}
-                    </FooterLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ))}
-
-          {/* Phone only: the artboard makes the legal links a LEGAL group in
-              the column stack, between COMPANY and CONTACT. Desktop keeps them
-              in the bottom bar (see below) — same array, two placements. */}
-          <nav aria-label="Legal" className="md:hidden">
-            <h2 className="text-[1.125rem] font-medium uppercase leading-none">
-              Legal
-            </h2>
-            <ul className="mt-[1.59375rem] space-y-[1.3125rem] leading-none">
-              {FOOTER.legal.map((link) => (
-                <li key={link.label}>
-                  <FooterLink href={link.href} className="text-[1rem] leading-none">
-                    {link.label}
-                  </FooterLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {/* PRODUCT, then LEGAL, then COMPANY — the phone artboard's order.
+              LEGAL sits BETWEEN the two on the phone and is display:none from
+              md up, where the same links are the bottom bar's cluster instead
+              (see below). Because it never renders at md, moving it here does
+              not shift the desktop grid: a display:none child is not a grid
+              item, so the four columns above still line up with the four
+              blocks that remain. */}
+          <LinkGroup
+            title={FOOTER.columns[0].title}
+            titleDesktop={FOOTER.columns[0].titleDesktop}
+            links={FOOTER.columns[0].links}
+          />
+          <LinkGroup
+            title="Legal"
+            titleDesktop="Legal"
+            links={FOOTER.legal}
+            className="md:hidden"
+          />
+          <LinkGroup
+            title={FOOTER.columns[1].title}
+            titleDesktop={FOOTER.columns[1].titleDesktop}
+            links={FOOTER.columns[1].links}
+          />
 
           {/* CONTACT — the address on the same row as the other columns' first
               link, then the social row 32 under it. */}
@@ -365,17 +426,26 @@ export function SiteFooter() {
                  #808080, the same as everything else in its columns. Two
                  frames, two values — hence the md: override rather than one
                  shared colour. */
-              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-muted mt-[1.53125rem] block text-[1.125rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
+              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-muted mt-5 block text-[1.125rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
             >
               {CONTACT_EMAIL}
             </a>
 
-            {/* Node `4134:653`: 46 tiles, radius 10, #222222, pitch 67 —
-                20.67 between them, which is what makes the row 246 across.
-                They invert on hover like the site's buttons: the tile goes
-                white and the mark takes the tile's own #222222, so no glyph
-                disappears into its fill. `--tile` carries that second colour
-                into Facebook's knockout. */}
+            {/* DESKTOP node `4134:653`: 46 tiles, radius 10, #222222, pitch
+                67 — 20.67 between them, which is what makes the row 246
+                across, and no stroke.
+
+                THE PHONE IS ITS OWN TILE (Žilvinas 2026-08-28): 50 square,
+                radius 12, the same #222222 fill, plus a 1px inside stroke
+                running #222222 to #666666 down the tile — `.tile-ring` in
+                globals.css. The ring is switched off from md up, where the
+                desktop node draws none; if that frame gained the same stroke,
+                delete the `md:[&::before]:hidden` and the two agree again.
+
+                All four marks are white, and they invert on hover like the
+                site's buttons: the tile goes white and the mark takes the
+                tile's own #222222, so no glyph disappears into its fill.
+                `--tile` carries that second colour into Facebook's knockout. */}
             <ul className="mt-[3.25rem] flex items-center justify-center gap-5 md:mt-[1.9375rem] md:justify-start md:gap-[1.29167rem]">
               {SOCIALS.map((s) => (
                 <li key={s.label}>
@@ -384,7 +454,7 @@ export function SiteFooter() {
                     rel="noopener noreferrer"
                     target="_blank"
                     aria-label={`${SITE_NAME} on ${s.label}`}
-                    className="flex size-[2.625rem] items-center justify-center rounded-[0.75rem] bg-[#222222] text-white transition-colors duration-300 ease-out [--tile:#222222] hover:bg-white hover:text-[#222222] hover:[--tile:#fff] md:size-[2.875rem] md:rounded-[0.625rem]"
+                    className="tile-ring flex size-[3.125rem] items-center justify-center rounded-[0.75rem] bg-[#222222] text-white transition-colors duration-300 ease-out [--tile:#222222] hover:bg-white hover:text-[#222222] hover:[--tile:#fff] md:size-[2.875rem] md:rounded-[0.625rem] md:[&::before]:hidden"
                   >
                     <svg
                       viewBox={SOCIAL_MARKS[s.label].view}
