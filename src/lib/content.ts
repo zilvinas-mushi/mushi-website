@@ -256,23 +256,21 @@ export const HERO_PANELS: HeroPanel[] = [
  * The hero sub breaks in ONE specific place per frame, and the two frames do
  * not agree:
  *
- *   desktop (2 lines)          phone (3 lines)
- *   Paid ads, banger           Paid ads, banger creatives, landing
- *   creatives, landing pages,  pages, and strategy - all led by us,
- *   and strategy - all led     under one roof.
- *   by us, under one roof.
+ *   desktop (2 lines)                 phone (3 lines)
+ *   Weekly research, scripting,       Weekly research, scripting, creator
+ *   creator sourcing, editing,        sourcing, editing, and angle testing
+ *   and angle testing for Meta,       for Meta, TikTok, and YouTube ads.
+ *   TikTok, and YouTube ads.
  *
- * Left to the browser neither one comes out right: desktop put "and" at the
- * end of line one, and a 375-wide phone fits "pages," on line one, which is
- * the design's line two. No width can be trusted to produce either break — it
- * shifts with the viewport, and again while the fallback face is showing
- * before Poppins loads — so both breaks are authored, not tuned.
+ * Left to the browser neither one comes out right — the break shifts with the
+ * viewport, and again while the fallback face is showing before Poppins
+ * loads — so both breaks are authored, not tuned.
  *
  * PARTS, not lines, because the phone breaks INSIDE the desktop's first line
- * ("...landing / pages, and..."). Cut at every point either frame breaks at
- * and the two orders are the same four pieces with different <br>s between
- * them; a per-frame list of whole lines would repeat the copy twice and let
- * the two drift apart.
+ * ("...creator / sourcing, editing..."). Cut at every point either frame
+ * breaks at and the two orders are the same four pieces with different <br>s
+ * between them; a per-frame list of whole lines would repeat the copy twice
+ * and let the two drift apart.
  *
  *   desktop:  a b / c d        phone:  a / b c / d
  *
@@ -280,10 +278,10 @@ export const HERO_PANELS: HeroPanel[] = [
  * wants the flat sentence gets it without the copy being typed again.
  */
 const HERO_SUB_PARTS = {
-  a: "Paid ads, banger creatives, landing",
-  b: "pages,",
-  c: "and strategy - all led by us,",
-  d: "under one roof.",
+  a: "Weekly research, scripting, creator",
+  b: "sourcing, editing,",
+  c: "and angle testing",
+  d: "for Meta, TikTok, and YouTube ads.",
 } as const;
 
 const HERO_SUB_LINES = [
@@ -292,8 +290,22 @@ const HERO_SUB_LINES = [
 ] as const;
 
 export const HERO = {
-  eyebrow: "Growth Partner for eCom & AI brands",
-  heading: "Your Path to $100M.",
+  eyebrow: "Creative Partner for eCom & AI brands",
+  heading: "Premium Ads for $1M to $100M Brands.",
+  /**
+   * TWO LINES, AND THE BREAK IS AUTHORED (Žilvinas 2026-08-26).
+   *
+   * The headline used to be a single line, so `text-balance` had nothing to
+   * do and the h1 carried no break. This one has to break, and left to the
+   * browser it breaks in the wrong place: `text-balance` equalises the two
+   * lines and lands on "Premium Ads for $1M / to $100M Brands.", which splits
+   * the "$1M to $100M" range across the fold of the sentence. The frame breaks
+   * after "for" and leaves the range whole.
+   *
+   * `heading` stays the flat sentence for metadata, JSON-LD and anything else
+   * that wants it in one piece; only the h1 renders the lines.
+   */
+  headingLines: ["Premium Ads for", "$1M to $100M Brands."],
   subLines: HERO_SUB_LINES,
   subParts: HERO_SUB_PARTS,
   sub: HERO_SUB_LINES.join(" "),

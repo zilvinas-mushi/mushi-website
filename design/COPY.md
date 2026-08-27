@@ -13,13 +13,27 @@ paraphrase it.
 - AGENCY
 - CASE STUDIES
 - TEMPLATES
-- Book a Call *(primary CTA)*
+- Book a Call *(primary CTA, desktop bar)*
+- SCHEDULE A CALL *(primary CTA, phone — both in the drawer and as the bar's
+  own button once you have scrolled past the creatives "Yes" pill)*
+
+The phone drawer carries the three nav rows and SCHEDULE A CALL, nothing else.
+It used to also offer "Buy now" and "Login" into the webapp; the 2026-08-26
+redesign drops both.
 
 ## Hero
 
-- Eyebrow: Growth Partner for eCom & AI brands
-- **H1: Your Path to $100M.** *(the only `<h1>` on the page)*
-- Sub: Paid ads, banger creatives, landing pages, and strategy - all led by us, under one roof.
+Revised 2026-08-26 (Žilvinas, from the updated frame). The previous deck read
+"Growth Partner for eCom & AI brands" / "Your Path to $100M." / "Paid ads,
+banger creatives, landing pages, and strategy - all led by us, under one roof."
+
+- Eyebrow: Creative Partner for eCom & AI brands
+- **H1: Premium Ads for $1M to $100M Brands.** *(the only `<h1>` on the page)*
+  - Breaks over **two** lines, and the break is authored, not balanced:
+    `Premium Ads for` / `$1M to $100M Brands.`
+- Sub: Weekly research, scripting, creator sourcing, editing, and angle testing for Meta, TikTok, and YouTube ads.
+  - Desktop two lines: `Weekly research, scripting, creator sourcing, editing,` /
+    `and angle testing for Meta, TikTok, and YouTube ads.`
 - CTA primary: 15 MINUTE FIT-CHECK
 - CTA secondary: STEAL OUR SECRETS
 

@@ -44,7 +44,7 @@ Verified headline fonts:
 
 | Element | Font | Size |
 | --- | --- | --- |
-| Hero `Your Path to $100M.` | Poppins SemiBold | 80px |
+| Hero `Premium Ads for $1M to $100M Brands.` | Poppins SemiBold | 80px |
 | `Want Creatives This Premium?` | Poppins SemiBold | 48px |
 | `Not Just Pretty, but Profitable.` | Poppins SemiBold | 48px |
 
@@ -52,7 +52,7 @@ Verified headline fonts:
 
 | px | Weight seen | Role |
 | --- | --- | --- |
-| 80 | SemiBold | Hero headline ("Your Path to $100M.") |
+| 80 | SemiBold | Hero headline ("Premium Ads for $1M to $100M Brands.") |
 | 48 | SemiBold | Section headings |
 | 30 | SemiBold / Medium | Sub-section headings (most frequent size) |
 | 28 | Medium | Card titles |

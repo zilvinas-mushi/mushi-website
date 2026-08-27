@@ -27,7 +27,7 @@ Exactly one `<h1>`. Every section is a `<section>` with an accessible name.
 ```
 <header>            site nav + primary CTA
 <main>
-  <section>  hero            → h1 "Your Path to $100M."
+  <section>  hero            → h1 "Premium Ads for $1M to $100M Brands."
   <section>  social proof    → h2 (visually hidden if needed)
   <section>  creatives       → h2 "Want Creatives This Premium?"
   <section>  case studies    → h2 "Not Just Pretty, but Profitable."

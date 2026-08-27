@@ -9,10 +9,19 @@ export const SITE_URL = "https://mushi.agency";
 
 export const SITE_NAME = "Mushi";
 
-export const SITE_TAGLINE = "Growth Partner for eCom & AI brands";
+/**
+ * The hero eyebrow, verbatim — it is the <title>'s second half and the OG
+ * title, so the two have to say the same thing. Revised with the rest of the
+ * hero on 2026-08-26; it read "Growth Partner for eCom & AI brands".
+ */
+export const SITE_TAGLINE = "Creative Partner for eCom & AI brands";
 
+/**
+ * The hero sub plus the social-proof line, which is what a search result and a
+ * share card should read as. Revised 2026-08-26 with the hero copy.
+ */
 export const SITE_DESCRIPTION =
-  "Paid ads, banger creatives, landing pages, and strategy - all led by us, under one roof. 110+ brands enhanced their ads with Mushi.";
+  "Weekly research, scripting, creator sourcing, editing, and angle testing for Meta, TikTok, and YouTube ads. 110+ brands enhanced their ads with Mushi.";
 
 /** Absolute URL helper — OG tags and JSON-LD both require absolute paths. */
 export const abs = (path: string) =>

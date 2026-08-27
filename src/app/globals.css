@@ -63,24 +63,99 @@
     how the header's height and the hero's pull-up drifted apart.
 
     It is bound by viewport HEIGHT as well as width, and that is what makes the
-    hero fit without scrolling. The design is 1083 tall at 1920 wide; a laptop
+    hero fit without scrolling. The design is ~1083 tall at 1920 wide; a laptop
     at 1920 has roughly 990px of viewport, so at full size it cannot fit — no
-    amount of spacing tuning changes that, only scale does. The hero's content
-    measures about 9.75u top to bottom, so capping u at 9.6vh keeps it inside
-    the window with a little room whatever the window is:
+    amount of spacing tuning changes that, only scale does.
 
-      1440 x 812   u = 75.0  (width-bound)   content 731
-      1440 x 755   u = 72.5  (height-bound)  content 707
-      1920 x 992   u = 95.2  (height-bound)  content 929
+    THE HEIGHT TERM IS A BUDGET, NOT A FLAT FRACTION OF THE WINDOW. It used to
+    be a flat `9.6vh`, which worked only while the hero's height was a single
+    multiple of u. It is not: the field measures
 
-    The floor is higher than --header-u's because a 15px panel line stops being
-    legible sooner than nav type does.
+      header + hero + brand strip  =  7.37u  +  2.05w  +  9.5rem
+
+    and those three terms answer to different things. The 2.05w is the eyebrow
+    pill (0.45w) and the HEADLINE (0.8w a line) — type, which rides --hero-w
+    and therefore does NOT shrink when the window gets short. The 9.5rem is the
+    header bar and the rem-based gaps, which follow width only. So only the
+    7.37u can absorb a short window, and how much it has to absorb depends on
+    what the other two already spent.
+
+    A flat fraction cannot express that, and the moment the headline went from
+    one line to two (2026-08-26: "Premium Ads for / $1M to $100M Brands.") the
+    w term grew by 0.8w and 9.6vh started overflowing the fold — by 14px at
+    1920x1080, 64 at 1920x990, 44 at 1440x760, 11 at 1366x768.
+
+    So the cap is solved for instead: take the window, subtract what the type
+    and the header have already committed, and divide the rest by the hero's
+    u-height. The 10.5rem is the measured 9.5 plus a 1rem cushion, so the fold
+    is cleared rather than exactly met.
+
+    Measured clearance below the fold, two-line headline, `.hero-bg` with its
+    min-height released so the number is the content's own:
+
+      2560 x 1000  +27      1512 x 945   +83      1280 x 800   +71
+      1920 x 1080  +19      1512 x 842   +16      1280 x 720   +12
+      1920 x  990  +27      1440 x 900   +79      1280 x 660   +17
+      1920 x  940  +32      1440 x 760   +19      1024 x 700   +23
+      1680 x  910  +20      1366 x 768   +13       900 x 700   +23
+      1600 x  760  +29
+
+    Re-measure the three coefficients — not just retune the divisor — if the
+    hero gains or loses a row. `__fit2` in the session notes did it by pinning
+    --hero-u and --hero-w to literals in a sized iframe and reading the field's
+    natural height back; the terms come straight out of the two slopes.
+
+    TWO FLOORS, BECAUSE THERE ARE TWO REASONS TO SHRINK AND THEY ARE NOT WORTH
+    THE SAME. 66 is the WIDTH floor — below ~1267 the layout stops shrinking
+    and starts to be merely tight, and a 15px panel line (0.15u) stops being
+    legible sooner than nav type does, which is why it sits above --header-u's.
+    That trade is unchanged.
+
+    But a SHORT window is a different bargain. There the choice is not "small
+    type or tight layout", it is "small type or the fold is broken", and 66 was
+    answering a question it was never asked: at 1600x760 the solved cap wants
+    60.9 and the floor handed back 66, so the field ran 12px past the fold
+    while the panels held a legibility margin nobody could see. So the width
+    floor is left on the width term and the height term gets its own, lower
+    one — 56, reached only when the alternative is overflowing.
+
+    Written as `min(--hero-w, ...)` because --hero-w IS clamp(66, 5.2083vw,
+    100): u is w with the height squeeze applied, which is exactly what the two
+    variables have always meant. It reads forward to a variable declared below
+    it; custom properties resolve by reference, not by source order.
+
+    This is strictly kinder than the old flat cap at every size measured,
+    including the ones that already overflowed before the headline grew:
+
+                      old 9.6vh, 1 line     now, 2 lines
+      1600 x 760           +7                   +29
+      1280 x 660           -4                   +17
+      1366 x 628          -45                   -28
+      1024 x 600          -53                   -31
+
+    The slack it spends to get there is the slack the old cap was sitting on at
+    the top of the range — 1920x1080 goes from +69 to +19 — which is the second
+    headline line being paid for, and it is paid out of clearance nobody sees.
+
+    It does not reach zero everywhere. A 1366x768 or 1024x600 SCREEN — ~628 and
+    ~600 of viewport once the browser takes its chrome — cannot hold this hero
+    at any legible scale, and could not before either. Solving those needs the
+    hero to lose a row, not the clamp to be retuned.
+
+    `svh`, not `vh`, to agree with the field's own `md:min-h-svh` in page.tsx.
+    Every consumer of u is behind a `md:` prefix, where the two are equal, so
+    this is only ever the same number — but the two numbers that define the
+    fold should at least be the same unit.
 
     Consequence worth knowing: a card is exactly 500 x 200 only when the window
-    is tall enough for u to reach 100. In a short window everything scales
-    together, which is the trade for never scrolling.
+    is tall enough for u to reach 100, which now takes ~1120px of viewport at
+    1920 rather than 1042. In a short window everything scales together, which
+    is the trade for never scrolling.
   */
-  --hero-u: clamp(66px, min(5.2083vw, 9.6vh), 100px);
+  --hero-u: min(
+    var(--hero-w),
+    max(56px, calc((100svh - var(--hero-w) * 2.05 - 10.5rem) / 7.37))
+  );
 
   /*
     The hero's TYPE scale — u without the height cap.
@@ -342,8 +417,11 @@ body {
       rgba(122, 94, 198, 0.12) 44%,
       transparent 68%
     ),
-    /* 2. Headline light: a faint lift right behind "Your Path to $100M." —
-          kept well below the sun so it never competes with it. */
+    /* 2. Headline light: a faint lift right behind the h1 — kept well below
+          the sun so it never competes with it. Its ellipse is centred at 27%
+          of the field, which still sits between the headline's two lines now
+          that it sets on two (2026-08-26); the pool is 32% tall, so it covers
+          both without being re-aimed. */
     radial-gradient(
       ellipse 50% 32% at 50% 27%,
       rgba(160, 124, 248, 0.07) 0%,
@@ -820,7 +898,7 @@ body {
 }
 
 /*
-  Hero eyebrow — "Growth Partner for eCom & AI brands" (Figma 3803:1591/1593/
+  Hero eyebrow — "Creative Partner for eCom & AI brands" (Figma 3803:1591/1593/
   1594: 417 x 45, radius 50, Poppins Medium 20 in black).
 
   A WHITE core with a #6E54B5 loop running the whole way round.

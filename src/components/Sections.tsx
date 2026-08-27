@@ -282,19 +282,48 @@ export function Hero() {
           // 2026-08-20. The old sm:text-6xl step jumped it to 60px between 640
           // and 767px — still phone width — so 32 holds all the way to md.
           //
-          // A FLAT 32, deliberately outside --pu. Everything else above the
-          // fold shrinks with the viewport's height so the block always fits
-          // one screen (see the note on --pu in globals.css); the headline is
-          // the one thing that does not. It is the page's first statement and
-          // 32 is what the artboard sets, so a short window may now spend a
-          // few pixels more than it has rather than quietly setting the
-          // headline at 22.
+          // Outside --pu, deliberately. Everything else above the fold shrinks
+          // with the viewport's HEIGHT so the block always fits one screen (see
+          // the note on --pu in globals.css); the headline is the one thing
+          // that does not. It is the page's first statement, so a short window
+          // may now spend a few pixels more than it has rather than quietly
+          // setting the headline at 22.
+          //
+          // It is no longer a FLAT 32, because the headline is no longer short
+          // enough for one (2026-08-26). "$1M to $100M Brands." measures 10.73
+          // times its font-size — 343.4px at 32 — against a 345px column at the
+          // 375 artboard. It fits by 1.6px there and not at all at 360, where
+          // it took the authored break to three lines and put "Brands." on a
+          // line of its own.
+          //
+          // So the phone size is the COLUMN divided by that ratio, capped at
+          // the artboard's 32. The 11 is the measured 10.73 plus a ~2.5%
+          // cushion, which is what buys the line its margin back at 375 and
+          // covers the fallback face still being up before Poppins lands. 32
+          // returns at 382 wide and holds from there to md, so every modern
+          // handset (390 and up) is unchanged; only 375 and below scale, and
+          // they scale rather than re-wrap.
+          //
+          // --gutter, not a literal 30: the column is the viewport less both
+          // gutters, and this has to move if that does.
           //
           // Desktop is 0.8u — Figma's 80 at 1920, in proportion below it.
           // leading-[1] is Figma's 80/80; the phone keeps 1.08.
-          className="mx-auto max-w-4xl text-balance text-[2rem] font-semibold leading-[1.08] md:text-[length:calc(var(--hero-w)*0.8)] md:leading-[1]"
+          //
+          // NO `text-balance`. The headline is two lines now, and balance
+          // equalises them — it lands on "Premium Ads for $1M / to $100M
+          // Brands.", splitting the range. The break is authored instead
+          // (HERO.headingLines), so it is the frame's break at every width.
+          //
+          // max-w-4xl is gone with it: at 0.8w the second line measures wider
+          // than 56rem near the reference width, so the cap would have
+          // re-wrapped the line the <br> exists to hold. The lines are their
+          // own width limit now.
+          className="mx-auto text-[length:min(2rem,calc((100vw-var(--gutter)*2)/11))] font-semibold leading-[1.08] md:text-[length:calc(var(--hero-w)*0.8)] md:leading-[1]"
         >
-          {HERO.heading}
+          {HERO.headingLines[0]}
+          <br />
+          {HERO.headingLines[1]}
         </h1>
 
         {/* Poppins Regular 30 / 40 line-height, letter-spacing 0 — already the
