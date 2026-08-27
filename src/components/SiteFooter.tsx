@@ -203,13 +203,13 @@ function LinkGroup({
         {links.map((link) => (
           <li key={link.label}>
             {/* nowrap for the reason the desktop legal row has it: the right
-                column is 130 for a label that sets ~122, and the margin is
-                thinner still while the fallback face is up before Poppins
-                lands. A wrap there is not a small error — the row doubles in
+                column is 130 for a label that sets ~114 at 15, and the
+                margin is thinner still while the fallback face is up before
+                Poppins lands. A wrap there is not a small error — the row doubles in
                 height and every group below it moves down by 16. */}
             <FooterLink
               href={link.href}
-              className="whitespace-nowrap text-[1rem] leading-none md:text-[1.3125rem] md:leading-none"
+              className="whitespace-nowrap text-[0.9375rem] leading-none md:text-[1.3125rem] md:leading-none"
             >
               {link.label}
             </FooterLink>
@@ -261,7 +261,7 @@ export function SiteFooter() {
           sits 3px inside it. The 20 gutter stays on the padding, so below the
           crossover the content still cannot touch the window edge.
         */
-        className="mx-auto w-full max-w-[calc(86.25rem+2*var(--gutter))] px-[var(--gutter)] pb-[3.25rem] pt-[2.4375rem] md:pb-[3.90625rem] md:pt-[3.84375rem]"
+        className="mx-auto w-full max-w-[calc(86.25rem+2*var(--gutter))] px-[var(--gutter)] pb-5 pt-[2.4375rem] md:pb-[3.90625rem] md:pt-[3.84375rem]"
       >
         {/*
           Four columns, and their widths ARE their measured x positions: the
@@ -425,8 +425,13 @@ export function SiteFooter() {
                  than its column links; the DESKTOP node `4134:617` sets it
                  #808080, the same as everything else in its columns. Two
                  frames, two values — hence the md: override rather than one
-                 shared colour. */
-              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-muted mt-5 block text-[1.125rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
+                 shared colour.
+
+                 SIZE is the links' 15, not a size of its own (Žilvinas
+                 2026-08-28: the small grey type is all Poppins 15 Regular,
+                 the white heads all Medium 18). It was 18 here, off the
+                 earlier artboard. Desktop keeps its 21. */
+              className={`text-[#8e8e8e] transition-colors duration-200 hover:text-white md:text-muted mt-5 block text-[0.9375rem] leading-none md:mt-[1.90625rem] md:text-[1.3125rem] md:leading-none`}
             >
               {CONTACT_EMAIL}
             </a>
@@ -495,7 +500,7 @@ export function SiteFooter() {
             touch (globals.css). */}
         {/* No rule on the phone: the artboard runs the copyright straight
             under the social row, 23 below it, with nothing drawn between. */}
-        <div className="mt-[1.4375rem] border-t-0 pt-0 md:mt-[3.93rem] md:border-t md:border-[#808080] md:pt-[3.890625rem]">
+        <div className="mt-5 border-t-0 pt-0 md:mt-[3.93rem] md:border-t md:border-[#808080] md:pt-[3.890625rem]">
           {/* Desktop is two regions, not a flex row with a gap: the
               copyright on the column's left edge and the legal cluster running
               from the PRODUCTS stop (599) to the right edge (1380), i.e. 781

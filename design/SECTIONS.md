@@ -272,6 +272,10 @@ that scale, which is what makes the others trustworthy.
 | Link groups | **left-aligned**, and each is TWO columns. The second starts at **215** of the 345 — the same stop for every group, so it is a tab stop, not the width of what happens to sit left of it. |
 | Group order | PRODUCT · **LEGAL** · COMPANY · CONTACT — legal moves up between the first two |
 | Legal fill | column-major: Money-Back / Terms down the left, Refund / Privacy down the right. `FOOTER.legal` is already in that order. |
+| Type | the white heads are Poppins **Medium 18**; ALL the small grey type — column links and the address alike — is Poppins **Regular 15**. The address was 18 on the earlier frame. |
+| Trustpilot row | "Trustpilot" **16 Regular**, the score **22 SemiBold** — unchanged |
+| Copyright | Poppins **Regular 14**, centred, **20** under the social tiles |
+| Plate bottom | **20** under the copyright |
 | Title → first link | **20** (box gap at `leading-none`; 38 cap-top to cap-top) |
 | Link → link | **20** (36 cap-top to cap-top) |
 | Group → group | **36** (52 from the last link's cap-top to the next title's) |
