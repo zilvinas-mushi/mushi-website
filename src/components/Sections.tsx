@@ -195,7 +195,15 @@ function Stars({ count = 5 }: { count?: number }) {
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative">
-      <div className={`${SHELL} relative pb-[calc(var(--pu)*56)] pt-[calc(var(--pu)*20)] text-center md:pb-[calc(var(--hero-u)*0.56)] md:pt-[calc(var(--hero-u)*0.8)]`}>
+      {/*
+        THE PHONE'S BOTTOM PADDING IS THE WHOLE GAP to the brand strip — 28,
+        measured (Žilvinas 2026-08-26). It was 56 here plus 8 on SocialProof's
+        top, which rendered 64 and, worse, put one design number in two files:
+        changing the gap meant editing both and getting the sum right. The
+        section below now opens at pt-0 on the phone so this 28 is the number
+        you can read off the screen. Desktop keeps its own measured pair.
+      */}
+      <div className={`${SHELL} relative pb-[calc(var(--pu)*28)] pt-[calc(var(--pu)*20)] text-center md:pb-[calc(var(--hero-u)*0.56)] md:pt-[calc(var(--hero-u)*0.8)]`}>
         {/*
           Figma nodes 3803:1591/1593/1594: a frosted white pill — a blurred
           white fill under a 50px-radius container — carrying BLACK Poppins
@@ -431,7 +439,7 @@ export function SocialProof() {
     // it — nearly 270px of empty screen between the logo strip and "Want
     // Creatives This Premium?". Halved to 96; the ramp still has room to
     // dissolve. Desktop keeps its --hero-u scaling.
-    <section aria-labelledby="proof-heading" className="relative pb-[calc(var(--pu)*37.5)] pt-[calc(var(--pu)*8)] md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
+    <section aria-labelledby="proof-heading" className="relative pb-[calc(var(--pu)*37.5)] pt-0 md:pb-[calc(var(--hero-u)*0.6)] md:pt-[calc(var(--hero-u)*0.08)]">
       <div className={SHELL}>
         {/* Rule-and-sparkle divider from the design. */}
         {/* The design's own divider ornament — a gradient line running into a
@@ -482,7 +490,9 @@ export function SocialProof() {
         {/* Official client logotypes from /public/logos. Each keeps its own
             viewBox width so relative sizing matches the design; only
             "we interiors" has no supplied SVG and falls back to text. */}
-        <div className="mx-auto mt-[calc(var(--pu)*40)] max-w-3xl space-y-[calc(var(--pu)*16)] md:mt-[calc(var(--hero-u)*0.4)] md:space-y-[calc(var(--hero-u)*0.24)]">
+        {/* 28 under the brand line, measured on the phone frame alongside the 28
+          above it (Žilvinas 2026-08-26); it was 40. Desktop keeps 0.4u. */}
+        <div className="mx-auto mt-[calc(var(--pu)*28)] max-w-3xl space-y-[calc(var(--pu)*16)] md:mt-[calc(var(--hero-u)*0.4)] md:space-y-[calc(var(--hero-u)*0.24)]">
           {/*
             The design stacks the brands as a centred pyramid — four, three,
             two, one — not a width-driven wrap, which broke rows in different
