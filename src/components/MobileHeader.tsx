@@ -44,14 +44,33 @@ const VIOLET_CTA =
 const CTA_BOX =
   "flex h-[3.25rem] items-center justify-center rounded-[0.4375rem] text-[1.0625rem] font-semibold uppercase";
 
+/**
+ * Three bars that become one.
+ *
+ * NO FADE (designer, 2026-08-30). The outer two used to go `opacity-0` on the
+ * way in, which made the open state a single bar because the other two had
+ * been erased. They now only travel: 0.625rem is exactly the 0.4375 gap plus
+ * the 0.1875 bar, so each outer bar lands ON the middle one and the three
+ * genuinely merge into the one rule the artboard draws. Nothing disappears —
+ * it stacks — which is also why the move has to stay exact. Change the gap or
+ * the bar height and this number changes with them, or the open state is
+ * three bars with a seam in it.
+ *
+ * `transition-transform`, not `transition-all`: with the opacity gone there is
+ * nothing else on these spans worth animating, and naming the property keeps a
+ * later colour or width change from acquiring a 400ms lag by accident.
+ */
 function MenuIcon({ open }: { open: boolean }) {
+  // 400ms, up from 200 (Žilvinas 2026-08-30). At 200 over 10px the bars did
+  // not read as travelling — the icon just changed. The slower move is what
+  // makes the merge legible as a merge.
   const bar =
-    "block h-[0.1875rem] w-[1.875rem] rounded-full bg-white transition-all duration-200";
+    "block h-[0.1875rem] w-[1.875rem] rounded-full bg-white transition-transform duration-[400ms] ease-out motion-reduce:transition-none";
   return (
     <span aria-hidden="true" className="flex flex-col items-end gap-[0.4375rem]">
-      <span className={`${bar} ${open ? "translate-y-[0.625rem] opacity-0" : ""}`} />
+      <span className={`${bar} ${open ? "translate-y-[0.625rem]" : ""}`} />
       <span className={bar} />
-      <span className={`${bar} ${open ? "-translate-y-[0.625rem] opacity-0" : ""}`} />
+      <span className={`${bar} ${open ? "-translate-y-[0.625rem]" : ""}`} />
     </span>
   );
 }
@@ -156,10 +175,10 @@ function useBarCtaDown(barRef: RefObject<HTMLDivElement | null>) {
 
 /**
  * Phone header, ported from mushi-app's components/app/mobile-header so both
- * properties share one motion: the hamburger's outer bars fade/slide into the
- * middle one while the drawer is open — leaving the single rule the artboard
- * draws in the open state — and the drawer floats over the page below the bar
- * rather than pushing content down.
+ * properties share one motion: the hamburger's outer bars slide onto the middle
+ * one while the drawer is open — stacking into the single rule the artboard
+ * draws, rather than fading out behind it, see MenuIcon — and the drawer floats
+ * over the page below the bar rather than pushing content down.
  *
  * REDESIGNED 2026-08-26 (Žilvinas). What changed from the port:
  *
