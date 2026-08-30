@@ -10,11 +10,36 @@ export const SITE_URL = "https://mushi.agency";
 export const SITE_NAME = "Mushi";
 
 /**
- * The hero eyebrow, verbatim — it is the <title>'s second half and the OG
- * title, so the two have to say the same thing. Revised with the rest of the
+ * The hero eyebrow, verbatim. Nothing in metadata reads this any more — the
+ * <title> and the OG title are SITE_TITLE below. Revised with the rest of the
  * hero on 2026-08-26; it read "Growth Partner for eCom & AI brands".
  */
 export const SITE_TAGLINE = "Creative Partner for eCom & AI brands";
+
+/**
+ * The <title> and OG title, WHOLE — not a fragment something else prefixes
+ * with the brand. It leads with the search term and puts "Mushi" last after a
+ * pipe, which is the shape a result gets clicked in: the promise is read
+ * first, the name is what it is attributed to. Set 2026-08-30, replacing
+ * `${SITE_NAME} — ${SITE_TAGLINE}`.
+ *
+ * The dollar figures are the qualifier, so leave them as digits — "one to a
+ * hundred million" reads as prose and stops scanning.
+ */
+export const SITE_TITLE = "Premium Ads for $1M to $100M Brands | Mushi";
+
+/**
+ * The share card and the tab icon, both cropped from one 3000x3000 master:
+ * the wordmark in white on the brand's purple gradient.
+ *
+ * TWO exports of the same picture. Crawlers letterbox or centre-crop whatever
+ * they are given, and a card is the one place the mark should not be guessed
+ * at, so the 1.91:1 that Slack, X, Facebook and LinkedIn all render is cut
+ * here rather than by them. The square is second — iMessage and WhatsApp
+ * prefer it, and a client that wants 1:1 takes the one that already is.
+ */
+export const OG_IMAGE = "/images/og-mushi-wide.jpg";
+export const OG_IMAGE_SQUARE = "/images/og-mushi.jpg";
 
 /**
  * The hero sub plus the social-proof line, which is what a search result and a

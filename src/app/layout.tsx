@@ -8,6 +8,9 @@ import {
   SITE_NAME,
   SITE_DESCRIPTION,
   SITE_TAGLINE,
+  SITE_TITLE,
+  OG_IMAGE,
+  OG_IMAGE_SQUARE,
   SOCIALS,
   abs,
 } from "@/lib/site";
@@ -48,8 +51,11 @@ const dutch801 = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
-    template: `%s — ${SITE_NAME}`,
+    // SITE_TITLE already ends in "| Mushi", so the template has to match its
+    // separator — a page title reading "Pricing — Mushi" next to a home title
+    // reading "... | Mushi" looks like two different sites.
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
@@ -58,31 +64,37 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     locale: "en_US",
     // Absolute URL: required by CLAUDE.md, and relative OG images are ignored
-    // by most crawlers. Dimensions are the file's real size — declaring a
+    // by most crawlers. Dimensions are each file's real size — declaring a
     // 1200x630 that does not exist makes crawlers drop the card.
     //
-    // TODO(og): this is the Mushi logo, not a designed share image. It is the
-    // only Mushi-owned graphic in the export — every other candidate is a
-    // client's screenshot, which must not be published as Mushi's share card.
-    // Commission a proper 1200x630 and swap it in here.
+    // JPEG, not the WebP the rest of the site uses: LinkedIn and iMessage
+    // still refuse WebP share cards and fall back to no image at all.
     images: [
       {
-        url: abs("/images/logo-without-bg-white102.webp"),
-        width: 672,
-        height: 199,
+        url: abs(OG_IMAGE),
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
+      },
+      {
+        url: abs(OG_IMAGE_SQUARE),
+        width: 1200,
+        height: 1200,
         alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [abs("/images/logo-without-bg-white102.webp")],
+    // The wide crop only. X centre-crops a square to 1.91:1 itself, and it
+    // does it without knowing where the wordmark sits.
+    images: [abs(OG_IMAGE)],
   },
   robots: {
     index: true,
@@ -101,7 +113,7 @@ const jsonLd = {
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_DESCRIPTION,
-      logo: abs("/images/logo-without-bg-white102.webp"),
+      logo: abs(OG_IMAGE_SQUARE),
       sameAs: SOCIALS.map((s) => s.href),
     },
     {
