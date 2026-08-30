@@ -46,6 +46,14 @@ import { SHELL } from "@/lib/layout";
  *
  * The incoming one is held back 75ms so the two read as a relay rather than as
  * one arrow sliding across.
+ *
+ * THE CALLER'S viewBox MUST CLEAR THE STROKE BY MORE THAN THE STROKE'S OWN
+ * OVERHANG. An svg clips to its viewport, and at the arrowhead the round join
+ * is a circle whose top and right sit exactly on that overhang — a curve
+ * tangent to the clip edge, so it runs almost parallel to it and sheds a wide
+ * flat where a perpendicular edge would lose a sliver. Half a unit of air each
+ * side is what keeps the tip round; the rendered size has to carry the same
+ * factor or the arrow just draws smaller.
  */
 function ArrowDisc({
   disc,
@@ -617,15 +625,20 @@ export function Creatives() {
             {CREATIVES.cta}
             {/* ~/Documents/arrow icon.svg, inlined in ArrowDisc. The path
                 draws a 15-unit arrow; the viewBox has to add the stroke's
-                overhang on every side or the ends clip, so at stroke 3 it is
-                15 + 1.5 + 1.5 = 18 offset to -0.5. The rendered size carries
-                the same 18/15 factor, which is why it is 18px and not 15 —
-                rendering the box at 15 shrinks the drawn arrow instead. Stroke
-                3, not the original 2: the design's arrow is the bold weight. */}
+                overhang on every side or the ends clip, so at stroke 3 that is
+                15 + 1.5 + 1.5 = 18 — AND THEN HALF A UNIT MORE EACH SIDE, 19
+                offset to -1. At exactly 18 the round join at the arrowhead is
+                tangent to the viewport edge, and a curve that runs parallel to
+                the edge loses a wide flat chord to a fraction of a pixel of
+                rasterising: a quarter of a unit off the top cuts 1.7 units
+                across, which is the corner reading as sawn off. The rendered
+                size carries the same 19/15 factor — rendering the box at the
+                arrow's own size shrinks the drawn arrow instead. Stroke 3, not
+                the original 2: the design's arrow is the bold weight. */}
             <ArrowDisc
               disc="size-[2.125rem] md:size-[2.8125rem]"
-              arrow="size-[0.86rem] md:size-[1.125rem]"
-              viewBox="-0.5 -0.5 18 18"
+              arrow="size-[0.90778rem] md:size-[1.1875rem]"
+              viewBox="-1 -1 19 19"
               strokeWidth={3}
             />
           </a>
@@ -1305,18 +1318,21 @@ export function FinalCta() {
                   42 - 30. The pill is content-sized, so those three numbers
                   are all there is to its width. */}
               {/* The house arrow (see the creatives pill): a 15-unit arrow in
-                  a 17-unit viewBox, the extra unit each side being the
-                  stroke's overhang. So the box has to render at 17/15 of the
-                  size the arrow is specified at — the phone's 10 x 10 arrow
-                  needs an 11.33 box, desktop's 14 needs 15.87. Rendering the
-                  box at the arrow's own size draws it 12% short.
+                  an 18-unit viewBox — the stroke's 1-unit overhang each side,
+                  plus half a unit of air so the round join at the arrowhead is
+                  not tangent to the viewport edge (tangency there sheds a wide
+                  flat chord to antialiasing and the tip reads as cut). So the
+                  box renders at 18/15 of the size the arrow is specified at —
+                  the phone's 10 x 10 arrow needs a 12 box, desktop's 14 needs
+                  16.8. Rendering the box at the arrow's own size draws it 17%
+                  short.
 
                   Same disc, same swap and same arrow relay as the creatives
                   "Yes" pill, which is what was asked for. */}
               <ArrowDisc
                 disc="size-[1.875rem] md:size-[2.5rem]"
-                arrow="size-[0.70833rem] md:size-[0.991875rem]"
-                viewBox="0 0 17 17"
+                arrow="size-[0.75rem] md:size-[1.05019rem]"
+                viewBox="-0.5 -0.5 18 18"
                 strokeWidth={2}
               />
             </a>
