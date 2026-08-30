@@ -57,6 +57,18 @@ export const BOOKING_ANCHOR = "book-a-call";
 export const CREATIVES_CTA_ID = "creatives-yes";
 
 /**
+ * DOM id on the final card's "15 Minute Fit-Check" pill.
+ *
+ * The other end of the same contract as CREATIVES_CTA_ID: the "Yes" pill
+ * leaving the top of the screen is what BRINGS the phone header's Schedule a
+ * Call button down, and this pill arriving from the bottom is what sends it
+ * back up. Past this point the page is already asking for the booking in a
+ * 60-tall pill of its own, and a second identical CTA stuck to the top of the
+ * screen is asking twice.
+ */
+export const FINAL_CTA_ID = "final-fit-check";
+
+/**
  * DOM id on the footer's plate.
  *
  * Another contract between components that never import each other:

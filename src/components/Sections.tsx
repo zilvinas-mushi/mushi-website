@@ -9,7 +9,7 @@ import {
   TESTIMONIALS,
   FINAL_CTA,
 } from "@/lib/content";
-import { BOOKING_ANCHOR, BOOKING_URL, CREATIVES_CTA_ID } from "@/lib/site";
+import { BOOKING_ANCHOR, BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID } from "@/lib/site";
 import { SHELL } from "@/lib/layout";
 
 /**
@@ -1291,6 +1291,10 @@ export function FinalCta() {
             */}
             <a
               href={BOOKING_URL}
+              // Watched by the phone header, which slides its own Schedule a
+              // Call button back up behind the bar once this one is on screen.
+              // See FINAL_CTA_ID in site.ts.
+              id={FINAL_CTA_ID}
               // Hover repeats the rest state's three stop positions in white so
               // the fill can interpolate instead of snapping at the halfway point.
               className="group inline-flex h-[2.625rem] items-center gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"

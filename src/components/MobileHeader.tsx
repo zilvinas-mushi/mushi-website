@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { Logo } from "./Logo";
 import { NAV } from "@/lib/content";
-import { BOOKING_URL, CREATIVES_CTA_ID, SITE_NAME } from "@/lib/site";
+import { BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID, SITE_NAME } from "@/lib/site";
 
 /**
  * Which drawer row reads as selected.
@@ -57,20 +57,27 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 /**
- * Reveals the bar's Schedule a Call button once the creatives "Yes" pill has
- * gone under the header, and hides it again on the way back up (Žilvinas
- * 2026-08-26). The CTA is not a permanent fixture of the bar — it arrives when
- * the reader has been shown enough to be worth asking.
+ * When the bar's Schedule a Call button should be down.
  *
- * WATCHES THE PILL, NOT A SCROLL DISTANCE. A hard `scrollY > n` would be a
+ * TWO EDGES, one at each end of the page's middle. It comes down once the
+ * creatives "Yes" pill has gone under the header — the CTA is not a permanent
+ * fixture of the bar, it arrives when the reader has been shown enough to be
+ * worth asking — and it goes back up the moment the final card's "15 Minute
+ * Fit-Check" pill comes on screen, because from there down the page is already
+ * asking in a pill of its own and a second identical button pinned to the top
+ * of the screen is asking twice (Žilvinas 2026-08-26, 2026-08-30). Both edges
+ * are reversible: scroll back up and the button comes back down.
+ *
+ * WATCHES THE PILLS, NOT A SCROLL DISTANCE. A hard `scrollY > n` would be a
  * number that silently goes wrong every time anything above the creatives
  * section changes height — and the hero alone changes height with the
  * viewport, the copy and the font that happens to be loaded. The threshold is
  * the element the design names, so it moves with it.
  *
- * The root is inset by the BAR'S OWN MEASURED HEIGHT so "past" means "under the
- * bar" rather than "past the top of the window": the bar floats over the page,
- * so a pill at y = 20 is already hidden behind it and reads as passed.
+ * The "Yes" root is inset by the BAR'S OWN MEASURED HEIGHT so "past" means
+ * "under the bar" rather than "past the top of the window": the bar floats over
+ * the page, so a pill at y = 20 is already hidden behind it and reads as
+ * passed. The fit-check root is NOT inset — see the note on that observer.
  *
  * Measured off the element, not read back from --header-h. That property is a
  * plain custom property, so getPropertyValue hands back the SPECIFIED token
@@ -86,38 +93,65 @@ function MenuIcon({ open }: { open: boolean }) {
  * refresh mid-page, a link to #templates) gets the right state without a
  * separate measurement path.
  */
-function usePassedCreativesCta(barRef: RefObject<HTMLDivElement | null>) {
-  const [passed, setPassed] = useState(false);
+function useBarCtaDown(barRef: RefObject<HTMLDivElement | null>) {
+  const [passedYes, setPassedYes] = useState(false);
+  const [reachedFinal, setReachedFinal] = useState(false);
 
   useEffect(() => {
-    const pill = document.getElementById(CREATIVES_CTA_ID);
-    if (!pill) return;
+    const yesPill = document.getElementById(CREATIVES_CTA_ID);
+    const finalPill = document.getElementById(FINAL_CTA_ID);
+    const observers: IntersectionObserver[] = [];
 
     // 0 from md up, where the bar is display:none — the fallback covers that,
     // and nothing is watching there anyway.
     const headerH = Math.round(barRef.current?.getBoundingClientRect().height ?? 0) || 92;
 
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        // Left the root by the TOP, not merely left it — scrolling the pill
-        // off the bottom of the screen is not passing it.
-        //
-        // Compared against headerH, not 0. `boundingClientRect` is in raw
-        // viewport coordinates while the root has been inset from the top by
-        // the bar's height, and mixing the two leaves a band the width of the
-        // bar where the pill has left the root but its rect has not yet
-        // crossed zero — and no further callback is coming to correct it,
-        // because the observer only fires on crossings of the INSET root. The
-        // button simply never appeared.
-        setPassed(!entry.isIntersecting && entry.boundingClientRect.bottom <= headerH);
-      },
-      { rootMargin: `-${headerH}px 0px 0px 0px`, threshold: 0 },
-    );
-    io.observe(pill);
-    return () => io.disconnect();
+    if (yesPill) {
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          // Left the root by the TOP, not merely left it — scrolling the pill
+          // off the bottom of the screen is not passing it.
+          //
+          // Compared against headerH, not 0. `boundingClientRect` is in raw
+          // viewport coordinates while the root has been inset from the top by
+          // the bar's height, and mixing the two leaves a band the width of
+          // the bar where the pill has left the root but its rect has not yet
+          // crossed zero — and no further callback is coming to correct it,
+          // because the observer only fires on crossings of the INSET root.
+          // The button simply never appeared.
+          setPassedYes(!entry.isIntersecting && entry.boundingClientRect.bottom <= headerH);
+        },
+        { rootMargin: `-${headerH}px 0px 0px 0px`, threshold: 0 },
+      );
+      io.observe(yesPill);
+      observers.push(io);
+    }
+
+    if (finalPill) {
+      // The PLAIN viewport, not inset by the bar. The two observers measure
+      // deliberately different things: the one above asks whether an element
+      // has gone under the bar, this one asks whether an element has arrived
+      // at all — and "starts showing up" is the pill crossing the BOTTOM edge
+      // of the screen, which the header is nowhere near.
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          // `bottom <= 0` holds the button up for everything BELOW the pill
+          // too. Once the fit-check has scrolled off the top the reader is in
+          // the footer, which asks a third time on its own; letting the button
+          // drop back down there is the CTA reappearing after the page has
+          // finished, which is not what hiding it meant.
+          setReachedFinal(entry.isIntersecting || entry.boundingClientRect.bottom <= 0);
+        },
+        { threshold: 0 },
+      );
+      io.observe(finalPill);
+      observers.push(io);
+    }
+
+    return () => observers.forEach((io) => io.disconnect());
   }, [barRef]);
 
-  return passed;
+  return passedYes && !reachedFinal;
 }
 
 /**
@@ -144,11 +178,11 @@ function usePassedCreativesCta(barRef: RefObject<HTMLDivElement | null>) {
 export function MobileHeader() {
   const [open, setOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
-  const passedCta = usePassedCreativesCta(shellRef);
+  const ctaDown = useBarCtaDown(shellRef);
 
   // The drawer carries its own copy of the CTA, so the bar's would be a second
   // identical button 8px above it.
-  const showBarCta = passedCta && !open;
+  const showBarCta = ctaDown && !open;
 
   // Tap-outside and Escape both dismiss the drawer — it floats over the page,
   // so there is no other affordance to close it besides the button itself.
@@ -183,7 +217,11 @@ export function MobileHeader() {
             the 16 this was ported with. The drawer below carries the same 5:
             fitting the artboard's corner arc gives ~12px at that screenshot's
             2.61x scale for both boxes. */}
-        <header className="flex items-center justify-between overflow-hidden rounded-[0.3125rem] bg-[#181818] px-4 py-3">
+        {/* `relative z-20` so the CTA below can slide UNDER it rather than
+            across it. The bar is opaque #181818 and 72 tall against the CTA's
+            52 + 8 gap, so the hidden position is fully covered — which is what
+            lets the hidden state be a pure slide with no fade propping it up. */}
+        <header className="relative z-20 flex items-center justify-between overflow-hidden rounded-[0.3125rem] bg-[#181818] px-4 py-3">
           <Link href="/" aria-label={`${SITE_NAME} home`}>
             <Logo className="text-[2.375rem]" />
           </Link>
@@ -201,26 +239,44 @@ export function MobileHeader() {
         </header>
 
         {/*
-          The bar's own CTA. Always mounted so it can cross-fade in BOTH
-          directions — mounting it on `showBarCta` would pop it in and then
-          unmount it mid-transition on the way back up.
+          The bar's own CTA. Always mounted so it can travel in BOTH directions
+          — mounting it on `showBarCta` would pop it in and then unmount it
+          mid-transition on the way back up.
+
+          IT SLIDES OUT OF THE BAR AND BACK INTO IT (Žilvinas 2026-08-30). It
+          used to cross-fade with a 6px nudge, which at 300ms over 6px is a
+          fade with a rumour of movement in it — mid-scroll the button simply
+          materialised. The hidden position is now the full 60 it stands below
+          the bar (52 tall + the 8 gap), so the button is genuinely parked
+          behind the bar and rides out from under its bottom edge. No opacity
+          in it at all: a slide that also fades reads as a fade, and the bar it
+          hides behind is opaque, so the fade was never load-bearing.
+
+          THE TRANSFORM LIVES ON A WRAPPER, not on the <a>. VIOLET_CTA carries
+          its own `transition-all duration-300` for the hover invert, and a
+          second duration on the same element is a fight decided by stylesheet
+          order rather than by class order — the slide would silently inherit
+          the hover's timing. One element per animation, and neither can take
+          the other's.
 
           `pointer-events-none` alone would leave it tabbable and readable to a
-          screen reader while it is invisible, so the hidden state also carries
+          screen reader while it is parked, so the hidden state also carries
           aria-hidden and takes the link out of the tab order.
         */}
-        <a
-          href={BOOKING_URL}
+        <div
           aria-hidden={!showBarCta}
-          tabIndex={showBarCta ? undefined : -1}
-          className={`absolute inset-x-0 top-full mt-2 ${CTA_BOX} ${VIOLET_CTA} ${
-            showBarCta
-              ? "translate-y-0 opacity-100"
-              : "pointer-events-none -translate-y-1.5 opacity-0"
+          className={`absolute inset-x-0 top-full z-10 mt-2 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+            showBarCta ? "translate-y-0" : "pointer-events-none -translate-y-[3.75rem]"
           }`}
         >
-          {PHONE_CTA}
-        </a>
+          <a
+            href={BOOKING_URL}
+            tabIndex={showBarCta ? undefined : -1}
+            className={`w-full ${CTA_BOX} ${VIOLET_CTA}`}
+          >
+            {PHONE_CTA}
+          </a>
+        </div>
 
         {open && (
           <nav
