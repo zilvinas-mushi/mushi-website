@@ -61,11 +61,12 @@ const CTA_BOX =
  * later colour or width change from acquiring a 400ms lag by accident.
  */
 function MenuIcon({ open }: { open: boolean }) {
-  // 400ms, up from 200 (Žilvinas 2026-08-30). At 200 over 10px the bars did
-  // not read as travelling — the icon just changed. The slower move is what
-  // makes the merge legible as a merge.
+  // 250ms. 200 was too quick to read as travel — the icon just changed — but
+  // the 400 that fixed that overshot and the menu felt slow to answer a tap
+  // (Žilvinas 2026-08-30, twice). 250 is the merge still legible as a merge
+  // over 10px, without the icon becoming something you wait for.
   const bar =
-    "block h-[0.1875rem] w-[1.875rem] rounded-full bg-white transition-transform duration-[400ms] ease-out motion-reduce:transition-none";
+    "block h-[0.1875rem] w-[1.875rem] rounded-full bg-white transition-transform duration-[250ms] ease-out motion-reduce:transition-none";
   return (
     <span aria-hidden="true" className="flex flex-col items-end gap-[0.4375rem]">
       <span className={`${bar} ${open ? "translate-y-[0.625rem]" : ""}`} />
@@ -76,101 +77,140 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 /**
- * When the bar's Schedule a Call button should be down.
+ * How far the bar's Schedule a Call button is out, 0 to 1.
  *
- * TWO EDGES, one at each end of the page's middle. It comes down once the
- * creatives "Yes" pill has gone under the header — the CTA is not a permanent
- * fixture of the bar, it arrives when the reader has been shown enough to be
- * worth asking — and it goes back up the moment the final card's "15 Minute
- * Fit-Check" pill comes on screen, because from there down the page is already
- * asking in a pill of its own and a second identical button pinned to the top
- * of the screen is asking twice (Žilvinas 2026-08-26, 2026-08-30). Both edges
- * are reversible: scroll back up and the button comes back down.
+ * TIED TO THE SCROLL, NOT TRIGGERED BY IT (Žilvinas 2026-08-30). This was a
+ * boolean and a 500ms transition: you crossed a line and the button then
+ * played its own little animation afterwards, on its own clock, whatever your
+ * finger was doing. It is a POSITION now rather than an event — the button is
+ * out exactly as far as you have scrolled, and goes back in if you scroll
+ * back, frame for frame with the page.
  *
- * WATCHES THE PILLS, NOT A SCROLL DISTANCE. A hard `scrollY > n` would be a
- * number that silently goes wrong every time anything above the creatives
+ * TWO EDGES, one at each end of the page's middle, and each is now a RANGE
+ * rather than a threshold:
+ *
+ *   - It comes out over exactly the scroll it takes the creatives "Yes" pill
+ *     to disappear under the bar: nothing when the pill's top touches the
+ *     bar's bottom edge, all the way out when the pill's own bottom does. One
+ *     goes in as the other comes out, which is the swap the design asks for
+ *     and reads as one movement rather than two.
+ *   - It goes back in over the scroll it takes the final card's "15 Minute
+ *     Fit-Check" pill to arrive: untouched when that pill's top touches the
+ *     bottom of the screen, fully back in once the pill is entirely on screen.
+ *     From there down the page is already asking in a pill of its own, and a
+ *     second identical button pinned to the top of the screen asks twice.
+ *
+ * THE TRAVEL OF EACH RANGE IS THE PILL'S OWN HEIGHT, the only number here that
+ * is not invented. It also keeps both movements near 1:1 with the finger — 42
+ * of scroll for 52 of button — so the CTA reads as being carried by the page
+ * rather than as something the page set off.
+ *
+ * MEASURED FROM THE PILLS, NOT A SCROLL DISTANCE. A hard `scrollY > n` would
+ * be a number that silently goes wrong every time anything above the creatives
  * section changes height — and the hero alone changes height with the
- * viewport, the copy and the font that happens to be loaded. The threshold is
- * the element the design names, so it moves with it.
+ * viewport, the copy and the font that happens to be loaded. The range is the
+ * elements the design names, so it moves with them.
  *
- * The "Yes" root is inset by the BAR'S OWN MEASURED HEIGHT so "past" means
- * "under the bar" rather than "past the top of the window": the bar floats over
- * the page, so a pill at y = 20 is already hidden behind it and reads as
- * passed. The fit-check root is NOT inset — see the note on that observer.
+ * The "Yes" edge measures against the BAR'S OWN MEASURED BOTTOM rather than
+ * the top of the window: the bar floats over the page, so a pill at y = 20 is
+ * already behind it. Measured off the element, not parsed out of --header-h —
+ * that property is a plain custom property, so getPropertyValue hands back the
+ * SPECIFIED token stream rather than a resolved length ("92px" on a phone, but
+ * the literal string "clamp(42.48px, 4.16664vw, 80px)" from md up, which
+ * parseFloat turns into NaN). The element already knows its own height.
  *
- * Measured off the element, not read back from --header-h. That property is a
- * plain custom property, so getPropertyValue hands back the SPECIFIED token
- * stream rather than a resolved length — "92px" on a phone, but the literal
- * string "clamp(42.48px, 4.16664vw, 80px)" from md up, which parseFloat turns
- * into NaN. It happens not to matter today (the bar is hidden from md up, and
- * the phone value is a bare 92px) but it is a parse that works by luck, and
- * the element already knows its own height.
+ * The fit-check edge measures against the bottom of the window instead, and
+ * deliberately: the two ask different questions — has this gone under the bar,
+ * versus has this arrived at all — and the bar is nowhere near that edge.
  *
- * IntersectionObserver rather than a scroll listener: it fires once per
- * crossing instead of on every frame of the scroll, and it delivers an initial
- * callback on observe, so a page loaded already scrolled past the pill (a
- * refresh mid-page, a link to #templates) gets the right state without a
- * separate measurement path.
+ * IT WRITES A CUSTOM PROPERTY, NOT REACT STATE. This runs on every scroll
+ * frame, and re-rendering the header sixty times a second to move one box
+ * would be absurd; the number goes straight onto the node and the transform
+ * stays in CSS. The one thing that IS state is whether the button is out far
+ * enough to be worth offering to a screen reader or the tab key, which changes
+ * twice in a page.
+ *
+ * The scroll listener replaces two IntersectionObservers, and loses nothing:
+ * an observer reports crossings, and a crossing is exactly the thing this no
+ * longer wants to know. It also quietly fixes an edge those had — a jump that
+ * lands past the pill without it ever touching the viewport (an anchor from
+ * the drawer) crosses no threshold, fires no callback, and used to leave the
+ * button in the wrong place until the next crossing. A measurement per frame
+ * has no such state to get stuck in.
  */
-function useBarCtaDown(barRef: RefObject<HTMLDivElement | null>) {
-  const [passedYes, setPassedYes] = useState(false);
-  const [reachedFinal, setReachedFinal] = useState(false);
+function useCtaTravel(
+  barRef: RefObject<HTMLDivElement | null>,
+  ctaRef: RefObject<HTMLDivElement | null>,
+) {
+  const [reachable, setReachable] = useState(false);
 
   useEffect(() => {
+    const cta = ctaRef.current;
+    if (!cta) return;
+
     const yesPill = document.getElementById(CREATIVES_CTA_ID);
     const finalPill = document.getElementById(FINAL_CTA_ID);
-    const observers: IntersectionObserver[] = [];
 
-    // 0 from md up, where the bar is display:none — the fallback covers that,
-    // and nothing is watching there anyway.
-    const headerH = Math.round(barRef.current?.getBoundingClientRect().height ?? 0) || 92;
+    let frame = 0;
+    let last = -1;
 
-    if (yesPill) {
-      const io = new IntersectionObserver(
-        ([entry]) => {
-          // Left the root by the TOP, not merely left it — scrolling the pill
-          // off the bottom of the screen is not passing it.
-          //
-          // Compared against headerH, not 0. `boundingClientRect` is in raw
-          // viewport coordinates while the root has been inset from the top by
-          // the bar's height, and mixing the two leaves a band the width of
-          // the bar where the pill has left the root but its rect has not yet
-          // crossed zero — and no further callback is coming to correct it,
-          // because the observer only fires on crossings of the INSET root.
-          // The button simply never appeared.
-          setPassedYes(!entry.isIntersecting && entry.boundingClientRect.bottom <= headerH);
-        },
-        { rootMargin: `-${headerH}px 0px 0px 0px`, threshold: 0 },
-      );
-      io.observe(yesPill);
-      observers.push(io);
-    }
+    const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
-    if (finalPill) {
-      // The PLAIN viewport, not inset by the bar. The two observers measure
-      // deliberately different things: the one above asks whether an element
-      // has gone under the bar, this one asks whether an element has arrived
-      // at all — and "starts showing up" is the pill crossing the BOTTOM edge
-      // of the screen, which the header is nowhere near.
-      const io = new IntersectionObserver(
-        ([entry]) => {
-          // `bottom <= 0` holds the button up for everything BELOW the pill
-          // too. Once the fit-check has scrolled off the top the reader is in
-          // the footer, which asks a third time on its own; letting the button
-          // drop back down there is the CTA reappearing after the page has
-          // finished, which is not what hiding it meant.
-          setReachedFinal(entry.isIntersecting || entry.boundingClientRect.bottom <= 0);
-        },
-        { threshold: 0 },
-      );
-      io.observe(finalPill);
-      observers.push(io);
-    }
+    // Arrow consts rather than `function` declarations: a hoisted declaration
+    // could in principle run before the `if (!cta) return` above, so TS will
+    // not carry that narrowing into one and `cta` reads as possibly null.
+    const measure = () => {
+      frame = 0;
 
-    return () => observers.forEach((io) => io.disconnect());
-  }, [barRef]);
+      // Re-read rather than measured once on mount: the bar's height is a
+      // media query away from changing, and this is a rect being taken on a
+      // frame that is already being spent.
+      const barBottom = barRef.current?.getBoundingClientRect().bottom ?? 0;
 
-  return passedYes && !reachedFinal;
+      let out = 0;
+
+      if (yesPill) {
+        const r = yesPill.getBoundingClientRect();
+        // `|| 1` guards the divide, not the layout: a zero-height rect means
+        // the pill is display:none, and 0/0 puts NaN into the transform, which
+        // freezes the button wherever it happened to be.
+        out = clamp01((barBottom - r.top) / (r.height || 1));
+      }
+
+      if (finalPill) {
+        const r = finalPill.getBoundingClientRect();
+        // The clamp at 1 is also what holds the button IN for everything below
+        // the pill: once the fit-check has scrolled off the top this only
+        // grows, so the CTA cannot reappear over the footer after the page has
+        // finished asking.
+        out *= 1 - clamp01((window.innerHeight - r.top) / (r.height || 1));
+      }
+
+      if (out === last) return;
+      last = out;
+      cta.style.setProperty("--cta-out", String(out));
+      // Two values, so React bails out of the re-render on every frame that
+      // does not cross the line.
+      setReachable(out > 0.5);
+    };
+
+    const onScroll = () => {
+      // Coalesced to one measurement per frame: a passive listener still fires
+      // more often than the page paints, on a trackpad or a fast flick.
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [barRef, ctaRef]);
+
+  return reachable;
 }
 
 /**
@@ -197,11 +237,21 @@ function useBarCtaDown(barRef: RefObject<HTMLDivElement | null>) {
 export function MobileHeader() {
   const [open, setOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
-  const ctaDown = useBarCtaDown(shellRef);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const ctaReachable = useCtaTravel(shellRef, ctaRef);
 
-  // The drawer carries its own copy of the CTA, so the bar's would be a second
-  // identical button 8px above it.
-  const showBarCta = ctaDown && !open;
+  // THE DRAWER DOES NOT MOVE THE CTA (Žilvinas 2026-08-30). Opening the menu
+  // used to send the bar's button back up, because the drawer carries its own
+  // copy and two identical buttons 8px apart is one too many. But the drawer
+  // opens at exactly the CTA's own `top-full mt-2`, is opaque #181818, is four
+  // rows tall and sits at z-50 — it already COVERS the button completely. So
+  // the button was animating out from behind something that had just hidden
+  // it, which is the "off" thing you see on tap: two movements where the
+  // drawer's arrival is the only one anybody can follow.
+  //
+  // It stays put now, and `open` only takes it out of the tab order and the
+  // accessibility tree, so nothing behind the drawer can be reached.
+  const ctaOffered = ctaReachable && !open;
 
   // Tap-outside and Escape both dismiss the drawer — it floats over the page,
   // so there is no other affordance to close it besides the button itself.
@@ -258,39 +308,45 @@ export function MobileHeader() {
         </header>
 
         {/*
-          The bar's own CTA. Always mounted so it can travel in BOTH directions
-          — mounting it on `showBarCta` would pop it in and then unmount it
-          mid-transition on the way back up.
+          The bar's own CTA. Always mounted: it has no discrete states left to
+          mount on, it has a position, and it is at rest at both ends of it.
 
-          IT SLIDES OUT OF THE BAR AND BACK INTO IT (Žilvinas 2026-08-30). It
-          used to cross-fade with a 6px nudge, which at 300ms over 6px is a
-          fade with a rumour of movement in it — mid-scroll the button simply
-          materialised. The hidden position is now the full 60 it stands below
-          the bar (52 tall + the 8 gap), so the button is genuinely parked
-          behind the bar and rides out from under its bottom edge. No opacity
-          in it at all: a slide that also fades reads as a fade, and the bar it
-          hides behind is opaque, so the fade was never load-bearing.
+          IT RIDES OUT OF THE BAR AND BACK INTO IT. `--cta-out` is 0 when the
+          button is parked and 1 when it is out, written by useCtaTravel on
+          each scroll frame; 3.75rem is the whole travel, the 3.25rem box plus
+          the 0.5rem gap it stands below the bar. So at 0 the button sits
+          exactly inside the bar's own footprint — the bar is opaque #181818
+          and 72 tall against that 60 — and there is nothing to fade: a slide
+          that also fades reads as a fade, and behind an opaque bar the fade
+          was never load-bearing anyway.
 
-          THE TRANSFORM LIVES ON A WRAPPER, not on the <a>. VIOLET_CTA carries
-          its own `transition-all duration-300` for the hover invert, and a
-          second duration on the same element is a fight decided by stylesheet
-          order rather than by class order — the slide would silently inherit
-          the hover's timing. One element per animation, and neither can take
-          the other's.
+          NO TRANSITION, deliberately. The button's position IS the scroll
+          position, so a duration here would be the button lagging behind the
+          finger and then catching up — the exact "it plays its own animation"
+          quality this replaced.
+
+          THE TRANSFORM LIVES ON THIS WRAPPER, not on the <a>. VIOLET_CTA
+          carries its own `transition-all duration-300` for the hover invert,
+          and it would happily transition a translate that is supposed to be
+          instantaneous. One element per movement, and neither can take the
+          other's.
 
           `pointer-events-none` alone would leave it tabbable and readable to a
-          screen reader while it is parked, so the hidden state also carries
-          aria-hidden and takes the link out of the tab order.
+          screen reader while it is parked or covered by the drawer, so that
+          state also carries aria-hidden and takes the link out of the tab
+          order.
         */}
         <div
-          aria-hidden={!showBarCta}
-          className={`absolute inset-x-0 top-full z-10 mt-2 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-            showBarCta ? "translate-y-0" : "pointer-events-none -translate-y-[3.75rem]"
+          ref={ctaRef}
+          aria-hidden={!ctaOffered}
+          style={{ translate: "0 calc((var(--cta-out, 0) - 1) * 3.75rem)" }}
+          className={`absolute inset-x-0 top-full z-10 mt-2 ${
+            ctaOffered ? "" : "pointer-events-none"
           }`}
         >
           <a
             href={BOOKING_URL}
-            tabIndex={showBarCta ? undefined : -1}
+            tabIndex={ctaOffered ? undefined : -1}
             className={`w-full ${CTA_BOX} ${VIOLET_CTA}`}
           >
             {PHONE_CTA}
