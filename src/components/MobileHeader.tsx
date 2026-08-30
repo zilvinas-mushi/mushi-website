@@ -76,6 +76,10 @@ function MenuIcon({ open }: { open: boolean }) {
   );
 }
 
+/** The scroll each edge is spread over, and how hard the button trails it. */
+const SPAN_PX = 240;
+const TAU_MS = 110;
+
 /**
  * How far the bar's Schedule a Call button is out, 0 to 1.
  *
@@ -89,21 +93,41 @@ function MenuIcon({ open }: { open: boolean }) {
  * TWO EDGES, one at each end of the page's middle, and each is now a RANGE
  * rather than a threshold:
  *
- *   - It comes out over exactly the scroll it takes the creatives "Yes" pill
- *     to disappear under the bar: nothing when the pill's top touches the
- *     bar's bottom edge, all the way out when the pill's own bottom does. One
- *     goes in as the other comes out, which is the swap the design asks for
- *     and reads as one movement rather than two.
- *   - It goes back in over the scroll it takes the final card's "15 Minute
- *     Fit-Check" pill to arrive: untouched when that pill's top touches the
- *     bottom of the screen, fully back in once the pill is entirely on screen.
+ *   - It comes out as the creatives "Yes" pill goes under the bar: nothing
+ *     when the pill's top touches the bar's bottom edge, and then over
+ *     SPAN_PX of further scrolling. The two still swap — the CTA starts
+ *     moving on the frame the pill starts disappearing — but the CTA outlasts
+ *     it rather than finishing with it.
+ *   - It goes back in as the final card's "15 Minute Fit-Check" pill arrives:
+ *     untouched when that pill's top touches the bottom of the screen, and
+ *     then over the same SPAN_PX.
  *     From there down the page is already asking in a pill of its own, and a
  *     second identical button pinned to the top of the screen asks twice.
  *
- * THE TRAVEL OF EACH RANGE IS THE PILL'S OWN HEIGHT, the only number here that
- * is not invented. It also keeps both movements near 1:1 with the finger — 42
- * of scroll for 52 of button — so the CTA reads as being carried by the page
- * rather than as something the page set off.
+ * BOTH RANGES ARE SPAN_PX LONG, AND THE BUTTON FOLLOWS RATHER THAN TRACKS
+ * (Žilvinas 2026-08-30, on the version that shipped). Each range used to be
+ * the pill's own height, 42 of scroll for 52 of button, welded 1:1 to the
+ * finger. Read slowly that is exactly right, and it is how it was checked.
+ * But almost nobody reads a phone page at that speed: a normal flick covers
+ * the whole 42 inside one gesture, and a 1:1 button crosses its entire travel
+ * in a frame or two — which arrives as a jump, not as travel. The complaint
+ * was that it "instantly pops in", and both halves of this are that same
+ * complaint:
+ *
+ *   - SPAN_PX (a scroll DISTANCE, not a fixed duration) stretches the range to
+ *     about a third of a phone viewport, so an ordinary flick spends real
+ *     scrolling inside it and the movement is legible.
+ *   - TAU_MS lets the button trail the scroll instead of being welded to it.
+ *     The target is still the scroll position, but the button covers 63% of
+ *     the remaining gap per TAU, so it CANNOT move faster than its own time
+ *     constant however big a jump the scroll hands it, and it eases to a stop
+ *     of its own after the finger lifts instead of stopping dead with it.
+ *
+ * Deliberately not a CSS transition, which is what this replaced: a duration
+ * plays the same length whether you moved 3px or 300, so it lags a slow drag
+ * and truncates a fast one. An exponential follower has no duration — it is
+ * always chasing wherever the scroll currently says, only smoothly. Under
+ * a slow read the gap never opens and it is still, in effect, 1:1.
  *
  * MEASURED FROM THE PILLS, NOT A SCROLL DISTANCE. A hard `scrollY > n` would
  * be a number that silently goes wrong every time anything above the creatives
@@ -123,9 +147,10 @@ function MenuIcon({ open }: { open: boolean }) {
  * deliberately: the two ask different questions — has this gone under the bar,
  * versus has this arrived at all — and the bar is nowhere near that edge.
  *
- * IT WRITES A CUSTOM PROPERTY, NOT REACT STATE. This runs on every scroll
- * frame, and re-rendering the header sixty times a second to move one box
- * would be absurd; the number goes straight onto the node and the transform
+ * IT WRITES A CUSTOM PROPERTY, NOT REACT STATE. This runs on every animation
+ * frame of a scroll, and on the frames after it while the button catches up;
+ * re-rendering the header sixty times a second to move one box would be
+ * absurd, the number goes straight onto the node and the transform
  * stays in CSS. The one thing that IS state is whether the button is out far
  * enough to be worth offering to a screen reader or the tab key, which changes
  * twice in a page.
@@ -137,6 +162,9 @@ function MenuIcon({ open }: { open: boolean }) {
  * the drawer) crosses no threshold, fires no callback, and used to leave the
  * button in the wrong place until the next crossing. A measurement per frame
  * has no such state to get stuck in.
+ *
+ * The loop parks itself: a scroll event only kicks it, and it stops as soon as
+ * the button has caught up with the page, so a still page costs nothing.
  */
 function useCtaTravel(
   barRef: RefObject<HTMLDivElement | null>,
@@ -151,17 +179,26 @@ function useCtaTravel(
     const yesPill = document.getElementById(CREATIVES_CTA_ID);
     const finalPill = document.getElementById(FINAL_CTA_ID);
 
+    // Reduced motion drops the follower and goes back to the exact 1:1: the
+    // reveal is the page's own scroll and stays, but nothing keeps moving
+    // after the finger stops.
+    const welded = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     let frame = 0;
+    let prev = 0;
+    // -1 is "nothing painted yet", which no real position can equal, so the
+    // first write always lands.
     let last = -1;
+    // Where the button actually is, which is the followed value rather than
+    // the scroll's own. Set to the real position at mount, below.
+    let at = 0;
 
     const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
     // Arrow consts rather than `function` declarations: a hoisted declaration
     // could in principle run before the `if (!cta) return` above, so TS will
     // not carry that narrowing into one and `cta` reads as possibly null.
-    const measure = () => {
-      frame = 0;
-
+    const target = () => {
       // Re-read rather than measured once on mount: the bar's height is a
       // media query away from changing, and this is a rect being taken on a
       // frame that is already being spent.
@@ -170,37 +207,78 @@ function useCtaTravel(
       let out = 0;
 
       if (yesPill) {
-        const r = yesPill.getBoundingClientRect();
-        // `|| 1` guards the divide, not the layout: a zero-height rect means
-        // the pill is display:none, and 0/0 puts NaN into the transform, which
-        // freezes the button wherever it happened to be.
-        out = clamp01((barBottom - r.top) / (r.height || 1));
+        // From the frame the pill's top meets the bar's bottom, over SPAN_PX
+        // of further scrolling.
+        out = clamp01((barBottom - yesPill.getBoundingClientRect().top) / SPAN_PX);
       }
 
       if (finalPill) {
-        const r = finalPill.getBoundingClientRect();
         // The clamp at 1 is also what holds the button IN for everything below
         // the pill: once the fit-check has scrolled off the top this only
         // grows, so the CTA cannot reappear over the footer after the page has
         // finished asking.
-        out *= 1 - clamp01((window.innerHeight - r.top) / (r.height || 1));
+        const top = finalPill.getBoundingClientRect().top;
+        out *= 1 - clamp01((window.innerHeight - top) / SPAN_PX);
       }
 
-      if (out === last) return;
-      last = out;
-      cta.style.setProperty("--cta-out", String(out));
+      return out;
+    };
+
+    const paint = () => {
+      if (at === last) return;
+      last = at;
+      cta.style.setProperty("--cta-out", String(at));
       // Two values, so React bails out of the re-render on every frame that
       // does not cross the line.
-      setReachable(out > 0.5);
+      setReachable(at > 0.5);
+    };
+
+    const step = (now: number) => {
+      frame = 0;
+      const to = target();
+
+      // Frame-rate independent, so the follower is the same 110ms on a 60Hz
+      // phone and a 120Hz one — a flat fraction per frame would run twice as
+      // fast on the 120. Capped so a backgrounded tab's first frame back is a
+      // step, not a teleport.
+      const dt = prev ? Math.min(100, now - prev) : 16;
+      prev = now;
+
+      if (welded) {
+        at = to;
+      } else {
+        at += (to - at) * (1 - Math.exp(-dt / TAU_MS));
+        // Land it rather than approach it forever: below this the button is
+        // inside a tenth of a pixel of home and the loop would never park.
+        if (Math.abs(to - at) < 0.002) at = to;
+      }
+
+      paint();
+
+      // Keep going while the button is still catching up — the scroll may
+      // have stopped, but the movement it asked for has not finished.
+      if (at !== to) frame = requestAnimationFrame(step);
+      else prev = 0;
     };
 
     const onScroll = () => {
-      // Coalesced to one measurement per frame: a passive listener still fires
-      // more often than the page paints, on a trackpad or a fast flick.
-      if (!frame) frame = requestAnimationFrame(measure);
+      // One measurement per frame: a passive listener fires more often than
+      // the page paints, on a trackpad or a fast flick. Once the loop is
+      // running it re-reads the scroll itself, so this only has to start it.
+      if (!frame) {
+        prev = 0;
+        frame = requestAnimationFrame(step);
+      }
     };
 
-    measure();
+    // The first position is painted HERE rather than on the first frame: a
+    // page opened already scrolled past the pill (a refresh mid-page, a link
+    // to #agency) would otherwise render one frame with the button parked. It
+    // also covers a tab that loads in the background, where rAF does not run
+    // at all until it is looked at.
+    at = target();
+    paint();
+
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
@@ -320,15 +398,17 @@ export function MobileHeader() {
           that also fades reads as a fade, and behind an opaque bar the fade
           was never load-bearing anyway.
 
-          NO TRANSITION, deliberately. The button's position IS the scroll
-          position, so a duration here would be the button lagging behind the
-          finger and then catching up — the exact "it plays its own animation"
-          quality this replaced.
+          NO CSS TRANSITION, deliberately — the smoothing is in the hook, not
+          here. `--cta-out` is already a followed value rather than the raw
+          scroll (see useCtaTravel), and a duration on top of it would be a
+          second lag stacked on the first: the button would then be chasing a
+          value that is itself chasing the page, and a fixed duration plays the
+          same length whether you moved 3px or 300.
 
           THE TRANSFORM LIVES ON THIS WRAPPER, not on the <a>. VIOLET_CTA
           carries its own `transition-all duration-300` for the hover invert,
-          and it would happily transition a translate that is supposed to be
-          instantaneous. One element per movement, and neither can take the
+          and it would happily transition a translate that is written fresh on
+          every frame. One element per movement, and neither can take the
           other's.
 
           `pointer-events-none` alone would leave it tabbable and readable to a
