@@ -853,7 +853,7 @@ function TestimonialCard({
   return (
     /* #181818 at radius 20, both from Figma. The fill was #161519, an
        eyeballed near-black. NOTE this is NOT the same grey as the
-       "Trusted by 100+ brands" pill below the grid, which is #222222 — the two
+       "Trusted by 110+ brands" pill below the grid, which is #222222 — the two
        were briefly conflated. Card is darker than the control sitting on it. */
     /* Phone padding is the artboard's, and it is not uniform: 20 left and
        right (the desktop 28 left the stars and the quote too far in on a 375

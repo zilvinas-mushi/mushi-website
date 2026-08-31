@@ -133,7 +133,7 @@ wider than the card, so breaking there wrapped it onto a third line and left
 
 ## Section — Testimonials
 
-**Reputation is everything. Ours is flawless.** · Trusted by 100+ brands · View More
+**Reputation is everything. Ours is flawless.** · Trusted by 110+ brands · View More
 
 1. **Other marketers ask us who cooks our ads** — 5★ — Mushi team is exceptional, no other creative agency has ever met our needs - either because of the speed of execution, ideas or editing.\
    Mushi delivers on all fronts. Other people & marketers even ask us where we get such creatives because they're top-notch. — *November 01, 2024 · David Kovger · GB*

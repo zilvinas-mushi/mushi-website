@@ -756,7 +756,7 @@ export const TESTIMONIALS = {
   heading: "Reputation is everything. Ours is flawless.",
   /** The design breaks the heading after the first sentence — one line each. */
   headingLines: ["Reputation is everything.", "Ours is flawless."],
-  trustLine: "Trusted by 100+ brands",
+  trustLine: "Trusted by 110+ brands",
   moreLabel: "View More",
   /** First three render immediately; the rest sit behind the disclosure. */
   visibleCount: 3,
