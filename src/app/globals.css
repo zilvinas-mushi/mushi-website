@@ -784,6 +784,35 @@ html[data-canvas="footer"] body {
     #000;
 }
 
+/* The competitors' card carries a 1px INSIDE stroke that is a linear
+   gradient running top to bottom: #999999 at 0% into #FFFFFF at 50%, and
+   white from there down (Žilvinas 2026-09-05). So the corner catches a grey
+   edge and the body of the card sits in a clean white hairline.
+
+   Same masked-pseudo-element trick as .tile-ring and .animated-gradient-border
+   above, and for the same two reasons: a border-color cannot hold a gradient,
+   and border-image breaks on a rounded corner. `padding: 1px` plus the xor
+   mask draws the ring WITHIN the card's 24px radius rather than adding to it,
+   which is what Figma's "Inside" stroke means. */
+.diff-card-ring {
+  position: relative;
+}
+.diff-card-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(180deg, #999999 0%, #ffffff 50%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 20;
+}
+
 /* Process step visuals: crops from the reference screenshot, so every edge is
    a hard cut through the card's gradient. Fading all four edges (two linear
    masks intersected, same technique as .hero-grid) dissolves the cuts into

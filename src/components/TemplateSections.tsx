@@ -858,7 +858,7 @@ export function TemplatesDifference() {
               reference. The card takes its height from the Mushi card
               beside it (grid stretch). */}
           <article
-            className="relative flex min-h-[560px] flex-col overflow-hidden rounded-[24px] bg-[#101010] bg-cover bg-center p-6 md:p-7"
+            className="diff-card-ring relative flex min-h-[560px] flex-col overflow-hidden rounded-[24px] bg-[#101010] bg-cover bg-center p-6 md:p-7"
             style={{ backgroundImage: "url(/images/templates/diff-card-dark.webp)" }}
           >
             <ul className="relative z-10 flex flex-wrap items-center justify-center gap-2.5">
