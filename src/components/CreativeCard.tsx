@@ -23,7 +23,7 @@ function Verified() {
       alt="Verified account"
       width={21}
       height={21}
-      loading="eager"
+      loading="lazy"
       decoding="async"
       className="size-[0.9375rem] shrink-0"
     />
@@ -46,7 +46,7 @@ function ActionIcon({ name, w, h }: { name: string; w: number; h: number }) {
       alt=""
       width={w}
       height={h}
-      loading="eager"
+      loading="lazy"
       decoding="async"
       className="h-[2rem] w-auto"
       aria-hidden="true"
@@ -74,7 +74,7 @@ export function CreativeCard({ item }: { item: Creative }) {
             alt=""
             width={32}
             height={32}
-            loading="eager"
+            loading="lazy"
             decoding="async"
             className="size-8 shrink-0 rounded-full object-cover"
           />
@@ -105,17 +105,27 @@ export function CreativeCard({ item }: { item: Creative }) {
       </header>
 
       {/*
-        Eager, not lazy — deliberately. These cards live in an auto-scrolling
-        marquee, so something is ALWAYS just entering the viewport; lazy
-        loading guarantees the visitor watches images pop in blank for the
-        whole first loop. Everything loads up front instead, and the neutral
-        backing only shows for the brief moment before that finishes.
+        Lazy, and that is not a retreat from the marquee guarantee.
+
+        These were eager on the reasoning that a card is ALWAYS just entering
+        the viewport, so lazy would mean watching stills pop in blank for the
+        whole first loop. What that missed is where React puts an eager image:
+        it emits a `<link rel="preload" as="image">` into the document HEAD
+        for each one. Twenty-three of them — ten stills, ten avatars, the icon
+        set — sat above the stylesheet, and the stylesheet is what the hero's
+        headline (the LCP element) is blocked on.
+
+        Lazy costs the rail nothing here because the rail is never in the first
+        viewport at any width — the hero field is min-h-svh — and Chrome starts
+        a lazy image 1250px before it arrives, 3000px on a slow connection.
+        The rail sits inside that window, so the stills are already on the wire
+        by the time anyone reaches them; they are simply no longer ahead of the
+        CSS in the head.
 
         Film cards carry the same still as their poster and layer the video
-        over it, so this eager-load guarantee holds for every card in the rail
-        regardless of which kind it is. Only the poster is on the critical
-        path — see CreativeVideo for why the film itself costs nothing until
-        the card is on screen.
+        over it, so this holds for every card in the rail regardless of which
+        kind it is. Only the poster is on the critical path — see CreativeVideo
+        for why the film itself costs nothing until the card is on screen.
       */}
       {item.video ? (
         <CreativeVideo
@@ -134,7 +144,7 @@ export function CreativeCard({ item }: { item: Creative }) {
           alt={media}
           width={item.w}
           height={item.h}
-          loading="eager"
+          loading="lazy"
           decoding="async"
           // Creatives are portrait ads; a 4:5 crop cut the tops and bottoms off.
           // 9:16 matches the source material, so the whole ad stays visible.

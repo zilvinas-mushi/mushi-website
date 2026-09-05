@@ -189,6 +189,45 @@ export function CreativesRail() {
     [paint, run],
   );
 
+  /**
+   * ARM THE WHOLE RAIL AT ONCE, two viewports out.
+   *
+   * The cards ship `loading="lazy"` so React does not put a
+   * `<link rel="preload" as="image">` for all twenty-three of them in the
+   * document head, ahead of the stylesheet the hero's headline is blocked on.
+   * But lazy on its own is not what this rail needs either: it is a marquee,
+   * so a card is always arriving from the right, and the browser's own
+   * lookahead only reaches the next 1250px of it — the rest pop in blank
+   * mid-glide, which is exactly what the eager version existed to prevent.
+   *
+   * So: lazy in the markup, and the moment the section is within two
+   * viewports every image in it is flipped to eager in one DOM pass. No
+   * re-render (twenty cards' worth of React for an attribute would be its own
+   * cost), no head preloads, and the rail is fully painted before anyone
+   * reaches it.
+   */
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+
+    const load = () => {
+      for (const img of view.querySelectorAll<HTMLImageElement>('img[loading="lazy"]')) {
+        img.loading = "eager";
+      }
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries[entries.length - 1].isIntersecting) return;
+        io.disconnect();
+        load();
+      },
+      { rootMargin: "200% 0px" },
+    );
+    io.observe(view);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     snap.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

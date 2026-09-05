@@ -326,7 +326,7 @@ export function CreativeVideo({
   return (
     <div className="relative aspect-[9/16] w-full overflow-hidden bg-zinc-100">
       {/*
-        The poster stays a real <img>, eager, exactly as on a still card — not
+        The poster stays a real <img> — not
         the <video poster> attribute. The rail's cards must never show blank
         while the marquee is mid-glide, and an <img> is the only version of
         that guarantee that does not depend on how a given browser treats a
@@ -341,7 +341,10 @@ export function CreativeVideo({
         alt={alt}
         width={w}
         height={h}
-        loading="eager"
+        // Lazy for the same reason as the still cards: eager put a preload
+        // for every poster in the document head, ahead of the stylesheet.
+        // See the note in CreativeCard.
+        loading="lazy"
         decoding="async"
         className="absolute inset-0 size-full object-cover"
       />
