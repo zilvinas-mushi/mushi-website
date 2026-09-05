@@ -915,34 +915,33 @@ export const TEMPLATES_PAGE = {
    * tile per side on the top row, two on the second, outer tiles cut by the
    * viewport edge, inner second-row tiles sliding UNDER the MacBook.
    *
-   * EVERY OFFSET IS A PERCENTAGE OF THE MACBOOK'S OWN WIDTH, and the tiles
-   * are positioned inside its box rather than the section's (Žilvinas
-   * 2026-09-05, "every laptop should see till the end of the mac").
+   * Positions are anchored to the CENTRE (calc(50% - Npx)), not the
+   * viewport edges: on wider screens the field stays put around the MacBook
+   * and the extra outer tiles (Food, second Drink) come into view, exactly
+   * as the wide-screen example shows. At 1440 those two sit fully outside
+   * the clip. Beauty genuinely appears three times in the reference.
    *
-   * They were px offsets from the section's centre with fixed `top`s, which
-   * held only while the machine was a fixed 1010 wide. It is not any more —
-   * on a short window its width is now whatever the leftover height allows,
-   * so anything pinned in px drifted away from it: the tiles kept their
-   * places while the machine shrank out from under them.
+   * EVERYTHING HERE IS FIXED PX AND STAYS THAT WAY. The tiles are 230
+   * square and the offsets are the artboard's own; nothing in this cluster
+   * scales against the viewport (Žilvinas 2026-09-05: "you can't squeeze
+   * those 230x230 sections"). The whole hero is zoomed as ONE piece to fit
+   * the window instead — see .tpl-fit in globals.css — so the composition
+   * on a MacBook Air is the composition in Figma, just smaller.
    *
-   * As percentages the whole cluster is one object with the machine. The
-   * pattern is unchanged: one tile per side on the top row, two on the
-   * second, the outer ones cut by the viewport edge and the inner
-   * second-row pair sliding UNDER the machine. Beauty genuinely appears
-   * three times in the reference.
-   *
-   * Rows sit at 13.5% and 36.9% of that width — the second is the first
-   * plus a tile (22.8%) and the reference's hairline gap.
+   * The two rows moved down 142 from 523/719 when the headline reached its
+   * drawn 80/80 and the gaps their measured 40 and 70: that is exactly how
+   * much taller the block above them became, so the tiles keep their
+   * position against the machine rather than against the section's top.
    */
   categories: [
-    { label: "Drink", image: "templates/cat-drink.webp", pos: "left-[-40.6%] top-[13.5%]" },
-    { label: "Fashion", image: "templates/cat-fashion.webp", pos: "left-[-18.5%] top-[13.5%]" },
-    { label: "Health", image: "templates/cat-health.webp", pos: "left-[-30.6%] top-[36.9%]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "left-[-8.8%] top-[36.9%]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[-20.8%] top-[13.5%]" },
-    { label: "Food", image: "templates/cat-food.webp", pos: "right-[-41.9%] top-[13.5%]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[-9.4%] top-[36.9%]" },
-    { label: "Drink", image: "templates/cat-drink.webp", pos: "right-[-30.2%] top-[36.9%]" },
+    { label: "Drink", image: "templates/cat-drink.webp", pos: "left-[calc(50%_-_915px)] top-[665px]" },
+    { label: "Fashion", image: "templates/cat-fashion.webp", pos: "left-[calc(50%_-_692px)] top-[665px]" },
+    { label: "Health", image: "templates/cat-health.webp", pos: "left-[calc(50%_-_814px)] top-[861px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "left-[calc(50%_-_594px)] top-[861px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_715px)] top-[665px]" },
+    { label: "Food", image: "templates/cat-food.webp", pos: "right-[calc(50%_-_928px)] top-[665px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_600px)] top-[861px]" },
+    { label: "Drink", image: "templates/cat-drink.webp", pos: "right-[calc(50%_-_810px)] top-[861px]" },
   ],
   /**
    * "Difference" comparison section. Rebuilt 2026-09-03 (late) from the

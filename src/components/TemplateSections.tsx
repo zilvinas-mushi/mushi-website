@@ -21,9 +21,10 @@ const BADGE_GRADIENT =
  */
 export function TemplatesHero() {
   return (
-    <section aria-labelledby="templates-heading" className="relative">
+    <section aria-labelledby="templates-heading" className="tpl-fit relative">
+      <CategoryTiles />
 
-      <div className={`${SHELL} relative z-[1] pt-10 text-center md:pt-[clamp(32px,7svh,80px)]`}>
+      <div className={`${SHELL} relative z-[1] pt-10 text-center md:pt-20`}>
         {/* Gradient-ringed chip, not the home hero's frosted white pill. Ring
             and text share ONE purple-to-salmon gradient, sampled from the
             zoomed badge reference (2026-09-03) — the ring via the
@@ -68,7 +69,7 @@ export function TemplatesHero() {
             further; the <br> only guarantees that ONE break is always there. */}
         <h1
           id="templates-heading"
-          className="mx-auto mt-6 max-w-[1240px] text-[28px] font-semibold leading-none sm:text-[44px] md:mt-[clamp(24px,2.0833vw,40px)] lg:text-[clamp(44px,4.1667vw,80px)]"
+          className="mx-auto mt-6 max-w-[1240px] text-[28px] font-semibold leading-none sm:text-[44px] md:mt-10 lg:text-[80px]"
         >
           {TEMPLATES_PAGE.headingLines[0]}
           <br />
@@ -100,7 +101,7 @@ export function TemplatesHero() {
             half too brightly here. */}
         <a
           href={APP_URL}
-          className="group mt-8 inline-flex h-[52px] items-center justify-center gap-2.5 rounded-[8px] bg-[linear-gradient(120deg,#a08ade_0%,#8764c1_22%,#7b54b5_48%,#6e54b5_100%)] px-7 text-[17px] font-semibold text-white shadow-[0_10px_30px_-10px_rgba(110,84,181,0.9)] transition-all duration-150 hover:bg-[linear-gradient(120deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-[clamp(32px,3.6458vw,70px)] md:h-[clamp(56px,5vw,96px)] md:w-[clamp(230px,20.052vw,385px)] md:gap-[clamp(10px,0.833vw,16px)] md:rounded-[clamp(8px,0.78vw,15px)] md:px-0 md:text-[clamp(19px,1.5625vw,30px)]"
+          className="group mt-8 inline-flex h-[52px] items-center justify-center gap-2.5 rounded-[8px] bg-[linear-gradient(120deg,#a08ade_0%,#8764c1_22%,#7b54b5_48%,#6e54b5_100%)] px-7 text-[17px] font-semibold text-white shadow-[0_10px_30px_-10px_rgba(110,84,181,0.9)] transition-all duration-150 hover:bg-[linear-gradient(120deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-[70px] md:h-[96px] md:w-[385px] md:gap-4 md:rounded-[15px] md:px-0 md:text-[30px]"
         >
           {TEMPLATES_PAGE.cta}
           {/* The design's own dart glyph ("Icon.png", supplied 2026-09-03),
@@ -115,7 +116,7 @@ export function TemplatesHero() {
             /* Grows with the label rather than staying at its phone size —
                a 15-wide dart beside 30px type in a 96-tall button read as a
                speck. 24 x 21 at 1920 keeps the glyph's own 21.9:19.7 ratio. */
-            className="inline-block h-[13px] w-[15px] bg-current md:h-[clamp(13px,1.094vw,21px)] md:w-[clamp(15px,1.25vw,24px)]"
+            className="inline-block h-[13px] w-[15px] bg-current md:h-[21px] md:w-[24px]"
             style={{
               WebkitMaskImage: "url(/images/templates/cta-arrow.png)",
               maskImage: "url(/images/templates/cta-arrow.png)",
@@ -996,8 +997,6 @@ export function TemplatesDifference() {
  */
 function CategoryTiles() {
   return (
-    /* inset-0 of the MACHINE now, not of the section — see the note on
-       TEMPLATES_PAGE.categories. */
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-0 hidden xl:block"
@@ -1012,12 +1011,11 @@ function CategoryTiles() {
              tile smaller than the ones inside the MacBook screenshot beside
              it; they are meant to read as the same object.
 
-             Expressed as a SHARE OF THE MACHINE'S WIDTH — 22.8% is 230
-             against its 1010 reference — so the tile and the identical tiles
-             printed inside the screenshot stay the same size as the machine
-             resizes. A vw-based size drifted from them the moment the
-             machine stopped being 1010 wide. */
-          className={`absolute ${c.pos} flex aspect-square w-[22.8%] flex-col items-center gap-2.5 rounded-[30px] bg-[radial-gradient(circle_at_50%_50%,#393939_0%,#000000_100%)] pt-6 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]`}
+             A FLAT 230, never scaled against the viewport. It is the size
+             the tiles are drawn at, and the hero is zoomed as one piece to
+             fit the window (.tpl-fit) rather than each part being squeezed
+             separately. */
+          className={`absolute ${c.pos} flex size-[230px] flex-col items-center gap-2.5 rounded-[30px] bg-[radial-gradient(circle_at_50%_50%,#393939_0%,#000000_100%)] pt-6 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]`}
         >
           <span className="text-[17px] font-semibold uppercase tracking-[0.02em] text-white">
             {c.label}
@@ -1040,11 +1038,7 @@ function AppWindow() {
   return (
     // max-w per the final hero reference: the MacBook spans ~980px at 1440,
     // which also closes the gap to the category tiles beside it.
-    /* .tpl-machine is what makes the whole hero end above the fold — it sets
-       this box's width from the height the block above it did not use. See
-       the rule in globals.css. */
-    <div className="tpl-machine relative z-[1] mx-auto mt-10 w-full max-w-[1010px] px-4 md:mt-[clamp(20px,5svh,56px)] md:max-w-none md:px-0">
-      <CategoryTiles />
+    <div className="relative z-[1] mx-auto mt-10 w-full max-w-[1010px] px-4 md:mt-14">
       {/* NO ROUNDED CLIP, NO SCALE (Žilvinas 2026-09-05: "as the mac
           screenshot attached — not you added some stupid corners").
 
@@ -1053,14 +1047,10 @@ function AppWindow() {
           SECOND set of corners at a different radius, and the `scale-[1.02]`
           that pushed the artwork's own bezel out past that clip is what made
           the two sets visibly disagree. The image goes in as it comes. */}
-      {/* relative z-[1] puts the machine ABOVE the tiles it now contains —
-          the inner second-row pair is meant to slide under it. As static
-          content it painted below every absolutely-positioned tile, which is
-          the opposite of the reference. */}
       <Img
         src="templates/hero-macbook.webp"
         alt="The Mushi template library on a MacBook: a grid of ad templates with industry filters"
-        className="relative z-[1] w-full"
+        className="w-full"
         priority
       />
     </div>
