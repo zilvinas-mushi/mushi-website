@@ -890,25 +890,19 @@ export function TemplatesDifference() {
               ))}
             </ul>
             <div role="img" aria-label={d.bad.alt} className="absolute inset-0">
-              {/* The bin is split in two layers so the ads sit INSIDE it:
-                  the full can renders first (its back rim behind the ads),
-                  the ads go on top, and the can's front wall — a crop of the
-                  same artwork from the near lip down, bottom-aligned so it
-                  registers pixel-perfect — covers their lower ends. */}
-              <span className="absolute left-[-5%] top-[21%] block w-[110%]">
+              {/* ONE IMAGE, NOT FOUR (Žilvinas 2026-09-05: "change the whole
+                  trashcan to this — including everything trash that should
+                  have been inside the bin as well").
+
+                  It used to be a composition: the can behind, two ad cards on
+                  top, then a bottom-aligned crop of the can's front wall over
+                  their lower ends so they read as being inside it. The
+                  supplied master already has the ads in the bin, so all of
+                  that machinery — and the pixel-perfect registration it
+                  depended on — is gone. diff-ad-add, diff-ad-bad and
+                  diff-can-front are no longer rendered. */}
+              <span className="absolute left-[-5%] top-[8%] block w-[110%]">
                 <Img src="templates/diff-trashcan.webp" alt="" className="w-full" />
-              </span>
-              {/* Small ADD-heading card peeking behind the big ad. */}
-              <span className="absolute left-[5%] top-[36%] block w-[24%]">
-                <Img src="templates/diff-ad-add.webp" alt="" className="w-full" />
-              </span>
-              <span className="absolute left-[10%] top-[13%] block w-[87%]">
-                <Img src="templates/diff-ad-bad.webp" alt="" className="w-full" />
-              </span>
-              <span className="absolute left-[-5%] top-[21%] block aspect-[900/940] w-[110%]">
-                <span className="absolute bottom-0 left-0 block w-full">
-                  <Img src="templates/diff-can-front.webp" alt="" className="w-full" />
-                </span>
               </span>
             </div>
             <p className="relative z-10 mt-auto text-[20px] font-bold leading-tight text-white md:text-[24px]">
