@@ -784,45 +784,24 @@ html[data-canvas="footer"] body {
     #000;
 }
 
-/*
-  THE WHOLE HERO — badge, headline, CTA, the machine and its tiles — HAS TO
-  FIT ONE SCREEN AT 100% ZOOM, on a MacBook Air, a MacBook Pro or an external
-  monitor (Žilvinas 2026-09-05).
-
-  IT IS SCALED, NOT SQUEEZED. The first attempt drove the machine's width off
-  the leftover height and made the tiles a percentage of it, which fitted the
-  screen and destroyed the composition: the machine came out half size with
-  the tiles shrunk against it, and it stopped looking like the file. Every
-  part of this hero is drawn at a fixed size — 80/80 headline, 40 and 70 gaps,
-  385 x 96 CTA, 1010 machine, 230 tiles — and every one of them stays that
-  size relative to the others.
-
-  `zoom` on the section is what fits it: one factor applied to the whole
-  composition, so a short window gets the Figma layout at 68% rather than a
-  rearranged one at 100%. Unlike `transform: scale()` it reflows — the box
-  really is smaller, so nothing below it needs a negative margin to close a
-  gap, and text is rasterised at its final size instead of being resampled.
-
-  1172 is the section's own drawn height: 80 top + 38 badge + 40 + 160
-  headline + 70 + 96 CTA + 56 + 632 machine (1010 x 1503/2400). It is a
-  constant because none of those numbers track the viewport — which is the
-  whole point, and also what makes the factor computable in CSS at all. If any
-  of them changes, this changes with it.
-
-  The header's height comes off the budget: the section starts below it.
-
-  Capped at 1 — a tall monitor shows the hero at its drawn size and no
-  larger. Phones are exempt: they scroll, and the phone layout is its own set
-  of numbers.
-*/
-@media (min-width: 768px) {
-  .tpl-fit {
-    /* DIVIDE BY A LENGTH, NOT A NUMBER. `calc(100svh / 1172)` is a length,
-       and zoom takes a number or a percentage — Chrome silently resolves the
-       invalid value to 1 and the whole rule does nothing. `/ 1172px` makes
-       the division dimensionless, which is what zoom will accept. */
-    zoom: min(1, calc((100svh - var(--header-h)) / 1172px));
-  }
+/* Process step visuals: crops from the reference screenshot, so every edge is
+   a hard cut through the card's gradient. Fading all four edges (two linear
+   masks intersected, same technique as .hero-grid) dissolves the cuts into
+   the CSS gradient behind — which is sampled from the same reference, so the
+   colours meet. */
+.process-shot {
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 80%, transparent 100%);
+  -webkit-mask-repeat: no-repeat, no-repeat;
+  -webkit-mask-size: 100% 100%, 100% 100%;
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 80%, transparent 100%);
+  mask-repeat: no-repeat, no-repeat;
+  mask-size: 100% 100%, 100% 100%;
+  mask-composite: intersect;
 }
 
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a

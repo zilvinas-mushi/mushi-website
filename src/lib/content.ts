@@ -894,19 +894,6 @@ export const TEMPLATES_PAGE = {
   // Drive", and "500 winner static templates".
   badge: "500+ Static Templates",
   heading: "Your 8-Minute Shortcut to High-ROAS Ads",
-  /**
-   * THE BREAK IS AUTHORED: after "Shortcut", so "to High-ROAS Ads" is the
-   * whole second line (Žilvinas 2026-09-05).
-   *
-   * `text-balance` was picking the break instead, and balance equalises the
-   * two lines — it lands after "Shortcut to", which strands "to" at the end
-   * of line one and leaves the second line short. Worse, it is width-
-   * dependent, so the break moved as the window did.
-   *
-   * `heading` stays the flat sentence for metadata and JSON-LD; only the h1
-   * renders the lines.
-   */
-  headingLines: ["Your 8-Minute Shortcut", "to High-ROAS Ads"],
   cta: "Take the Shortcut",
   login: "Login",
     /**
@@ -920,28 +907,16 @@ export const TEMPLATES_PAGE = {
    * and the extra outer tiles (Food, second Drink) come into view, exactly
    * as the wide-screen example shows. At 1440 those two sit fully outside
    * the clip. Beauty genuinely appears three times in the reference.
-   *
-   * EVERYTHING HERE IS FIXED PX AND STAYS THAT WAY. The tiles are 230
-   * square and the offsets are the artboard's own; nothing in this cluster
-   * scales against the viewport (Žilvinas 2026-09-05: "you can't squeeze
-   * those 230x230 sections"). The whole hero is zoomed as ONE piece to fit
-   * the window instead — see .tpl-fit in globals.css — so the composition
-   * on a MacBook Air is the composition in Figma, just smaller.
-   *
-   * The two rows moved down 142 from 523/719 when the headline reached its
-   * drawn 80/80 and the gaps their measured 40 and 70: that is exactly how
-   * much taller the block above them became, so the tiles keep their
-   * position against the machine rather than against the section's top.
    */
   categories: [
-    { label: "Drink", image: "templates/cat-drink.webp", pos: "left-[calc(50%_-_915px)] top-[665px]" },
-    { label: "Fashion", image: "templates/cat-fashion.webp", pos: "left-[calc(50%_-_692px)] top-[665px]" },
-    { label: "Health", image: "templates/cat-health.webp", pos: "left-[calc(50%_-_814px)] top-[861px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "left-[calc(50%_-_594px)] top-[861px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_715px)] top-[665px]" },
-    { label: "Food", image: "templates/cat-food.webp", pos: "right-[calc(50%_-_928px)] top-[665px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_600px)] top-[861px]" },
-    { label: "Drink", image: "templates/cat-drink.webp", pos: "right-[calc(50%_-_810px)] top-[861px]" },
+    { label: "Drink", image: "templates/cat-drink.webp", pos: "left-[calc(50%_-_915px)] top-[523px]" },
+    { label: "Fashion", image: "templates/cat-fashion.webp", pos: "left-[calc(50%_-_692px)] top-[523px]" },
+    { label: "Health", image: "templates/cat-health.webp", pos: "left-[calc(50%_-_814px)] top-[719px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "left-[calc(50%_-_594px)] top-[719px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_715px)] top-[523px]" },
+    { label: "Food", image: "templates/cat-food.webp", pos: "right-[calc(50%_-_928px)] top-[523px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_600px)] top-[719px]" },
+    { label: "Drink", image: "templates/cat-drink.webp", pos: "right-[calc(50%_-_810px)] top-[719px]" },
   ],
   /**
    * "Difference" comparison section. Rebuilt 2026-09-03 (late) from the
