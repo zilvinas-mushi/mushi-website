@@ -1,5 +1,4 @@
 import { HERO_FLOATERS } from "@/lib/content";
-import { Img } from "./Img";
 
 /**
  * Platform marks floating around the hero artwork.
@@ -76,17 +75,29 @@ export function HeroFloaters() {
               }}
             >
               {/*
-                `priority` — these are ABOVE THE FOLD. Without it Img ships
-                loading="lazy" + decoding="async", so on every refresh the four
-                tiles rendered as empty dark squares and the marks popped in a
-                beat later. CLAUDE.md's rule is lazy below the fold, EAGER for
-                the hero, and these sit in the hero.
+                A BACKGROUND, not an <img>, and that is a mobile decision.
 
-                Being decorative does not make them lazy-able: nothing here is
-                offscreen, so lazy buys no bytes — it only defers bytes the page
-                needs immediately, which is pure flicker for no saving.
+                These four marks are `hidden lg:block` — the phone never shows
+                them — but as eager <img> elements React emitted a
+                `<link rel="preload" as="image" fetchPriority="high">` for each
+                one into the document head, ahead of the stylesheet. That is
+                77 KB of high-priority artwork a phone downloads and never
+                paints, arriving before the 16 KB of CSS the hero's headline
+                (the LCP element) is blocked on. Measured on the live site it
+                was most of what stood between the CSS and the wire.
+
+                A background-image inside a display:none subtree is not
+                fetched at all, so the phone now spends nothing here, and
+                desktop still loads all four the moment the stylesheet
+                applies — eagerly, which is what the previous note was really
+                asking for. What it must NOT become is a lazy <img>: nothing
+                here is offscreen on a desktop, so lazy would buy no bytes and
+                only bring back the flicker.
               */}
-              <Img src={f.image} alt="" width={50} priority className="h-full w-full" />
+              <span
+                className="block size-full bg-contain bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(/images/${f.image})` }}
+              />
             </span>
           </span>
         </span>
