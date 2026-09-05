@@ -35,6 +35,14 @@ let audible: Token = null;
  */
 const sequence: Array<() => void> = [];
 
+/**
+ * Whether the lookahead has already spent its one head start. The warm
+ * observer fires for every film card inside the rail's clip box — three of
+ * them on a desktop — and each `arm()` is a whole-file download plus a
+ * decoder. One is a head start; three is the page's blocking time.
+ */
+let warmedAhead = false;
+
 function claimAudio(next: Token) {
   audible = next;
   for (const notify of listeners) notify(next);
@@ -182,7 +190,8 @@ export function CreativeVideo({
       // a scroll side effect. These cards are ~530px tall; on a laptop a small
       // scroll crosses 55% easily. Hysteresis is the fix: loud and playing is
       // a state you have to scroll fully past to leave.
-      // WARM: arm the card well before it arrives.
+      // WARM: arm the card well before it arrives — but only after the
+      // visitor has started moving down the page, and only ONE card at a time.
       //
       // The vertical margin is a viewport and a half, not a token 200px. The
       // rail sits far down the page, so the meaningful head start is measured
@@ -192,31 +201,31 @@ export function CreativeVideo({
       // already be moving when the section arrives rather than starting to
       // fetch as you land on it.
       //
-      // It stays honest about page load — the observer fires from scroll
-      // position, never at load, and the section is nowhere near the first
-      // screen. It also cannot run away horizontally: the rail is
-      // overflow-hidden, so the only cards this can reach are the two or
-      // three actually inside the clip box. The rest still wait their turn
-      // in the sequence.
-      // ...but NOT before the page has finished loading. A viewport and a half
-      // of margin reaches past the fold on a phone, so on a 412x823 screen the
-      // first film card is already inside the warm root the moment the observer
-      // is created — which put a multi-megabyte `preload="auto"` fetch on the
-      // wire during the initial load, competing with the stylesheet and the
-      // fonts the hero's own text is waiting on. Lighthouse measured 3.2 MB of
-      // sintra-soshie-ad.mp4 downloaded before the page had settled.
+      // THAT MARGIN IS WHY THIS WAITS FOR A SCROLL. A viewport and a half
+      // reaches past the fold, so the film cards nearest the top of the rail
+      // are inside the warm root from the moment the observer exists — at
+      // scroll position zero, on a page nobody has touched yet. Measured on
+      // the live site that was 3.2 MB on a phone and 16.5 MB on a desktop,
+      // where the rail is wide enough to hold three film cards side by side
+      // and all three armed at once: three simultaneous `preload="auto"`
+      // fetches and three decoders starting, which is where the desktop run's
+      // 850ms of blocking time came from. None of it is a head start, because
+      // a visitor who has not scrolled is not on their way anywhere.
       //
-      // Waiting for `load` costs the head start nothing that matters: the rail
-      // is several screens down, so a visitor cannot have scrolled to it in
-      // less time than the page takes to finish loading. It only stops the
-      // lookahead from firing at a moment when there is nothing to look ahead
-      // TO.
+      // One scroll event is all it takes to arm, and the rail is still two
+      // screens below the fold at that point, so the lead time this exists to
+      // buy is untouched. `scrollY > 0` covers a restored or deep-linked
+      // position, where the scroll has already happened.
+      //
+      // The observer also cannot run away horizontally: the rail is
+      // overflow-hidden, so the only cards it can reach are the two or three
+      // actually inside the clip box.
+      //
       // ...and not at all on a metered or slow connection. The lookahead is a
-      // luxury — it buys a card that is already moving when you reach it — and
-      // it is paid for in megabytes. Save-Data is an explicit ask not to spend
-      // them, and on 2g the whole file would not arrive before the visitor had
-      // scrolled past anyway. The strict observer below still starts playback
-      // on arrival; it just fetches then rather than ahead.
+      // luxury paid for in megabytes. Save-Data is an explicit ask not to
+      // spend them, and on 2g the file would not arrive before the visitor
+      // had scrolled past anyway. The strict observer below still starts
+      // playback on arrival; it just fetches then rather than ahead.
       const link = (
         navigator as Navigator & {
           connection?: { saveData?: boolean; effectiveType?: string };
@@ -227,15 +236,23 @@ export function CreativeVideo({
       const install = () => {
         warm = new IntersectionObserver(
           (entries) => {
-            if (entries[entries.length - 1].isIntersecting) arm();
+            if (!entries[entries.length - 1].isIntersecting) return;
+            // ONE film gets the head start, not every film the clip box holds.
+            // From here the lookahead travels by warmNext, one card per card
+            // actually played — which is what the note on warmNext describes
+            // and what this observer used to undo by arming its whole
+            // neighbourhood in the same frame.
+            if (warmedAhead) return;
+            warmedAhead = true;
+            arm();
           },
           { rootMargin: "150% 400px" },
         );
         warm.observe(el);
       };
-      if (document.readyState === "complete") install();
-      else window.addEventListener("load", install, { once: true });
-      offLoad = () => window.removeEventListener("load", install);
+      if (window.scrollY > 0) install();
+      else window.addEventListener("scroll", install, { once: true, passive: true });
+      offLoad = () => window.removeEventListener("scroll", install);
 
       io = new IntersectionObserver(
         (entries) => {
