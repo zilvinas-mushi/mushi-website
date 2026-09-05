@@ -41,25 +41,60 @@ export function TemplatesHero() {
           </span>
         </span>
 
-        {/* The only <h1> on the page. Figma typography panel (2026-09-03):
-            Poppins SemiBold 80/80 (leading 1.0), 0% letter spacing, centred —
-            so no tracking-tight, and 80px at the desktop reference width. */}
+        {/* The only <h1> on the page. Figma typography panel (2026-09-03,
+            confirmed by Žilvinas 2026-09-05): Poppins SemiBold 80/80
+            (leading 1.0), 0% letter spacing, centred — so no tracking-tight,
+            and 80 at the 1920 reference.
+
+            THE DESKTOP SIZE IS FLUID, NOT A BREAKPOINT LADDER. It was
+            28 / 44 / 56, which never reached the drawn 80 at any width: the
+            ladder topped out at 56 and stayed there from 1024 to 2560. 4.1667vw
+            IS 80 at 1920 — the same "one 1920 number, expressed as a
+            proportion" the home page uses for its own 80px h1 (see --hero-w in
+            globals.css) — and it scales down through 60 at 1440 rather than
+            stepping. The 44 floor holds the old size where the column is
+            narrowest; the 80 ceiling stops it growing past the drawn size on
+            wider monitors.
+
+            The gap above is 40 (Žilvinas 2026-09-05); it was 24. Same fluid
+            treatment, and 2.0833vw is 40 at 1920.
+
+            max-w rises with it: at 80px "Your 8-Minute Shortcut to" measures
+            past 1000, and the cap was re-wrapping the line the design keeps
+            whole. */}
         <h1
           id="templates-heading"
-          className="mx-auto mt-6 max-w-[1000px] text-balance text-[28px] font-semibold leading-none sm:text-[44px] lg:text-[56px]"
+          className="mx-auto mt-6 max-w-[1240px] text-balance text-[28px] font-semibold leading-none sm:text-[44px] md:mt-[clamp(24px,2.0833vw,40px)] lg:text-[clamp(44px,4.1667vw,80px)]"
         >
           {TEMPLATES_PAGE.heading}
         </h1>
 
-        {/* Header-CTA sizing rather than the home hero's pill — the reference
-            shows a compact rounded-rect button. Hover inverts its own two
-            colours, gradient layer kept in both states (CLAUDE.md). */}
+        {/* THE BUTTON IS MEASURED, NOT SIZED BY ITS LABEL (Žilvinas
+            2026-09-05): 385 x 96 with a 15 radius at the 1920 reference. It
+            was header-CTA sized — 56 tall, 8 radius, width whatever the words
+            came to — which is a different object from the one on the artboard.
+
+            Width is now EXPLICIT and the label centred inside it, so the box
+            is the design's box whatever the copy does; padding-driven width
+            was the reason it could never be 385.
+
+            All four numbers ride the same 1920 proportion as the headline
+            above (96 = 5vw, 385 = 20.052vw, 15 = 0.78vw, label 30 = 1.5625vw),
+            with floors at the old phone values so nothing below md changes.
+            The label size is the one number the artboard did not give — 30 is
+            the scale step that fits the 96-tall box; correct it if the file
+            says otherwise.
+
+            The gap above is 70, up from 32.
+
+            Hover still inverts its own two colours with the gradient layer
+            kept in both states (CLAUDE.md). Per the button reference
+            (2026-09-03) the highlight stays pinned to the LEFT edge and is
+            dead by mid-button — the house 140deg ramp lit the whole top-left
+            half too brightly here. */}
         <a
           href={APP_URL}
-          // Per the button reference (2026-09-03): sharper 8px corners, and
-          // the highlight pinned to the LEFT edge, dead by mid-button — the
-          // house 140deg ramp lit the whole top-left half too brightly here.
-          className="group mt-8 inline-flex h-[52px] items-center gap-2.5 rounded-[8px] bg-[linear-gradient(120deg,#a08ade_0%,#8764c1_22%,#7b54b5_48%,#6e54b5_100%)] px-7 text-[17px] font-semibold text-white shadow-[0_10px_30px_-10px_rgba(110,84,181,0.9)] transition-all duration-150 hover:bg-[linear-gradient(120deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:h-[56px] md:px-8 md:text-[19px]"
+          className="group mt-8 inline-flex h-[52px] items-center justify-center gap-2.5 rounded-[8px] bg-[linear-gradient(120deg,#a08ade_0%,#8764c1_22%,#7b54b5_48%,#6e54b5_100%)] px-7 text-[17px] font-semibold text-white shadow-[0_10px_30px_-10px_rgba(110,84,181,0.9)] transition-all duration-150 hover:bg-[linear-gradient(120deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-[clamp(32px,3.6458vw,70px)] md:h-[clamp(56px,5vw,96px)] md:w-[clamp(230px,20.052vw,385px)] md:gap-[clamp(10px,0.833vw,16px)] md:rounded-[clamp(8px,0.78vw,15px)] md:px-0 md:text-[clamp(19px,1.5625vw,30px)]"
         >
           {TEMPLATES_PAGE.cta}
           {/* The design's own dart glyph ("Icon.png", supplied 2026-09-03),
@@ -71,7 +106,10 @@ export function TemplatesHero() {
               per the button reference. */}
           <span
             aria-hidden="true"
-            className="inline-block h-[13px] w-[15px] bg-current"
+            /* Grows with the label rather than staying at its phone size —
+               a 15-wide dart beside 30px type in a 96-tall button read as a
+               speck. 24 x 21 at 1920 keeps the glyph's own 21.9:19.7 ratio. */
+            className="inline-block h-[13px] w-[15px] bg-current md:h-[clamp(13px,1.094vw,21px)] md:w-[clamp(15px,1.25vw,24px)]"
             style={{
               WebkitMaskImage: "url(/images/templates/cta-arrow.png)",
               maskImage: "url(/images/templates/cta-arrow.png)",
@@ -959,7 +997,18 @@ function CategoryTiles() {
       {TEMPLATES_PAGE.categories.map((c, i) => (
         <span
           key={`${c.label}-${i}`}
-          className={`absolute ${c.pos} flex h-[190px] w-[190px] flex-col items-center gap-2.5 rounded-[30px] bg-[radial-gradient(circle_at_50%_42%,#3a3a3a_0%,#1c1c1c_58%,#101010_100%)] pt-6 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]`}
+          /* 230 SQUARE, radius 30, and the fill is Figma's own two-stop radial
+             — #393939 at 0% to #000000 at 100%, both at full opacity
+             (Žilvinas 2026-09-05, read off the fill panel). It was 190 square
+             with a three-stop grey ramp centred high at 42%, which made the
+             tile smaller than the ones inside the MacBook screenshot beside
+             it; they are meant to read as the same object.
+
+             Fluid to 230 at the 1920 reference, like the rest of this hero.
+             The floor is 170, below the old 190: the tiles flank the MacBook,
+             so holding them at 190 while the machine shrinks is what closes
+             the gap between them on a narrow desktop. */
+          className={`absolute ${c.pos} flex size-[clamp(170px,11.979vw,230px)] flex-col items-center gap-2.5 rounded-[30px] bg-[radial-gradient(circle_at_50%_50%,#393939_0%,#000000_100%)] pt-6 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]`}
         >
           <span className="text-[17px] font-semibold uppercase tracking-[0.02em] text-white">
             {c.label}
@@ -983,16 +1032,20 @@ function AppWindow() {
     // max-w per the final hero reference: the MacBook spans ~980px at 1440,
     // which also closes the gap to the category tiles beside it.
     <div className="relative z-[1] mx-auto mt-10 w-full max-w-[1010px] px-4 md:mt-14">
-      <div className="overflow-hidden rounded-[14px] shadow-[0_50px_140px_-40px_rgba(0,0,0,0.95)] md:rounded-[22px]">
-        {/* scale-[1.02] crops the artwork's baked-in silver bezel rim off
-            against the rounded clip — the client wants no bright frame. */}
-        <Img
-          src="templates/hero-macbook.webp"
-          alt="The Mushi template library on a MacBook: a grid of ad templates with industry filters"
-          className="w-full scale-[1.02]"
-          priority
-        />
-      </div>
+      {/* NO ROUNDED CLIP, NO SCALE (Žilvinas 2026-09-05: "as the mac
+          screenshot attached — not you added some stupid corners").
+
+          The master already draws the device frame and the screen's own
+          corners. Wrapping it in `overflow-hidden rounded-[22px]` added a
+          SECOND set of corners at a different radius, and the `scale-[1.02]`
+          that pushed the artwork's own bezel out past that clip is what made
+          the two sets visibly disagree. The image goes in as it comes. */}
+      <Img
+        src="templates/hero-macbook.webp"
+        alt="The Mushi template library on a MacBook: a grid of ad templates with industry filters"
+        className="w-full"
+        priority
+      />
     </div>
   );
 }

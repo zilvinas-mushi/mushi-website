@@ -151,6 +151,7 @@ export function CreativeVideo({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let io: IntersectionObserver | undefined;
     let warm: IntersectionObserver | undefined;
+    let offLoad: (() => void) | undefined;
 
     // Deferred a frame for the same reason CreativesRail defers its own
     // enhancement flag: setting state synchronously in an effect body trips
@@ -195,13 +196,31 @@ export function CreativeVideo({
       // overflow-hidden, so the only cards this can reach are the two or
       // three actually inside the clip box. The rest still wait their turn
       // in the sequence.
-      warm = new IntersectionObserver(
-        (entries) => {
-          if (entries[entries.length - 1].isIntersecting) arm();
-        },
-        { rootMargin: "150% 400px" },
-      );
-      warm.observe(el);
+      // ...but NOT before the page has finished loading. A viewport and a half
+      // of margin reaches past the fold on a phone, so on a 412x823 screen the
+      // first film card is already inside the warm root the moment the observer
+      // is created — which put a multi-megabyte `preload="auto"` fetch on the
+      // wire during the initial load, competing with the stylesheet and the
+      // fonts the hero's own text is waiting on. Lighthouse measured 3.2 MB of
+      // sintra-soshie-ad.mp4 downloaded before the page had settled.
+      //
+      // Waiting for `load` costs the head start nothing that matters: the rail
+      // is several screens down, so a visitor cannot have scrolled to it in
+      // less time than the page takes to finish loading. It only stops the
+      // lookahead from firing at a moment when there is nothing to look ahead
+      // TO.
+      const install = () => {
+        warm = new IntersectionObserver(
+          (entries) => {
+            if (entries[entries.length - 1].isIntersecting) arm();
+          },
+          { rootMargin: "150% 400px" },
+        );
+        warm.observe(el);
+      };
+      if (document.readyState === "complete") install();
+      else window.addEventListener("load", install, { once: true });
+      offLoad = () => window.removeEventListener("load", install);
 
       io = new IntersectionObserver(
         (entries) => {
@@ -223,6 +242,7 @@ export function CreativeVideo({
 
     return () => {
       cancelAnimationFrame(enable);
+      offLoad?.();
       io?.disconnect();
       warm?.disconnect();
     };

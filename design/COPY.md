@@ -102,7 +102,7 @@ staggered — left column Breezit then eany, right column Holo then we interiors
 | Brand | Result | Tags |
 | --- | --- | --- |
 | Breezit | Generated 700 sales calls & 1500 leads in 8 months. | AI, SALES, VENUES |
-| Holo | From $0k/month to $117k/month in 7 months | AI, MARKETING, GENERATOR |
+| Holo | From $0k/month to $117k/month in 7 months. | AI, MARKETING, GENERATOR |
 | eany.io | Helped find 3 evergreen ads for an 8 figure company. | B2B, MARKETPLACE, RESELLERS |
 | we interiors | From $13k/month to $75k/month in 3 months. | ECOM, FURNITURE, HOME |
 
@@ -120,7 +120,7 @@ the break is written into the string rather than left to wrapping:
 | Brand | Line 1 | Line 2 |
 | --- | --- | --- |
 | Breezit | Generated 700 sales calls & 1500 | leads in 8 months. |
-| Holo | From $0k/month to $117k/month | in 7 months |
+| Holo | From $0k/month to $117k/month | in 7 months. |
 | eany.io | Helped find 3 evergreen ads for | an 8 figure company. |
 | we interiors | From $13k/month to $75k/month | in 3 months. |
 

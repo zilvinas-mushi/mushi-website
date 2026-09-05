@@ -42,7 +42,14 @@ const poppins = Poppins({
  */
 const dutch801 = localFont({
   variable: "--font-dutch801",
-  src: "./fonts/Dutch801-Roman.ttf",
+  // woff2, subset to Basic Latin: the supplied master is a 121 KB TTF, and it
+  // is preloaded (it draws the wordmark in the header), so it was 72 KB on the
+  // wire ahead of the first paint. The wordmark needs five glyphs; the subset
+  // keeps all of ASCII and still lands at 15 KB. Regenerate with
+  // `python3 -m fontTools.subset src/app/fonts/Dutch801-Roman.ttf
+  //  --unicodes="U+0020-007E,U+00A0" --layout-features='*' --flavor=woff2
+  //  --output-file=src/app/fonts/Dutch801-Roman.woff2` if the master changes.
+  src: "./fonts/Dutch801-Roman.woff2",
   weight: "400",
   style: "normal",
   display: "swap",
