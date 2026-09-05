@@ -59,14 +59,21 @@ export function TemplatesHero() {
             The gap above is 40 (Žilvinas 2026-09-05); it was 24. Same fluid
             treatment, and 2.0833vw is 40 at 1920.
 
-            max-w rises with it: at 80px "Your 8-Minute Shortcut to" measures
-            past 1000, and the cap was re-wrapping the line the design keeps
-            whole. */}
+            max-w rises with it: at 80px the first line measures past 1000, and
+            the cap was re-wrapping the line the design keeps whole.
+
+            NO `text-balance` — the break is authored in
+            TEMPLATES_PAGE.headingLines, after "Shortcut". Balance equalises
+            the two lines and lands after "Shortcut to" instead, and it moves
+            with the window. Below sm the two lines are still allowed to wrap
+            further; the <br> only guarantees that ONE break is always there. */}
         <h1
           id="templates-heading"
-          className="mx-auto mt-6 max-w-[1240px] text-balance text-[28px] font-semibold leading-none sm:text-[44px] md:mt-[clamp(24px,2.0833vw,40px)] lg:text-[clamp(44px,4.1667vw,80px)]"
+          className="mx-auto mt-6 max-w-[1240px] text-[28px] font-semibold leading-none sm:text-[44px] md:mt-[clamp(24px,2.0833vw,40px)] lg:text-[clamp(44px,4.1667vw,80px)]"
         >
-          {TEMPLATES_PAGE.heading}
+          {TEMPLATES_PAGE.headingLines[0]}
+          <br />
+          {TEMPLATES_PAGE.headingLines[1]}
         </h1>
 
         {/* THE BUTTON IS MEASURED, NOT SIZED BY ITS LABEL (Žilvinas

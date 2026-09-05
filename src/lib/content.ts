@@ -894,6 +894,19 @@ export const TEMPLATES_PAGE = {
   // Drive", and "500 winner static templates".
   badge: "500+ Static Templates",
   heading: "Your 8-Minute Shortcut to High-ROAS Ads",
+  /**
+   * THE BREAK IS AUTHORED: after "Shortcut", so "to High-ROAS Ads" is the
+   * whole second line (Žilvinas 2026-09-05).
+   *
+   * `text-balance` was picking the break instead, and balance equalises the
+   * two lines — it lands after "Shortcut to", which strands "to" at the end
+   * of line one and leaves the second line short. Worse, it is width-
+   * dependent, so the break moved as the window did.
+   *
+   * `heading` stays the flat sentence for metadata and JSON-LD; only the h1
+   * renders the lines.
+   */
+  headingLines: ["Your 8-Minute Shortcut", "to High-ROAS Ads"],
   cta: "Take the Shortcut",
   login: "Login",
     /**
