@@ -983,16 +983,24 @@ function AppWindow() {
     // max-w per the final hero reference: the MacBook spans ~980px at 1440,
     // which also closes the gap to the category tiles beside it.
     <div className="relative z-[1] mx-auto mt-10 w-full max-w-[1010px] px-4 md:mt-14">
-      <div className="overflow-hidden rounded-[14px] shadow-[0_50px_140px_-40px_rgba(0,0,0,0.95)] md:rounded-[22px]">
-        {/* scale-[1.02] crops the artwork's baked-in silver bezel rim off
-            against the rounded clip — the client wants no bright frame. */}
-        <Img
-          src="templates/hero-macbook.webp"
-          alt="The Mushi template library on a MacBook: a grid of ad templates with industry filters"
-          className="w-full scale-[1.02]"
-          priority
-        />
-      </div>
+      {/* NO ROUNDED CLIP, NO SCALE (Žilvinas 2026-09-05: "as the mac
+          screenshot attached — not you added some stupid corners").
+
+          The master draws the device frame and the screen's own corners
+          itself. Wrapping it in `overflow-hidden rounded-[22px]` added a
+          SECOND set at a different radius, and the `scale-[1.02]` that pushed
+          the artwork's own bezel out past that clip is what made the two
+          visibly disagree. The image goes in as it comes.
+
+          The file is the supplied master ("Macbook 1.png", re-supplied
+          2026-09-05) at 5200 x 3256, straight down to 2400 x 1503 and
+          nothing else done to it. */}
+      <Img
+        src="templates/hero-macbook.webp"
+        alt="The Mushi template library on a MacBook: a grid of ad templates with industry filters"
+        className="w-full drop-shadow-[0_50px_140px_rgba(0,0,0,0.95)]"
+        priority
+      />
     </div>
   );
 }
