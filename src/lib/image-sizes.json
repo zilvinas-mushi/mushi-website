@@ -23,13 +23,61 @@
     "w": 800,
     "h": 800
   },
+  "case-breezit-cut.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-breezit-v2.webp": {
+    "w": 1950,
+    "h": 1950
+  },
+  "case-breezit.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-eany-cut.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-eany-v2.webp": {
+    "w": 1950,
+    "h": 1950
+  },
+  "case-eany.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-holo-cut.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-holo-v2.webp": {
+    "w": 1950,
+    "h": 1950
+  },
+  "case-holo.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-we-interiors-macbook.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "case-we-interiors-v2.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "case-we-interiors-v4.webp": {
+    "w": 1950,
+    "h": 1933
+  },
   "deividas-kovger1.svg": {
     "w": 80,
     "h": 80
   },
   "deividas-kovger2.webp": {
-    "w": 1440,
-    "h": 1440
+    "w": 400,
+    "h": 400
   },
   "ellipse192.svg": {
     "w": 26,
@@ -54,6 +102,10 @@
   "ellipse54.svg": {
     "w": 80,
     "h": 80
+  },
+  "emoji-sunglasses.png": {
+    "w": 160,
+    "h": 160
   },
   "erika-zakareviciute1.webp": {
     "w": 800,
@@ -235,6 +287,10 @@
     "w": 672,
     "h": 199
   },
+  "lukas-rasciauskas1.webp": {
+    "w": 80,
+    "h": 80
+  },
   "mask-group.svg": {
     "w": 1380,
     "h": 842
@@ -366,22 +422,6 @@
   "vector4.svg": {
     "w": 10,
     "h": 19
-  },
-  "case-breezit.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-eany.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-holo.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-we-interiors-v2.webp": {
-    "w": 1000,
-    "h": 1000
   },
   "templates/process-pick.webp": {
     "w": 600,

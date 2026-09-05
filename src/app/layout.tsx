@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { CanvasTint } from "@/components/CanvasTint";
 import {
   SITE_URL,
   SITE_NAME,
   SITE_DESCRIPTION,
   SITE_TAGLINE,
+  SITE_TITLE,
+  OG_IMAGE,
+  OG_IMAGE_SQUARE,
   SOCIALS,
   abs,
 } from "@/lib/site";
@@ -22,7 +26,8 @@ import {
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  // 300 is here for the testimonial meta line, which the design sets in Light.
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -59,8 +64,11 @@ const satoshi = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
-    template: `%s — ${SITE_NAME}`,
+    // SITE_TITLE already ends in "| Mushi", so the template has to match its
+    // separator — a page title reading "Pricing — Mushi" next to a home title
+    // reading "... | Mushi" looks like two different sites.
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
@@ -69,31 +77,37 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     locale: "en_US",
     // Absolute URL: required by CLAUDE.md, and relative OG images are ignored
-    // by most crawlers. Dimensions are the file's real size — declaring a
+    // by most crawlers. Dimensions are each file's real size — declaring a
     // 1200x630 that does not exist makes crawlers drop the card.
     //
-    // TODO(og): this is the Mushi logo, not a designed share image. It is the
-    // only Mushi-owned graphic in the export — every other candidate is a
-    // client's screenshot, which must not be published as Mushi's share card.
-    // Commission a proper 1200x630 and swap it in here.
+    // JPEG, not the WebP the rest of the site uses: LinkedIn and iMessage
+    // still refuse WebP share cards and fall back to no image at all.
     images: [
       {
-        url: abs("/images/logo-without-bg-white102.webp"),
-        width: 672,
-        height: 199,
+        url: abs(OG_IMAGE),
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
+      },
+      {
+        url: abs(OG_IMAGE_SQUARE),
+        width: 1200,
+        height: 1200,
         alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [abs("/images/logo-without-bg-white102.webp")],
+    // The wide crop only. X centre-crops a square to 1.91:1 itself, and it
+    // does it without knowing where the wordmark sits.
+    images: [abs(OG_IMAGE)],
   },
   robots: {
     index: true,
@@ -112,7 +126,7 @@ const jsonLd = {
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_DESCRIPTION,
-      logo: abs("/images/logo-without-bg-white102.webp"),
+      logo: abs(OG_IMAGE_SQUARE),
       sameAs: SOCIALS.map((s) => s.href),
     },
     {
@@ -135,13 +149,23 @@ export default function RootLayout({
       lang="en"
       className={`${poppins.variable} ${dutch801.variable} ${satoshi.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-bg font-sans text-white">
+      {/*
+        NO BACKGROUND ON `body` — it is set in globals.css, and it is not the
+        page's colour. It is the colour iOS stretches into view when you
+        rubber-band past an end, and CanvasTint moves it as you scroll. The
+        page's own black is on the wrapper below, which is opaque and covers
+        the whole document, so body's is never seen except in the overscroll.
+      */}
+      <body className="min-h-full flex flex-col font-sans text-white">
         <script
           type="application/ld+json"
           // Static, build-time constant — no user input reaches this.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {children}
+        {/* flex-1 and the same column as body, so `main`'s own flex-1 still
+            pushes the footer to the bottom on a short page. */}
+        <div className="flex min-h-full flex-1 flex-col bg-bg">{children}</div>
+        <CanvasTint />
       </body>
     </html>
   );

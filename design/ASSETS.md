@@ -6,13 +6,185 @@ then optimized. All live in `public/images/`.
 **Figma asset URLs expire ~7 days after export.** These files are the durable copy —
 re-exporting costs Figma MCP calls, and the budget is 6/month. Do not delete them.
 
-| | count | size |
-| --- | --- | --- |
-| WebP (converted from PNG/JPEG) | 46 | 2.08 MB |
-| SVG (passthrough) | 46 | 78 KB |
+## `hero-light.webp` — hand-exported 2026-08-12, not part of the 92
 
-Original PNG/JPEG total was **24.4 MB**; WebP conversion at q80 (max width 1600px)
-brought it to **2.16 MB**, a 91% reduction. CLAUDE.md requires WebP sources.
+The hero's entire lighting group: the top-left source, the diagonal shafts, the
+vignette and the centre pool, in one RGBA image. Exported from the Figma UI (no
+MCP call spent) with the tile layer hidden. Used by `.hero-light`.
+
+This is the export the first attempt lacked. `effects-layer.webp` is the same
+group flattened *with* the tiles, which is why it came back a featureless purple
+blur with no rays in it — a note in `globals.css` blamed the technique when the
+asset was the problem. If you need to redo this: **hide the tiles, export the
+light alone, and export at 4x.**
+
+- Source `~/Documents/Tiles background.png` at 4x, 10080 x 7124. The frame is the
+  inner **7680 x 4320 at offset (1200, 1200)**; everything outside that is the
+  group's blur bounds — a noise staircase and offset rounded-rect ghosts. Crop
+  it off. (A 1x export of the same group put the frame at 1920x1080 offset
+  300,300 — the bleed scales with the export.)
+- Shipped at **1920 x 1080, q90, 260 KB**, Lanczos from the 4x crop. The 16:1
+  downsample averages away the export's dither and is why this is clean where
+  the first pass was not.
+- **Do not shrink it on the strength of an error metric.** A 768px version
+  measured identically — error is genuinely flat from 1920 down to 384 because
+  the layer is pure blur — and looked bad in use, because the metric was
+  computed at 1920 while a retina display stretches this across ~4000 device
+  pixels. Banding is not the constraint either: steps between plateaus are ~1
+  level, max 2.
+- Corners are opaque black and the centre is alpha 37 — the vignette and the
+  tile show-through are both baked in. Composite it normally, no blend mode.
+- **The centre light is already in it.** Figma keeps that ellipse as a separate
+  layer (`~/Documents/Center light.png`) but it is composited into this export;
+  adding it on top too washes the middle out to lavender. If it is ever wanted
+  alone it is a plain CSS gradient — a farthest-side ellipse centred in the
+  frame, solid `#2D1940` to r=10.5% then linear to zero at the edge, which
+  rebuilds the PNG to within 1.8/255 at its worst pixel. Not worth shipping.
+- **It goes behind HeroPanels and HeroFloaters.** Figma stacks the lighting
+  group above them and that version was built — it does read better for depth —
+  but the dark corners swallowed the platform marks and the ad panels, which are
+  the things the hero exists to show. Putting it back on top needs a mask with
+  holes cut for those elements, not a flat z-bump.
+
+The tiles stay in CSS and must not become a raster: their 215px pitch is fixed
+regardless of viewport, and `background-position: center 171.5px` is what lands
+`.cta-tile` on a column instead of a gutter. See `.hero-grid`.
+
+## `hero-light-mobile.webp` — hand-exported 2026-08-12
+
+The phone frame's lighting group, same idea as the desktop file. Used by
+`.hero-light` inside `@media (max-width: 767px)`. The desktop image cannot be
+reused: it is a 16:9 frame, and stretched into a tall hero its vignette closes
+in from the sides and chokes the copy.
+
+- Source `~/Documents/Mobile lightning.png`, 1724 x 3608. **The frame is only
+  the left 1500 x 3608** (= 375 x 902 at 4x); the right 224px is transparent
+  spill. Find the edge from the ALPHA profile, not brightness: alpha is a clean
+  U centred on x=750 and falls off a cliff at x=1499.
+- That spill contains loud magenta/blue speckle, which looks alarming in a
+  viewer but is **entirely in pixels with alpha 0** — 194 stray magenta pixels
+  land inside the crop and every one is invisible. Nothing to repair. Do zero
+  the RGB of fully-transparent pixels before encoding, so lossy WebP cannot
+  bleed that garbage inward as a halo.
+- Shipped at **640 x 1539, 175 KB**, q88 with a 1.2px pre-blur. Heavier per
+  pixel than the desktop file because the phone export carries visible grain,
+  which is exactly what lossy WebP cannot compress.
+- Error is flat from 750px down to 432px. **540px halves the weight for no
+  measurable loss** if mobile bytes ever matter more than the safety margin.
+
+### 2026-08-19: swapped to `lightning 1.png`, then reverted the same day
+
+A ray-less render (`lightning 1.png`, 375 x 901 — the same vignette with the
+shafts taken out, 61 KB at q80) shipped briefly and was **reverted on request**:
+the phone frame has the rays raking in from the top-left and they are wanted.
+`Mobile lightning.png` stays the source. Do not re-drop them for the weight.
+
+What the ray-less pass measured is still true and still applies:
+
+- RGB is inert in both renders. The artwork is black-with-alpha everywhere that
+  alpha matters, so the encoder gets a flat colour plane — zero all three
+  channels before saving.
+- **WHERE THE CENTRE LIGHT IS: dead centre, 48% / 50%.** Not the top-left
+  corner — the rays come from there, the clear oval does not. An
+  earlier note here claimed the phone light was a corner source and that a
+  centred ellipse was "a light source the artwork does not have" — that is
+  backwards, and it is measurable in ten lines: plot `255 - alpha` of either
+  PNG and the clear oval is in the middle of the frame in both. The corner
+  radial that claim produced dimmed exactly the tiles the design leaves lit.
+- `.hero-grid` now carries **no lighting mask at all** on phones, only the base
+  rule's bottom hand-off. This file IS the vignette — opaque black at the edges,
+  open in the middle — so anything the grid adds is the same light painted
+  twice. Same reasoning that already applies on desktop.
+- Still true from the earlier pass: `.hero-bg` is a ramp and nothing else, and
+  `.cta-glow` is off at ≤767px (the phone frame measures under 8/255 there).
+
+## `tile.png` — the phone grid tile, 84 x 84
+
+Not shipped as a file: it is transcribed into the repeating SVG on `.hero-grid`
+inside `@media (max-width: 767px)`. Source `~/Documents/tile.png`.
+
+- Interior alpha **89/255 = 35%** across the whole face (min 88, max 90) — the
+  phone tile was drawn at 50% before this was measured.
+- The three Figma stops (`A08ADE` / `7C54B5` at 40% / `6E54B5`) on a handle that
+  is **much flatter than the desktop tile's 45deg**: fitting the export (rms
+  0.035 over 6186 px) gives objectBoundingBox `-0.011,0.326 -> 1.031,0.681`,
+  i.e. ~19deg below horizontal.
+- Square corners, 84 on a 90px unit — the 1px black frame in the PNG is the
+  export's edge, not a stroke.
+
+## `cta-card-phone.webp` — hand-exported 2026-08-19
+
+The whole face of the final-CTA card on phones, as one image: the #1E0A38 fill
+ramp, the streaks, the light at the bottom edge and the violet edge stroke.
+Used by `.cta-card` inside `@media (max-width: 767px)`, which no longer builds
+any of that in CSS — the `::after` ring went with it. Desktop still uses the
+CSS build (`cta-streaks.svg` over a #1d0937 ramp) and its own flat border.
+
+- Source `~/Documents/phone last section background.png`, 1380 x 1280 RGBA =
+  **4x the 345 x 320 phone card**.
+- **Shipped flat, composited over #000, no alpha.** The card only ever sits on
+  the page's black, so the baked rounded corners come out black on black and
+  the encoder gets no alpha plane to bleed. The source is semi-transparent
+  almost everywhere (mean alpha 131) — the fill is #1E0A38 at ~50% and the
+  ramp lives in the ALPHA, not the colour, so do not read the RGB alone.
+- **1380 x 1280 at q92, 19 KB.** Smooth ramps and soft streaks are cheap, so
+  full size costs nothing worth trading; rms error against the source is 1.1.
+  The worst pixel (40/255) is on the antialiased corner where the ring meets
+  transparency, which lands on black either way.
+- The source's top edge carries a band of RGB noise. It is all in pixels of
+  alpha 1-8, so over black it is a handful of levels and disappears in the
+  encode. Nothing to repair.
+
+## `public/videos/` — the four film creatives, added 2026-08-19
+
+Five of the ten creatives in the rail are films, not stills. The masters came
+from the client as 1080 x 1920 delivery files at 8-15 Mbps; those are 381 MB
+across the five and cannot ship. They are transcoded to **720 x 1280, H.264
+CRF 28, 30 fps, AAC 96k, `+faststart`** — 29 MB across the five, a 92% cut,
+at roughly 1 Mbps each, which is about what Instagram itself serves.
+
+| file | poster (`public/images/`) | card | source master |
+| --- | --- | --- | --- |
+| `sintra-soshie-ad.mp4` | `sintra-soshie-ad.webp` | sintra.ai — AI Agents Comparison | `TOF_502_SocialMedia_FounderEcommerce_Non-UGC_VAR3_...mp4` |
+| `tryholo-10x.mp4` | `tryholo-10x.webp` | tryholo.ai — AI Marketing UGC | `030_EN_Video_AIUGC_FireYourAgencyIteration_...Var3.mp4` |
+| `celemi-serum.mp4` | `celemi-serum.webp` | celemi — Serum Product | `EN Celemi Advertisment 001 (be modelio).mp4` |
+| `used-by-10000.mp4` | `used-by-10000.webp` | PersyBooths — Booth Storytelling | `001_Video_WhatMakesAnOfficeGreat__PersyONE_Var1.mp4` |
+| `dogfood-real-results.mp4` | `dogfood-real-results.webp` | SuperiorCarePet — Dog Food Voiceover | `001_Video_Care_Aistė&Danielis_Var1.mp4` |
+
+**Every pairing was verified by rendering frames out of the master and matching
+them against the poster**, not inferred from the filenames — the two `sintra.ai`
+cards and the two `celemi` cards are each other's obvious mis-assignment, and
+the file names do not distinguish them. The Soshie laptop shot is a real frame
+of `TOF_502` at ~4 s; the Celemi card is the *serum* one (`FACE AND NECK
+HYDRATION`), not the pouch.
+
+**720 wide is deliberate and is not padding.** The card renders ~300 CSS px, so
+this is 2.4x — enough that a 2x display still has pixels to spare. The section
+asks "Want Creatives This Premium?", so it is the one place where compressing
+until the small type in an ad goes soft would undercut the copy. A frame check
+at 720 keeps the Sintra nav bar (`Helpers / Pricing / Add-ons / Support`)
+legible and the flat purple gradient free of banding.
+
+`+faststart` matters as much as the size: the `moov` atom sits ahead of `mdat`
+in all five, so the browser streams only the part it plays. A visitor who
+watches four seconds costs four seconds of video, not the whole file — which is
+what makes autoplay-on-scroll affordable.
+
+Nothing is fetched at page load; a card fetches when the visitor nears it, and
+each playing card hands a head start to the NEXT film in the rail. That
+one-card lookahead is not decoration — without it the later cards began
+downloading at the exact moment you stepped onto them, so they sat on their
+poster long enough to look broken. It cannot be done with `rootMargin`, because
+the rail is `overflow-hidden` and the spec clips intersection by ancestor
+overflow no matter how wide the margin. See `CreativeVideo.tsx`.
+
+To re-encode from a new master:
+
+```sh
+ffmpeg -i IN.mp4 -vf "scale=720:1280:flags=lanczos" -r 30 \
+  -c:v libx264 -profile:v high -crf 28 -preset slow -pix_fmt yuv420p \
+  -c:a aac -b:a 96k -movflags +faststart -y public/videos/OUT.mp4
+```
 
 ## Largest images
 

@@ -7,8 +7,15 @@
      #181818 is the HEADER BAR's fill (Figma 3803:1568), not the page — reading
      it as the background made everything grey and washed out. The bar reads as
      a lighter panel sitting on black, which is the point. */
-  --bg: #0a090f;
+  --bg: #000000;
   --bg-alt: #0d0b13;
+
+  /* The phone unit, at its ceiling. Every phone-side vertical measure is
+     written as calc(var(--pu) * <the design's px>), so at 1px the numbers read
+     exactly as the artboard's. The phone media query re-declares it against
+     svh; see the note there. Declared here as well so those same classes stay
+     valid above md, where nothing has re-declared it. */
+  --pu: 1px;
   --surface: #1c1a24;
   --bar: #181818;
   --accent-purple: #6e54b5;
@@ -18,6 +25,217 @@
   --text-dim: #9e9e9e;
   --paper: #ececec;
   --sand: #d6cfc3;
+
+  /*
+    Header geometry, kept here rather than in the component because the PAGE
+    needs it too: the hero field is pulled up by exactly the header's flow
+    height so it starts at the very top, and a stale hardcoded number there
+    showed up as a black band across the top of the page.
+
+    --header-u  the scale SiteHeader is built from; 100px at the design's 1920
+                reference. See the sizing note in SiteHeader.tsx.
+    --header-h  how much room the header actually takes in normal flow. It is
+                `sticky`, so it occupies its box. On phones that is
+                MobileHeader: pt-3 + (py-3 + its 48px controls) + pb-2 = 92.
+                From md up the bar is 1u tall.
+  */
+  /*
+    80% of the design's scale. Figma draws the bar 100 tall at 1920 with 28px
+    nav links and a 242 x 70 CTA, which read as oversized live — the artboard
+    number never accounted for that. So u is 80 at 1920: a ~80 tall bar with
+    22px links and a 194 x 56 button.
+
+    A 50% version was tried first and was far too aggressive — 14px nav links
+    in a bar still 1386 wide read as a thin strip. 20% off is the correction.
+
+    ONLY height and type scale. The bar's WIDTH stays at the design's (see
+    SiteHeader), because at 1386 it matches the 1380 content column below it —
+    that alignment is the point of the bar's width and must not drift with this
+    number.
+  */
+  --header-u: clamp(42.48px, 4.16664vw, 80px);
+  --header-h: 92px;
+
+  /*
+    The hero's own scale, 100px at 1920. Drives the stat panels, the platform
+    tiles AND the hero's whole vertical rhythm, which is why it lives here
+    rather than being declared per component — a duplicated clamp is exactly
+    how the header's height and the hero's pull-up drifted apart.
+
+    It is bound by viewport HEIGHT as well as width, and that is what makes the
+    hero fit without scrolling. The design is ~1083 tall at 1920 wide; a laptop
+    at 1920 has roughly 990px of viewport, so at full size it cannot fit — no
+    amount of spacing tuning changes that, only scale does.
+
+    THE HEIGHT TERM IS A BUDGET, NOT A FLAT FRACTION OF THE WINDOW. It used to
+    be a flat `9.6vh`, which worked only while the hero's height was a single
+    multiple of u. It is not: the field measures
+
+      header + hero + brand strip  =  7.37u  +  2.05w  +  9.5rem
+
+    and those three terms answer to different things. The 2.05w is the eyebrow
+    pill (0.45w) and the HEADLINE (0.8w a line) — type, which rides --hero-w
+    and therefore does NOT shrink when the window gets short. The 9.5rem is the
+    header bar and the rem-based gaps, which follow width only. So only the
+    7.37u can absorb a short window, and how much it has to absorb depends on
+    what the other two already spent.
+
+    A flat fraction cannot express that, and the moment the headline went from
+    one line to two (2026-08-26: "Premium Ads for / $1M to $100M Brands.") the
+    w term grew by 0.8w and 9.6vh started overflowing the fold — by 14px at
+    1920x1080, 64 at 1920x990, 44 at 1440x760, 11 at 1366x768.
+
+    So the cap is solved for instead: take the window, subtract what the type
+    and the header have already committed, and divide the rest by the hero's
+    u-height. The 10.5rem is the measured 9.5 plus a 1rem cushion, so the fold
+    is cleared rather than exactly met.
+
+    Measured clearance below the fold, two-line headline, `.hero-bg` with its
+    min-height released so the number is the content's own:
+
+      2560 x 1000  +27      1512 x 945   +83      1280 x 800   +71
+      1920 x 1080  +19      1512 x 842   +16      1280 x 720   +12
+      1920 x  990  +27      1440 x 900   +79      1280 x 660   +17
+      1920 x  940  +32      1440 x 760   +19      1024 x 700   +23
+      1680 x  910  +20      1366 x 768   +13       900 x 700   +23
+      1600 x  760  +29
+
+    Re-measure the three coefficients — not just retune the divisor — if the
+    hero gains or loses a row. `__fit2` in the session notes did it by pinning
+    --hero-u and --hero-w to literals in a sized iframe and reading the field's
+    natural height back; the terms come straight out of the two slopes.
+
+    TWO FLOORS, BECAUSE THERE ARE TWO REASONS TO SHRINK AND THEY ARE NOT WORTH
+    THE SAME. 66 is the WIDTH floor — below ~1267 the layout stops shrinking
+    and starts to be merely tight, and a 15px panel line (0.15u) stops being
+    legible sooner than nav type does, which is why it sits above --header-u's.
+    That trade is unchanged.
+
+    But a SHORT window is a different bargain. There the choice is not "small
+    type or tight layout", it is "small type or the fold is broken", and 66 was
+    answering a question it was never asked: at 1600x760 the solved cap wants
+    60.9 and the floor handed back 66, so the field ran 12px past the fold
+    while the panels held a legibility margin nobody could see. So the width
+    floor is left on the width term and the height term gets its own, lower
+    one — 56, reached only when the alternative is overflowing.
+
+    Written as `min(--hero-w, ...)` because --hero-w IS clamp(66, 5.2083vw,
+    100): u is w with the height squeeze applied, which is exactly what the two
+    variables have always meant. It reads forward to a variable declared below
+    it; custom properties resolve by reference, not by source order.
+
+    This is strictly kinder than the old flat cap at every size measured,
+    including the ones that already overflowed before the headline grew:
+
+                      old 9.6vh, 1 line     now, 2 lines
+      1600 x 760           +7                   +29
+      1280 x 660           -4                   +17
+      1366 x 628          -45                   -28
+      1024 x 600          -53                   -31
+
+    The slack it spends to get there is the slack the old cap was sitting on at
+    the top of the range — 1920x1080 goes from +69 to +19 — which is the second
+    headline line being paid for, and it is paid out of clearance nobody sees.
+
+    It does not reach zero everywhere. A 1366x768 or 1024x600 SCREEN — ~628 and
+    ~600 of viewport once the browser takes its chrome — cannot hold this hero
+    at any legible scale, and could not before either. Solving those needs the
+    hero to lose a row, not the clamp to be retuned.
+
+    `svh`, not `vh`, to agree with the field's own `md:min-h-svh` in page.tsx.
+    Every consumer of u is behind a `md:` prefix, where the two are equal, so
+    this is only ever the same number — but the two numbers that define the
+    fold should at least be the same unit.
+
+    Consequence worth knowing: a card is exactly 500 x 200 only when the window
+    is tall enough for u to reach 100, which now takes ~1120px of viewport at
+    1920 rather than 1042. In a short window everything scales together, which
+    is the trade for never scrolling.
+  */
+  --hero-u: min(
+    var(--hero-w),
+    max(56px, calc((100svh - var(--hero-w) * 2.05 - 10.5rem) / 7.37))
+  );
+
+  /*
+    The hero's TYPE scale — u without the height cap.
+
+    Same 5.2083vw and the same floor, so at any given width it agrees with
+    --hero-u exactly UNLESS the window is short enough for the 9.6vh term to
+    bite. That difference is the whole point:
+
+      1920 x 937   u = 90.0   w = 100    a 1920 laptop: type at its drawn size
+      1440 x 860   u = 75.0   w = 75.0   identical, width-bound
+      1440 x 700   u = 67.2   w = 75.0   artwork tightens, type holds
+
+    The hero's ARTWORK (panels, platform marks, the vertical rhythm) stays on
+    u so the section still fits a short window without scrolling — squeezing
+    is what it is for. But applying that squeeze to the headline as well means
+    the type at 1920x1080 comes out at 72 against Figma's 80, and 1920 is the
+    reference the design is checked against. Type on w, boxes on u.
+
+    This is what the h1, the eyebrow pill and the awards row were pinned to
+    literal px for. Pinning got 1920 right and every other width wrong; w gets
+    both, and — unlike a literal — it still shrinks in proportion to the
+    marks it sits between.
+  */
+  --hero-w: clamp(66px, 5.2083vw, 100px);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: var(--header-u);
+  }
+}
+
+/*
+  ONE SCALE FOR EVERY DESKTOP WIDTH.
+
+  The design is a single 1920 frame (design/README.md), and every number in it
+  — type, padding, card sizes, radii — is a 1920 number. The page's COLUMN was
+  already proportional (SHELL was 71.875%, i.e. 1380/1920) but its CONTENTS were
+  literal px, so the two drifted apart the moment the window was not 1920:
+
+    1920   column 1380   30px card headline   the design
+    1440   column 1035   30px card headline   type 33% too big for its column
+
+  That mismatch is what showed up as the hero's platform marks landing on the
+  awards row, case-card headlines breaking to three lines where the design says
+  two, and the next section pushing into the fold on a laptop. Nothing was
+  individually wrong; the type simply was not shrinking with the frame.
+
+  So the root font-size becomes the scale, and everything downstream is
+  expressed in rem: 1rem = 16 design px, exactly as at 1920. 0.8333vw is
+  16/1920, so the page is the Figma frame zoomed to whatever width it is in.
+  Tailwind's own spacing scale is rem-derived (--spacing: 0.25rem), so p-7,
+  mt-12, gap-4 and friends come along for free — that is most of the page's
+  rhythm with no per-value edit.
+
+  RANGE, and why it is clamped at both ends:
+    - 16px ceiling: at and above 1920 the design is at its drawn size. Wider
+      monitors get bigger margins, not bigger type. The shell is 86.25rem —
+      1380 in this unit — so that cap now falls out of the same clamp
+      (lib/layout.ts) instead of being a second number to keep in step.
+    - 10.5px floor: a pure zoom to 768 would put body copy at 8px. The floor
+      bites below ~1260, where the layout stops shrinking and starts to be
+      merely tight — the same trade --hero-u and --header-u already make.
+
+      1920 -> 16.00   1512 -> 12.60   1280 -> 10.67
+      1680 -> 14.00   1440 -> 12.00   1024 -> 10.50 (floor)
+
+  Below 768 this does not apply at all: the phone frame is its own design with
+  its own measured values, and it must not be scaled off a desktop reference.
+
+  THE COROLLARY, and it is the important one: on desktop, DO NOT write a length
+  in px unless you mean a physical pixel that must not scale — a hairline
+  border, a 1px nudge. Everything else is rem (or a --hero-u multiple inside
+  the hero). A px value here is a value that will be wrong at every width but
+  one.
+*/
+@media (min-width: 768px) {
+  html {
+    font-size: clamp(10.5px, 0.83333vw, 16px);
+  }
 }
 
 @theme inline {
@@ -48,6 +266,26 @@
   --radius-card: 15px;
   --radius-chip: 5px;
   --radius-pill: 100px;
+
+  /* The testimonials reveal, in one place so the clip, the pill's clearance
+     and the fade cannot drift apart. Opening is the long easeOutExpo settle;
+     closing is shorter and firmer. See .testi-clip. */
+  --testi-open: 1500ms;
+  --testi-open-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --testi-close: 900ms;
+  --testi-close-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Side gutter: 15 on phones (Žilvinas 2026-08-11), the design's measured 20
+     from md up. A token rather than a literal because the creatives rail is
+     full-bleed and has to reproduce this exact edge to line its first card up
+     with the headings — see src/lib/layout.ts. Two literals would drift. */
+  --gutter: 15px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 1.25rem;
+  }
 }
 
 /* Clicking a nav item eases to the section instead of jumping. `scroll-padding`
@@ -58,11 +296,101 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 110px;
+
+  /*
+    THE CANVAS — what the browser stretches into view when you rubber-band
+    past either end of the page.
+
+    NOTHING HERE DECIDES IT. The spec says the root element's background
+    becomes the canvas and paints the whole thing, and that is not what WebKit
+    does: it derives one document background colour by blending html's with
+    body's, and an opaque `body` wins outright. `background-color: #121212`
+    here did nothing at all on an iPhone for that reason. The colour lives on
+    `body` below, and CanvasTint moves it as you scroll — black past the top,
+    the footer's grey past the bottom.
+
+    Left black as the sane default for anything that reads this instead.
+  */
+  background-color: #000000;
 }
 
+/* The landing point has to clear the sticky bar plus its 22px top gap and a
+   little air. --header-h already tracks the bar's height per breakpoint. */
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: calc(var(--header-h) + 2.5rem);
+  }
+}
+
+/*
+  BODY'S BACKGROUND IS THE OVERSCROLL COLOUR, not the page's — see the canvas
+  note above and CanvasTint. The page's black is on layout.tsx's wrapper, which
+  is opaque and covers the document, so this is only ever visible in the band
+  iOS reveals past an end.
+
+  CanvasTint sets `data-canvas="footer"` while the footer is on screen — the
+  only time you can overscroll the bottom — and the plate's own #121212
+  continues out of the page instead of a black seam under a grey block
+  (Žilvinas 2026-08-28, on an iPhone).
+
+  THE DEFAULT IS THE TOP'S COLOUR, and it is not black. It was, and black read
+  as a slab against the hero rather than as more of it — the field's top edge
+  is lit, not dark. The number is SAMPLED from the rendered page rather than
+  guessed: at 375 the first rows average #1C1927, at 1440 they average #17151E,
+  and both run the same way across — violet where the sun sits over the first
+  quarter, near-black the rest of the way. One flat colour cannot hold that
+  gradient, so this is the average of it, which is as close as a canvas colour
+  gets. Re-sample if the hero's lighting changes.
+
+  A transition would be wrong here: the colour is invisible until the moment it
+  is stretched into view, so there is nothing to ease, and a half-finished
+  cross-fade is exactly what you would catch.
+*/
 body {
-  background: var(--bg);
+  background: #1c1927;
   color: var(--text);
+}
+
+html[data-canvas="footer"] body {
+  background: #121212;
+}
+
+/*
+  DESKTOP: centre the hero in the field.
+
+  The field is min-h-svh (page.tsx) so the next section can never peek in on
+  first load, and the hero's own height comes from the window's WIDTH — so on a
+  tall window there is slack, and left to itself all of it collects at the
+  bottom. On a 2560x1352 that is ~340px of empty ramp under the logo strip with
+  the copy pinned to the top, which reads as the section having fallen short
+  rather than as air.
+
+  Centring is a NO-OP wherever the content is at least as tall as the field —
+  the box is then content-height and there is nothing to distribute — which is
+  what makes it safe to apply at every desktop height.
+
+  It used to be gated at min-height 900 so that mid-size windows kept the
+  design's top rhythm under the header. That is exactly the case this was then
+  reported on: a browser that is not full screen leaves ~100-200px of slack, all
+  of it collected under the logo strip, and the copy reads as having drifted up
+  (Noah 2026-08-19, on a windowed Arc). Equal air above and below is what is
+  wanted at every height, so the gate is gone.
+
+  It centres inside the PADDING box, i.e. the space below the header, since the
+  field carries padding-top: var(--header-h). The bar is not air the hero can
+  sit in.
+
+  display:flex is declared inside the query rather than on the element so that
+  below this size the field's layout is byte-for-byte what it was. The absolute
+  children (grid, light, panels, floaters) are out of flow and unaffected;
+  the two sections stretch to full width as flex items exactly as blocks did.
+*/
+@media (min-width: 768px) {
+  .hero-bg {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }
 
 /* Hero lighting.
@@ -87,10 +415,15 @@ body {
 */
 .hero-bg {
   /* Matched against the Figma frame, not tuned by feel: the field is
-     near-black — the tiles' own 35% fill supplies most of the visible
-     purple — and the washes only breathe a little light around the
+     near-black and the washes only breathe a little light around the
      top-left source and behind the headline. Resist brightening these:
-     every stacked layer (wash + tiles + rays) compounds. */
+     every stacked layer (wash + tiles + rays) compounds.
+
+     NOTE these washes are largely redundant now. The tiles above them are a
+     35% layer (Figma's own opacity for that group) and the lighting is the
+     exported image on .hero-light, which sits above these. Reach for that, not
+     these — most of what is here only shows through where the export's alpha
+     lets it. */
   background:
     /* 0. Settle layer, painted over everything: the vignette below darkens
        the hero's bottom edge past the page colour, so the hand-off to the
@@ -98,9 +431,9 @@ body {
        bring the edge back to var(--bg) exactly, making it invisible. */
     linear-gradient(
       180deg,
-      rgba(10, 9, 15, 0) 88%,
-      rgba(10, 9, 15, 0.85) 97%,
-      #0a090f 100%
+      rgba(0, 0, 0, 0) 88%,
+      rgba(0, 0, 0, 0.85) 97%,
+      #000000 100%
     ),
     /* 1. The sun: a violet source just outside the top-left corner. Candle
        logic: a slightly brighter core with a FAST falloff, so the glow is
@@ -113,8 +446,11 @@ body {
       rgba(122, 94, 198, 0.12) 44%,
       transparent 68%
     ),
-    /* 2. Headline light: a faint lift right behind "Your Path to $100M." —
-          kept well below the sun so it never competes with it. */
+    /* 2. Headline light: a faint lift right behind the h1 — kept well below
+          the sun so it never competes with it. Its ellipse is centred at 27%
+          of the field, which still sits between the headline's two lines now
+          that it sets on two (2026-08-26); the pool is 32% tall, so it covers
+          both without being re-aimed. */
     radial-gradient(
       ellipse 50% 32% at 50% 27%,
       rgba(160, 124, 248, 0.07) 0%,
@@ -153,71 +489,9 @@ body {
       #100b20 52%,
       #0d0a18 66%,
       #0b0912 80%,
-      #0a090f 92%,
-      #0a090f 100%
+      #000000 92%,
+      #000000 100%
     );
-}
-
-/* Light-streak burst radiating from centre — the artwork Figma exported as
-   its own layer. Screen blending lets it read as light rather than as a
-   pasted image, and it is masked so it never reaches a hard edge. */
-/*
-  Spinduliai — the light beams.
-
-  These are broad, soft diagonal shafts thrown from the top-left, the way light
-  falls through a window. The exported mask-group.svg is a centre-radiating
-  starburst, which is a different thing entirely and never matched; the beams
-  are drawn here instead.
-
-  Four shafts at slightly different angles and widths so the fan is irregular
-  rather than a repeating pattern. Screen blending makes them add light rather
-  than paint grey, and the mask keeps them strongest near the source.
-*/
-.hero-rays {
-  /* Drawn as a conic fan, not the exported effects-layer.webp: that file
-     turned out to be a featureless purple blur with no rays in it, which is
-     why no opacity ever produced beams. The fan's centre sits just outside
-     the top-left corner — the same point as .hero-bg's sun — so the shafts
-     radiate from the visible glow. `from 90deg` zeroes the stop angles at
-     "pointing right": the beams live between ~10deg (just under horizontal)
-     and ~80deg (nearly straight down), i.e. the down-right quadrant.
-
-     Widths, gaps and alphas are deliberately irregular so it reads as light
-     through a window rather than a repeating pattern. The blur softens the
-     stop edges; the radial mask is the falloff — beams are strongest near
-     the source and dissolve before they reach the headline's right side. */
-  background: conic-gradient(
-    from 90deg at -5% -12%,
-    transparent 8deg,
-    rgba(205, 178, 255, 0.2) 14deg,
-    transparent 21deg,
-    transparent 25deg,
-    rgba(198, 168, 255, 0.33) 32deg,
-    transparent 40deg,
-    rgba(205, 178, 255, 0.14) 45deg,
-    transparent 51deg,
-    rgba(198, 168, 255, 0.28) 58deg,
-    transparent 67deg,
-    rgba(205, 178, 255, 0.18) 73deg,
-    transparent 81deg
-  );
-  filter: blur(14px);
-  mix-blend-mode: screen;
-  opacity: 0.85;
-  -webkit-mask-image: radial-gradient(
-    ellipse 80% 76% at 0% -8%,
-    #000 0%,
-    rgba(0, 0, 0, 0.6) 42%,
-    rgba(0, 0, 0, 0.2) 62%,
-    transparent 82%
-  );
-  mask-image: radial-gradient(
-    ellipse 80% 76% at 0% -8%,
-    #000 0%,
-    rgba(0, 0, 0, 0.6) 42%,
-    rgba(0, 0, 0, 0.2) 62%,
-    transparent 82%
-  );
 }
 
 /* Centre light: the hero's second source, an elegant pool of light in the
@@ -229,8 +503,8 @@ body {
    core alpha is what keeps it a glow rather than a beam. */
 .cta-glow {
   /* Candle-like: a touch brighter at the heart, gone sooner at the rim. */
-  width: min(780px, 94vw);
-  height: 470px;
+  width: min(48.75rem, 94vw);
+  height: 29.375rem;
   background: radial-gradient(
     ellipse closest-side,
     rgba(214, 188, 255, 0.16) 0%,
@@ -282,28 +556,69 @@ body {
   background-repeat: repeat;
   background-size: 215px 215px;
   background-position: center 171.5px;
-  /* Three fades intersected: the vertical ramp down the page, the horizontal
-     edge feather, and — same as the phone treatment — a lighting ellipse so
-     tile brightness follows the LIGHT. The ellipse spans both sources —
-     stretched from the top-left sun across the centre pool — so tiles near
-     either glow show strongly and only the far corners fall toward black.
-     Without the third layer the desktop grid read as a wall of
-     equally-bright squares; the Figma frame is dark everywhere the light
-     doesn't reach. */
-  -webkit-mask-image:
-    linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.28) 87%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-    radial-gradient(ellipse 78% 62% at 42% 32%, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.42) 50%, rgba(0, 0, 0, 0.12) 76%, rgba(0, 0, 0, 0.04) 100%);
-  -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
-  -webkit-mask-size: 100% 100%, 100% 100%, 100% 100%;
-  -webkit-mask-composite: source-in, source-in;
-  mask-image:
-    linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.28) 87%, transparent 100%),
-    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-    radial-gradient(ellipse 78% 62% at 42% 32%, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.42) 50%, rgba(0, 0, 0, 0.12) 76%, rgba(0, 0, 0, 0.04) 100%);
-  mask-repeat: no-repeat, no-repeat, no-repeat;
-  mask-size: 100% 100%, 100% 100%, 100% 100%;
-  mask-composite: intersect;
+  /*
+    EVERY TILE THE SAME COLOUR. The lighting ellipse and the left/right edge
+    feather are gone — nothing varies a tile's brightness by where it sits any
+    more, which is what those two did. The light is now a layer of its own (see
+    .hero-light below) rather than something baked into the grid's alpha.
+
+    The one mask left is the last 12% of the field. It is not lighting: it
+    fades the grid out so it hands off to the flat section underneath instead
+    of stopping on a hard line. Take it out and the tiles end mid-square.
+  */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+/*
+  THE LIGHT IS NOW THE DESIGN'S OWN ARTWORK, not a transcription of it.
+
+  The earlier attempt failed on the asset, not the technique: effects-layer.webp
+  was the lighting group flattened together WITH the tiles, which is why it came
+  back "a featureless purple blur with no rays in it". Re-exported with the tile
+  layer hidden, the shafts are in there. Hand-built .hero-glow and .hero-rays
+  are gone — this replaces both.
+
+  ONE element. The export is the whole lighting group: the corner source, the
+  shafts, the vignette AND the centre pool. The centre light Figma holds as a
+  separate ellipse is already composited into it — layering that ellipse on top
+  as well washed the middle of the hero out to lavender, which is how the
+  double-count was caught. Measured off Center light.png in case it is ever
+  needed alone: a farthest-side ellipse centred in the frame, solid #2D1940 to
+  r=10.5%, then a straight linear ramp to zero at the edge (accurate to 1.8/255
+  at its worst pixel). Do not add it back without checking the middle.
+
+  Corners are opaque black — that IS the vignette — and the centre sits at
+  alpha 37, which is what lets the middle tiles read through.
+
+  It sits BEHIND HeroPanels and HeroFloaters. Figma stacks the lighting group
+  above them, and that version was built and looked right for depth — but the
+  vignette's dark corners swallowed the platform marks and the ad panels, which
+  are the things the hero exists to show. See page.tsx.
+*/
+.hero-light {
+  /* 1920x1080 at q90, downsampled from a 4x (7680x4320) Figma export, which
+     averages 16 source pixels per output pixel and is why this is clean where
+     the first pass was not.
+
+     DO NOT shrink it on the strength of an error metric. A 768px version
+     measured identically — error against the original is genuinely flat from
+     1920 down to 384, because the layer is pure blur — and still looked bad,
+     because the metric was computed at 1920 while a retina display stretches
+     this across ~4000 device pixels. Banding is not the risk either: steps
+     between plateaus are ~1 level, max 2. Resolution against the DEVICE pixel
+     grid is the thing that matters here.
+
+     `100% 100%`, not `cover`: the vignette's dark corners have to land on the
+     hero's real corners at whatever height it ends up, and stretching a blur
+     costs nothing. */
+  background-image: url("/images/hero-light.webp");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 /* Phone hero: same darkened field and gradient-filled tiles as desktop —
@@ -312,64 +627,145 @@ body {
    Only the geometry differs: ~90px pitch, square corners, per the phone
    frame's grid. */
 @media (max-width: 767px) {
-  .hero-grid {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='84' height='84' fill='url(%23g)' fill-opacity='0.3'/></svg>");
-    background-size: 90px 90px;
-    /* Tile brightness follows the LIGHT, not the pattern: a third mask layer
-       lets the middle tiles (behind the hero copy) show at full strength and
-       dims the outer columns and corners toward black, per the phone frame —
-       a uniform fill read as a wall of equally-bright squares. */
-    -webkit-mask-image:
-      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
-      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-      radial-gradient(ellipse 72% 40% at 50% 30%, #000 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.03) 100%);
-    -webkit-mask-repeat: no-repeat, no-repeat, no-repeat;
-    -webkit-mask-size: 100% 100%, 100% 100%, 100% 100%;
-    -webkit-mask-position: 0 0, 0 0, 0 0;
-    -webkit-mask-composite: source-in, source-in;
-    mask-image:
-      linear-gradient(to bottom, #000 0%, #000 64%, rgba(0, 0, 0, 0.3) 85%, transparent 100%),
-      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%),
-      radial-gradient(ellipse 72% 40% at 50% 30%, #000 0%, rgba(0, 0, 0, 0.5) 45%, rgba(0, 0, 0, 0.12) 72%, rgba(0, 0, 0, 0.03) 100%);
-    mask-repeat: no-repeat, no-repeat, no-repeat;
-    mask-size: 100% 100%, 100% 100%, 100% 100%;
-    mask-position: 0 0, 0 0, 0 0;
-    mask-composite: intersect;
+  /*
+    THE PHONE UNIT. One number that makes the whole first screen fit one screen.
+
+    Everything above the fold on a phone — the bar, the pill, the headline, the
+    sub, the two CTAs, the award row, the proof line and the four logo rows
+    down to Kiloverse — is authored at the design's px against an 812-tall
+    frame, where it measures 765. That fits the LAYOUT viewport on most phones
+    and misses the VISIBLE one on nearly all of them: Safari's chrome takes
+    ~100px off a 14/15, and an SE is only ~553 tall with the bars showing.
+
+    So the vertical rhythm is quoted in `--pu` instead of px: 1px at 812svh and
+    proportionally less below it, which keeps the block at a constant 94% of
+    whatever height the browser actually leaves. `svh` (small viewport height)
+    is the state with the chrome SHOWING — the conservative one — so the fold
+    lands after Kiloverse even before the URL bar collapses.
+
+    Capped at 1px so tall phones get the design's own numbers rather than
+    inflated ones, and floored so a freak short window degrades instead of
+    collapsing to nothing.
+
+    Horizontal measures are NOT in this unit — the gutter, the logo pitch and
+    the pill padding all key off width, which svh knows nothing about.
+  */
+  :root {
+    --pu: clamp(0.62px, 0.12315svh, 1px);
   }
 
-  /* Phone hero-bg: the desktop sources at the same darkness, but NO vignette
-     and the ramp's last stop is the page colour exactly — the vignette pushed
-     the hero's bottom edge below var(--bg) and the hand-off to the next
-     section showed as a hard line (an earlier, reported bug on phones). */
+  /* One screen, exactly: the block ends where the phone's visible area does. */
   .hero-bg {
-    background:
-      radial-gradient(
-        ellipse 62% 58% at 2% -10%,
-        rgba(214, 186, 255, 0.3) 0%,
-        rgba(166, 130, 246, 0.17) 24%,
-        rgba(120, 92, 196, 0.08) 48%,
-        transparent 76%
-      ),
-      radial-gradient(
-        ellipse 50% 32% at 50% 27%,
-        rgba(160, 124, 248, 0.1) 0%,
-        rgba(130, 98, 212, 0.05) 48%,
-        transparent 76%
-      ),
-      /* Darker ramp than desktop's: phones carry no vignette (see above), so
-         the base itself must sit near-black to match the phone frame. */
-      linear-gradient(
-        180deg,
-        #191234 0%,
-        #171031 12%,
-        #150e2c 24%,
-        #120c26 38%,
-        #0f0a1e 52%,
-        #0d0918 66%,
-        #0b0912 80%,
-        #0a090f 92%,
-        #0a090f 100%
-      );
+    min-height: 100svh;
+  }
+
+  /* The phone frame's own lighting export. The desktop image cannot be reused
+     here: it is a 16:9 frame, and stretched into a tall hero its vignette
+     closes in from the left and right and chokes the copy.
+
+     Built from `~/Documents/Mobile lightning.png` (640 x 1539, 175 KB): a black
+     vignette whose clear oval sits dead centre, PLUS the shafts of light
+     raking down from the top-left corner. Both belong to the phone frame.
+
+     A pass on 2026-08-19 swapped in a ray-less render (`lightning 1.png`) and
+     was reverted the same day — the rays are wanted. Do not re-drop them. The
+     heavier file is the price of that export's grain, which is exactly what
+     lossy WebP cannot compress. */
+  .hero-light {
+    background-image: url("/images/hero-light-mobile.webp");
+  }
+
+  .hero-grid {
+    /* ONE TILE, exported from the phone frame (tile.png, 84 x 84 on the 90px
+       unit). Everything here is read off that file rather than reused from the
+       desktop tile:
+
+         fill      35% opacity, not 50% — the export's interior sits at
+                   alpha 89/255 across its whole face (min 88, max 90).
+         gradient  the same three Figma stops, but the handle is NOT the
+                   desktop's corner-to-corner 45deg. Fitting the exported tile
+                   (rms 0.035 over 6186 px) puts it at ~19deg below horizontal,
+                   entering at 33% height on the left and leaving at 68% on the
+                   right — a much flatter sweep, which is why the desktop
+                   vector read too dark down the left edge here.
+         corners   square. */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><defs><linearGradient id='g' x1='-0.011' y1='0.326' x2='1.031' y2='0.681'><stop offset='0' stop-color='%23A08ADE'/><stop offset='0.4' stop-color='%237C54B5'/><stop offset='1' stop-color='%236E54B5'/></linearGradient></defs><rect width='84' height='84' fill='url(%23g)' fill-opacity='0.35'/></svg>");
+    background-size: 90px 90px;
+    /* No lighting mask on the phone grid — it inherits the base rule's bottom
+       hand-off ramp and nothing else.
+
+       The three-layer mask that stood here (a vertical ramp, a side feather
+       and a radial "source") was painting light onto the tiles a second time.
+       The export above them already IS the vignette: opaque black at the
+       edges, open in the middle. Measured on lightning 1.png, its clear
+       centre sits dead centre (48% / 50%) — the corner-anchored radial that
+       was here traced a light the artwork does not have, and dimmed exactly
+       the tiles the design leaves lit. Desktop has worked this way all along;
+       this is the phone catching up. */
+  }
+
+  /* Phone hero-bg: A RAMP AND NOTHING ELSE.
+     The two radials that used to sit on top of it — a corner source and a
+     lift behind the headline — were hand-built stand-ins from the days before
+     hero-light-mobile.webp existed. Once the export went in they were
+     double-counting it: the same light, painted twice, at roughly twice the
+     strength the phone frame has. The corner one is why the top half of the
+     hero came back lavender rather than near-black.
+
+     The export is now the ONLY source on phones. Anything that emits light
+     here has to be in Mobile lightning.png, or it is inventing a light the
+     design does not have.
+
+     Still no vignette, and the ramp's last stop is the page colour exactly —
+     the vignette pushed the hero's bottom edge below var(--bg) and the
+     hand-off to the next section showed as a hard line (an earlier, reported
+     bug on phones). The ramp itself is darker than it was for the same reason
+     as the radials: the export carries the colour now. */
+  .hero-bg {
+    background: linear-gradient(
+      180deg,
+      #0d0a1c 0%,
+      #0b0817 14%,
+      #090614 28%,
+      #070511 44%,
+      #05040c 60%,
+      #030207 78%,
+      #000000 92%,
+      #000000 100%
+    );
+  }
+
+  /* No centre pool on phones. .cta-glow is a 470px screen-blended ellipse
+     behind the CTA row — on a 400px-wide phone that is most of the field, and
+     the phone frame has nothing there: measured across Mobile lightning.png,
+     the whole lower half sits under 8/255 with no local maximum anywhere near
+     the buttons. The desktop frame does have that pool (it is composited into
+     hero-light.webp), which is why this is a phone-only removal. */
+  .cta-glow {
+    display: none;
+  }
+}
+
+/* Case studies, phone only: the two desktop columns stop generating boxes, so
+   their four cards become direct children of the one flex column and can order
+   themselves against each other.
+
+   Stacking the two lists as lists cannot produce the artboard's phone order —
+   that order interleaves them (Holo, Breezit, eany, we interiors, against
+   desktop's Breezit, eany | Holo, we interiors). `display: contents` is what
+   makes the `order` on each card (set from CASE_STUDIES.phoneOrder) apply
+   across both, and the 40px gap on the container then falls between all four
+   rather than only between the two lists.
+
+   The explicit role="list" in the markup is deliberate: `display: contents`
+   drops the implicit list semantics in some engines, and the role puts them
+   back.
+
+   Ends at 639.98px — from sm up the two columns are side by side and must keep
+   their boxes, their own gaps and the right column's stagger. */
+@media (max-width: 639.98px) {
+  .case-columns > ul {
+    display: contents;
   }
 }
 
@@ -505,25 +901,200 @@ body {
   pointer-events: none;
 }
 
+/* The footer's social tiles (Žilvinas 2026-08-28, phone frame): 50 square,
+   radius 12, filled #222222, with a 1px INSIDE stroke that is a linear
+   gradient running top to bottom from #222222 to #666666 — so the edge is
+   invisible against the fill at the top and lifts to a soft rim at the bottom.
+
+   Figma's stroke is "Inside", which is what `padding: 1px` plus the xor mask
+   reproduces: the ring is drawn within the 50, not added to it. Same
+   masked-pseudo-element trick as the two rings above, for the same reason — a
+   border-color cannot hold a gradient, and border-image breaks the radius. */
+.tile-ring {
+  position: relative;
+}
+.tile-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(180deg, #222222 0%, #666666 100%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* The mobile drawer's "Book an agency call" ring. NOT a flat white border: the
+   artboard lights the stroke at the top-left corner and, more faintly, at the
+   bottom-right, and leaves the middle of every edge unpainted.
+
+   The stops are read off the artboard rather than eyeballed — sampling the
+   button's whole perimeter and projecting each sample onto a 135deg axis
+   collapses both long edges onto one curve: ~0.75 white at the start, down to
+   nothing by 27%, dark until 70%, then back up to ~0.42 at the far corner. The
+   decay is faster than linear, hence the intermediate stops.
+
+   Same masked-pseudo-element trick as .animated-gradient-border above (a
+   border-color cannot hold a gradient), but static — this ring does not pan. */
+.corner-lit-ring {
+  position: relative;
+}
+.corner-lit-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 255, 255, 0.5) 6%,
+    rgba(255, 255, 255, 0.28) 12%,
+    rgba(255, 255, 255, 0.12) 18%,
+    rgba(255, 255, 255, 0) 27%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.1) 82%,
+    rgba(255, 255, 255, 0.25) 91%,
+    rgba(255, 255, 255, 0.42) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 /* Final-CTA card. Desktop: the design's own streak artwork — the exported
    1380x842 "mask ground" layer of violet arcs converging on the centre —
    laid over a light-at-the-top wash and a deep violet base. The artwork is
    drawn for exactly this card, so it stretches 100% both ways rather than
    cover-cropping. */
 .cta-card {
-  /* Matched to the Figma card — and note the ORIENTATION: the card is black
-     at the top, and the purple is a glow rising from the BOTTOM edge, gone
-     by mid-height. Every earlier version had this upside-down (light at the
-     top), which is why it kept reading too bright no matter the alphas. */
+  /*
+    The fill is the Figma one, verbatim: a single LINEAR gradient of ONE
+    colour, #1d0937, from 0% opacity at the top of the card to 100% at the
+    bottom, over the page's black. Note the ORIENTATION — the purple rises
+    from the bottom edge; every early version had this upside-down, which is
+    why it kept reading too bright no matter the alphas.
+
+    It replaces an eyeballed radial "glow" that pooled light in the lower
+    middle. A flat vertical ramp is both what the design says and what makes
+    it read as subtle: #1d0937 is dark enough that even at full opacity it
+    only just lifts off the black.
+  */
   background:
     url("/images/cta-streaks.svg") center / 100% 100% no-repeat,
-    radial-gradient(
-      ellipse 85% 65% at 50% 110%,
-      rgba(122, 92, 196, 0.3) 0%,
-      rgba(90, 66, 150, 0.15) 40%,
-      rgba(0, 0, 0, 0) 64%
-    ),
-    linear-gradient(180deg, #0a0710 0%, #0b0814 55%, #0e0a1a 100%);
+    linear-gradient(180deg, rgba(29, 9, 55, 0) 0%, rgba(29, 9, 55, 1) 100%),
+    var(--bg);
+}
+
+/*
+  Hero eyebrow — "Creative Partner for eCom & AI brands" (Figma 3803:1591/1593/
+  1594: 417 x 45, radius 50, Poppins Medium 20 in black).
+
+  A WHITE core with a #6E54B5 loop running the whole way round.
+
+  The previous version painted the loop as a vertical gradient — lavender rim,
+  white middle, lavender rim. That can only ever colour the top and bottom
+  edges: at mid-height the left and right caps are inside the white band and
+  run pure white right up to the boundary, which is precisely the "sides are
+  gone" that was reported. A gradient cannot follow a rounded rect; an inset
+  shadow can, so the ring is three stacked inset shadows and the fill is flat.
+
+  FOUR layers, because a single blur can only be either tight or far-reaching
+  and this needs both: a defined edge AND colour carried well in toward the
+  centre. Stacking them is how the falloff curve gets shaped by hand.
+
+    1. a 1px hairline that closes the shape, so the white never reaches the
+       boundary and the pill keeps a defined outline against the dark field
+    2. the loop proper — a short, strong band
+    3. a mid falloff
+    4. a wide, very faint wash that carries the purple most of the way to the
+       middle
+
+  Layer 4 is what stops the pill reading as a white lozenge with a rim. Its
+  alpha is deliberately low: at 45px tall there is only ~22px from edge to
+  centre, and the black type has to stay legible, so the reach comes from the
+  blur radius rather than from strength. Raising its alpha instead is what
+  greys the text out — reach and opacity are not interchangeable here.
+
+  Sized in `em`, not px, so it tracks the pill's own font-size: 0.5em of band
+  is ~10px against the desktop 20px type and ~7px against the phone's 14px,
+  without a second set of numbers. That means THE FONT SIZE MUST BE ON THIS
+  ELEMENT, not on a child.
+
+  Note the colour is the brand purple itself. It used to be #C3B2E9 / #BFA9E6,
+  two lighter tints picked by eye; at these alphas #6E54B5 lands on the same
+  lavender over white while actually being the token.
+*/
+.eyebrow-pill {
+  background: #ffffff;
+  box-shadow:
+    inset 0 0 0 1px rgba(110, 84, 181, 0.32),
+    inset 0 0 0.28em 0.07em rgba(110, 84, 181, 0.6),
+    inset 0 0 0.7em 0.18em rgba(110, 84, 181, 0.38),
+    inset 0 0 1.3em 0.3em rgba(110, 84, 181, 0.18);
+}
+
+/*
+  Centre UPPERCASE labels on their LETTERS rather than on their line box.
+
+  `items-center` centres an element's BOX. For a line of text that box is built
+  from the font's ascent and descent — space reserved for accents above and
+  descenders below — and all-caps text puts ink in neither. So the box is taller
+  than the letters at both ends, and unless the two overhangs happen to be equal
+  the letters land off-centre inside it. That is why the header nav read high.
+
+  Poppins is very nearly the lucky case: measured off next/font's own fallback
+  overrides in the build output (93.62% x 112.16% size-adjust, 31.21% x 112.16%)
+  its ascent is 1.05em and its descent 0.35em, so the box centre falls at
+  baseline + 0.35em — exactly the cap-height centre IF its caps are 0.70em. They
+  are, near enough, which is why this was only ever about a pixel.
+
+  `text-box: trim-both cap alphabetic` stops that being an assumption. It trims
+  the box to the cap line at the top and the baseline at the bottom, so the box
+  IS the ink and centring it centres the letters, whatever the font's metrics
+  are. Nothing here depends on Poppins any more.
+
+  Progressive enhancement: Chrome and Safari trim, Firefox ignores the property
+  and keeps the metric-centred result — which, per the numbers above, is within
+  about a pixel. There is no fallback to write.
+
+  ONLY for all-caps or otherwise descender-free text. On normal prose this
+  clips the box to the baseline and descenders (g, y, p) hang outside it, which
+  is wrong for anything that has to sit in a padded container.
+*/
+.cap-centered {
+  text-box: trim-both cap alphabetic;
+}
+
+/* Phone: the whole card face is ONE exported image rather than a stack of CSS
+   layers — `~/Documents/phone last section background.png`, the artboard's own
+   render. Fill ramp, streaks, the light pooling at the bottom and the violet
+   edge stroke are all in it, and they no longer have to be reproduced (and
+   kept in sync) three different ways.
+
+   It replaces the CSS build that stood here: the streak SVG + #1d0937 ramp
+   from the base rule, and a masked 1px ring drawn as ::after because
+   border-color cannot hold a gradient. That ring is baked into the artwork
+   now, so the pseudo-element is gone with it. Desktop is untouched — it keeps
+   the CSS build and its own flat violet border.
+
+   Shipped FLAT, no alpha: the card only ever sits on the page's black, so the
+   export is composited over #000 and its rounded corners come out black on
+   black. 1380 x 1280 (4x the 345 x 320 card) at q92, 19 KB — the artwork is
+   smooth ramps plus soft streaks, which is cheap to encode at full size, so
+   there was no reason to hand a retina phone anything less. */
+@media (max-width: 767px) {
+  .cta-card {
+    background: url("/images/cta-card-phone.webp") center / 100% 100% no-repeat,
+      var(--bg);
+  }
 }
 
 /* Partial border that fades away from the top-left and is gone by the
@@ -551,6 +1122,132 @@ body {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+/*
+  Testimonials expand — the "View More" reveal.
+
+  It used to flip `max-height: none` and `display: none` the instant the
+  <details> opened, so the grid appeared in one frame and the fade vanished
+  with it. Both are now transitions, which is the whole difference between a
+  jump cut and the reveal on flighty.com: the block GROWS into place and the
+  fade dissolves off it slightly faster, so the copy underneath is already
+  legible while the container is still settling.
+
+  `interpolate-size: allow-keywords` is what makes this possible at all. A
+  max-height cannot animate to `none`, and animating to a big fixed number
+  instead (5000px and hope) spends most of the easing curve on empty space, so
+  the motion arrives early and then idles. The keyword lets the browser
+  interpolate to the content's real height, so the curve maps onto the actual
+  distance travelled.
+
+  Where it is unsupported the reveal simply snaps, exactly as it did before —
+  no fallback to write, and nothing to detect.
+
+  easeOutQuint: fast off the mark, long settle, no overshoot. A spring would
+  overshoot, and on a block this tall that reads as the section bouncing.
+*/
+:root {
+  interpolate-size: allow-keywords;
+}
+
+.testi-clip {
+  overflow: hidden;
+  /* The collapsed heights are the measured ones — two full cards and two
+     halves, so it is visibly cut off rather than looking like the end. */
+  /* TWO AND A HALF CARDS on phones, which is what the artboard shows: two
+     whole ones and the third cut through its middle, so the block reads as
+     continuing rather than ending.
+
+     956 is measured, not guessed. At 375 the first three cards sit at 0 (375
+     tall), 399 (382) and 805 (302) — a 24 gap — so half of the third is
+     805 + 151. It was 700, which cut the SECOND card at three quarters.
+
+     Re-measure if the testimonial copy changes; the cards are content-sized
+     and this number is the only thing holding the cut where the design puts
+     it. */
+  max-height: 956px;
+  /* The BASE rule's transition is the one that runs on the way back, because a
+     transition is read off the state being moved TO. Closing wants to be a
+     touch quicker and more decisive than opening — a long settle on the way
+     down reads as the section sagging. */
+  transition: max-height var(--testi-close) var(--testi-close-ease);
+}
+
+@media (min-width: 1024px) {
+  .testi-clip {
+    max-height: 52.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .testi-clip {
+    max-height: 46.25rem;
+  }
+}
+
+/* Kept shorter than the growth so the fade is gone before the block finishes
+   settling — the copy underneath is readable while the container is still
+   moving, which is what stops the reveal feeling like it lags. */
+.testi-fade {
+  transition: opacity 700ms var(--testi-close-ease);
+}
+
+.testi-wrap:has(details[open]) .testi-fade {
+  /* Still shorter than the growth, so the copy underneath is readable while
+     the container is finishing its settle — that is what stops the reveal
+     feeling like it lags — but on the opening curve, so the two start
+     together rather than the fade jumping ahead. */
+  transition: opacity 900ms var(--testi-open-ease);
+}
+
+/* `:has` on the wrapper, so the open state reaches back up to a sibling the
+   <details> does not contain. No JS, no state, no hydration. */
+.testi-wrap:has(details[open]) .testi-clip {
+  max-height: max-content;
+  /* Opening: 1500ms on an easeOutExpo. Almost all of the distance is covered
+     in the first third and the rest is a long, slowing settle, which is what
+     makes a block this tall read as unfolding rather than as a jump with a
+     tail. Everything that moves with it — the wrapper's padding, the fade —
+     runs on this same pair so nothing arrives early or drifts. */
+  transition: max-height var(--testi-open) var(--testi-open-ease);
+}
+
+.testi-wrap:has(details[open]) .testi-fade {
+  opacity: 0;
+}
+
+/*
+  THE PILL'S ROOM, ANIMATED.
+
+  The pill is absolutely positioned against this wrapper at every width and in
+  both states (see the note in Sections.tsx). Collapsed, it floats over the
+  bottom of the clipped block; open, it has to sit clear of the last card. That
+  clearance is this padding, and because padding is animatable on the SAME
+  curve and duration as the clip's height, the pill glides down with the growth
+  instead of teleporting the way the old `static` switch made it.
+
+  --pill-h is the pill's own height, set once and used by both. In rem, so it
+  tracks the root scale-down above md exactly as the pill itself does.
+
+  2.5rem = the 0.5rem the pill sits above this box's bottom edge plus the 2rem
+  that used to be `mt-8`, so the open position is unchanged to the pixel.
+*/
+.testi-wrap {
+  --pill-h: 3rem;
+  padding-bottom: 0;
+  transition: padding-bottom var(--testi-close) var(--testi-close-ease);
+}
+
+@media (min-width: 768px) {
+  .testi-wrap {
+    --pill-h: 3.875rem;
+  }
+}
+
+.testi-wrap:has(details[open]) {
+  padding-bottom: calc(var(--pill-h) + 2.5rem);
+  transition: padding-bottom var(--testi-open) var(--testi-open-ease);
 }
 
 /* Tailwind v4 preflight sets cursor:default on buttons; restore the pointer. */

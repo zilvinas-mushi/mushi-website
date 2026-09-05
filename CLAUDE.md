@@ -21,6 +21,18 @@ Static marketing site for mushi.agency. Deployed to Cloudflare Pages.
   Applies to every button on the site, including the header CTA. Always
   transition the change so it cross-fades rather than snapping; keep a
   gradient background layer on both states so the fill can animate.
+- **One exception: the "Trusted by 100+ brands" pill** in the testimonials
+  section does NOT invert. At 594 × 62 it is a section control rather than a
+  call to action, and flipping that much area to white flashes the whole block.
+  Only its "View More" cluster reacts, and only with a small opacity fade.
+- **A second exception: the two arrow pills** — the creatives "Yes" and the
+  final card's "15 Minute Fit-Check". They do not go white. The violet and the
+  arrow disc's #222222 trade places instead: on hover the button takes the
+  disc's grey and the disc takes the button's violet, so the same two colours
+  are still on screen in the same amounts, just swapped. Label and arrow stay
+  white at both ends. Both pills also fly the arrow out along its diagonal and
+  bring a second one in from behind it. All of it lives in one component —
+  `ArrowDisc` in `Sections.tsx` — so the two can never drift apart.
 
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.

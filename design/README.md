@@ -22,6 +22,29 @@ by a future session, or by you.
 - Frame `Desktop Home`, node `3843:28`, 1921 × 7426
 - Extracted 2026-07-28
 
+> **⚠️ The whole-page node `3843:28` is GONE as of 2026-08-07.**
+> `get_metadata` on it returns "node ID was not found in the file", and three
+> calls were burned confirming that. **Do not go hunting for it again.**
+>
+> The file itself is alive — Žilvinas has since supplied live node ids for the
+> footer (below), so the page was reorganised rather than deleted. What a future
+> session needs from him is a `figma.com/design/...` URL **with a `node-id`**
+> for whatever frame it is about to build, not a search.
+
+### Live nodes (supplied, verified)
+
+| Node | What | Size | Pulled |
+| --- | --- | --- | --- |
+| `4167:280` | Footer desktop | 1920 × 425 | 2026-08-19 |
+| `4167:278` | Footer phone | 375 × 977 | 2026-08-19 |
+
+Both are in this same file. `4167:280`'s children are numbered `4134:6xx` — the
+band `4134:616`, the field `4134:619`, the button `4134:621`, the rule
+`4134:634`, the star `4134:637`, the social group `4134:653` — and those ids are
+quoted at the point of use in `src/components/SiteFooter.tsx`.
+[SECTIONS.md](SECTIONS.md) holds every number they gave up, so neither node has
+to be read again.
+
 The frame was created by wrapping loose layers, so it has **no auto-layout**.
 Figma therefore emits absolute pixel positions, which cannot be shipped. See
 [SECTIONS.md](SECTIONS.md) for why and what to do instead.

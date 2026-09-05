@@ -1,4 +1,5 @@
 import type { Creative } from "@/lib/content";
+import { CreativeVideo } from "./CreativeVideo";
 
 /**
  * Instagram-post card used in the creatives rail.
@@ -23,7 +24,7 @@ function Verified() {
       height={21}
       loading="eager"
       decoding="async"
-      className="size-[15px] shrink-0"
+      className="size-[0.9375rem] shrink-0"
     />
   );
 }
@@ -46,7 +47,7 @@ function ActionIcon({ name, w, h }: { name: string; w: number; h: number }) {
       height={h}
       loading="eager"
       decoding="async"
-      className="h-[32px] w-auto"
+      className="h-[2rem] w-auto"
       aria-hidden="true"
     />
   );
@@ -58,8 +59,12 @@ const Share = () => <ActionIcon name="send" w={45} h={41} />;
 const Bookmark = () => <ActionIcon name="save" w={46} h={42} />;
 
 export function CreativeCard({ item }: { item: Creative }) {
+  // One description for the media whichever way it renders, so a film card
+  // and a still card read identically to a screen reader.
+  const media = `${item.caption} — ad creative for ${item.handle}`;
+
   return (
-    <article className="w-[280px] shrink-0 snap-start overflow-hidden rounded-[15px] bg-white sm:w-[300px]">
+    <article className="w-[17.5rem] shrink-0 snap-start overflow-hidden rounded-[0.9375rem] bg-white sm:w-[18.75rem]">
       <header className="flex items-center gap-2.5 px-3 py-2.5">
         {item.avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -77,18 +82,22 @@ export function CreativeCard({ item }: { item: Creative }) {
           // with the handle's initial, never a stand-in photo.
           <span
             aria-hidden="true"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[13px] font-semibold text-zinc-600"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-[0.8125rem] font-semibold text-zinc-600"
           >
             {item.handle.charAt(0).toUpperCase()}
           </span>
         )}
 
         <div className="min-w-0">
-          <p className="flex items-center gap-1 text-[13px] font-semibold leading-tight text-black">
+          <p className="flex items-center gap-1 text-[0.8125rem] font-semibold leading-tight text-black">
             <span className="truncate">{item.handle}</span>
             {item.verified && <Verified />}
           </p>
-          <h3 className="truncate text-[12px] leading-tight text-black/70">
+          {/* Solid #000 at full opacity, per Figma — NOT a muted black. It was
+              black/70, an eyeballed step down from the handle above it. In the
+              design the two lines differ by weight and size only, so the
+              caption reads as the same ink as the handle, not a faded one. */}
+          <h3 className="truncate text-[0.75rem] leading-tight text-black">
             {item.caption}
           </h3>
         </div>
@@ -100,19 +109,35 @@ export function CreativeCard({ item }: { item: Creative }) {
         loading guarantees the visitor watches images pop in blank for the
         whole first loop. Everything loads up front instead, and the neutral
         backing only shows for the brief moment before that finishes.
+
+        Film cards carry the same still as their poster and layer the video
+        over it, so this eager-load guarantee holds for every card in the rail
+        regardless of which kind it is. Only the poster is on the critical
+        path — see CreativeVideo for why the film itself costs nothing until
+        the card is on screen.
       */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`/images/${item.image}`}
-        alt={`${item.caption} — ad creative for ${item.handle}`}
-        width={item.w}
-        height={item.h}
-        loading="eager"
-        decoding="async"
-        // Creatives are portrait ads; a 4:5 crop cut the tops and bottoms off.
-        // 9:16 matches the source material, so the whole ad stays visible.
-        className="aspect-[9/16] w-full bg-zinc-100 object-cover"
-      />
+      {item.video ? (
+        <CreativeVideo
+          video={item.video}
+          image={item.image}
+          alt={media}
+          w={item.w}
+          h={item.h}
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`/images/${item.image}`}
+          alt={media}
+          width={item.w}
+          height={item.h}
+          loading="eager"
+          decoding="async"
+          // Creatives are portrait ads; a 4:5 crop cut the tops and bottoms off.
+          // 9:16 matches the source material, so the whole ad stays visible.
+          className="aspect-[9/16] w-full bg-zinc-100 object-cover"
+        />
+      )}
 
       <footer className="flex items-center justify-between px-3 py-2.5">
         <span className="flex items-center gap-1.5">

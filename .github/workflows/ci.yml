@@ -1,0 +1,53 @@
+# The check that runs BEFORE Cloudflare tries to deploy.
+#
+# Cloudflare Pages already builds this repo on every push to main — that is the
+# deploy pipeline and this does not replace it. What Cloudflare does NOT do is
+# tell you about a lint failure, and it only tells you about a type error by
+# failing the deploy itself, minutes later, in a log you have to go and open.
+# This runs the same three commands on the push that triggers that build, so a
+# red X appears next to the commit instead.
+#
+# Free: the repo is public, so Actions minutes on standard runners are
+# unmetered. (The 2,000/month cap applies to private repos only.)
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push while the first is still running makes the first irrelevant —
+# cancel it rather than paying for two answers about the same branch.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # 24 is the current LTS. Local is 26; nothing here is version-sensitive —
+      # it is a static export with no native dependencies — so CI stays on the
+      # conservative one.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      # `ci`, not `install`: it installs exactly what package-lock.json pins and
+      # fails if the two have drifted, which is the point of running it here.
+      - run: npm ci
+
+      # ESLint is the only one of the three that nothing else runs. `next build`
+      # already type-checks, so a broken type would be caught below either
+      # way — but it would be caught as a failed BUILD, which reads like an
+      # infrastructure problem rather than a two-line fix.
+      - run: npx eslint src --max-warnings=0
+
+      - run: npx tsc --noEmit
+
+      # The real thing, with the same command Cloudflare uses. If this passes,
+      # the deploy will too.
+      - run: npx next build

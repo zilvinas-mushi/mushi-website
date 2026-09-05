@@ -13,13 +13,27 @@ paraphrase it.
 - AGENCY
 - CASE STUDIES
 - TEMPLATES
-- Book a Call *(primary CTA)*
+- Book a Call *(primary CTA, desktop bar)*
+- SCHEDULE A CALL *(primary CTA, phone — both in the drawer and as the bar's
+  own button once you have scrolled past the creatives "Yes" pill)*
+
+The phone drawer carries the three nav rows and SCHEDULE A CALL, nothing else.
+It used to also offer "Buy now" and "Login" into the webapp; the 2026-08-26
+redesign drops both.
 
 ## Hero
 
-- Eyebrow: Growth Partner for eCom & AI brands
-- **H1: Your Path to $100M.** *(the only `<h1>` on the page)*
-- Sub: Paid ads, banger creatives, landing pages, and strategy - all led by us, under one roof.
+Revised 2026-08-26 (Žilvinas, from the updated frame). The previous deck read
+"Growth Partner for eCom & AI brands" / "Your Path to $100M." / "Paid ads,
+banger creatives, landing pages, and strategy - all led by us, under one roof."
+
+- Eyebrow: Creative Partner for eCom & AI brands
+- **H1: Premium Ads for $1M to $100M Brands.** *(the only `<h1>` on the page)*
+  - Breaks over **two** lines, and the break is authored, not balanced:
+    `Premium Ads for` / `$1M to $100M Brands.`
+- Sub: Weekly research, scripting, creator sourcing, editing, and angle testing for Meta, TikTok, and YouTube ads.
+  - Desktop two lines: `Weekly research, scripting, creator sourcing, editing,` /
+    `and angle testing for Meta, TikTok, and YouTube ads.`
 - CTA primary: 15 MINUTE FIT-CHECK
 - CTA secondary: STEAL OUR SECRETS
 
@@ -27,6 +41,37 @@ Floating proof chips around the hero visual:
 Performance Score · Successfully Reached 10M+ Views · Consistently Considered
 to be Excellent · Growth Performance Analysis · Refined, Delivered & Measured ·
 Optimized for the Quarter
+
+The hero carries **four** stat panels, each a title plus two lines. The six
+strings above supply exactly two of them:
+
+| # | Title | Line 1 | Line 2 |
+| --- | --- | --- | --- |
+| 1 | Performance Score | Successfully Reached 10M+ Views | Consistently Considered to be Excellent |
+| 2 | Growth Performance Analysis | Optimized for the Quarter | Refined, Delivered & Measured |
+Panels 3 and 4 have different shapes. Panel 3:
+
+The label reads **"(today)"** where the Figma frame says "(last 7 days)". That
+is a deliberate change, not a transcription slip: a weekly figure invites the
+reader to divide it down and conclude the client is small, where a daily one
+does not. Keep it unless the frame is updated to match.
+
+| | |
+| --- | --- |
+| Label | Total Revenue (today) |
+| Figure | $6,240.28 |
+| Badge | +2 |
+
+Panel 4:
+
+| | |
+| --- | --- |
+| Title | Trending Videos |
+| Rows | Video 1 · Video 2 · Video 3 |
+| Axis | 0 · 2K · 4K · 8K |
+
+All four panels' copy is now real: panels 1 and 2 from the chip list above,
+panels 3 and 4 supplied with their measurements on 2026-08-10.
 
 ## Social proof strip
 
@@ -68,9 +113,27 @@ staggered — left column Breezit then eany, right column Holo then we interiors
 > reputational and legal problem, so this table — verified against the design —
 > is authoritative over any loose copy.
 
+**Line breaks are part of the copy, not the layout** (Žilvinas, 2026-08-11).
+Each result breaks at a fixed point and must break there at every width, so
+the break is written into the string rather than left to wrapping:
+
+| Brand | Line 1 | Line 2 |
+| --- | --- | --- |
+| Breezit | Generated 700 sales calls & 1500 | leads in 8 months. |
+| Holo | From $0k/month to $117k/month | in 7 months |
+| eany.io | Helped find 3 evergreen ads for | an 8 figure company. |
+| we interiors | From $13k/month to $75k/month | in 3 months. |
+
+Holo's line genuinely has no full stop; the other three do. That is the deck,
+not a typo to tidy.
+
+Breezit breaks after "1500", not after "leads": at 30px "…& 1500 leads" is
+wider than the card, so breaking there wrapped it onto a third line and left
+"leads" stranded alone. "leads in 8 months." stays together.
+
 ## Section — Testimonials
 
-**Reputation is everything. Ours is flawless.** · Trusted by 100+ brands · View More
+**Reputation is everything. Ours is flawless.** · Trusted by 110+ brands · View More
 
 1. **Other marketers ask us who cooks our ads** — 5★ — Mushi team is exceptional, no other creative agency has ever met our needs - either because of the speed of execution, ideas or editing.\
    Mushi delivers on all fronts. Other people & marketers even ask us where we get such creatives because they're top-notch. — *November 01, 2024 · David Kovger · GB*
@@ -98,14 +161,21 @@ staggered — left column Breezit then eany, right column Holo then we interiors
 
 ## Footer
 
-- Want a welcome gift? *(email capture — must post to a third-party email
-  provider; there is no server. See CLAUDE.md.)*
-- Columns: PRODUCT (SEO Tools, Templates · Agency Services) · LEGAL (Privacy
-  Policy · Terms & Conditions · Refund Policy · Money Back Guarantee) ·
-  COMPANY (Case Studies)
-- Trustpilot 4.0 · 100+ reviews
-- Social: LinkedIn · TikTok · Facebook · Instagram
-- Copyright 2026 © Mushi Agency
+Updated from the desktop reference of 2026-08-19. The heading, the CONTACT
+column and the bottom bar are all new; the old PRODUCT/LEGAL/COMPANY split is
+gone — legal moved into the bottom bar and Trustpilot now reads 4.9, matching
+the awards row.
+
+- Want a mystery gift? *(email capture — placeholder "Enter your email\*",
+  button "Redeem". Must post to a third-party provider; there is no server.
+  See CLAUDE.md and SECTIONS.md.)*
+- Trustpilot 4.9
+- PRODUCTS: 500+ Static Templates · Agency Services
+- COMPANY: Case Studies
+- CONTACT: support@mushi.agency, then the social row — Instagram · LinkedIn ·
+  TikTok · Facebook, in that left-to-right order
+- Bottom bar: Copyright © 2026 All Rights Reserved · Privacy Policy ·
+  Terms & Conditions · Refund Policy · Money-Back Guarantee
 
 ---
 
