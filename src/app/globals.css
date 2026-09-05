@@ -37,6 +37,8 @@
 
   --font-sans: var(--font-poppins);
   --font-serif: var(--font-dutch801);
+  /* Satoshi (variable) — the Konvert wordmark only; exposed as font-satoshi. */
+  --font-satoshi: var(--font-satoshi-v);
 
   /* Slow horizontal pan for animated gradient text. Pair with
      bg-[length:200%_auto]. Ported from mushi-app. */
@@ -371,6 +373,41 @@ body {
   }
 }
 
+/* ------------------------------------------------------ templates page --- */
+
+/* The /templates hero field: the design's own burst artwork ("Mask group",
+   supplied 2026-09-03), shipped verbatim as hero-burst.webp — colours,
+   brightness and sharpness are the file's, not a CSS approximation (which is
+   what the conic-gradient this replaces was). `cover` anchored to the top
+   keeps the artwork's black upper region under the header and headline; the
+   wrapper ends with the MacBook image, so the background does too — no
+   colour runs below it. */
+.tpl-bg {
+  background:
+    url("/images/templates/hero-burst.webp") center top / cover no-repeat,
+    #000;
+}
+
+/* Process step visuals: crops from the reference screenshot, so every edge is
+   a hard cut through the card's gradient. Fading all four edges (two linear
+   masks intersected, same technique as .hero-grid) dissolves the cuts into
+   the CSS gradient behind — which is sampled from the same reference, so the
+   colours meet. */
+.process-shot {
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 80%, transparent 100%);
+  -webkit-mask-repeat: no-repeat, no-repeat;
+  -webkit-mask-size: 100% 100%, 100% 100%;
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 10%, #000 80%, transparent 100%);
+  mask-repeat: no-repeat, no-repeat;
+  mask-size: 100% 100%, 100% 100%;
+  mask-composite: intersect;
+}
+
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a
    static export and the row must work with no hydration. */
 .scroll-row {
@@ -447,11 +484,16 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(
-    90deg,
-    rgba(196, 181, 253, 0.35),
-    rgba(232, 121, 249, 0.75),
-    rgba(196, 181, 253, 0.35)
+  /* Override the ring's colours per use by setting --agb-gradient on the
+     element (the /templates badge matches its ring to its gradient text). */
+  background: var(
+    --agb-gradient,
+    linear-gradient(
+      90deg,
+      rgba(196, 181, 253, 0.35),
+      rgba(232, 121, 249, 0.75),
+      rgba(196, 181, 253, 0.35)
+    )
   );
   background-size: 200% auto;
   -webkit-mask:

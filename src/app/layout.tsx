@@ -43,6 +43,19 @@ const dutch801 = localFont({
   display: "swap",
 });
 
+/**
+ * Satoshi Variable — used ONLY for the Konvert competitor wordmark in the
+ * /templates Difference section, per its Figma spec. Fontshare's free ITF
+ * license; self-hosted so the static export makes no runtime request.
+ */
+const satoshi = localFont({
+  variable: "--font-satoshi-v",
+  src: "./fonts/Satoshi-Variable.woff2",
+  weight: "300 900",
+  style: "normal",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -120,7 +133,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${dutch801.variable} h-full antialiased`}
+      className={`${poppins.variable} ${dutch801.variable} ${satoshi.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg font-sans text-white">
         <script

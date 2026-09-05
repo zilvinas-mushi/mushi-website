@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { HeroPanels } from "@/components/HeroPanels";
 import {
@@ -51,8 +52,8 @@ export default function Home() {
         <Testimonials />
         <FinalCta />
       </main>
-      {/* Footer intentionally removed — a new one is being designed. The
-          SiteFooter component stays in the repo for when it returns. */}
+      {/* The redesigned footer (2026-09-03) — shared with /templates. */}
+      <SiteFooter />
     </>
   );
 }

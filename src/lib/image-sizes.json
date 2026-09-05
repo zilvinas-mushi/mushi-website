@@ -382,5 +382,169 @@
   "case-we-interiors-v2.webp": {
     "w": 1000,
     "h": 1000
+  },
+  "templates/process-pick.webp": {
+    "w": 600,
+    "h": 378
+  },
+  "templates/process-canva.webp": {
+    "w": 242,
+    "h": 176
+  },
+  "templates/process-test.webp": {
+    "w": 253,
+    "h": 176
+  },
+  "templates/team-noah.webp": {
+    "w": 420,
+    "h": 359
+  },
+  "templates/team-urte.webp": {
+    "w": 420,
+    "h": 359
+  },
+  "templates/hero-macbook.webp": {
+    "w": 1840,
+    "h": 1152
+  },
+  "templates/cat-fashion.webp": {
+    "w": 200,
+    "h": 200
+  },
+  "templates/cat-health.webp": {
+    "w": 200,
+    "h": 200
+  },
+  "templates/cat-beauty.webp": {
+    "w": 200,
+    "h": 200
+  },
+  "templates/cat-drink.webp": {
+    "w": 200,
+    "h": 200
+  },
+  "templates/cat-food.webp": {
+    "w": 200,
+    "h": 200
+  },
+  "templates/diff-card-dark.webp": {
+    "w": 800,
+    "h": 1054
+  },
+  "templates/diff-ad-bad.webp": {
+    "w": 900,
+    "h": 706
+  },
+  "templates/diff-trashcan.webp": {
+    "w": 900,
+    "h": 940
+  },
+  "templates/diff-ad-good.webp": {
+    "w": 960,
+    "h": 990
+  },
+  "templates/diff-mushi-mark.webp": {
+    "w": 240,
+    "h": 101
+  },
+  "templates/showcase-wall.webp": {
+    "w": 2400,
+    "h": 1589
+  },
+  "templates/access-emoji-good.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "templates/access-emoji-bad.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "templates/access-rays.webp": {
+    "w": 2400,
+    "h": 267
+  },
+  "templates/icon-headset.webp": {
+    "w": 48,
+    "h": 48
+  },
+  "templates/icon-shield.webp": {
+    "w": 48,
+    "h": 48
+  },
+  "templates/icon-tools.webp": {
+    "w": 48,
+    "h": 48
+  },
+  "templates/icon-layers.webp": {
+    "w": 48,
+    "h": 48
+  },
+  "templates/icon-card.webp": {
+    "w": 48,
+    "h": 48
+  },
+  "templates/icon-target.webp": {
+    "w": 48,
+    "h": 48
+  },
+  "templates/icon-sparkles.webp": {
+    "w": 48,
+    "h": 48
+  },
+  "templates/icon-x.webp": {
+    "w": 48,
+    "h": 48
+  },
+  "templates/cmp-check.webp": {
+    "w": 40,
+    "h": 33
+  },
+  "templates/cmp-x.webp": {
+    "w": 32,
+    "h": 32
+  },
+  "templates/cmp-get-mushi.webp": {
+    "w": 260,
+    "h": 42
+  },
+  "templates/cmp-creativeos-icon.webp": {
+    "w": 48,
+    "h": 43
+  },
+  "templates/cmp-mushi.webp": {
+    "w": 240,
+    "h": 72
+  },
+  "templates/cmp-konvert.webp": {
+    "w": 240,
+    "h": 51
+  },
+  "templates/cmp-creativeos.webp": {
+    "w": 300,
+    "h": 62
+  },
+  "templates/cmp-kandy.webp": {
+    "w": 200,
+    "h": 116
+  },
+  "templates/cmp-konvert-icon.webp": {
+    "w": 196,
+    "h": 196
+  },
+  "templates/team-noah-cut.webp": {
+    "w": 420,
+    "h": 328
+  },
+  "templates/team-urte-cut.webp": {
+    "w": 420,
+    "h": 361
+  },
+  "templates/diff-ad-add.webp": {
+    "w": 500,
+    "h": 449
+  },
+  "templates/diff-can-front.webp": {
+    "w": 900,
+    "h": 595
   }
 }

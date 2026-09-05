@@ -34,9 +34,17 @@ export const BOOKING_URL = "#book-a-call";
  */
 export const BOOKING_ANCHOR = "book-a-call";
 
+/**
+ * The templates product lives in the separate webapp (see CLAUDE.md —
+ * nothing is shared with it, we only link out). Both the /templates page CTA
+ * and its header "Login" button point here.
+ */
+export const APP_URL = "https://app.mushi.agency";
+
+/** Order matters: the footer's icon discs render in this sequence. */
 export const SOCIALS = [
+  { label: "Instagram", href: "https://www.instagram.com/mushi.agency" },
   { label: "LinkedIn", href: "https://www.linkedin.com/company/mushi-agency" },
   { label: "TikTok", href: "https://www.tiktok.com/@mushi.agency" },
   { label: "Facebook", href: "https://www.facebook.com/mushi.agency" },
-  { label: "Instagram", href: "https://www.instagram.com/mushi.agency" },
 ] as const;

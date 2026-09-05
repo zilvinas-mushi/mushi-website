@@ -5,8 +5,7 @@ import { SITE_URL } from "@/lib/site";
  * Static sitemap.
  *
  * `output: 'export'` prerenders this to /sitemap.xml at build time — no server
- * involved. Add entries here as real routes appear; the home page is currently
- * the only one.
+ * involved. Add entries here as real routes appear.
  */
 /**
  * Required under `output: 'export'`. Metadata routes default to dynamic
@@ -22,6 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-07-28"),
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${SITE_URL}/templates`,
+      lastModified: new Date("2026-09-02"),
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
   ];
 }

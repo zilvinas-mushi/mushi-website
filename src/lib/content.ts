@@ -9,10 +9,15 @@
  * words; do not silently correct them.
  */
 
+/**
+ * Anchors are root-relative so the header works from /templates too — a bare
+ * "#agency" would dead-end there. On the home page the browser still treats
+ * "/#agency" as a same-document jump, so smooth scrolling is unaffected.
+ */
 export const NAV = [
-  { label: "Agency", href: "#agency" },
-  { label: "Case Studies", href: "#case-studies" },
-  { label: "Templates", href: "#templates" },
+  { label: "Agency", href: "/#agency" },
+  { label: "Case Studies", href: "/#case-studies" },
+  { label: "Templates", href: "/templates" },
 ] as const;
 
 /**
@@ -427,36 +432,329 @@ export const FINAL_CTA = {
   scarcity: "2/10 client spots left for 2026",
 } as const;
 
-export const FOOTER = {
-  giftHeading: "Want a welcome gift?",
-  /**
-   * No email provider has been chosen and there is no server to post to, so
-   * the capture input is deliberately not rendered — a form that silently
-   * discards submissions is worse than none. See design/SECTIONS.md.
+/**
+ * /templates page copy. Mirrors design/COPY.md — change there first.
+ *
+ * Built from the supplied screenshot of the Templates design (no Figma call
+ * spent). The badge count was illegible in the reference — "800+" is a
+ * placeholder flagged in COPY.md; confirm before launch.
+ */
+export const TEMPLATES_PAGE = {
+  // "500+", not the earlier "800+" guess: the count was illegible in the
+  // low-res reference, and every legible source since says 500 — the
+  // supplied MacBook artwork's own "500 Results" chip, "500 Winners in Your
+  // Drive", and "500 winner static templates".
+  badge: "500+ Static Templates",
+  heading: "Your 8-Minute Shortcut to High-ROAS Ads",
+  cta: "Take the Shortcut",
+  login: "Login",
+    /**
+   * Category tiles beside the window — decorative (aria-hidden). Pattern,
+   * size and layering follow the final hero reference (2026-09-03): one
+   * tile per side on the top row, two on the second, outer tiles cut by the
+   * viewport edge, inner second-row tiles sliding UNDER the MacBook.
+   *
+   * Positions are anchored to the CENTRE (calc(50% - Npx)), not the
+   * viewport edges: on wider screens the field stays put around the MacBook
+   * and the extra outer tiles (Food, second Drink) come into view, exactly
+   * as the wide-screen example shows. At 1440 those two sit fully outside
+   * the clip. Beauty genuinely appears three times in the reference.
    */
-  giftCta: "15 Minute Fit-Check",
+  categories: [
+    { label: "Drink", image: "templates/cat-drink.webp", pos: "left-[calc(50%_-_915px)] top-[523px]" },
+    { label: "Fashion", image: "templates/cat-fashion.webp", pos: "left-[calc(50%_-_692px)] top-[523px]" },
+    { label: "Health", image: "templates/cat-health.webp", pos: "left-[calc(50%_-_814px)] top-[719px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "left-[calc(50%_-_594px)] top-[719px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_715px)] top-[523px]" },
+    { label: "Food", image: "templates/cat-food.webp", pos: "right-[calc(50%_-_928px)] top-[523px]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_600px)] top-[719px]" },
+    { label: "Drink", image: "templates/cat-drink.webp", pos: "right-[calc(50%_-_810px)] top-[719px]" },
+  ],
+  /**
+   * "Difference" comparison section. Rebuilt 2026-09-03 (late) from the
+   * real exports: the tilted half-finished ad + trash can composition and
+   * the finished fungies ad, the dark card panel, the Mushi wordmark for
+   * the white chip, and real Kandy/CreativeOS chip SVGs. Asset paths live
+   * in TemplateSections. Konvert's chip is still a drawn stand-in — no
+   * official asset was supplied for it.
+   */
+  difference: {
+    eyebrow: "Difference",
+    heading: "Not just another Template Library",
+    bad: {
+      brands: ["Konvert", "Kandy", "CreativeOS"],
+      alt: "Competitors' half-finished ad templates dumped in a trash can",
+      lead: "Poorly Made Templates.",
+      rest: "Sold as a 5x faster way to make ads, ends up unusable once bought.",
+    },
+    good: {
+      alt: "The same ad as a finished, fully editable Mushi template for fungies cordyceps gummies",
+      lead: "High Quality Templates.",
+      rest: "No more overpromises, only 100% editable designs that are easy to use.",
+    },
+  },
+  /**
+   * FAQ. Questions from the design; ANSWERS supplied verbatim by the client
+   * (2026-09-04) — reproduce exactly, including "libraries has" and the
+   * schedule URL in the last answer.
+   */
+  faq: {
+    eyebrow: "FAQ",
+    heading: "Frequently Asked Questions",
+    items: [
+      {
+        q: "What do I get inside?",
+        a: "You get access to 500+ static ad templates designed for eCommerce brands, organized inside the Mushi platform and ready to open in Canva.",
+      },
+      {
+        q: "Why are these templates better than other static templates?",
+        a: "Most template libraries has beautiful examples, but the actual template is hard to edit and often slower to use than starting from scratch. We know that because we bought those products ourselves while trying to speed up production in our agency. That’s why we built ours differently: the template you open is just as good as the one you saw. Fully editable, production-ready, and made to save time instead of wasting it.",
+      },
+      {
+        q: "Which industries are covered?",
+        a: "This pack includes templates for 5 eCommerce industries: Health, Beauty, Food, Drink, and Fashion.",
+      },
+      {
+        q: "Do I need Canva Pro to use the templates?",
+        a: "Some templates include Pro assets, so Canva Pro may be needed to fully download the final ad. For editing, the free Canva plan is enough. But a lot of templates do not use Pro assets at all.",
+      },
+      {
+        q: "How do I access the templates after purchase?",
+        a: "After purchase, go to app.mushi.agency and enter the same email address you used when buying the subscription. You’ll receive a login code by email. Enter the code, and you’ll get access to the platform.",
+      },
+      {
+        q: "Can I use these even if I’m not a designer?",
+        a: "Yes, this product was built to be easy to use, even if you’re not a designer and if you run into any issues, you can always contact our support inside the platform.",
+      },
+      {
+        q: "Do I get new templates over time?",
+        a: "Yes, you’ll get 50+ new static templates every month.",
+      },
+      {
+        q: "Is there customer support if I need help?",
+        a: "Yes, you can contact support directly inside the platform or email support@mushi.agency.",
+      },
+      {
+        q: "Do you offer a money-back guarantee?",
+        a: "Yes, you’re covered by a 14-day money-back guarantee. If there’s anything you don’t like about the product within 14 days of purchase, just contact support inside the platform or email support@mushi.agency, and we’ll refund you.",
+      },
+      {
+        q: "Can you do the creatives for me?",
+        a: "Yes, If you want a done-for-you option, that’s exactly what our agency does. We help eCommerce, AI, and SaaS brands with creative production, so instead of getting templates you still need to edit yourself, you get new creatives produced weekly. All you need to do to get started is book a call with us here: https://www.mushi.agency/schedule.",
+      },
+    ],
+  },
+  /**
+   * "Team" note, from the eighth supplied screenshot (2026-09-03). Copy is
+   * transcribed verbatim, hyphens and all. Portraits are 88px crops of the
+   * screenshot — they display at their natural size, so unlike the other
+   * crops they are NOT upscaled; still, swap in real exports when supplied.
+   */
+  team: {
+    eyebrow: "Team",
+    heading: "Note from The Team",
+    people: [
+      {
+        name: "Noah Bakanas",
+        role: "Founder",
+        image: "templates/team-noah-cut.webp",
+        color: "#a78ae0",
+        backdrop: "linear-gradient(135deg,#8168d0 0%,#4f3694 100%)",
+      },
+      {
+        name: "Urtė Balevičiūtė",
+        role: "Product Developer",
+        image: "templates/team-urte-cut.webp",
+        color: "#d0737f",
+        backdrop: "linear-gradient(135deg,#c98a8c 0%,#96494c 100%)",
+      },
+    ],
+    notes: [
+      {
+        label: "Why we started",
+        body: "When we started building this in 2025, it wasn't because templates were trending. It was because every template product we bought had the same problem: they looked bad, took too long to customize, and often made the process slower than starting from scratch.",
+      },
+      {
+        label: "What we built",
+        body: "Over the past year, while running our agency and creating ads for clients every day, we kept testing, improving, and building a collection of 500 winning static creatives - the kind we wish we had the first time we bought templates ourselves.",
+      },
+      {
+        label: "Why it matters",
+        body: "We poured our hearts into creating a template product that is genuinely useful, actually makes the production faster, and feels worth paying for. Let's start supporting products that actually solve problems - not the ones that overpromise just to get you to buy.",
+      },
+    ],
+  },
+  /**
+   * "Comparison" table, from the seventh supplied screenshot (2026-09-03):
+   * Mushi as a raised purple column against three competitor template shops.
+   * Competitor marks are styled text + drawn glyphs (interim rule, TOKENS.md).
+   * `mushi`/`others` hold strings for value rows and booleans for
+   * feature rows (true -> check, false -> red cross).
+   */
+  comparison: {
+    eyebrow: "Comparison",
+    heading: "Best Deal on The Market",
+    competitors: ["CreativeOS", "Kandy", "Konvert"],
+    rows: [
+      { label: "Trustpilot Review Score", mushi: "4.9", others: ["3.1", "2.3", "3.3"] },
+      { label: "Lowest Starting Price", mushi: "$5", others: ["$14", "$17", "$24"] },
+      { label: "High-Quality Templates", mushi: true, others: [false, false, false] },
+      { label: "24/7 Customer Support", mushi: true, others: [false, false, false] },
+      { label: "14-Day Guarantee", mushi: true, others: [false, false, false] },
+    ] as { label: string; mushi: string | boolean; others: (string | boolean)[] }[],
+    cta: "Get Mushi",
+  },
+  /**
+   * "Access" pricing section, from the sixth supplied screenshot
+   * (2026-09-03): from-scratch pain vs the $5 template library, plus the
+   * done-for-you banner bridging to the agency. Built entirely in CSS/emoji.
+   * Right-list `icon` keys map to inline SVGs in TemplateSections.
+   */
+  access: {
+    eyebrow: "Access",
+    heading: "Save 10+ Hours Weekly",
+    scratch: {
+      emoji: "🥺",
+      title: "Ad creation from scratch",
+      sub: "This sucks…",
+      figure: "-520 hours",
+      unit: "/ year",
+      items: [
+        "Spend hours finding ad ideas",
+        "Writing everything from zero",
+        "Daily designing disasters",
+        "Harder to stay consistent",
+        "Slower creative testing",
+        "Wasted ad spend",
+        "Chaos every day",
+      ],
+      cta: "Try an Alternative",
+    },
+    templates: {
+      emoji: "😎",
+      title: "Ad creation with templates",
+      sub: "For the cost of one coffee per month.",
+      figure: "$5",
+      unit: "/ month",
+      chip: "50% Discount",
+      items: [
+        { icon: "icon-layers", label: "500 winner static templates" },
+        { icon: "icon-sparkles", label: "50+ new templates monthly" },
+        { icon: "icon-card", label: "14-day money-back guarantee" },
+        { icon: "icon-headset", label: "24/7 customer support" },
+        { icon: "icon-target", label: "5 industries covered" },
+        { icon: "icon-tools", label: "Editable in Canva" },
+        { icon: "icon-shield", label: "Secure Checkout" },
+      ],
+      cta: "Buy Now",
+    },
+    banner: {
+      emoji: "🤩",
+      title: "Done-for-you premium creatives",
+      sub: "Growth partner for eCommerce, AI, SaaS.",
+      cta: "Book Your Discovery Call",
+    },
+  },
+  /**
+   * "Showcase" section. The wall itself ships as the design's own baked
+   * composition (templates/showcase-wall.webp, supplied 2026-09-04) — no
+   * per-tile data needed anymore.
+   */
+  showcase: {
+    eyebrow: "Showcase",
+    heading: "1 cent = 1 design",
+  },
+  /**
+   * "Process" three-step section. `card` is each step's real gradient
+   * panel export (2026-09-04); `gradient` stays as its sampled CSS loading
+   * fallback. The step VISUALS are still ~250px screenshot crops (soft on
+   * retina) — real exports for those are still wanted.
+   */
+  /**
+   * "Inside" bento section, from the fourth supplied screenshot (2026-09-03).
+   * Unlike Difference/Process this one ships NO screenshot crops — every
+   * visual (memoji circles, industry chips, star tiles, laurel sprigs, the
+   * template collage) is rebuilt from CSS, emoji and the existing thumbs.
+   * The Trustpilot mark is a styled-text stand-in, same interim rule as the
+   * client logotypes in TOKENS.md.
+   */
+  inside: {
+    eyebrow: "Inside",
+    heading: "500 Winners in Your Drive",
+    support: { big: "24/7", small: "support" },
+    industries: { big: "5", small: "industries" },
+    reviews: { caption: "5 star reviews" },
+    monthly: { big: "50+ NEW", small: "templates monthly" },
+  },
+  process: {
+    eyebrow: "Process",
+    heading: "Quick to Launch, Hard to Miss",
+    steps: [
+      {
+        step: "Step One",
+        title: "Pick a Template",
+        chip: "Easy Peasy!",
+        image: "templates/process-pick.webp",
+        card: "process-card-1.webp",
+        alt: "Cursor picking a Back In Stock ad template from the Mushi library",
+        gradient: "linear-gradient(150deg,#5e3d8a 0%,#53347b 45%,#512e7e 100%)",
+      },
+      {
+        step: "Step Two",
+        title: "Customize in Canva",
+        chip: "Super fast!",
+        image: "templates/process-canva.webp",
+        card: "process-card-2.webp",
+        alt: "The same template being edited in Canva",
+        gradient: "linear-gradient(150deg,#8f3287 0%,#82296f 55%,#6d1a72 100%)",
+      },
+      {
+        step: "Step Three",
+        title: "Time to Test",
+        chip: "Smashhh!",
+        image: "templates/process-test.webp",
+        card: "process-card-3.webp",
+        alt: "Meta Ads Manager campaign list running A/B tests of the finished ad",
+        gradient: "linear-gradient(160deg,#9b5b18 0%,#a95f14 55%,#b56815 100%)",
+      },
+    ],
+  },
+} as const;
+
+/**
+ * Footer, redesigned per the ninth supplied screenshot (2026-09-03).
+ *
+ * The design shows an email capture ("Enter your email*" + Redeem). No email
+ * provider has been chosen and there is no server to post to, so the input
+ * is deliberately not rendered — a form that silently discards submissions
+ * is worse than none (design/SECTIONS.md). The Redeem CTA points at booking
+ * until a provider exists; see the enablement note in SiteFooter.
+ */
+export const FOOTER = {
+  giftHeading: "Want a mystery gift?",
+  emailPlaceholder: "Enter your email*",
+  giftCta: "Redeem",
+  trustpilot: { score: "4.9" },
   columns: [
     {
-      title: "Product",
+      title: "Products",
       links: [
-        { label: "SEO Tools, Templates", href: "#templates" },
-        { label: "Agency Services", href: "#agency" },
-      ],
-    },
-    {
-      title: "Legal",
-      links: [
-        { label: "Privacy Policy", href: "#privacy" },
-        { label: "Terms & Conditions", href: "#terms" },
-        { label: "Refund Policy", href: "#refund" },
-        { label: "Money Back Guarantee", href: "#guarantee" },
+        { label: "500+ Static Templates", href: "/templates" },
+        { label: "Agency Services", href: "/#agency" },
       ],
     },
     {
       title: "Company",
-      links: [{ label: "Case Studies", href: "#case-studies" }],
+      links: [{ label: "Case Studies", href: "/#case-studies" }],
     },
   ],
-  trustpilot: { score: "4.0", reviews: "100+ reviews" },
-  copyright: "Copyright 2026 © Mushi Agency",
+  contact: { title: "Contact", email: "support@mushi.agency" },
+  /** Placeholder anchors until the legal pages exist. */
+  legal: [
+    { label: "Privacy Policy", href: "#privacy" },
+    { label: "Terms & Conditions", href: "#terms" },
+    { label: "Refund Policy", href: "#refund" },
+    { label: "Money-Back Guarantee", href: "#guarantee" },
+  ],
+  copyright: "Copyright © 2026 All Rights Reserved",
 } as const;

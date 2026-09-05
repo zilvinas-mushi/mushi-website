@@ -106,3 +106,198 @@ staggered — left column Breezit then eany, right column Holo then we interiors
 - Trustpilot 4.0 · 100+ reviews
 - Social: LinkedIn · TikTok · Facebook · Instagram
 - Copyright 2026 © Mushi Agency
+
+---
+
+# Copy deck — Templates page
+
+Source: a screenshot of the Templates page design supplied by the user on
+2026-09-02 (no Figma call spent — the reference was 355px wide, so fine text
+was read as well as possible and flagged where illegible). Route: `/templates`.
+
+## Nav
+
+Same links as home, but the header CTA is **Login** (light button, pointing at
+app.mushi.agency) instead of Book a Call.
+
+## Hero
+
+- Badge (gradient-ringed chip): **500+ Static Templates** — ring and text
+  share one purple→orchid→salmon gradient (zoomed reference, 2026-09-03)
+  - The count was illegible in the low-res reference and first shipped as
+    "800+"; corrected 2026-09-03 — the supplied MacBook artwork's "500
+    Results" chip, "500 Winners in Your Drive" and "500 winner static
+    templates" all agree on 500.
+- **H1: Your 8-Minute Shortcut to High-ROAS Ads** *(the only `<h1>`)*
+- CTA: Take the Shortcut *(arrow icon; links to app.mushi.agency)*
+
+## App-window mockup
+
+The real MacBook artwork ("Macbook 1.png", supplied 2026-09-03, 5200x3256)
+ships as `templates/hero-macbook.webp` (1840px, eager-loaded hero visual).
+It replaced a CSS-built stand-in window; all chrome — wordmark, TEMPLATES /
+DONE FOR YOU tabs, avatar, template grid, INDUSTRY · 500 Results · SORT BY
+bar — is baked into the image.
+
+## Floating category tiles
+
+FASHION 👠 · HEALTH 🩺 · BEAUTY 🧖‍♀️ · BEAUTY 💄 · FOOD 🍔 · DRINK 🥤
+(emoji stand in for the design's category images; tiles are cropped by the
+viewport edges as in the reference)
+
+## Background
+
+Black field with four blurred colour wedges radiating from a point above the
+window: teal → gold on the right, magenta → purple on the left. Header and
+headline sit on black.
+
+## Section — Difference
+
+Source: second supplied screenshot, 2026-09-03 (914px wide, legible).
+
+- Eyebrow: ✦ DIFFERENCE ✦ *(gradient rules either side)*
+- **H2: Not just another Template Library**
+- Left card (dark): competitor chips **Konvert · Kandy · CreativeOS** over a
+  trash can of half-finished ads.
+  **Poorly Made Templates.** Sold as a 5x faster way to make ads, ends up
+  unusable once bought.
+- Right card (purple): **Mushi** chip over the same ad finished (fungies
+  cordyceps gummies).
+  **High Quality Templates.** No more overpromises, only 100% editable
+  designs that are easy to use.
+- 2026-09-03 (late): the screenshot crops were replaced with the real
+  exports — trash-can composition, tilted ad, fungies ad, dark card panel,
+  Mushi wordmark, and official Kandy + CreativeOS chip SVGs. Only Konvert's
+  chip is still a drawn stand-in (no asset supplied).
+
+## Section — Process
+
+Source: third supplied screenshot, 2026-09-03.
+
+- Eyebrow: ✦ PROCESS ✦
+- **H2: Quick to Launch, Hard to Miss** *(left-aligned under the centred eyebrow)*
+- Three step cards with arrow discs between them:
+  1. STEP ONE — **Pick a Template** — chip: Easy Peasy! *(purple card)*
+  2. STEP TWO — **Customize in Canva** — chip: Super fast! *(magenta card)*
+  3. STEP THREE — **Time to Test** — chip: Smashhh! *(orange card, Meta Ads
+     Manager table)*
+- ⚠️ Step visuals are crops of the screenshot itself
+  (`public/images/templates/process-*.webp`, ~250px wide — soft on retina).
+  Replace with real exports when supplied.
+
+## Section — Inside
+
+Source: fourth supplied screenshot, 2026-09-03.
+
+- Eyebrow: ✦ INSIDE ✦
+- **H2: 500 Winners in Your Drive** *(centred)*
+- Bento cards:
+  - **24/7** support — chip: Need help? — memoji avatar cluster
+  - **5** industries — faded rows of the category chips
+  - Trustpilot — 5 purple star tiles · ★ Trustpilot · **5 star reviews**
+  - **50+ NEW** templates monthly — collage of template thumbnails, fading out
+- Built entirely in CSS/emoji + existing thumbs — no screenshot crops.
+  Trustpilot mark is styled text (interim, same rule as client logotypes).
+
+## Section — Showcase
+
+Source: fifth supplied screenshot, 2026-09-03.
+
+- Eyebrow: ✦ SHOWCASE ✦
+- **H2: 1 cent = 1 design** *(centred)*
+- Masonry wall of ad creatives below: staggered columns, outer columns
+  cropped by the viewport edges, tiles cut at the section's bottom.
+- Tiles are the reference's own ads (Soothe, Javy, Jackson's, Hims, Lenny,
+  Olipop, Gymshark, Huel, Gadzhi, mom-to-baby, tea, Oura, Lanolips, Deep
+  Cleanse Rx), cropped from the screenshot at the client's explicit request
+  (2026-09-03) after a first version substituted Mushi's own creatives.
+- ⚠️ Crops are 70-156px wide (`templates/show-*.webp`) — soft on retina.
+  Replace with real exports at the same paths when supplied.
+
+## Section — Access
+
+Source: sixth supplied screenshot, 2026-09-03.
+
+- Eyebrow: ✦ ACCESS ✦ · **H2: Save 10+ Hours Weekly** *(centred)*
+- Left card (dark): 🥺 **Ad creation from scratch** · This sucks… ·
+  **-520 hours** / year *(red)* · ✕ Spend hours finding ad ideas · ✕ Writing
+  everything from zero · ✕ Daily designing disasters · ✕ Harder to stay
+  consistent · ✕ Slower creative testing · ✕ Wasted ad spend · ✕ Chaos every
+  day · CTA: TRY AN ALTERNATIVE *(outlined → booking)*
+- Right card (purple ring, highlighted): 😎 **Ad creation with templates** ·
+  For the cost of one coffee per month. · **$5** / month · chip: 50% DISCOUNT ·
+  500 winner static templates · 50+ new templates monthly · 14-day money-back
+  guarantee · 24/7 customer support · 5 industries covered · Editable in
+  Canva · Secure Checkout · CTA: BUY NOW *(→ app.mushi.agency)*
+- Banner: 🤩 **Done-for-you premium creatives** · Growth partner for
+  eCommerce, AI, SaaS. · CTA: BOOK YOUR DISCOVERY CALL *(→ booking)*
+
+## Section — Comparison
+
+Source: seventh supplied screenshot, 2026-09-03.
+
+- Eyebrow: ✦ COMPARISON ✦ · **H2: Best Deal on The Market** *(centred)*
+- Table: Mushi *(raised purple column)* vs CreativeOS · Kandy · Konvert
+  | Row | Mushi | CreativeOS | Kandy | Konvert |
+  |---|---|---|---|---|
+  | Trustpilot Review Score | 4.9 | 3.1 | 2.3 | 3.3 |
+  | Lowest Starting Price | $5 | $14 | $17 | $24 |
+  | High-Quality Templates | ✓ | ✕ | ✕ | ✕ |
+  | 24/7 Customer Support | ✓ | ✕ | ✕ | ✕ |
+  | 14-Day Guarantee | ✓ | ✕ | ✕ | ✕ |
+- CTA on the card's foot: **Get Mushi** *(→ app.mushi.agency)*
+- Competitor marks are styled text/glyphs (interim, as elsewhere).
+
+## Section — Team
+
+Source: eighth supplied screenshot, 2026-09-03. Copy verbatim.
+
+- Eyebrow: ✦ TEAM ✦ · **H2: Note from The Team** *(centred)*
+- People: **Noah Bakanas** — Founder *(purple)* · **Urtė Balevičiūtė** —
+  Product Developer *(rose)*
+- WHY WE STARTED — When we started building this in 2025, it wasn't because
+  templates were trending. It was because every template product we bought
+  had the same problem: they looked bad, took too long to customize, and
+  often made the process slower than starting from scratch.
+- WHAT WE BUILT — Over the past year, while running our agency and creating
+  ads for clients every day, we kept testing, improving, and building a
+  collection of 500 winning static creatives - the kind we wish we had the
+  first time we bought templates ourselves.
+- WHY IT MATTERS — We poured our hearts into creating a template product
+  that is genuinely useful, actually makes the production faster, and feels
+  worth paying for. Let's start supporting products that actually solve
+  problems - not the ones that overpromise just to get you to buy.
+- Portraits: `templates/team-*.webp`, 88px crops of the screenshot shown at
+  natural size (not upscaled); swap in real photos when supplied.
+
+## Footer (redesigned)
+
+Source: ninth supplied screenshot, 2026-09-03. Replaces the earlier footer deck.
+
+- **Want a mystery gift?** · input placeholder: Enter your email* · CTA: Redeem
+  *(input NOT rendered until an email provider exists — standing rule, see
+  SECTIONS.md; Redeem points at booking meanwhile)*
+- ★ Trustpilot **4.9** *(purple star)*
+- PRODUCTS: 500+ Static Templates *(→ /templates)* · Agency Services
+- COMPANY: Case Studies
+- CONTACT: support@mushi.agency · socials as icon discs (IG · LinkedIn ·
+  TikTok · FB)
+- Legal bar: Copyright © 2026 All Rights Reserved · Privacy Policy · Terms &
+  Conditions · Refund Policy · Money-Back Guarantee *(targets are placeholder
+  anchors until the legal pages exist)*
+
+## Section — FAQ
+
+Source: tenth supplied screenshot, 2026-09-03. Questions verbatim; the design
+shows them COLLAPSED, so the answers are NOT from any design.
+
+- Eyebrow: ✦ FAQ ✦ · **H2: Frequently Asked Questions** *(centred)*
+- Questions: What do I get inside? · Why are these templates better than
+  other static templates? · Which industries are covered? · Do I need Canva
+  Pro to use the templates? · How do I access the templates after purchase? ·
+  Can I use these even if I'm not a designer? · Do I get new templates over
+  time? · Is there customer support if I need help? · Do you offer a
+  money-back guarantee? · Can you do the creatives for me?
+- Answers supplied verbatim by the client 2026-09-04 (in content.ts) —
+  including the Canva-Pro nuance and app.mushi.agency login-code delivery.
+  The earlier drafted answers and their caveats are superseded.
