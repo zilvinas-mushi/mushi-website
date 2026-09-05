@@ -22,9 +22,8 @@ const BADGE_GRADIENT =
 export function TemplatesHero() {
   return (
     <section aria-labelledby="templates-heading" className="relative">
-      <CategoryTiles />
 
-      <div className={`${SHELL} relative z-[1] pt-10 text-center md:pt-20`}>
+      <div className={`${SHELL} relative z-[1] pt-10 text-center md:pt-[clamp(32px,7svh,80px)]`}>
         {/* Gradient-ringed chip, not the home hero's frosted white pill. Ring
             and text share ONE purple-to-salmon gradient, sampled from the
             zoomed badge reference (2026-09-03) — the ring via the
@@ -997,6 +996,8 @@ export function TemplatesDifference() {
  */
 function CategoryTiles() {
   return (
+    /* inset-0 of the MACHINE now, not of the section — see the note on
+       TEMPLATES_PAGE.categories. */
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-0 hidden xl:block"
@@ -1011,11 +1012,12 @@ function CategoryTiles() {
              tile smaller than the ones inside the MacBook screenshot beside
              it; they are meant to read as the same object.
 
-             Fluid to 230 at the 1920 reference, like the rest of this hero.
-             The floor is 170, below the old 190: the tiles flank the MacBook,
-             so holding them at 190 while the machine shrinks is what closes
-             the gap between them on a narrow desktop. */
-          className={`absolute ${c.pos} flex size-[clamp(170px,11.979vw,230px)] flex-col items-center gap-2.5 rounded-[30px] bg-[radial-gradient(circle_at_50%_50%,#393939_0%,#000000_100%)] pt-6 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]`}
+             Expressed as a SHARE OF THE MACHINE'S WIDTH — 22.8% is 230
+             against its 1010 reference — so the tile and the identical tiles
+             printed inside the screenshot stay the same size as the machine
+             resizes. A vw-based size drifted from them the moment the
+             machine stopped being 1010 wide. */
+          className={`absolute ${c.pos} flex aspect-square w-[22.8%] flex-col items-center gap-2.5 rounded-[30px] bg-[radial-gradient(circle_at_50%_50%,#393939_0%,#000000_100%)] pt-6 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]`}
         >
           <span className="text-[17px] font-semibold uppercase tracking-[0.02em] text-white">
             {c.label}
@@ -1038,7 +1040,11 @@ function AppWindow() {
   return (
     // max-w per the final hero reference: the MacBook spans ~980px at 1440,
     // which also closes the gap to the category tiles beside it.
-    <div className="relative z-[1] mx-auto mt-10 w-full max-w-[1010px] px-4 md:mt-14">
+    /* .tpl-machine is what makes the whole hero end above the fold — it sets
+       this box's width from the height the block above it did not use. See
+       the rule in globals.css. */
+    <div className="tpl-machine relative z-[1] mx-auto mt-10 w-full max-w-[1010px] px-4 md:mt-[clamp(20px,5svh,56px)] md:max-w-none md:px-0">
+      <CategoryTiles />
       {/* NO ROUNDED CLIP, NO SCALE (Žilvinas 2026-09-05: "as the mac
           screenshot attached — not you added some stupid corners").
 
@@ -1047,10 +1053,14 @@ function AppWindow() {
           SECOND set of corners at a different radius, and the `scale-[1.02]`
           that pushed the artwork's own bezel out past that clip is what made
           the two sets visibly disagree. The image goes in as it comes. */}
+      {/* relative z-[1] puts the machine ABOVE the tiles it now contains —
+          the inner second-row pair is meant to slide under it. As static
+          content it painted below every absolutely-positioned tile, which is
+          the opposite of the reference. */}
       <Img
         src="templates/hero-macbook.webp"
         alt="The Mushi template library on a MacBook: a grid of ad templates with industry filters"
-        className="w-full"
+        className="relative z-[1] w-full"
         priority
       />
     </div>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { CARD_SIZES, srcSet } from "./creative-media";
+
 /**
  * Sound is exclusive across the whole rail: unmuting one creative mutes
  * whichever one was audible before. Two ads talking over each other is the
@@ -209,6 +211,19 @@ export function CreativeVideo({
       // less time than the page takes to finish loading. It only stops the
       // lookahead from firing at a moment when there is nothing to look ahead
       // TO.
+      // ...and not at all on a metered or slow connection. The lookahead is a
+      // luxury — it buys a card that is already moving when you reach it — and
+      // it is paid for in megabytes. Save-Data is an explicit ask not to spend
+      // them, and on 2g the whole file would not arrive before the visitor had
+      // scrolled past anyway. The strict observer below still starts playback
+      // on arrival; it just fetches then rather than ahead.
+      const link = (
+        navigator as Navigator & {
+          connection?: { saveData?: boolean; effectiveType?: string };
+        }
+      ).connection;
+      if (link?.saveData || /^(slow-)?2g$/.test(link?.effectiveType ?? "")) return;
+
       const install = () => {
         warm = new IntersectionObserver(
           (entries) => {
@@ -304,6 +319,8 @@ export function CreativeVideo({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`/images/${image}`}
+        srcSet={srcSet(image)}
+        sizes={CARD_SIZES}
         alt={alt}
         width={w}
         height={h}

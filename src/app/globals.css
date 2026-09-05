@@ -784,6 +784,68 @@ html[data-canvas="footer"] body {
     #000;
 }
 
+/*
+  THE WHOLE HERO — badge, headline, CTA and the MacBook down to its last
+  pixel — HAS TO FIT ONE SCREEN AT 100% ZOOM, on any laptop
+  (Žilvinas 2026-09-05). It did not: the block above the machine is sized from
+  the viewport's WIDTH, so on a wide-but-short laptop (1512 x 850 is the
+  common one) the machine started below the fold's remaining room and its
+  bottom edge fell off the screen.
+
+  The type does NOT take the squeeze. Those sizes are the artboard's, measured
+  and signed off the same day, and a headline that shrinks because a window is
+  short is the bug the home page's --hero-w exists to avoid. The MACHINE takes
+  it instead: it is the one element with slack, and it is the element that has
+  to be seen whole.
+
+  So its WIDTH is driven by the height left over. --tpl-above is everything
+  stacked above it, each term the same clamp the element itself uses — change
+  one there and it must change here, which is why they are written out rather
+  than rolled into a single number:
+
+    header      var(--header-h)
+    section     clamp(32, 7svh, 80)
+    badge       38   (14px label + py-2)
+    -> headline clamp(24, 2.0833vw, 40)
+    headline    2 x clamp(44, 4.1667vw, 80)   two authored lines
+    -> CTA      clamp(32, 3.6458vw, 70)
+    CTA         clamp(56, 5vw, 96)
+    -> machine  clamp(20, 5svh, 56)
+    tail        16   so the edge is not flush against the fold
+
+  The two PADDINGS are the only things that give way on a short window — 80
+  above the badge and 56 above the machine are the artboard's air, not its
+  content, and spending them buys the machine ~90px of width back. The type
+  and the four measured gaps do not move: they are the numbers off the
+  artboard, signed off the same day.
+
+  0.62625 is the artwork's own 1503/2400, so dividing the leftover height by
+  it turns "how much room is left" into "how wide the machine may be". The
+  1010 ceiling is the reference width from the artboard; 100% keeps it inside
+  the column on a narrow window. Whichever is smallest wins.
+
+  Phones are exempt — they scroll, and the machine there is already narrower
+  than the column.
+*/
+@media (min-width: 768px) {
+  .tpl-machine {
+    --tpl-above: calc(
+      var(--header-h) + clamp(32px, 7svh, 80px) + 38px +
+        clamp(24px, 2.0833vw, 40px) + 2 * clamp(44px, 4.1667vw, 80px) +
+        clamp(32px, 3.6458vw, 70px) + clamp(56px, 5vw, 96px) +
+        clamp(20px, 5svh, 56px) + 16px
+    );
+    /* The 420 floor is the give-up point: on a window too short for even
+       that, the machine runs past the fold rather than shrinking to a
+       thumbnail. Nothing between 768 and ~600 tall hits it. */
+    width: min(
+      1010px,
+      max(420px, calc((100svh - var(--tpl-above)) / 0.62625)),
+      100%
+    );
+  }
+}
+
 /* Process step visuals: crops from the reference screenshot, so every edge is
    a hard cut through the card's gradient. Fading all four edges (two linear
    masks intersected, same technique as .hero-grid) dissolves the cuts into

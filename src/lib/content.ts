@@ -383,7 +383,7 @@ export const SOCIAL_PROOF = {
      */
     { name: "superior care.pet", logo: "superior-care.svg", w: 528, h: 183, tall: true },
     { name: "Holo", logo: "holo.svg", w: 62, h: 25 },
-    { name: "we interiors", logo: "we-interiors.webp", w: 849, h: 153 },
+    { name: "we interiors", logo: "we-interiors.webp", w: 400, h: 72 },
     { name: "Breezit", logo: "breezit.svg", w: 98, h: 25 },
     { name: "Unive", logo: "unive.svg", w: 95, h: 26 },
     { name: "SE Ranking", logo: "se-ranking.svg", w: 101, h: 25 },
@@ -455,8 +455,8 @@ export const CREATIVES = {
       caption: "AI Agents Comparison Video Ad",
       image: "sintra-soshie-ad.webp",
       video: "sintra-soshie-ad.mp4",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "sintra-logo.webp",
       verified: true,
     },
@@ -464,8 +464,8 @@ export const CREATIVES = {
       handle: "celemi",
       caption: "Minimalistic Skincare Static Ad",
       image: "celemi-pouch.webp",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "celemi-logo.webp",
     },
     {
@@ -473,8 +473,8 @@ export const CREATIVES = {
       caption: "AI Marketing UGC Video Ad",
       image: "tryholo-10x.webp",
       video: "tryholo-10x.mp4",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "tryholo-logo.webp",
       verified: true,
     },
@@ -482,8 +482,8 @@ export const CREATIVES = {
       handle: "tevaplanter",
       caption: "Planter Comparison Static Ad",
       image: "tevaplanter-ad.webp",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "tevaplanter-logo.webp",
     },
 
@@ -506,8 +506,8 @@ export const CREATIVES = {
       caption: "Dog Food Voiceover Video Ad",
       image: "dogfood-real-results.webp",
       video: "dogfood-real-results.mp4",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "superiorcarepet-logo.webp",
       verified: true,
     },
@@ -515,8 +515,8 @@ export const CREATIVES = {
       handle: "unive",
       caption: "Dream College Tool Static Ad",
       image: "unive-dream-college.webp",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "unive-logo.webp",
       verified: true,
     },
@@ -525,16 +525,16 @@ export const CREATIVES = {
       caption: "Serum Product Video Ad",
       image: "celemi-serum.webp",
       video: "celemi-serum.mp4",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "celemi-logo.webp",
     },
     {
       handle: "bluechew",
       caption: "Tablet Benefit Static Ad",
       image: "bluechew.webp",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "bluechew-logo.webp",
       verified: true,
     },
@@ -543,8 +543,8 @@ export const CREATIVES = {
       caption: "Booth Storytelling Video Ad",
       image: "used-by-10000.webp",
       video: "used-by-10000.mp4",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "persybooths-logo.webp",
       verified: true,
     },
@@ -552,8 +552,8 @@ export const CREATIVES = {
       handle: "sintra.ai",
       caption: "3D Character Hook Video Ad",
       image: "sintra-soshie.webp",
-      w: 800,
-      h: 1418,
+      w: 900,
+      h: 1595,
       avatar: "sintra-logo.webp",
       verified: true,
     },
@@ -915,21 +915,34 @@ export const TEMPLATES_PAGE = {
    * tile per side on the top row, two on the second, outer tiles cut by the
    * viewport edge, inner second-row tiles sliding UNDER the MacBook.
    *
-   * Positions are anchored to the CENTRE (calc(50% - Npx)), not the
-   * viewport edges: on wider screens the field stays put around the MacBook
-   * and the extra outer tiles (Food, second Drink) come into view, exactly
-   * as the wide-screen example shows. At 1440 those two sit fully outside
-   * the clip. Beauty genuinely appears three times in the reference.
+   * EVERY OFFSET IS A PERCENTAGE OF THE MACBOOK'S OWN WIDTH, and the tiles
+   * are positioned inside its box rather than the section's (Žilvinas
+   * 2026-09-05, "every laptop should see till the end of the mac").
+   *
+   * They were px offsets from the section's centre with fixed `top`s, which
+   * held only while the machine was a fixed 1010 wide. It is not any more —
+   * on a short window its width is now whatever the leftover height allows,
+   * so anything pinned in px drifted away from it: the tiles kept their
+   * places while the machine shrank out from under them.
+   *
+   * As percentages the whole cluster is one object with the machine. The
+   * pattern is unchanged: one tile per side on the top row, two on the
+   * second, the outer ones cut by the viewport edge and the inner
+   * second-row pair sliding UNDER the machine. Beauty genuinely appears
+   * three times in the reference.
+   *
+   * Rows sit at 13.5% and 36.9% of that width — the second is the first
+   * plus a tile (22.8%) and the reference's hairline gap.
    */
   categories: [
-    { label: "Drink", image: "templates/cat-drink.webp", pos: "left-[calc(50%_-_915px)] top-[523px]" },
-    { label: "Fashion", image: "templates/cat-fashion.webp", pos: "left-[calc(50%_-_692px)] top-[523px]" },
-    { label: "Health", image: "templates/cat-health.webp", pos: "left-[calc(50%_-_814px)] top-[719px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "left-[calc(50%_-_594px)] top-[719px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_715px)] top-[523px]" },
-    { label: "Food", image: "templates/cat-food.webp", pos: "right-[calc(50%_-_928px)] top-[523px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_600px)] top-[719px]" },
-    { label: "Drink", image: "templates/cat-drink.webp", pos: "right-[calc(50%_-_810px)] top-[719px]" },
+    { label: "Drink", image: "templates/cat-drink.webp", pos: "left-[-40.6%] top-[13.5%]" },
+    { label: "Fashion", image: "templates/cat-fashion.webp", pos: "left-[-18.5%] top-[13.5%]" },
+    { label: "Health", image: "templates/cat-health.webp", pos: "left-[-30.6%] top-[36.9%]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "left-[-8.8%] top-[36.9%]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[-20.8%] top-[13.5%]" },
+    { label: "Food", image: "templates/cat-food.webp", pos: "right-[-41.9%] top-[13.5%]" },
+    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[-9.4%] top-[36.9%]" },
+    { label: "Drink", image: "templates/cat-drink.webp", pos: "right-[-30.2%] top-[36.9%]" },
   ],
   /**
    * "Difference" comparison section. Rebuilt 2026-09-03 (late) from the

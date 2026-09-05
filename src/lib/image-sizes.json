@@ -23,13 +23,29 @@
     "w": 800,
     "h": 800
   },
+  "background-light.webp": {
+    "w": 1600,
+    "h": 1600
+  },
+  "bluechew-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "bluechew.webp": {
+    "w": 900,
+    "h": 1595
+  },
   "case-breezit-cut.webp": {
     "w": 1000,
     "h": 1000
   },
+  "case-breezit-v2-sm.webp": {
+    "w": 700,
+    "h": 700
+  },
   "case-breezit-v2.webp": {
-    "w": 1950,
-    "h": 1950
+    "w": 1200,
+    "h": 1200
   },
   "case-breezit.webp": {
     "w": 1000,
@@ -39,9 +55,13 @@
     "w": 1000,
     "h": 1000
   },
+  "case-eany-v2-sm.webp": {
+    "w": 700,
+    "h": 700
+  },
   "case-eany-v2.webp": {
-    "w": 1950,
-    "h": 1950
+    "w": 1200,
+    "h": 1200
   },
   "case-eany.webp": {
     "w": 1000,
@@ -51,9 +71,13 @@
     "w": 1000,
     "h": 1000
   },
+  "case-holo-v2-sm.webp": {
+    "w": 700,
+    "h": 700
+  },
   "case-holo-v2.webp": {
-    "w": 1950,
-    "h": 1950
+    "w": 1200,
+    "h": 1200
   },
   "case-holo.webp": {
     "w": 1000,
@@ -64,44 +88,52 @@
     "h": 680
   },
   "case-we-interiors-v2.webp": {
-    "w": 1000,
-    "h": 1000
+    "w": 680,
+    "h": 680
+  },
+  "case-we-interiors-v4-sm.webp": {
+    "w": 700,
+    "h": 694
   },
   "case-we-interiors-v4.webp": {
-    "w": 1950,
-    "h": 1933
+    "w": 1200,
+    "h": 1190
   },
-  "deividas-kovger1.svg": {
-    "w": 80,
-    "h": 80
+  "celemi-pouch-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "celemi-pouch.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "celemi-serum-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "celemi-serum.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "cta-card-phone.webp": {
+    "w": 1380,
+    "h": 1280
   },
   "deividas-kovger2.webp": {
     "w": 400,
     "h": 400
   },
-  "ellipse192.svg": {
-    "w": 26,
-    "h": 26
+  "dogfood-real-results-sm.webp": {
+    "w": 512,
+    "h": 908
   },
-  "ellipse198.svg": {
-    "w": 45,
-    "h": 45
+  "dogfood-real-results.webp": {
+    "w": 900,
+    "h": 1595
   },
-  "ellipse2.svg": {
-    "w": 45,
-    "h": 45
-  },
-  "ellipse201.svg": {
-    "w": 40,
-    "h": 40
-  },
-  "ellipse3.svg": {
-    "w": 50,
-    "h": 50
-  },
-  "ellipse54.svg": {
-    "w": 80,
-    "h": 80
+  "effects-layer.webp": {
+    "w": 2400,
+    "h": 1696
   },
   "emoji-sunglasses.png": {
     "w": 160,
@@ -111,61 +143,17 @@
     "w": 800,
     "h": 800
   },
-  "group.svg": {
-    "w": 98,
-    "h": 24
-  },
-  "group1.svg": {
-    "w": 126,
-    "h": 25
-  },
-  "group156.svg": {
-    "w": 160,
-    "h": 21
-  },
-  "group1707479581.svg": {
-    "w": 161,
-    "h": 21
-  },
-  "group1707479587.svg": {
-    "w": 101,
-    "h": 25
-  },
-  "group1707479591.svg": {
-    "w": 95,
-    "h": 25
-  },
-  "group1707479592.svg": {
-    "w": 95,
-    "h": 25
-  },
-  "group2.svg": {
-    "w": 126,
-    "h": 25
-  },
   "hana-skomra-budre1.webp": {
     "w": 800,
     "h": 800
   },
-  "icon.svg": {
-    "w": 17,
-    "h": 17
+  "hero-light-mobile.webp": {
+    "w": 640,
+    "h": 1539
   },
-  "icon1.svg": {
-    "w": 16,
-    "h": 28
-  },
-  "icon2.svg": {
-    "w": 16,
-    "h": 28
-  },
-  "icon3.svg": {
-    "w": 18,
-    "h": 13
-  },
-  "icon4.svg": {
-    "w": 16,
-    "h": 16
+  "hero-light.webp": {
+    "w": 1920,
+    "h": 1080
   },
   "image139.webp": {
     "w": 631,
@@ -183,10 +171,6 @@
     "w": 538,
     "h": 952
   },
-  "image154.svg": {
-    "w": 34,
-    "h": 29
-  },
   "image155.webp": {
     "w": 691,
     "h": 361
@@ -194,10 +178,6 @@
   "image239.webp": {
     "w": 1600,
     "h": 924
-  },
-  "image240.svg": {
-    "w": 680,
-    "h": 680
   },
   "image271.webp": {
     "w": 150,
@@ -255,34 +235,6 @@
     "w": 800,
     "h": 800
   },
-  "line11.svg": {
-    "w": 450,
-    "h": 2
-  },
-  "line20.svg": {
-    "w": 450,
-    "h": 2
-  },
-  "line213.svg": {
-    "w": 26,
-    "h": 2
-  },
-  "line214.svg": {
-    "w": 12,
-    "h": 2
-  },
-  "line215.svg": {
-    "w": 12,
-    "h": 2
-  },
-  "line218.svg": {
-    "w": 1116,
-    "h": 4
-  },
-  "line234.svg": {
-    "w": 150,
-    "h": 1
-  },
   "logo-without-bg-white102.webp": {
     "w": 672,
     "h": 199
@@ -291,17 +243,17 @@
     "w": 80,
     "h": 80
   },
-  "mask-group.svg": {
-    "w": 1380,
-    "h": 842
+  "macbook-clean.webp": {
+    "w": 680,
+    "h": 674
   },
-  "rectangle157.svg": {
-    "w": 269,
-    "h": 248
+  "og-mushi-wide.jpg": {
+    "w": 1200,
+    "h": 630
   },
-  "rectangle161.svg": {
-    "w": 301,
-    "h": 234
+  "og-mushi.jpg": {
+    "w": 1200,
+    "h": 1200
   },
   "rectangle161124919.webp": {
     "w": 90,
@@ -322,10 +274,6 @@
   "rectangle161125111.webp": {
     "w": 1600,
     "h": 1600
-  },
-  "rectangle161125184.svg": {
-    "w": 417,
-    "h": 45
   },
   "rectangle161125186.webp": {
     "w": 145,
@@ -355,10 +303,6 @@
     "w": 425,
     "h": 77
   },
-  "rectangle161125763.svg": {
-    "w": 680,
-    "h": 680
-  },
   "rectangle161125764.webp": {
     "w": 960,
     "h": 1914
@@ -367,41 +311,41 @@
     "w": 960,
     "h": 1913
   },
-  "rectangle161126030.svg": {
-    "w": 1920,
-    "h": 1080
-  },
-  "rectangle482.svg": {
-    "w": 1636,
-    "h": 1216
-  },
   "screenshot202604071536181.webp": {
     "w": 960,
     "h": 1775
   },
-  "star-x2.svg": {
-    "w": 35,
-    "h": 35
+  "sintra-soshie-ad-sm.webp": {
+    "w": 512,
+    "h": 908
   },
-  "star-x3.svg": {
-    "w": 36,
-    "h": 35
+  "sintra-soshie-ad.webp": {
+    "w": 900,
+    "h": 1595
   },
-  "star-x4.svg": {
-    "w": 34,
-    "h": 35
+  "sintra-soshie-sm.webp": {
+    "w": 512,
+    "h": 908
   },
-  "star-x5.svg": {
-    "w": 35,
-    "h": 35
+  "sintra-soshie.webp": {
+    "w": 900,
+    "h": 1595
   },
-  "star-x6.svg": {
-    "w": 36,
-    "h": 35
+  "templates/access-btn-dark.webp": {
+    "w": 1100,
+    "h": 195
   },
-  "star-x7.svg": {
-    "w": 34,
-    "h": 35
+  "templates/access-btn-purple.webp": {
+    "w": 1100,
+    "h": 205
+  },
+  "templates/access-card-dark.webp": {
+    "w": 760,
+    "h": 988
+  },
+  "templates/access-card-purple.webp": {
+    "w": 760,
+    "h": 988
   },
   "templates/access-emoji-bad.webp": {
     "w": 96,
@@ -467,9 +411,21 @@
     "w": 240,
     "h": 72
   },
+  "templates/cmp-row-band.webp": {
+    "w": 1600,
+    "h": 244
+  },
   "templates/cmp-x.webp": {
     "w": 32,
     "h": 32
+  },
+  "templates/compare-card.webp": {
+    "w": 600,
+    "h": 1237
+  },
+  "templates/cta-arrow.png": {
+    "w": 88,
+    "h": 79
   },
   "templates/diff-ad-add.webp": {
     "w": 500,
@@ -498,6 +454,10 @@
   "templates/diff-trashcan.webp": {
     "w": 900,
     "h": 940
+  },
+  "templates/hero-burst.webp": {
+    "w": 2400,
+    "h": 1720
   },
   "templates/hero-macbook.webp": {
     "w": 2400,
@@ -535,9 +495,37 @@
     "w": 48,
     "h": 48
   },
+  "templates/inside-industries.webp": {
+    "w": 1000,
+    "h": 708
+  },
+  "templates/inside-monthly.webp": {
+    "w": 800,
+    "h": 1078
+  },
+  "templates/inside-support.webp": {
+    "w": 1000,
+    "h": 708
+  },
+  "templates/laurel-mask.webp": {
+    "w": 1200,
+    "h": 506
+  },
   "templates/process-canva.webp": {
     "w": 242,
     "h": 176
+  },
+  "templates/process-card-1.webp": {
+    "w": 500,
+    "h": 1183
+  },
+  "templates/process-card-2.webp": {
+    "w": 500,
+    "h": 1183
+  },
+  "templates/process-card-3.webp": {
+    "w": 500,
+    "h": 1183
   },
   "templates/process-pick.webp": {
     "w": 600,
@@ -567,24 +555,40 @@
     "w": 420,
     "h": 359
   },
+  "tevaplanter-ad-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "tevaplanter-ad.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "tryholo-10x-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "tryholo-10x.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "unive-dream-college-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "unive-dream-college.webp": {
+    "w": 900,
+    "h": 1595
+  },
   "untitled2.webp": {
     "w": 1600,
     "h": 1600
   },
-  "vector.svg": {
-    "w": 79,
-    "h": 25
+  "used-by-10000-sm.webp": {
+    "w": 512,
+    "h": 908
   },
-  "vector1.svg": {
-    "w": 10,
-    "h": 19
-  },
-  "vector2.svg": {
-    "w": 9,
-    "h": 19
-  },
-  "vector4.svg": {
-    "w": 10,
-    "h": 19
+  "used-by-10000.webp": {
+    "w": 900,
+    "h": 1595
   }
 }

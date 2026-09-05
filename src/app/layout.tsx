@@ -66,6 +66,13 @@ const satoshi = localFont({
   weight: "300 900",
   style: "normal",
   display: "swap",
+  // Declared here because the variable belongs on <html>, but it draws ONE
+  // wordmark on /templates and nothing at all on the home page — where
+  // next/font's default preload still put 42 KB of it on the wire at high
+  // priority, ahead of the stylesheet the hero's headline is blocked on.
+  // Without the preload it is fetched from the @font-face rule, on the page
+  // that actually uses it.
+  preload: false,
 });
 
 export const metadata: Metadata = {

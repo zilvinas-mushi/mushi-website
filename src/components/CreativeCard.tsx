@@ -1,5 +1,6 @@
 import type { Creative } from "@/lib/content";
 import { CreativeVideo } from "./CreativeVideo";
+import { CARD_SIZES, srcSet } from "./creative-media";
 
 /**
  * Instagram-post card used in the creatives rail.
@@ -128,6 +129,8 @@ export function CreativeCard({ item }: { item: Creative }) {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={`/images/${item.image}`}
+          srcSet={srcSet(item.image)}
+          sizes={CARD_SIZES}
           alt={media}
           width={item.w}
           height={item.h}

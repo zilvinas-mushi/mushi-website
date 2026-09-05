@@ -765,6 +765,11 @@ export function CaseStudies() {
                   <Img
                     src={item.image}
                     alt={`${item.brand} campaign work by Mushi`}
+                    // The card is the full column: ~92vw on a phone (343 of
+                    // 375 on the artboard) and ~32vw from sm up, where the two
+                    // columns split the shell. That is what picks the -sm half
+                    // of the pair for a phone instead of the 1200 master.
+                    sizes="(min-width: 640px) 32vw, 92vw"
                     className="size-full object-cover object-center"
                   />
                   {/* Nothing sits over the artwork. Figma bakes a flat plate
