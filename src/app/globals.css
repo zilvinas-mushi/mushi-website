@@ -923,11 +923,24 @@ html[data-canvas="footer"] body {
    (Žilvinas 2026-09-06) rather than ending on a hard vertical edge: the
    artboard shows the violet and the salmon fading out under the name. Mask,
    not an overlay, so it works whatever the plate's own gradient is. */
+/* Both of these carry their colours as custom properties (see the note where
+   they are set): an inline `background` or `color` would win over the rule the
+   breakpoint switches, which is exactly what kept the phone on the desktop's
+   ramp. */
+.role-gradient {
+  color: var(--role-color);
+}
+
+.team-portrait-fade {
+  background-image: var(--plate-desktop);
+}
+
 @media (max-width: 767px) {
   /* The role reads as a gradient on the phone (Figma fill panel); above md it
      keeps the flat colour the desktop reference was signed off with. */
   .role-gradient {
     background-image: var(--role-gradient);
+    -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }

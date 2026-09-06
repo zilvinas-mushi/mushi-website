@@ -461,9 +461,13 @@ export function TemplatesTeam() {
                     // laps over its right edge, which is the artboard's own
                     // construction.
                     className="team-portrait-fade absolute inset-y-0 left-0 w-[65px] overflow-hidden rounded-l-[15px] sm:inset-0 sm:w-auto sm:rounded-l-[14px]"
+                    // Every colour here goes through a custom property, and
+                    // none of them is set as a plain declaration: an inline
+                    // `background` or `color` beats the class that the
+                    // breakpoint switches, so the phone's ramp never landed.
                     style={
                       {
-                        background: p.backdrop,
+                        "--plate-desktop": p.backdrop,
                         "--plate-top": p.plate[0],
                         "--plate-bottom": p.plate[1],
                       } as CSSProperties
@@ -487,7 +491,7 @@ export function TemplatesTeam() {
                     className="role-gradient mt-0.5 text-[16px] font-normal leading-tight md:text-[15px] md:font-medium"
                     style={
                       {
-                        color: p.color,
+                        "--role-color": p.color,
                         "--role-gradient": p.roleGradient,
                       } as CSSProperties
                     }
