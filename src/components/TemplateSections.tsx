@@ -209,7 +209,10 @@ function BreakBefore({ text, word }: { text: string; word: string }) {
   if (at < 1) return <>{text}</>;
   return (
     <>
-      {text.slice(0, at).trimEnd()}
+      {/* The space STAYS in the text — desktop needs it, since its break is
+          hidden, and on the phone a trailing space before a <br> collapses.
+          A trimEnd here once glued "premium creatives" into one word. */}
+      {text.slice(0, at)}
       <br className="md:hidden" />
       {text.slice(at)}
     </>
@@ -446,7 +449,7 @@ export function TemplatesTeam() {
             121-tall plate with a 113-wide portrait; the panel around them keeps
             its 20 radius but tightens to a 15 pad. Everything below md is the
             same markup the desktop uses — only the numbers change. */}
-        <div className="mx-auto mt-[37px] max-w-[880px] rounded-[20px] bg-[#141414] p-[15px] pb-[25px] md:mt-12 md:p-8">
+        <div className="mx-auto mt-[37px] max-w-[880px] rounded-[16px] bg-[#111111] p-[15px] pb-[25px] md:mt-12 md:p-8">
           <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
             {t.people.map((p) => (
               <div
@@ -479,7 +482,7 @@ export function TemplatesTeam() {
                     <Img
                       src={p.image}
                       alt={`${p.name}, ${p.role} at Mushi`}
-                      className="mx-auto h-[135px] w-auto max-w-none sm:h-[140px]"
+                      className="mx-auto h-[135px] w-auto max-w-none sm:h-[160px]"
                     />
                   </span>
                 </span>
@@ -965,13 +968,14 @@ export function TemplatesAccess() {
               className="rounded-[10px]"
             />
             <div>
-              {/* 16/16 SemiBold, and the phone banner carries the title
-                  ALONE — the artboard drops the caption there, where the
-                  title already wraps to two lines. */}
-              <p className="text-[16px] font-semibold leading-4 text-white">
+              {/* Phone: 16/16 SemiBold, title ALONE — the artboard drops
+                  the caption there, where the title already wraps to two
+                  lines. Desktop: the Figma panel's own 32.01 SemiBold over
+                  23.61 Regular (client 2026-09-07). */}
+              <p className="text-[16px] font-semibold leading-4 text-white md:text-[32px] md:leading-tight">
                 <BreakBefore text={a.banner.title} word="creatives" />
               </p>
-              <p className="hidden text-[13px] text-white/45 md:block">{a.banner.sub}</p>
+              <p className="hidden text-[13px] font-normal text-white/45 md:block md:text-[23.61px] md:leading-snug">{a.banner.sub}</p>
             </div>
           </div>
           <a
