@@ -451,9 +451,13 @@
     "w": 800,
     "h": 1054
   },
-  "templates/diff-mushi-mark.webp": {
+  "templates/diff-mushi-mark-phone.webp": {
     "w": 190,
     "h": 56
+  },
+  "templates/diff-mushi-mark.webp": {
+    "w": 240,
+    "h": 101
   },
   "templates/diff-trashcan.webp": {
     "w": 1200,
@@ -540,8 +544,8 @@
     "h": 78
   },
   "templates/process-canva.webp": {
-    "w": 1035,
-    "h": 1114
+    "w": 242,
+    "h": 176
   },
   "templates/process-card-1.webp": {
     "w": 500,
@@ -568,8 +572,8 @@
     "h": 378
   },
   "templates/process-test.webp": {
-    "w": 1035,
-    "h": 1035
+    "w": 253,
+    "h": 176
   },
   "templates/showcase-wall-phone.webp": {
     "w": 1125,

@@ -1282,16 +1282,23 @@ export function TemplatesDifference() {
                 reference keeps its 36-tall pill. */}
             <div className="flex justify-center">
               <span className="flex h-[26px] items-center rounded-[6px] bg-white px-[7px] md:h-9 md:rounded-[10px] md:px-4">
-                {/* 14 tall inside the 26 pill, which with the 7 gutters is
-                    the artboard's 62 x 26. The file was trimmed to the
-                    wordmark's ink (it shipped with ~45% transparent margin,
-                    so a height set on the BOX drew a much smaller word); the
-                    desktop's 53 is the old 68 less that margin. */}
+                {/* TWO FILES, one mark. The phone draws it 14 tall inside the
+                    26 pill (with the 7 gutters, the artboard's 62 x 26), and
+                    a height set on the export as supplied would spend most of
+                    that on its ~45% transparent margin — so the phone gets a
+                    copy trimmed to the ink. The desktop keeps the file it was
+                    signed off with, at its own 68. */}
+                <Img
+                  src="templates/diff-mushi-mark-phone.webp"
+                  alt="Mushi"
+                  width={47}
+                  className="h-[14px] w-auto md:hidden"
+                />
                 <Img
                   src="templates/diff-mushi-mark.webp"
                   alt="Mushi"
-                  width={53}
-                  className="h-[14px] w-auto md:h-auto md:w-[53px]"
+                  width={68}
+                  className="hidden md:block"
                 />
               </span>
             </div>
