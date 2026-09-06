@@ -135,6 +135,15 @@ export function TemplatesHero() {
  * 0% letter spacing, centred — filled with the hero badge's
  * purple-to-salmon gradient, per the client's palette instruction.
  */
+/**
+ * The eyebrow's own fill, sampled from the supplied "INSIDE.png" export
+ * (2026-09-07): violet #a167c4 through orchid into pink #ce76a6, Poppins
+ * Regular 30. The desktop rules and diamonds carry the ramp's end colours;
+ * the phone keeps its exported rule artwork.
+ */
+const EYEBROW_GRADIENT =
+  "linear-gradient(90deg,#a167c4 0%,#b66fca 30%,#cc76b9 70%,#ce76a6 100%)";
+
 function SectionEyebrow({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-center gap-4">
@@ -152,31 +161,33 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
 
       <span
         aria-hidden="true"
-        className="hidden h-px w-16 bg-gradient-to-r from-transparent via-[#7b5bbd] to-[#d0777b] md:block md:w-28"
+        className="hidden h-px w-16 bg-gradient-to-r from-transparent via-[#a167c4] to-[#b66fca] md:block md:w-28"
       />
       <span
         aria-hidden="true"
-        className="hidden text-[13px] leading-none text-[#cc77d1] md:inline"
+        className="hidden text-[13px] leading-none text-[#c273c0] md:inline"
       >
         ✦
       </span>
       {/* Poppins Regular 18 on the phone (artboard 2026-09-06), 30 at the
           desktop reference. */}
+      {/* Figma panel 2026-09-07: Poppins Regular 30 over an 80 line height
+          at the desktop reference; the phone keeps its artboard's 18. */}
       <p
-        className="bg-clip-text text-[18px] font-normal uppercase leading-none text-transparent md:text-[30px]"
-        style={{ backgroundImage: BADGE_GRADIENT }}
+        className="bg-clip-text text-[18px] font-normal uppercase leading-none text-transparent md:text-[21px]"
+        style={{ backgroundImage: EYEBROW_GRADIENT }}
       >
         {children}
       </p>
       <span
         aria-hidden="true"
-        className="hidden text-[13px] leading-none text-[#cc77d1] md:inline"
+        className="hidden text-[13px] leading-none text-[#c273c0] md:inline"
       >
         ✦
       </span>
       <span
         aria-hidden="true"
-        className="hidden h-px w-16 bg-gradient-to-l from-transparent via-[#7b5bbd] to-[#d0777b] md:block md:w-28"
+        className="hidden h-px w-16 bg-gradient-to-l from-transparent via-[#ce76a6] to-[#cc76b9] md:block md:w-28"
       />
 
       <Img src="templates/eyebrow-right.webp" alt="" width={117} className="md:hidden" />
@@ -224,9 +235,12 @@ function BreakAtComma({ text }: { text: string }) {
   if (at < 0) return <>{text}</>;
   return (
     <>
+      {/* The space after the comma STAYS in the text — desktop hides the
+          break, and a leading space collapses after a <br> on the phone.
+          Slicing it out glued "Launch,Hard" together. */}
       {text.slice(0, at + 1)}
       <br className="md:hidden" />
-      {text.slice(at + 2)}
+      {text.slice(at + 1)}
     </>
   );
 }
@@ -281,22 +295,27 @@ export function TemplatesProcess() {
                 </span>
               )}
               {i > 0 && (
+                /* Per "Group 166" (2026-09-07): a solid black outer disc
+                   with a #191919 inner one at 71% and a white right arrow —
+                   the phone join's own construction turned sideways. */
                 <span
                   aria-hidden="true"
-                  className="absolute -left-[26px] top-1/2 z-10 hidden size-[44px] -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[#0d0c11] shadow-[0_10px_30px_-8px_rgba(0,0,0,0.9)] md:flex"
+                  className="absolute -left-[29px] top-1/2 z-10 hidden size-[50px] -translate-y-1/2 items-center justify-center rounded-full bg-black md:flex"
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    strokeWidth="2.4"
-                    className="size-[20px] stroke-white"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 12h13M13 6l6 6-6 6"
-                    />
-                  </svg>
+                  <span className="flex size-[36px] items-center justify-center rounded-full bg-[#191919]">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      strokeWidth="2.4"
+                      className="size-[16px] stroke-white"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 12h13M13 6l6 6-6 6"
+                      />
+                    </svg>
+                  </span>
                 </span>
               )}
               <article
@@ -333,20 +352,21 @@ export function TemplatesProcess() {
                 {/* Negative margins run the visual to the card's edges; the
                     chip floats over its faded bottom. */}
                 {/* Where the artboard supplies the card as ONE flattened
-                    render, that render IS the card on the phone: it lies
-                    under the type at full bleed and the shot below is left to
-                    the desktop. Figma's blur-and-fade over the screenshot
+                    render, that render IS the card — on EVERY size since the
+                    client's 2026-09-07 exports (it lies under the type at
+                    full bleed); the crop-based shot below serves only steps
+                    without one. Figma's blur-and-fade over the screenshot
                     came out close but never identical in CSS. */}
                 {"phoneCard" in s && s.phoneCard ? (
                   <Img
                     src={s.phoneCard}
                     alt={s.alt}
-                    className="absolute inset-0 h-full w-full object-cover md:hidden"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 ) : null}
                 <div
                   className={`relative -mx-5 -mb-5 mt-3 flex-1 md:-mx-6 md:-mb-6 ${
-                    "phoneCard" in s && s.phoneCard ? "hidden md:block" : ""
+                    "phoneCard" in s && s.phoneCard ? "hidden" : ""
                   }`}
                 >
                   <Img src={s.image} alt={s.alt} className="process-shot w-full" />
@@ -396,10 +416,10 @@ export function TemplatesFaq() {
 
         {/* 65 under the title here, not the page's usual 37 (artboard
             2026-09-06). */}
-        <div className="mx-auto mt-[65px] max-w-[880px] space-y-3 md:mt-12">
+        <div className="mx-auto mt-[65px] max-w-[880px] space-y-3 md:mt-12 md:space-y-[30px]">
           {f.items.map((item) => (
-            <details key={item.q} className="disclosure group rounded-[14px] bg-[#1b1b1b]">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-[17px] text-[16px] font-medium text-white md:px-6 md:text-[15px] [&::-webkit-details-marker]:hidden">
+            <details key={item.q} className="disclosure group rounded-[14px] bg-[#1b1b1b] md:rounded-[17px] md:bg-[#222222]">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-[17px] text-[16px] font-medium text-white md:px-6 md:py-[19px] md:text-[18px] md:font-medium [&::-webkit-details-marker]:hidden">
                 {item.q}
                 {/* The design's own chevron (Vector 528.svg, 2026-09-06): an
                     18 x 11 path at weight 2, drawn at 22 x 11 — the artboard
@@ -449,7 +469,7 @@ export function TemplatesTeam() {
             121-tall plate with a 113-wide portrait; the panel around them keeps
             its 20 radius but tightens to a 15 pad. Everything below md is the
             same markup the desktop uses — only the numbers change. */}
-        <div className="mx-auto mt-[37px] max-w-[880px] rounded-[16px] bg-[#111111] p-[15px] pb-[25px] md:mt-12 md:p-8">
+        <div className="mx-auto mt-[37px] max-w-[880px] rounded-[20px] bg-[#141414] p-[15px] pb-[25px] md:mt-12 md:rounded-[16px] md:bg-[#111111] md:p-8">
           <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
             {t.people.map((p) => (
               <div
@@ -972,10 +992,10 @@ export function TemplatesAccess() {
                   the caption there, where the title already wraps to two
                   lines. Desktop: the Figma panel's own 32.01 SemiBold over
                   23.61 Regular (client 2026-09-07). */}
-              <p className="text-[16px] font-semibold leading-4 text-white md:text-[32px] md:leading-tight">
+              <p className="text-[16px] font-semibold leading-4 text-white md:text-[24px] md:leading-tight">
                 <BreakBefore text={a.banner.title} word="creatives" />
               </p>
-              <p className="hidden text-[13px] font-normal text-white/45 md:block md:text-[23.61px] md:leading-snug">{a.banner.sub}</p>
+              <p className="hidden text-[13px] font-normal text-white/45 md:block md:text-[17px] md:leading-snug">{a.banner.sub}</p>
             </div>
           </div>
           <a
@@ -1234,7 +1254,7 @@ export function TemplatesDifference() {
         {/* 27 between the cards on the phone, and each is 345 x 453 there —
             345 is the artboard's 375 less its 15 gutters, which is what SHELL
             already leaves. */}
-        <div className="mx-auto mt-[37px] grid max-w-[1080px] gap-[27px] md:mt-12 md:grid-cols-2 md:gap-8">
+        <div className="mx-auto mt-[37px] grid max-w-[1080px] gap-[27px] md:mt-12 md:grid-cols-2 md:gap-[125px]">
           {/* Competitors. Card panel, trash composition and the Kandy /
               CreativeOS chips are the design's own exports (2026-09-03);
               only Konvert's chip remains drawn — no asset was supplied.

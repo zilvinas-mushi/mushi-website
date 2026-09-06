@@ -955,6 +955,10 @@ html[data-canvas="footer"] body {
      panel. The desktop keeps the 135deg version in content.ts. */
   .team-portrait-fade {
     background-image: linear-gradient(180deg, var(--plate-top), var(--plate-bottom));
+    /* The phone artboard's own ramp — the desktop's tighter face-stop above
+       is a desktop-only decision (client 2026-09-07). */
+    -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
   }
 }
 
