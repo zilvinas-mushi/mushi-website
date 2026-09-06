@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { CanvasTop } from "@/components/CanvasTop";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
@@ -68,9 +67,18 @@ const faqJsonLd = {
 export default function Templates() {
   return (
     <>
-      {/* This page opens on black, not the home hero's lit violet — see
-          CanvasTop. */}
-      <CanvasTop color="#000000" />
+      {/* THE OVERSCROLL COLOUR, server-rendered. The canvas — the band iOS
+          drags in past the top — is `body`'s background (see the canvas note
+          in globals.css), and its default is sampled from the HOME hero's lit
+          violet first rows. This page opens on black.
+
+          A <style> in the page rather than the effect this started as: an
+          effect only lands after hydration, so a refresh painted the violet
+          first and you could catch it by pulling down immediately. A style
+          tag renders with the route and leaves with it. */}
+      <style
+        dangerouslySetInnerHTML={{ __html: "body{--canvas-top:#000000}" }}
+      />
       <SiteHeader
         cta={{ label: TEMPLATES_PAGE.login, href: APP_URL, variant: "light" }}
         // The phone bar's sliding offer. It rides out as the hero's own CTA

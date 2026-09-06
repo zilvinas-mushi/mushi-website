@@ -867,7 +867,7 @@ export function TemplatesAccess() {
               // Phone: Regular 20 with no tracking, a 2 INSIDE stroke and a
               // 15 radius, 24 below the list (artboard 2026-09-06). The
               // desktop reference keeps its 24/1px/12.
-              className="mt-6 inline-flex h-[60px] items-center justify-center rounded-[15px] border-2 border-white bg-[url(/images/templates/access-btn-dark.webp)] bg-cover text-[20px] font-normal uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black md:mt-8 md:rounded-[12px] md:border md:text-[24px] md:tracking-[0.06em]"
+              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] border-2 border-white bg-[url(/images/templates/access-btn-dark.webp)] bg-cover text-[20px] font-normal uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black md:mt-8 md:rounded-[12px] md:border md:text-[24px] md:tracking-[0.06em]"
             >
               {a.scratch.cta}
             </a>
@@ -925,7 +925,7 @@ export function TemplatesAccess() {
             </ul>
             <a
               href={APP_URL}
-              className="mt-6 inline-flex h-[60px] items-center justify-center rounded-[15px] bg-[url(/images/templates/access-btn-purple.webp)] bg-cover text-[20px] font-semibold uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:rounded-[12px] md:text-[24px] md:tracking-[0.06em]"
+              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] bg-[url(/images/templates/access-btn-purple.webp)] bg-cover text-[20px] font-semibold uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:rounded-[12px] md:text-[24px] md:tracking-[0.06em]"
             >
               {a.templates.cta}
             </a>

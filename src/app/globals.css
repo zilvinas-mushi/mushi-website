@@ -347,8 +347,8 @@ html {
   cross-fade is exactly what you would catch.
 */
 body {
-  /* --canvas-top is set per page by CanvasTop; see its note. The default is
-     the home hero's own top edge. */
+  /* --canvas-top is overridden per page (see /templates, which opens on
+     black); the default is the home hero's own top edge. */
   background: var(--canvas-top, #1c1927);
   color: var(--text);
 }
@@ -947,24 +947,25 @@ html[data-canvas="footer"] body {
 .disclosure::details-content {
   block-size: 0;
   overflow: hidden;
+  will-change: block-size;
   transition:
-    block-size 280ms cubic-bezier(0.22, 0.61, 0.36, 1),
-    content-visibility 280ms allow-discrete;
+    block-size 220ms ease-out,
+    content-visibility 220ms allow-discrete;
 }
 
 .disclosure[open]::details-content {
   block-size: auto;
 }
 
-/* The answer itself rides in behind the height: it starts 6 up and clear, and
-   lands as the row finishes opening. The height alone reads as a shutter; the
-   two together read as the row unfolding. */
+/* The answer rides in WITH the height, on the same curve and no delay: offset
+   the two and the row arrives in two steps, which is what read as choppy
+   (Žilvinas 2026-09-06). */
 .disclosure-body {
   opacity: 0;
   translate: 0 -6px;
   transition:
-    opacity 220ms ease 60ms,
-    translate 220ms cubic-bezier(0.22, 0.61, 0.36, 1) 60ms;
+    opacity 220ms ease-out,
+    translate 220ms ease-out;
 }
 
 .disclosure[open] .disclosure-body {
