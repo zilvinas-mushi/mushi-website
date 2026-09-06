@@ -383,7 +383,7 @@ export const SOCIAL_PROOF = {
      */
     { name: "superior care.pet", logo: "superior-care.svg", w: 528, h: 183, tall: true },
     { name: "Holo", logo: "holo.svg", w: 62, h: 25 },
-    { name: "we interiors", logo: "we-interiors.webp", w: 400, h: 72 },
+    { name: "we interiors", logo: "we-interiors.webp", w: 849, h: 153 },
     { name: "Breezit", logo: "breezit.svg", w: 98, h: 25 },
     { name: "Unive", logo: "unive.svg", w: 95, h: 26 },
     { name: "SE Ranking", logo: "se-ranking.svg", w: 101, h: 25 },
