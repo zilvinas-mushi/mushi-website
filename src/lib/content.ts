@@ -26,7 +26,11 @@ import { BOOKING_ANCHOR } from "@/lib/site";
 export const NAV = [
   { label: "Agency", href: "/" },
   { label: "Case Studies", href: null },
-  { label: "Templates", href: "/templates" },
+  // Back to null 2026-09-06: /templates is not ready to be linked from
+  // production. The page is still there and still works if you type the
+  // path — this only takes it out of both headers, where it renders as
+  // half-strength text instead of a link. Give it the href back to ship it.
+  { label: "Templates", href: null },
 ] as const;
 
 /**
@@ -290,7 +294,10 @@ const HERO_SUB_LINES = [
 ] as const;
 
 export const HERO = {
-  eyebrow: "Creative Partner for eCom & AI brands",
+  // Scarcity line rather than the tagline (Žilvinas 2026-09-06). The
+  // tagline itself is unchanged — SITE_TAGLINE still carries it for
+  // metadata and share cards; this is the pill on the hero only.
+  eyebrow: "2/10 client spots left for 2026",
   heading: "Premium Ads for $1M to $100M Brands.",
   /**
    * TWO LINES, AND THE BREAK IS AUTHORED (Žilvinas 2026-08-26).
