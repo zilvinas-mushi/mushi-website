@@ -101,6 +101,13 @@ export const FINAL_CTA_ID = "final-fit-check";
  * on screen, which is what turns the rubber-band colour from black to the
  * plate's own grey. See CanvasTint for why that cannot be CSS.
  */
+/**
+ * /templates hero CTA. The phone header's REDEEM 50% OFF button rides out as
+ * this one goes under the bar — the same hand-off the home page does from the
+ * creatives "Yes" pill, so the page is never asking twice in two places.
+ */
+export const TEMPLATES_HERO_CTA_ID = "templates-hero-cta";
+
 export const FOOTER_PLATE_ID = "footer-plate";
 
 /**

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import sizes from "@/lib/image-sizes.json";
 
 type Sizes = Record<string, { w: number; h: number }>;
@@ -19,6 +20,11 @@ type Props = {
    * the pair exists to avoid.
    */
   sizes?: string;
+  /**
+   * Inline styles that have no Tailwind literal — currently only mask-image,
+   * which needs its vendor-prefixed twin and so cannot be an arbitrary class.
+   */
+  style?: CSSProperties;
 };
 
 /**
@@ -44,6 +50,7 @@ export function Img({
   priority = false,
   width,
   sizes: sizesAttr,
+  style,
 }: Props) {
   const dim = IMAGE_SIZES[src];
 
@@ -80,6 +87,7 @@ export function Img({
       width={w}
       height={h}
       className={className}
+      style={style}
       loading={priority ? "eager" : "lazy"}
       decoding={priority ? "sync" : "async"}
       {...(priority ? { fetchPriority: "high" as const } : {})}

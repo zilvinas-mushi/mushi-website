@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Logo } from "./Logo";
-import { MobileHeader } from "./MobileHeader";
+import { MobileHeader, type MobileCtaConfig } from "./MobileHeader";
 import { NAV } from "@/lib/content";
 import { BOOKING_URL, SITE_NAME } from "@/lib/site";
 
@@ -60,9 +60,16 @@ const CTA_FILL = {
 
 export function SiteHeader({
   cta,
+  mobileCta,
   active,
 }: {
   cta?: HeaderCta;
+  /**
+   * The phone bar's sliding button — label, target, and the elements that
+   * bring it out and put it away. Defaults to the home page's Schedule a Call;
+   * /templates passes its own, see MobileCtaConfig.
+   */
+  mobileCta?: MobileCtaConfig;
   /**
    * href of the NAV item for the page being viewed (e.g. "/templates") —
    * that link renders at full white and its siblings drop to 70% so the
@@ -73,7 +80,7 @@ export function SiteHeader({
   return (
     <>
       {/* Phone header with mushi-app's drawer motion; hidden from md up. */}
-      <MobileHeader />
+      <MobileHeader cta={mobileCta} />
 
       <header
         className="sticky top-[1.375rem] z-50 hidden px-4 md:block"

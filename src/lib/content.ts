@@ -903,6 +903,10 @@ export const TEMPLATES_PAGE = {
   heading: "Your 8-Minute Shortcut to High-ROAS Ads",
   cta: "Take the Shortcut",
   login: "Login",
+  // The phone header's sliding button, which is this page's offer rather
+  // than the home bar's "Schedule a Call" — /templates sells the library,
+  // it does not book a call.
+  mobileCta: "Redeem 50% Off",
     /**
    * Category tiles beside the window — decorative (aria-hidden). Pattern,
    * size and layering follow the final hero reference (2026-09-03): one
@@ -1014,14 +1018,23 @@ export const TEMPLATES_PAGE = {
         role: "Founder",
         image: "templates/team-noah-cut.webp",
         color: "#a78ae0",
-        backdrop: "linear-gradient(135deg,#8168d0 0%,#4f3694 100%)",
+        // The role reads as a GRADIENT, not a flat colour (Figma fill panel,
+        // 2026-09-06): the house violet ramp for the founder, a salmon one
+        // for the product developer. `color` stays as the fallback for
+        // anything that cannot clip a background to text.
+        roleGradient: "linear-gradient(90deg,#a08ade 0%,#7c54b5 40%,#6e54b5 100%)",
+        // Top-to-bottom, per the Figma fill panel (2026-09-06). The
+        // developer's is the same construction in her own hue — the artboard
+        // only names the founder's two stops.
+        backdrop: "linear-gradient(180deg,#6e54b5 0%,#30254f 100%)",
       },
       {
         name: "Urtė Balevičiūtė",
         role: "Product Developer",
         image: "templates/team-urte-cut.webp",
         color: "#d0737f",
-        backdrop: "linear-gradient(135deg,#c98a8c 0%,#96494c 100%)",
+        roleGradient: "linear-gradient(90deg,#d07678 0%,#ffaeb0 100%)",
+        backdrop: "linear-gradient(180deg,#d07678 0%,#4f2f30 100%)",
       },
     ],
     notes: [
@@ -1088,7 +1101,10 @@ export const TEMPLATES_PAGE = {
     templates: {
       emoji: "😎",
       title: "Ad creation with templates",
-      sub: "For the cost of one coffee per month.",
+      // Not "For the cost of…": at 16 on a 345 card that sentence
+      // runs past the edge, and the artboard drops the first two words
+      // (Žilvinas 2026-09-06).
+      sub: "Cost of one coffee per month.",
       figure: "$5",
       unit: "/ month",
       chip: "50% Discount",
@@ -1159,6 +1175,8 @@ export const TEMPLATES_PAGE = {
         title: "Customize in Canva",
         chip: "Super fast!",
         image: "templates/process-canva.webp",
+        // Same flattened phone card as step three; see the note there.
+        phoneCard: "templates/process-phone-2.webp",
         card: "process-card-2.webp",
         alt: "The same template being edited in Canva",
         gradient: "linear-gradient(150deg,#8f3287 0%,#82296f 55%,#6d1a72 100%)",
@@ -1168,6 +1186,12 @@ export const TEMPLATES_PAGE = {
         title: "Time to Test",
         chip: "Smashhh!",
         image: "templates/process-test.webp",
+        // The phone card as ONE flattened export (2026-09-06). Its blur,
+        // its fade into the orange and its 25 corners are Figma effects
+        // stacked on the screenshot; rebuilding them in CSS was close but
+        // never the same picture, so the artboard's own render is the
+        // background and nothing but the type sits on top of it.
+        phoneCard: "templates/process-phone-3.webp",
         card: "process-card-3.webp",
         alt: "Meta Ads Manager campaign list running A/B tests of the finished ad",
         gradient: "linear-gradient(160deg,#9b5b18 0%,#a95f14 55%,#b56815 100%)",

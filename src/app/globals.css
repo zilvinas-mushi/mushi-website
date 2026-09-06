@@ -784,6 +784,34 @@ html[data-canvas="footer"] body {
     #000;
 }
 
+/* PHONES GET THE ARTBOARD'S OWN ANGULAR FIELD (Žilvinas 2026-09-06). The
+   desktop burst is a soft radial wash that reads as mush at 390 wide; the
+   phone artboard draws an eight-stop Figma ANGULAR fill instead, where each
+   hue owns a wedge and the seams between them are the thing you see behind
+   the device.
+
+   It ships as the file Figma exported ("background.png", 375 x 1070 at 4x,
+   here at 2x) rather than the equivalent conic-gradient, which is what this
+   started as. CSS can draw the wedges, but not the LAYER BLUR sitting on top
+   of them in the file — the vertex reads as a soft bloom in the artboard and
+   as a hard point in the browser, which is exactly the difference that was
+   visible. 15 KB for an exact match is the better trade.
+
+   `100% auto`, NOT `100% 100%`: the artboard's field is a 375 x 1070 layer
+   that runs PAST the bottom of the hero — the section clips it, it does not
+   end there. Stretching it to the section's own height (which is ~2:1, not
+   2.85:1) squashed the whole cone by 40%, which pulled the vertex up under
+   the headline and fanned every wedge out too wide. Matched on width and
+   left to fall where it falls, the cone sits where the artboard puts it and
+   the section crops the rest, exactly as Figma does. */
+@media (max-width: 767px) {
+  .tpl-bg {
+    background:
+      url("/images/templates/hero-burst-phone.webp") 50% 0 / 100% auto no-repeat,
+      #000;
+  }
+}
+
 /* The competitors' card carries a 1px INSIDE stroke that is a linear
    gradient running top to bottom: #999999 at 0% into #FFFFFF at 50%, and
    white from there down (Žilvinas 2026-09-05). So the corner catches a grey
@@ -802,8 +830,8 @@ html[data-canvas="footer"] body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(180deg, #999999 0%, #ffffff 50%);
+  padding: var(--ring-w, 1px);
+  background: var(--ring-fill, linear-gradient(180deg, #999999 0%, #ffffff 50%));
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -811,6 +839,146 @@ html[data-canvas="footer"] body {
   mask-composite: exclude;
   pointer-events: none;
   z-index: 20;
+}
+
+/* The phone artboard strokes this card the other way up (Žilvinas
+   2026-09-06): weight 2, still INSIDE, running from white at the TOP down to
+   nothing at the bottom — so the card catches the light along its top edge
+   and dissolves into the page where the artwork bleeds off it.
+
+   0.25, not 0.5: Figma stacks two opacities here — the top stop is #FFFFFF at
+   50%, and the stroke LAYER is itself at 50%. Taking only the stop read as a
+   hard white hairline against the card. The desktop
+   reference's own stroke (a hard #999 into white at 50%) stays put above md.
+   Both are the same masked pseudo-element; only the two variables change. */
+@media (max-width: 767px) {
+  .diff-card-ring {
+    --ring-w: 2px;
+    --ring-fill: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(153, 153, 153, 0) 100%
+    );
+  }
+}
+
+/* The templates card's stroke on the phone (Žilvinas 2026-09-06): 2 weight,
+   INSIDE at weight 4, running from #6E54B5 at the BOTTOM edge to #111111 at 0% opacity at
+   the top — so the card is lit along the edge nearest the button and fades
+   into the page above it. Same masked pseudo-element as .diff-card-ring; the
+   desktop reference keeps its flat 1px #8A5CF6 at 50%. */
+@media (max-width: 767px) {
+  .access-card-ring {
+    position: relative;
+  }
+  .access-card-ring::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 4px;
+    background: linear-gradient(0deg, #6e54b5 0%, rgba(17, 17, 17, 0) 100%);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 20;
+  }
+}
+
+/* The discovery-call button's stroke (Žilvinas 2026-09-06): 1px, and white
+   only at the TOP-LEFT and BOTTOM-RIGHT corners and faint even there (45%) —
+   a 135deg ramp that is
+   transparent through the middle, so the pill catches light diagonally
+   instead of being outlined. Same masked pseudo-element as the rings above. */
+.discovery-ring {
+  position: relative;
+}
+.discovery-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* The team portraits' colour plate dissolves into the card on the phone
+   (Žilvinas 2026-09-06) rather than ending on a hard vertical edge: the
+   artboard shows the violet and the salmon fading out under the name. Mask,
+   not an overlay, so it works whatever the plate's own gradient is. */
+@media (max-width: 767px) {
+  .team-portrait-fade {
+    -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
+  }
+}
+
+/* Disclosure rows open and close on a slide (Žilvinas 2026-09-06: "smooth,
+   like the menu"), without giving up the native <details> the FAQ is built on
+   — every answer stays in the DOM for crawlers and the rows still work with
+   no JS.
+
+   `::details-content` is the animatable box around the answer, and
+   `interpolate-size: allow-keywords` is what lets a height of 0 interpolate
+   to `auto` at all; `content-visibility` has to ride along as a discrete
+   transition or the content pops in at the start of the open. Browsers
+   without the pseudo-element simply toggle, as they did before. */
+:root {
+  interpolate-size: allow-keywords;
+}
+
+.disclosure::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 280ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    content-visibility 280ms allow-discrete;
+}
+
+.disclosure[open]::details-content {
+  block-size: auto;
+}
+
+/* The answer itself rides in behind the height: it starts 6 up and clear, and
+   lands as the row finishes opening. The height alone reads as a shutter; the
+   two together read as the row unfolding. */
+.disclosure-body {
+  opacity: 0;
+  translate: 0 -6px;
+  transition:
+    opacity 220ms ease 60ms,
+    translate 220ms cubic-bezier(0.22, 0.61, 0.36, 1) 60ms;
+}
+
+.disclosure[open] .disclosure-body {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure::details-content,
+  .disclosure-body {
+    transition: none;
+  }
+  .disclosure-body {
+    opacity: 1;
+    translate: none;
+  }
 }
 
 /* Process step visuals: crops from the reference screenshot, so every edge is
@@ -896,7 +1064,7 @@ html[data-canvas="footer"] body {
   }
 }
 
-/* Animated 1px gradient ring, ported verbatim from mushi-app. border-color
+/* Animated gradient ring (1px by default), ported verbatim from mushi-app. border-color
    cannot be a gradient and border-image breaks on rounded corners, so the ring
    is a masked pseudo-element. Pans with the same keyframe as the text inside,
    so ring and wording move together. Pair with a rounded-* utility. */
@@ -908,7 +1076,9 @@ html[data-canvas="footer"] body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 1px;
+  /* Ring weight, overridable per use with --agb-width — the /templates badge
+     is a 2 (Figma, phone artboard 2026-09-06) against this 1px default. */
+  padding: var(--agb-width, 1px);
   /* Override the ring's colours per use by setting --agb-gradient on the
      element (the /templates badge matches its ring to its gradient text). */
   background: var(

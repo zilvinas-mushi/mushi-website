@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { Logo } from "./Logo";
 import { NAV } from "@/lib/content";
 import { BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID, SITE_NAME } from "@/lib/site";
@@ -26,6 +26,44 @@ const ACTIVE_NAV = "Agency";
 const PHONE_CTA = "Schedule a Call";
 
 /**
+ * What the bar's sliding button says, where it goes, and the two elements
+ * that bring it out and put it away.
+ *
+ * ONE HEADER, TWO PAGES. The travel below is measured off named elements
+ * rather than a scroll distance (see useCtaTravel), and those elements are
+ * per-page: home hands off from the creatives "Yes" pill to the final
+ * fit-check pill, /templates from its hero CTA with nothing to put it back —
+ * that page has no closing pill of its own, so the offer stands to the footer.
+ *
+ * Sizes are numbers, not class strings, because the height is needed twice:
+ * once for the box and once for how far it has to travel to be hidden behind
+ * the bar. It is written as --cta-h and both read it, so the button cannot
+ * end up parked halfway out.
+ */
+export type MobileCtaConfig = {
+  label: string;
+  href: string;
+  /** id of the element whose passage under the bar brings the button out. */
+  fromId: string;
+  /** id of the element whose arrival on screen puts it back. Optional. */
+  untilId?: string;
+  /** Box height and label size in px at the design's phone width. */
+  heightPx?: number;
+  labelPx?: number;
+  /** Corner radius in px — home's 7, /templates' 5. */
+  radiusPx?: number;
+  /** Optional 1px INSIDE stroke; /templates rings its button in #7C54B5. */
+  strokeColor?: string;
+};
+
+const HOME_CTA: MobileCtaConfig = {
+  label: PHONE_CTA,
+  href: BOOKING_URL,
+  fromId: CREATIVES_CTA_ID,
+  untilId: FINAL_CTA_ID,
+};
+
+/**
  * The violet fill, and the white it inverts to.
  *
  * The header CTA's three Figma stops verbatim. At 117.51deg the gradient line
@@ -43,6 +81,18 @@ const VIOLET_CTA =
 /** 52 tall, radius 7, 17px semibold caps — the drawer's row box. */
 const CTA_BOX =
   "flex h-[3.25rem] items-center justify-center rounded-[0.4375rem] text-[1.0625rem] font-semibold uppercase";
+
+/**
+ * The same box for the BAR's sliding button, minus everything the page sets:
+ * the height comes from --cta-h (which the travel is also derived from), and
+ * the label size, radius and stroke from inline styles, since none of them can
+ * be a Tailwind literal when the page picks the number.
+ *
+ * `box-border` is Tailwind's default and is what makes the stroke an INSIDE
+ * one, as Figma has it — the ring is drawn within the 45, not added to it.
+ */
+const CTA_BAR_BOX =
+  "box-border flex h-[var(--cta-h)] items-center justify-center font-semibold uppercase";
 
 /**
  * Three bars that become one.
@@ -169,15 +219,17 @@ const TAU_MS = 110;
 function useCtaTravel(
   barRef: RefObject<HTMLDivElement | null>,
   ctaRef: RefObject<HTMLDivElement | null>,
+  cta: MobileCtaConfig,
 ) {
   const [reachable, setReachable] = useState(false);
+  const { fromId, untilId } = cta;
 
   useEffect(() => {
-    const cta = ctaRef.current;
-    if (!cta) return;
+    const node = ctaRef.current;
+    if (!node) return;
 
-    const yesPill = document.getElementById(CREATIVES_CTA_ID);
-    const finalPill = document.getElementById(FINAL_CTA_ID);
+    const fromEl = document.getElementById(fromId);
+    const untilEl = untilId ? document.getElementById(untilId) : null;
 
     // Reduced motion drops the follower and goes back to the exact 1:1: the
     // reveal is the page's own scroll and stays, but nothing keeps moving
@@ -206,18 +258,18 @@ function useCtaTravel(
 
       let out = 0;
 
-      if (yesPill) {
+      if (fromEl) {
         // From the frame the pill's top meets the bar's bottom, over SPAN_PX
         // of further scrolling.
-        out = clamp01((barBottom - yesPill.getBoundingClientRect().top) / SPAN_PX);
+        out = clamp01((barBottom - fromEl.getBoundingClientRect().top) / SPAN_PX);
       }
 
-      if (finalPill) {
+      if (untilEl) {
         // The clamp at 1 is also what holds the button IN for everything below
         // the pill: once the fit-check has scrolled off the top this only
         // grows, so the CTA cannot reappear over the footer after the page has
         // finished asking.
-        const top = finalPill.getBoundingClientRect().top;
+        const top = untilEl.getBoundingClientRect().top;
         out *= 1 - clamp01((window.innerHeight - top) / SPAN_PX);
       }
 
@@ -227,7 +279,7 @@ function useCtaTravel(
     const paint = () => {
       if (at === last) return;
       last = at;
-      cta.style.setProperty("--cta-out", String(at));
+      node.style.setProperty("--cta-out", String(at));
       // Two values, so React bails out of the re-render on every frame that
       // does not cross the line.
       setReachable(at > 0.5);
@@ -286,7 +338,7 @@ function useCtaTravel(
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [barRef, ctaRef]);
+  }, [barRef, ctaRef, fromId, untilId]);
 
   return reachable;
 }
@@ -312,11 +364,11 @@ function useCtaTravel(
  * Since these are same-page anchor links, where the pathname never changes,
  * the drawer closes on link tap instead of on route change.
  */
-export function MobileHeader() {
+export function MobileHeader({ cta = HOME_CTA }: { cta?: MobileCtaConfig }) {
   const [open, setOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const ctaReachable = useCtaTravel(shellRef, ctaRef);
+  const ctaReachable = useCtaTravel(shellRef, ctaRef, cta);
 
   // THE DRAWER DOES NOT MOVE THE CTA (Žilvinas 2026-08-30). Opening the menu
   // used to send the bar's button back up, because the drawer carries its own
@@ -419,17 +471,29 @@ export function MobileHeader() {
         <div
           ref={ctaRef}
           aria-hidden={!ctaOffered}
-          style={{ translate: "0 calc((var(--cta-out, 0) - 1) * 3.75rem)" }}
+          style={{
+            // The box height, and the travel derived from it: the whole box
+            // plus the 0.5rem gap it stands below the bar, so at 0 the button
+            // sits exactly inside the bar's own footprint whatever height the
+            // page asked for. 52 is home's; /templates is 45.
+            "--cta-h": `${cta.heightPx ?? 52}px`,
+            translate: "0 calc((var(--cta-out, 0) - 1) * (var(--cta-h) + 0.5rem))",
+          } as CSSProperties}
           className={`absolute inset-x-0 top-full z-10 mt-2 ${
             ctaOffered ? "" : "pointer-events-none"
           }`}
         >
           <a
-            href={BOOKING_URL}
+            href={cta.href}
             tabIndex={ctaOffered ? undefined : -1}
-            className={`w-full ${CTA_BOX} ${VIOLET_CTA}`}
+            style={{
+              fontSize: `${cta.labelPx ?? 17}px`,
+              borderRadius: `${cta.radiusPx ?? 7}px`,
+              border: cta.strokeColor ? `1px solid ${cta.strokeColor}` : undefined,
+            }}
+            className={`w-full ${CTA_BAR_BOX} ${VIOLET_CTA}`}
           >
-            {PHONE_CTA}
+            {cta.label}
           </a>
         </div>
 

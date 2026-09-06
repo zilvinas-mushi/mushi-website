@@ -13,7 +13,7 @@ import {
   TemplatesTeam,
 } from "@/components/TemplateSections";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { APP_URL, SITE_NAME, SITE_TAGLINE, abs } from "@/lib/site";
+import { APP_URL, SITE_NAME, SITE_TAGLINE, TEMPLATES_HERO_CTA_ID, abs } from "@/lib/site";
 
 const DESCRIPTION =
   "Plug-and-play ad templates from the team behind 110+ brands' creatives. Your 8-minute shortcut to high-ROAS ads — fashion, beauty, food, health and drink niches covered.";
@@ -69,6 +69,19 @@ export default function Templates() {
     <>
       <SiteHeader
         cta={{ label: TEMPLATES_PAGE.login, href: APP_URL, variant: "light" }}
+        // The phone bar's sliding offer. It rides out as the hero's own CTA
+        // goes under the bar, and stays out — this page has no closing pill of
+        // its own to hand back to, unlike home's fit-check. 45 tall / 20px
+        // label per the design; the width is whatever the bar's gutters leave.
+        mobileCta={{
+          label: TEMPLATES_PAGE.mobileCta,
+          href: APP_URL,
+          fromId: TEMPLATES_HERO_CTA_ID,
+          heightPx: 45,
+          labelPx: 20,
+          radiusPx: 5,
+          strokeColor: "#7c54b5",
+        }}
         active="/templates"
       />
       <main className="flex-1">

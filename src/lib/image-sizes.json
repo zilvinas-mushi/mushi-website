@@ -331,6 +331,10 @@
     "w": 900,
     "h": 1595
   },
+  "templates/access-banner-phone.webp": {
+    "w": 1035,
+    "h": 450
+  },
   "templates/access-btn-dark.webp": {
     "w": 1100,
     "h": 195
@@ -448,12 +452,24 @@
     "h": 1054
   },
   "templates/diff-mushi-mark.webp": {
-    "w": 240,
-    "h": 101
+    "w": 190,
+    "h": 56
   },
   "templates/diff-trashcan.webp": {
     "w": 1200,
     "h": 1342
+  },
+  "templates/eyebrow-left.webp": {
+    "w": 220,
+    "h": 28
+  },
+  "templates/eyebrow-right.webp": {
+    "w": 234,
+    "h": 28
+  },
+  "templates/hero-burst-phone.webp": {
+    "w": 750,
+    "h": 2140
   },
   "templates/hero-burst.webp": {
     "w": 2400,
@@ -462,6 +478,10 @@
   "templates/hero-macbook.webp": {
     "w": 2400,
     "h": 1503
+  },
+  "templates/hero-phone.webp": {
+    "w": 807,
+    "h": 1303
   },
   "templates/icon-card.webp": {
     "w": 48,
@@ -511,9 +531,17 @@
     "w": 1200,
     "h": 506
   },
+  "templates/logo-creativeos.webp": {
+    "w": 300,
+    "h": 54
+  },
+  "templates/logo-kandy.webp": {
+    "w": 135,
+    "h": 78
+  },
   "templates/process-canva.webp": {
-    "w": 242,
-    "h": 176
+    "w": 1035,
+    "h": 1114
   },
   "templates/process-card-1.webp": {
     "w": 500,
@@ -527,13 +555,25 @@
     "w": 500,
     "h": 1183
   },
+  "templates/process-phone-2.webp": {
+    "w": 1035,
+    "h": 1034
+  },
+  "templates/process-phone-3.webp": {
+    "w": 1035,
+    "h": 1035
+  },
   "templates/process-pick.webp": {
     "w": 600,
     "h": 378
   },
   "templates/process-test.webp": {
-    "w": 253,
-    "h": 176
+    "w": 1035,
+    "h": 1035
+  },
+  "templates/showcase-wall-phone.webp": {
+    "w": 1125,
+    "h": 1260
   },
   "templates/showcase-wall.webp": {
     "w": 2400,
@@ -554,6 +594,14 @@
   "templates/team-urte.webp": {
     "w": 420,
     "h": 359
+  },
+  "templates/trustpilot-lockup.webp": {
+    "w": 378,
+    "h": 102
+  },
+  "templates/trustpilot-star.webp": {
+    "w": 42,
+    "h": 42
   },
   "tevaplanter-ad-sm.webp": {
     "w": 512,
