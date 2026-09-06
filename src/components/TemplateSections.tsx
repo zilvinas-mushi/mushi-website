@@ -53,17 +53,13 @@ export function TemplatesHero() {
             zoomed badge reference (2026-09-03) — the ring via the
             --agb-gradient override, the text via background-clip. */}
         <span
-          className="animated-gradient-border inline-flex items-center rounded-[50px] bg-[#0d0a14]/80 px-5 py-2"
-          // Radius 50 and a 2-weight stroke, per the phone artboard. Figma
+          className="tpl-badge animated-gradient-border inline-flex items-center rounded-[50px] bg-[#0d0a14]/80 px-5 py-2"
+          // Radius 50, and a 2-weight stroke ON THE PHONE (.tpl-badge in
+          // globals.css — the desktop reference keeps the ring's 1px). Figma
           // calls the stroke "Outside"; the ring is masked INSIDE the box
           // here, which on a pill this size is the same picture and keeps the
           // badge's own width honest.
-          style={
-            {
-              "--agb-gradient": BADGE_GRADIENT,
-              "--agb-width": "2px",
-            } as React.CSSProperties
-          }
+          style={{ "--agb-gradient": BADGE_GRADIENT } as React.CSSProperties}
         >
           <span
             // Poppins Medium 15 on the phone (artboard 2026-09-06); the
@@ -114,7 +110,7 @@ export function TemplatesHero() {
             aria-hidden="true"
             viewBox="0 0 16 15"
             fill="none"
-            className="size-[14px] shrink-0"
+            className="size-[14px] shrink-0 md:h-[13px] md:w-[15px]"
           >
             <path
               d="M1.25293 2.08593C1.0626 1.63108 0.967435 1.40366 1.00923 1.2641C1.04547 1.14311 1.13552 1.0483 1.25054 1.01006C1.38322 0.965948 1.59961 1.06575 2.03241 1.26535L14.3147 6.92981C14.7054 7.10999 14.9008 7.20008 14.9606 7.32603C15.0125 7.43541 15.0125 7.5641 14.9606 7.67348C14.9008 7.79943 14.7054 7.88952 14.3147 8.0697L2.03241 13.7342C1.59961 13.9338 1.38321 14.0336 1.25054 13.9894C1.13552 13.9512 1.04547 13.8564 1.00923 13.7354C0.967435 13.5959 1.0626 13.3684 1.25293 12.9136L3.41344 7.7504C3.45208 7.65807 3.4714 7.61191 3.47903 7.56395C3.48579 7.52145 3.48579 7.47806 3.47903 7.43556C3.4714 7.38761 3.45208 7.34144 3.41344 7.24911L1.25293 2.08593Z"
@@ -361,7 +357,7 @@ export function TemplatesProcess() {
 
                     20 off the card's bottom edge, 15 either side of the
                     label, radius 50, Poppins Medium 14. */}
-                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black shadow-[0_6px_18px_-6px_rgba(0,0,0,0.6)] md:bottom-10 md:left-6 md:px-3.5 md:text-[12px] md:font-semibold">
+                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black shadow-[0_6px_18px_-6px_rgba(0,0,0,0.6)] md:bottom-4 md:left-6 md:px-3.5 md:text-[12px] md:font-semibold">
                   {s.chip}
                 </span>
               </article>
@@ -410,7 +406,7 @@ export function TemplatesFaq() {
                   viewBox="0 0 18 11"
                   fill="none"
                   strokeWidth="2"
-                  className="h-[11px] w-[22px] shrink-0 stroke-white transition-transform duration-150 group-open:rotate-180"
+                  className="h-[11px] w-[22px] shrink-0 stroke-white transition-transform duration-150 group-open:rotate-180 md:h-[18px] md:w-[18px]"
                   aria-hidden="true"
                 >
                   <path strokeLinecap="round" d="M1 1l8 8 8-8" />
@@ -465,7 +461,13 @@ export function TemplatesTeam() {
                     // laps over its right edge, which is the artboard's own
                     // construction.
                     className="team-portrait-fade absolute inset-y-0 left-0 w-[65px] overflow-hidden rounded-l-[15px] sm:inset-0 sm:w-auto sm:rounded-l-[14px]"
-                    style={{ background: p.backdrop }}
+                    style={
+                      {
+                        background: p.backdrop,
+                        "--plate-top": p.plate[0],
+                        "--plate-bottom": p.plate[1],
+                      } as CSSProperties
+                    }
                   />
                   {/* Bottom-anchored and taller than the card, so the hair
                       pops over the top edge as in the design. */}
@@ -482,8 +484,13 @@ export function TemplatesTeam() {
                     {p.name}
                   </p>
                   <p
-                    className="mt-0.5 bg-clip-text text-[16px] font-normal leading-tight text-transparent md:text-[15px] md:font-medium"
-                    style={{ backgroundImage: p.roleGradient }}
+                    className="role-gradient mt-0.5 text-[16px] font-normal leading-tight md:text-[15px] md:font-medium"
+                    style={
+                      {
+                        color: p.color,
+                        "--role-gradient": p.roleGradient,
+                      } as CSSProperties
+                    }
                   >
                     {p.role}
                   </p>
@@ -502,7 +509,7 @@ export function TemplatesTeam() {
                 <h3 className="text-[16px] font-medium uppercase tracking-[0.08em] text-[#858585] md:text-[14px]">
                   {n.label}
                 </h3>
-                <p className="mt-1.5 text-[14px] font-normal leading-normal text-white/90 md:mt-1.5 md:text-[17px] md:leading-relaxed lg:text-[18px]">
+                <p className="mt-1.5 text-[14px] font-normal leading-normal text-white/90 md:mt-1.5 md:text-[18px] md:leading-relaxed">
                   {n.body}
                 </p>
               </div>
@@ -735,7 +742,7 @@ export function TemplatesComparison() {
               DESKTOP ONLY — see the phone's own button below the grid. */}
           <a
             href={APP_URL}
-            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-3 py-2.5 text-[12px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:block md:px-5 md:text-[14px]"
+            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-3 py-2.5 text-[12px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5 md:text-[14px]"
             style={{ gridRowStart: lastRow }}
           >
             {/* The supplied label artwork, masked with currentColor so it
@@ -1488,31 +1495,65 @@ const BRAND_LOGOS: Record<string, { src: string; w: number; svg?: boolean }> = {
 
 function BrandChips({ brands }: { brands: readonly string[] }) {
   return (
-    <ul className="relative z-10 flex flex-nowrap items-center justify-center gap-[15px]">
-      {brands.map((brand) => {
-        const logo = BRAND_LOGOS[brand];
-        return (
-          <li
-            key={brand}
-            className="flex h-[26px] shrink-0 items-center rounded-[6px] bg-white px-1.5"
-          >
-            {logo.svg ? (
+    <>
+      <ul className="relative z-10 flex flex-nowrap items-center justify-center gap-[15px] md:hidden">
+        {brands.map((brand) => {
+          const logo = BRAND_LOGOS[brand];
+          return (
+            <li
+              key={brand}
+              className="flex h-[26px] shrink-0 items-center rounded-[6px] bg-white px-1.5"
+            >
+              {logo.svg ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={`/images/templates/${logo.src}`}
+                  alt={brand}
+                  width={67}
+                  height={13}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <Img src={`templates/${logo.src}`} alt={brand} width={logo.w} />
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* THE DESKTOP ROW IS UNTOUCHED (the phone work of 2026-09-06 was
+          explicitly phone-only): 36-tall chips, Konvert set in Satoshi beside
+          its own blue mark, the other two as the chip-*.svg exports. */}
+      <ul className="relative z-10 hidden flex-wrap items-center justify-center gap-2.5 md:flex">
+        {brands.map((brand) => (
+          <li key={brand} className="flex items-center">
+            {brand === "Konvert" ? (
+              <span className="flex h-9 items-center gap-1.5 rounded-[10px] bg-white px-3 font-satoshi text-[16px] font-bold text-black">
+                <span
+                  aria-hidden="true"
+                  className="flex size-4 items-center justify-center rounded-[5px] bg-[#5b5bf0] text-[11px] font-bold leading-none text-white"
+                >
+                  +
+                </span>
+                {brand}
+              </span>
+            ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={`/images/templates/${logo.src}`}
+                src={`/images/templates/chip-${brand.toLowerCase()}.svg`}
                 alt={brand}
-                width={67}
-                height={13}
+                width={brand === "Kandy" ? 79 : 155}
+                height={36}
                 loading="lazy"
                 decoding="async"
+                className="h-9 w-auto"
               />
-            ) : (
-              <Img src={`templates/${logo.src}`} alt={brand} width={logo.w} />
             )}
           </li>
-        );
-      })}
-    </ul>
+        ))}
+      </ul>
+    </>
   );
 }
 

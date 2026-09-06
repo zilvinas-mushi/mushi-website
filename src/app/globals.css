@@ -924,9 +924,29 @@ html[data-canvas="footer"] body {
    artboard shows the violet and the salmon fading out under the name. Mask,
    not an overlay, so it works whatever the plate's own gradient is. */
 @media (max-width: 767px) {
+  /* The role reads as a gradient on the phone (Figma fill panel); above md it
+     keeps the flat colour the desktop reference was signed off with. */
+  .role-gradient {
+    background-image: var(--role-gradient);
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* The portrait plate's own ramp on the phone — top to bottom, per the fill
+     panel. The desktop keeps the 135deg version in content.ts. */
   .team-portrait-fade {
+    background-image: linear-gradient(180deg, var(--plate-top), var(--plate-bottom));
     -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
     mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
+  }
+}
+
+/* The /templates hero badge's ring is 2 on the phone (artboard 2026-09-06)
+   and the utility's own 1px above md, where the desktop reference was signed
+   off. Set here rather than inline so the breakpoint can reach it. */
+@media (max-width: 767px) {
+  .tpl-badge {
+    --agb-width: 2px;
   }
 }
 

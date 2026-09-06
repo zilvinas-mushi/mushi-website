@@ -1023,10 +1023,13 @@ export const TEMPLATES_PAGE = {
         // for the product developer. `color` stays as the fallback for
         // anything that cannot clip a background to text.
         roleGradient: "linear-gradient(90deg,#a08ade 0%,#7c54b5 40%,#6e54b5 100%)",
-        // Top-to-bottom, per the Figma fill panel (2026-09-06). The
-        // developer's is the same construction in her own hue — the artboard
-        // only names the founder's two stops.
-        backdrop: "linear-gradient(180deg,#6e54b5 0%,#30254f 100%)",
+        backdrop: "linear-gradient(135deg,#8168d0 0%,#4f3694 100%)",
+        // The phone's own plate, top to bottom, per the Figma fill panel
+        // (2026-09-06) — applied by .team-portrait-fade below md, so the
+        // desktop reference keeps the 135deg above. The developer's is the
+        // same construction in her own hue; the artboard only names the
+        // founder's two stops.
+        plate: ["#6e54b5", "#30254f"],
       },
       {
         name: "Urtė Balevičiūtė",
@@ -1034,7 +1037,8 @@ export const TEMPLATES_PAGE = {
         image: "templates/team-urte-cut.webp",
         color: "#d0737f",
         roleGradient: "linear-gradient(90deg,#d07678 0%,#ffaeb0 100%)",
-        backdrop: "linear-gradient(180deg,#d07678 0%,#4f2f30 100%)",
+        backdrop: "linear-gradient(135deg,#c98a8c 0%,#96494c 100%)",
+        plate: ["#d07678", "#4f2f30"],
       },
     ],
     notes: [
