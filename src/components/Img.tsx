@@ -57,9 +57,13 @@ export function Img({
   const w = width ?? dim.w;
   const h = width ? Math.round((dim.h / dim.w) * width) : dim.h;
 
-  const small = IMAGE_SIZES[src.replace(/\.webp$/, "-sm.webp")];
+  // The `-sm` name has to actually BE a different name: on a .png the replace
+  // is a no-op, so this looked itself up and emitted a srcset listing the same
+  // file twice at the same width (emoji-sunglasses.png did exactly that).
+  const smallSrc = src.replace(/\.webp$/, "-sm.webp");
+  const small = smallSrc !== src ? IMAGE_SIZES[smallSrc] : undefined;
   const srcSet = small
-    ? `/images/${src.replace(/\.webp$/, "-sm.webp")} ${small.w}w, /images/${src} ${dim.w}w`
+    ? `/images/${smallSrc} ${small.w}w, /images/${src} ${dim.w}w`
     : undefined;
 
   /* next/image is deliberately unused: optimization is off for the static

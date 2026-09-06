@@ -216,16 +216,33 @@ export function CreativesRail() {
       }
     };
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries[entries.length - 1].isIntersecting) return;
-        io.disconnect();
-        load();
-      },
-      { rootMargin: "200% 0px" },
-    );
-    io.observe(view);
-    return () => io.disconnect();
+    let io: IntersectionObserver | undefined;
+    const install = () => {
+      io = new IntersectionObserver(
+        (entries) => {
+          if (!entries[entries.length - 1].isIntersecting) return;
+          io?.disconnect();
+          load();
+        },
+        { rootMargin: "200% 0px" },
+      );
+      io.observe(view);
+    };
+
+    // AFTER THE FIRST SCROLL, for the same reason the film lookahead waits for
+    // one. Two viewports of margin reaches the rail from the top of the page,
+    // so this fired at scroll position zero and put sixty-seven image decodes
+    // straight into the window Total Blocking Time is measured over — on a
+    // phone that was 330ms of blocking against a 200ms budget. Nobody has
+    // reached the rail at that moment, and the rail is still two screens down
+    // when the first scroll event arrives, so the head start is untouched.
+    if (window.scrollY > 0) install();
+    else window.addEventListener("scroll", install, { once: true, passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", install);
+      io?.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -287,15 +304,28 @@ export function CreativesRail() {
     // Card art loads lazily and the shell is fluid, so the track's width is
     // not final at mount. Re-clamping on every size change keeps the rail
     // inside its ends and refreshes which arrows are live.
+    //
+    // COALESCED INTO ONE FRAME, for the same reason the scroll handler above
+    // is. `paint` reads scrollWidth and clientWidth and then writes a
+    // transform; doing that straight out of the observer means a forced
+    // reflow per callback, and the callbacks arrive one per card as twenty
+    // stills land. PageSpeed attributed 469ms of reflow to the page on a
+    // phone, which is most of a failing Total Blocking Time. Sixty-seven
+    // images still only cost one measurement.
+    let roTick = 0;
     const ro = new ResizeObserver(() => {
-      // In phone mode the browser clamps its own scrollLeft, so there is
-      // nothing to re-clamp — only the readout to refresh.
-      if (!nativeRef.current) {
-        const max = maxOffset();
-        target.current = Math.min(target.current, max);
-        pos.current = Math.min(pos.current, max);
-      }
-      paint();
+      if (roTick) return;
+      roTick = requestAnimationFrame(() => {
+        roTick = 0;
+        // In phone mode the browser clamps its own scrollLeft, so there is
+        // nothing to re-clamp — only the readout to refresh.
+        if (!nativeRef.current) {
+          const max = maxOffset();
+          target.current = Math.min(target.current, max);
+          pos.current = Math.min(pos.current, max);
+        }
+        paint();
+      });
     });
     if (trackRef.current) ro.observe(trackRef.current);
     if (viewRef.current) ro.observe(viewRef.current);
@@ -305,6 +335,7 @@ export function CreativesRail() {
       cancelAnimationFrame(enable);
       cancelAnimationFrame(raf.current);
       cancelAnimationFrame(ticking);
+      cancelAnimationFrame(roTick);
       phone.removeEventListener("change", applyMode);
       view?.removeEventListener("scroll", onScroll);
       ro.disconnect();
