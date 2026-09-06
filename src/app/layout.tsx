@@ -29,6 +29,24 @@ const poppins = Poppins({
   // 300 is here for the testimonial meta line, which the design sets in Light.
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
+  // NOT preloaded, and this is the single biggest thing on the phone's clock.
+  //
+  // next/font emits its `<link rel="preload" as="font">` tags BEFORE the
+  // stylesheet link in the head, so on a bandwidth-limited connection the
+  // fonts get the pipe first. Measured on the live site over Slow 4G: five
+  // Poppins subsets and Dutch801 started at 636ms and finished between 1898
+  // and 1945ms, and the 16 KB stylesheet — which blocks rendering, and which
+  // every one of those font files is only useful AFTER — did not land until
+  // after 2073ms. First Contentful Paint was 2275ms on a page whose HTML had
+  // arrived at 745ms. The hero sat black for a second and a half waiting for
+  // fonts to get out of the way of the CSS.
+  //
+  // Dropping the preload costs the fonts one hop: they are discovered when
+  // the stylesheet parses instead of when the HTML does. `display: "swap"`
+  // plus next/font's metric-matched fallback means the headline paints on
+  // time either way and swaps without moving, so the hop is invisible and
+  // the stylesheet arrives about 1.3s sooner.
+  preload: false,
 });
 
 /**
@@ -53,6 +71,9 @@ const dutch801 = localFont({
   weight: "400",
   style: "normal",
   display: "swap",
+  // Same reason as Poppins above: 15 KB of wordmark is not worth going ahead
+  // of the stylesheet the whole page is blocked on.
+  preload: false,
 });
 
 /**

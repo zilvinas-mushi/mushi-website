@@ -93,7 +93,11 @@ export function TrustBadges() {
                refresh — the same flicker the platform floaters had. */
             loading="eager"
             decoding="sync"
-            fetchPriority="high"
+            // NOT fetchPriority="high". Eager already gets these a preload in
+            // the head from React; marking them high put 16 KB of award marks
+            // ahead of the render-blocking stylesheet on a slow connection,
+            // which is the same mistake the font preloads were making. They
+            // still load before the fold, just behind the CSS.
             // The phone row is three columns of ~110, so the desktop badge
             // scales down with the text rather than keeping its 64.
             className="size-[calc(var(--pu)*40)] shrink-0 object-contain md:size-[calc(var(--hero-u)*0.64)]"
