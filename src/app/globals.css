@@ -347,7 +347,9 @@ html {
   cross-fade is exactly what you would catch.
 */
 body {
-  background: #1c1927;
+  /* --canvas-top is set per page by CanvasTop; see its note. The default is
+     the home hero's own top edge. */
+  background: var(--canvas-top, #1c1927);
   color: var(--text);
 }
 

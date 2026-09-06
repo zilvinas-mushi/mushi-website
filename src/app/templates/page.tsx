@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CanvasTop } from "@/components/CanvasTop";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
@@ -67,6 +68,9 @@ const faqJsonLd = {
 export default function Templates() {
   return (
     <>
+      {/* This page opens on black, not the home hero's lit violet — see
+          CanvasTop. */}
+      <CanvasTop color="#000000" />
       <SiteHeader
         cta={{ label: TEMPLATES_PAGE.login, href: APP_URL, variant: "light" }}
         // The phone bar's sliding offer. It rides out as the hero's own CTA
