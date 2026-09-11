@@ -971,6 +971,17 @@ html[data-canvas="footer"] body {
   }
 }
 
+/* And the ring does NOT pan (Žilvinas 2026-09-11). The utility draws its
+   gradient at 200% and slides it, so the ring's colours drifted off the text's
+   — purple where the wording was salmon, and back. Here it is laid once across
+   the badge, purple at the left end to salmon at the right, the same run the
+   text inside makes. Doubled class so it outranks the utility's ::before,
+   which comes later in this file. */
+.tpl-badge.animated-gradient-border::before {
+  animation: none;
+  background-size: 100% 100%;
+}
+
 /* Disclosure rows open and close on a slide (Žilvinas 2026-09-06: "smooth,
    like the menu"), without giving up the native <details> the FAQ is built on
    — every answer stays in the DOM for crawlers and the rows still work with
@@ -989,9 +1000,13 @@ html[data-canvas="footer"] body {
   block-size: 0;
   overflow: hidden;
   will-change: block-size;
+  /* 480ms on one smooth ease-in-out-leaning curve, both ways (Žilvinas
+     2026-09-11, third pass). 220 snapped, 420 on an ease-out-quart still
+     read as fast, and 600 dragged ("turtle"). 480 sits between, and this
+     curve starts gently and settles gently, so neither end jumps or crawls. */
   transition:
-    block-size 220ms ease-out,
-    content-visibility 220ms allow-discrete;
+    block-size 480ms cubic-bezier(0.4, 0, 0.2, 1),
+    content-visibility 480ms allow-discrete;
 }
 
 .disclosure[open]::details-content {
@@ -1005,8 +1020,8 @@ html[data-canvas="footer"] body {
   opacity: 0;
   translate: 0 -6px;
   transition:
-    opacity 220ms ease-out,
-    translate 220ms ease-out;
+    opacity 480ms cubic-bezier(0.4, 0, 0.2, 1),
+    translate 480ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .disclosure[open] .disclosure-body {
@@ -1096,6 +1111,39 @@ html[data-canvas="footer"] body {
 .marquee:hover .marquee-track,
 .marquee:focus-within .marquee-track {
   animation-play-state: paused;
+}
+
+/* The /templates phone hero's category strips (Žilvinas 2026-09-11): the
+   upper row drifts left, the lower one right, forever. Each strip is its five
+   tiles three times over, and one loop is exactly ONE set — 5 x (131 tile +
+   20 gutter) = 755 — so the frame it jumps back to is identical to the one it
+   left, and the artboard's composition is what shows at every loop point.
+   A pixel distance rather than a percentage because the track is three sets
+   long, not two; three is what keeps both edges of a 767-wide screen covered
+   through the whole cycle. */
+/* --drift-set is the one-set distance, per strip: the hero's 755 by default,
+   the showcase rows set their own (see TemplatesShowcase). A var() inside
+   keyframes resolves against the animated element, so each strip loops on
+   its own set. */
+@keyframes tile-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(-1 * var(--drift-set, 755px)), 0, 0);
+  }
+}
+
+/* ~25px/s: slow enough that the tiles read as drifting behind the phone
+   rather than racing it, which is all they are for. A strip with a longer
+   set sets a longer --drift-duration to keep the same pace. */
+.tile-drift {
+  animation: tile-drift var(--drift-duration, 30s) linear infinite;
+  will-change: transform;
+}
+
+.tile-drift-reverse {
+  animation-direction: reverse;
 }
 
 @keyframes gradient-x {
@@ -1503,7 +1551,8 @@ html[data-canvas="footer"] body {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-gradient-x,
-  .animated-gradient-border::before {
+  .animated-gradient-border::before,
+  .tile-drift {
     animation: none;
   }
   /* Stop the marquee outright and let the row be scrolled by hand instead —

@@ -2,7 +2,7 @@ import { Fragment, type CSSProperties } from "react";
 import { Img } from "./Img";
 import { Logo } from "./Logo";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { APP_URL, BOOKING_URL, TEMPLATES_HERO_CTA_ID } from "@/lib/site";
+import { APP_URL, BOOKING_URL, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID } from "@/lib/site";
 
 // 15 either side on the phone (artboard 2026-09-06: the cards measure
 // 345 inside a 375 frame); the desktop reference keeps its 20.
@@ -429,7 +429,10 @@ export function TemplatesFaq() {
                   viewBox="0 0 18 11"
                   fill="none"
                   strokeWidth="2"
-                  className="h-[11px] w-[22px] shrink-0 stroke-white transition-transform duration-150 group-open:rotate-180 md:h-[18px] md:w-[18px]"
+                  // Turns on the panel's own 480ms curve (see .disclosure in
+                  // globals.css) — at 150 it flipped long before the answer
+                  // had finished arriving.
+                  className="h-[11px] w-[22px] shrink-0 stroke-white transition-transform duration-[480ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-180 md:h-[18px] md:w-[18px]"
                   aria-hidden="true"
                 >
                   <path strokeLinecap="round" d="M1 1l8 8 8-8" />
@@ -470,7 +473,11 @@ export function TemplatesTeam() {
             its 20 radius but tightens to a 15 pad. Everything below md is the
             same markup the desktop uses — only the numbers change. */}
         <div className="mx-auto mt-[37px] max-w-[880px] rounded-[20px] bg-[#141414] p-[15px] pb-[25px] md:mt-12 md:rounded-[16px] md:bg-[#111111] md:p-8">
-          <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
+          {/* 15 between the phone cards, card to card (Žilvinas
+              2026-09-11, Figma). Urte's portrait is drawn smaller instead
+              (see phoneImageH in content.ts) so her hair stays inside her
+              own card rather than rising into Noah's. */}
+          <div className="grid gap-[15px] sm:grid-cols-2 sm:gap-4">
             {t.people.map((p) => (
               <div
                 key={p.name}
@@ -502,7 +509,8 @@ export function TemplatesTeam() {
                     <Img
                       src={p.image}
                       alt={`${p.name}, ${p.role} at Mushi`}
-                      className="mx-auto h-[135px] w-auto max-w-none sm:h-[160px]"
+                      className="mx-auto h-[var(--portrait-h)] w-auto max-w-none sm:h-[160px]"
+                      style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
                     />
                   </span>
                 </span>
@@ -536,7 +544,9 @@ export function TemplatesTeam() {
                 <h3 className="text-[16px] font-medium uppercase tracking-[0.08em] text-[#858585] md:text-[14px]">
                   {n.label}
                 </h3>
-                <p className="mt-1.5 text-[14px] font-normal leading-normal text-white/90 md:mt-1.5 md:text-[18px] md:leading-relaxed">
+                {/* 4 on the phone, 2 tighter than it was (Žilvinas
+                    2026-09-11: "a very bit smaller"). */}
+                <p className="mt-1 text-[14px] font-normal leading-normal text-white/90 md:mt-1.5 md:text-[18px] md:leading-relaxed">
                   {n.body}
                 </p>
               </div>
@@ -553,13 +563,28 @@ export function TemplatesTeam() {
  * not the brands' real logos (interim rule, TOKENS.md "Client logotypes").
  */
 function CompetitorMark({ name }: { name: string }) {
+  // PHONE marks are the design's own 4x exports (Žilvinas 2026-09-11 — the
+  // earlier files drew soft), drawn at a quarter of their pixels, which is
+  // the artboard's size for each. The desktop keeps the files it was signed
+  // off with.
   if (name === "Kandy") {
-    return <Img src="templates/cmp-kandy.webp" alt={name} width={54} />;
+    return (
+      <>
+        <Img src="templates/cmp-kandy-phone.webp" alt={name} width={44} className="md:hidden" />
+        <Img src="templates/cmp-kandy.webp" alt={name} width={54} className="hidden md:block" />
+      </>
+    );
   }
   if (name === "CreativeOS") {
     return (
       <>
-        <Img src="templates/cmp-creativeos-icon.webp" alt="" width={40} className="-mr-2.5" />
+        <Img src="templates/cmp-creativeos-icon-phone.webp" alt={name} width={27} className="md:hidden" />
+        <Img
+          src="templates/cmp-creativeos-icon.webp"
+          alt=""
+          width={40}
+          className="-mr-2.5 hidden md:block"
+        />
         <Img
           src="templates/cmp-creativeos.webp"
           alt={name}
@@ -571,9 +596,24 @@ function CompetitorMark({ name }: { name: string }) {
   }
   return (
     <>
-      <Img src="templates/cmp-konvert-icon.webp" alt="" width={22} className="rounded-[6px]" />
       {/* Icon only on the phone — the column is ~60 wide there and the
           artboard shows the mark alone. */}
+      {/* The 4x export ("3rd logo.png") is the white square alone — the
+          star Figma draws inside it is a separate layer that did not come
+          with it, so it is laid back on top: a concave four-point star at
+          half the square, in the table's own near-black. */}
+      <span className="relative size-[20px] md:hidden">
+        <Img src="templates/cmp-konvert-icon-phone.webp" alt={name} width={20} className="size-[20px] object-contain" />
+        <svg aria-hidden="true" viewBox="0 0 20 20" className="absolute inset-0 size-full">
+          <path fill="#141414" d="M10 5Q10.6 9.4 15 10Q10.6 10.6 10 15Q9.4 10.6 5 10Q9.4 9.4 10 5Z" />
+        </svg>
+      </span>
+      <Img
+        src="templates/cmp-konvert-icon.webp"
+        alt=""
+        width={22}
+        className="hidden rounded-[6px] md:block"
+      />
       <Img src="templates/cmp-konvert.webp" alt={name} width={82} className="hidden md:block" />
     </>
   );
@@ -628,7 +668,12 @@ export function TemplatesComparison() {
           {c.heading}
         </h2>
 
-        {/* THE PHONE TABLE IS THE SAME GRID, SHORTER (artboard 2026-09-06):
+        {/* PHONE COLUMNS are the artboard's own (Žilvinas 2026-09-11): 115
+            label / 68 Mushi / 54 per competitor, 345 in all, written as fr so
+            they hold their proportion at every phone width. The plate is the
+            Mushi column exactly, not 2 wider each side.
+
+            THE PHONE TABLE IS THE SAME GRID, SHORTER (artboard 2026-09-06):
             44 header over 40 rows instead of 72 over 56, and NO CTA row —
             the phone puts "Get Mushi" under the table as a full-width button
             rather than inside the purple column's foot.
@@ -638,7 +683,7 @@ export function TemplatesComparison() {
             something Tailwind can see, and an inline style would beat any
             md: class trying to override it. */}
         <div
-          className="mx-auto mt-[37px] grid max-w-[880px] grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,1fr))] grid-rows-[var(--cmp-rows)] gap-y-1.5 md:gap-y-2 md:mt-12 md:grid-cols-[minmax(0,1.7fr)_repeat(4,minmax(0,1fr))] md:grid-rows-[var(--cmp-rows-md)]"
+          className="mx-auto mt-[37px] grid max-w-[880px] grid-cols-[minmax(0,115fr)_minmax(0,68fr)_repeat(3,minmax(0,54fr))] grid-rows-[var(--cmp-rows)] gap-y-1.5 md:gap-y-2 md:mt-12 md:grid-cols-[minmax(0,1.7fr)_repeat(4,minmax(0,1fr))] md:grid-rows-[var(--cmp-rows-md)]"
           style={
             {
               "--cmp-rows": `44px repeat(${c.rows.length}, 48px)`,
@@ -648,7 +693,7 @@ export function TemplatesComparison() {
         >
           <div
             aria-hidden="true"
-            className="pointer-events-none relative z-[1] col-start-2 row-start-1 -mx-[2px] row-end-[var(--plate-end)] md:-mx-2.5 md:row-end-[var(--plate-end-md)]"
+            className="pointer-events-none relative z-[1] col-start-2 row-start-1 row-end-[var(--plate-end)] md:-mx-2.5 md:row-end-[var(--plate-end-md)]"
             style={
               {
                 "--plate-end": String(lastRow),
@@ -689,7 +734,7 @@ export function TemplatesComparison() {
                 is already loaded for the header, and a live font beats any
                 export at this size. The desktop keeps the artwork, which is
                 the version its column was measured against. */}
-            <Logo className="text-[22px] md:hidden" />
+            <Logo className="-translate-x-[0.33px] text-[20px] md:hidden" />
             <Img
               src="templates/cmp-mushi.webp"
               alt="Mushi"
@@ -700,13 +745,11 @@ export function TemplatesComparison() {
           {c.competitors.map((name, i) => (
             <span
               key={name}
-              className="z-10 row-start-1 flex items-center gap-1.5 self-center justify-self-center"
-              style={{
-                gridColumnStart: i + 3,
-                // Nudge CreativeOS right so its enlarged emblem clears the
-                // purple column's glow.
-                ...(name === "CreativeOS" ? { marginLeft: 22 } : {}),
-              }}
+              // Desktop only: nudge CreativeOS right so its enlarged emblem
+              // clears the purple column's glow. On the phone the mark is
+              // just centred in its column, as the artboard has it.
+              className={`z-10 row-start-1 flex items-center gap-1.5 self-center justify-self-center ${name === "CreativeOS" ? "md:ml-[22px]" : ""}`}
+              style={{ gridColumnStart: i + 3 }}
             >
               <CompetitorMark name={name} />
             </span>
@@ -812,9 +855,74 @@ export function TemplatesComparison() {
 }
 
 /** The supplied white icon artwork for the Access benefit list. */
+/**
+ * The plan card's list icons, INLINE SVG (Žilvinas 2026-09-11: "best
+ * quality", stroke "the same as the text"). They were 48px bitmaps, soft at
+ * 3x. All on a 24 grid at stroke 1.5 with round ends, which drawn at 22 is
+ * ~1.4px — Poppins Regular's own stem weight at 16.
+ *
+ * Sources: card, target, tools and shield are Hugeicons' free set
+ * (CreditCardAccept, Target02, Tools, SecurityCheck); layers is Tabler's
+ * stack-2; sparkles and the "00" headset matched neither set, so they are
+ * drawn on the same grid from the bitmaps they replace.
+ */
+const ACCESS_ICONS: Record<string, string[]> = {
+  "icon-layers": ["M12 4l-8 4l8 4l8 -4l-8 -4", "M4 12l8 4l8 -4", "M4 16l8 4l8 -4"],
+  "icon-sparkles": [
+    // Two concave four-point stars, top-left and bottom-right…
+    "M7 2.5Q7 7 11.5 7Q7 7 7 11.5Q7 7 2.5 7Q7 7 7 2.5Z",
+    "M17 11.5Q17 17 22 17Q17 17 17 22.5Q17 17 12 17Q17 17 17 11.5Z",
+    // …and two plus signs in the other corners.
+    "M17.5 2.5v5M15 5h5",
+    "M5.5 15.5v5M3 18h5",
+  ],
+  "icon-card": [
+    "M11 20H10.5C6.74142 20 4.86213 20 3.60746 19.0091C3.40678 18.8506 3.22119 18.676 3.0528 18.4871C2 17.3062 2 15.5375 2 12C2 8.46252 2 6.69377 3.0528 5.5129C3.22119 5.32403 3.40678 5.14935 3.60746 4.99087C4.86213 4 6.74142 4 10.5 4H13.5C17.2586 4 19.1379 4 20.3925 4.99087C20.5932 5.14935 20.7788 5.32403 20.9472 5.5129C21.8957 6.57684 21.9897 8.11799 21.999 11",
+    "M2 9H22",
+    "M14 18C14 18 15 18 16 20C16 20 19.1765 15 22 14",
+  ],
+  "icon-headset": [
+    "M2.75 20v-8a9.25 9.25 0 0 1 18.5 0v8",
+    "M6.5 15.5a2 2 0 0 1 4 0v3a2 2 0 0 1 -4 0z",
+    "M13.5 15.5a2 2 0 0 1 4 0v3a2 2 0 0 1 -4 0z",
+  ],
+  "icon-target": [
+    "M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12C7 9.23858 9.23858 7 12 7",
+    "M14 2.20004C13.3538 2.06886 12.6849 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 11.3151 21.9311 10.6462 21.8 10",
+    "M12.0303 11.9625L16.5832 7.4096M19.7404 4.34462L19.1872 2.35748C19.0853 2.03011 18.6914 1.89965 18.4259 2.11662C16.9898 3.29018 15.4254 4.87091 16.703 7.36419C19.2771 8.56455 20.7466 6.94584 21.8733 5.5853C22.0975 5.3146 21.9623 4.90767 21.6247 4.81005L19.7404 4.34462Z",
+  ],
+  "icon-tools": [
+    "M13 11L18 6",
+    "M19 7L17 5L19.5 3.5L20.5 4.5L19 7Z",
+    "M4.02513 8.97487C3.01416 7.96391 2.75095 6.48836 3.23548 5.23548L4.65748 6.65748H6.65748V4.65748L5.23548 3.23548C6.48836 2.75095 7.96391 3.01416 8.97487 4.02513C9.98621 5.03647 10.2493 6.51274 9.76398 7.76593L16.2341 14.236C17.4873 13.7507 18.9635 14.0138 19.9749 15.0251C20.9858 16.0361 21.2491 17.5116 20.7645 18.7645L19.3425 17.3425L17.3425 17.3425V19.3425L18.7645 20.7645C17.5116 21.2491 16.0361 20.9858 15.0251 19.9749C14.0145 18.9643 13.7511 17.4895 14.2349 16.2369L7.76312 9.76507C6.51053 10.2489 5.03571 9.98546 4.02513 8.97487Z",
+    "M12.203 14.5L6.59897 20.1041C6.07115 20.6319 5.2154 20.6319 4.68758 20.1041L3.89586 19.3124C3.36805 18.7846 3.36805 17.9288 3.89586 17.401L9.49994 11.7969",
+  ],
+  "icon-shield": [
+    "M18.7088 3.49534C16.8165 2.55382 14.5009 2 12 2C9.4991 2 7.1835 2.55382 5.29116 3.49534C4.36318 3.95706 3.89919 4.18792 3.4496 4.91378C3 5.63965 3 6.34248 3 7.74814V11.2371C3 16.9205 7.54236 20.0804 10.173 21.4338C10.9067 21.8113 11.2735 22 12 22C12.7265 22 13.0933 21.8113 13.8269 21.4338C16.4576 20.0804 21 16.9205 21 11.2371L21 7.74814C21 6.34249 21 5.63966 20.5504 4.91378C20.1008 4.18791 19.6368 3.95706 18.7088 3.49534Z",
+    "M9 11.5C9 11.5 10.4079 11.7519 11 13.5C11 13.5 12.5 10.5 15 9.5",
+  ],
+};
+
 function AccessIcon({ name }: { name: string }) {
+  const paths = ACCESS_ICONS[name];
+  if (!paths) {
+    return <Img src={`templates/${name}.webp`} alt="" width={22} className="shrink-0" />;
+  }
   return (
-    <Img src={`templates/${name}.webp`} alt="" width={22} className="shrink-0" />
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-[22px] shrink-0"
+    >
+      {paths.map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </svg>
   );
 }
 
@@ -840,18 +948,30 @@ export function TemplatesAccess() {
         <div className="mx-auto mt-[37px] grid max-w-[980px] gap-5 md:mt-12 md:grid-cols-2 md:gap-6">
           {/* From scratch. */}
           <article
+            id={TEMPLATES_SCRATCH_CARD_ID}
             className="flex flex-col rounded-[15px] bg-[#111111] bg-cover bg-center p-6 md:rounded-[20px] md:p-7"
             style={{ backgroundImage: "url(/images/templates/access-card-dark.webp)" }}
           >
             <header className="flex items-center gap-3.5">
               {/* 35 square on the phone (artboard 2026-09-06), 44 on the
                   desktop reference. */}
-              <Img
-                src="templates/access-emoji-bad.webp"
-                alt=""
-                width={44}
-                className="size-[35px] rounded-[12px] md:size-[44px]"
-              />
+              {/* NOT ONE BAKED 96px FILE ANY MORE (Žilvinas 2026-09-11):
+                  that drew soft on a 3x phone. The square is CSS — the old
+                  file's own 135deg gradient, sampled — and the emoji is a
+                  separate high-res glyph (the supplied 181px 😔) at Figma's
+                  64% of the square. Radius is Figma's 6.4 on a 64.33 square,
+                  i.e. 10%, which holds at 35 and 44 alike. */}
+              <span className="grid size-[35px] shrink-0 place-items-center rounded-[10%] bg-[linear-gradient(135deg,#d57e80_0%,#b45455_50%,#b45455_100%)] md:size-[44px]">
+                <Img
+                  src="templates/access-emoji-bad-glyph.webp"
+                  alt=""
+                  width={28}
+                  className="h-auto w-[64%]"
+                />
+              </span>
+              {/* Centred on the square as it stands: measured, the title's
+                  cap top to the caption's baseline sits dead on the square's
+                  middle (Žilvinas 2026-09-11 asked; no nudge needed). */}
               <div>
                 {/* SemiBold 16 with the caption Regular 16 at 50% white
                     directly under it (artboard 2026-09-06). */}
@@ -869,25 +989,34 @@ export function TemplatesAccess() {
               </span>
               {/* SemiBold 20, no tracking, and tight to the figure — the
                   slash is part of the price, not a separate label. */}
-              <span className="text-[20px] font-semibold tracking-normal text-[#c5696a] md:text-[16px] md:font-medium">
+              {/* 3 below the figure's baseline on the phone, as Figma sets
+                  it (Žilvinas 2026-09-11) — sharing the baseline read high. */}
+              <span className="translate-y-[3px] text-[20px] font-semibold tracking-normal text-[#c5696a] md:translate-y-0 md:text-[16px] md:font-medium">
                 {a.scratch.unit}
               </span>
             </p>
             <ul className="mt-6 flex-1 space-y-[10px] md:space-y-3">
               {a.scratch.items.map((item) => (
                 <li key={item} className="flex items-center gap-1.5 text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
-                  {/* The design's own cross (Icon.svg, 2026-09-06): a 12 x 11
-                      stroke at weight 2 with round caps — chunkier than the
-                      thin webp glyph, and drawn rather than rastered so it is
-                      exact at the artboard's 10. */}
+                  {/* The design's own cross ("cross icon.svg", re-supplied
+                      2026-09-11), inlined: a SQUARE 23 viewBox drawn into a
+                      square box, so it scales evenly and cannot stretch.
+                      Stroke weight is the file's, and scales with it.
+                      11 on the phone — the text's own cap height (Poppins
+                      caps are 0.7em of 16), so the cross is exactly as tall
+                      as the letters beside it (Žilvinas 2026-09-11). */}
                   <svg
                     aria-hidden="true"
-                    viewBox="0 0 12 11"
+                    viewBox="0 0 23 23"
                     fill="none"
-                    className="size-[10px] shrink-0 stroke-white md:size-[18px]"
-                    strokeWidth="2"
+                    className="size-[11px] shrink-0 stroke-white md:size-[18px]"
+                    strokeWidth="3.84168"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 1 1 10M1 1l10 9" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M20.9209 1.9209L1.9209 20.9209M1.9209 1.9209L20.9209 20.9209"
+                    />
                   </svg>
                   {item}
                 </li>
@@ -913,12 +1042,17 @@ export function TemplatesAccess() {
             style={{ backgroundImage: "url(/images/templates/access-card-purple.webp)" }}
           >
             <header className="flex items-center gap-3.5">
-              <Img
-                src="templates/access-emoji-good.webp"
-                alt=""
-                width={44}
-                className="size-[35px] rounded-[12px] md:size-[44px]"
-              />
+              {/* Same build as the scratch card's square: CSS gradient
+                  sampled off the old file, 10% radius, and the supplied
+                  99px 😎 ("cool glasses icon.png"). */}
+              <span className="grid size-[35px] shrink-0 place-items-center rounded-[10%] bg-[linear-gradient(135deg,#9a7ed5_0%,#7a53b5_50%,#7a53b5_100%)] md:size-[44px]">
+                <Img
+                  src="templates/access-emoji-good-glyph.webp"
+                  alt=""
+                  width={28}
+                  className="h-auto w-[64%]"
+                />
+              </span>
               <div>
                 <h3 className="text-[16px] font-semibold leading-tight text-white md:text-[17px]">
                   {a.templates.title}
@@ -939,13 +1073,16 @@ export function TemplatesAccess() {
                 <span className="bg-[linear-gradient(180deg,#a08ade_0%,#9275ce_50%,#7f56b6_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[44px]">
                   {a.templates.figure}
                 </span>
-                <span className="text-[20px] font-semibold tracking-normal text-[#9b79e2] md:text-[16px] md:font-medium">
+                {/* 1.5 below the figure's baseline on the phone (Figma). */}
+                <span className="translate-y-[1.5px] text-[20px] font-semibold tracking-normal text-[#9b79e2] md:translate-y-0 md:text-[16px] md:font-medium">
                   {a.templates.unit}
                 </span>
               </span>
-              {/* 40 tall, label Regular 16 (Žilvinas 2026-09-06 — the 40 is
-                  the chip's box, not its type). */}
-              <span className="ml-auto flex h-10 shrink-0 items-center whitespace-nowrap rounded-full bg-[#232323] px-6 text-[16px] font-normal uppercase tracking-[0.04em] text-white md:h-auto md:py-3 md:text-[18px]">
+              {/* 149 x 34 on the phone (Žilvinas 2026-09-11, Figma), label
+                  Regular 16 with NO tracking — the 0.04em it carried is
+                  what made it 172 wide. 16 either side of ~117 of type is
+                  the 149. Desktop keeps its own tracked 18. */}
+              <span className="ml-auto flex h-[34px] shrink-0 items-center whitespace-nowrap rounded-full bg-[#232323] px-4 text-[16px] font-normal uppercase tracking-normal text-white md:h-auto md:px-6 md:py-3 md:text-[18px] md:tracking-[0.04em]">
                 {a.templates.chip}
               </span>
             </p>
@@ -977,16 +1114,18 @@ export function TemplatesAccess() {
           className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[url(/images/templates/access-banner-phone.webp)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:url(/images/templates/access-rays.webp),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:px-6"
         >
           <div className="flex items-center gap-3.5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/templates/access-banner-emoji.svg"
-              alt=""
-              width={44}
-              height={44}
-              loading="lazy"
-              decoding="async"
-              className="rounded-[10px]"
-            />
+            {/* Built like the two card squares (Žilvinas 2026-09-11): the
+                old SVG drew 🤩 as a raster inside a <pattern>, soft at any
+                size. Its own gradient and 6.4-on-64.33 radius (10%) in CSS,
+                the supplied 112px 🤩 on top at the SVG's 70%. */}
+            <span className="grid size-[44px] shrink-0 place-items-center rounded-[10%] bg-[linear-gradient(135deg,#4c4c4c_0%,#0a0a0a_40%,#333333_100%)]">
+              <Img
+                src="templates/access-banner-emoji-glyph.webp"
+                alt=""
+                width={31}
+                className="h-auto w-[70%]"
+              />
+            </span>
             <div>
               {/* Phone: 16/16 SemiBold, title ALONE — the artboard drops
                   the caption there, where the title already wraps to two
@@ -1000,7 +1139,11 @@ export function TemplatesAccess() {
           </div>
           <a
             href={BOOKING_URL}
-            className="discovery-ring group inline-flex h-[46px] items-center gap-2.5 rounded-[100px] bg-[linear-gradient(147deg,#100d16_0%,#100d16_100%)] pl-[17px] pr-5 md:pl-2 text-[15px] font-semibold uppercase tracking-[0.05em] text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black sm:ml-auto md:border md:border-white/70"
+            // #000, not the #100d16 it had — a purple-black that read blue
+            // against the banner (Žilvinas 2026-09-11; Figma fill 000000).
+            // 305 x 50 on the phone, i.e. the banner's full content width.
+            // The gradient layer stays so the hover still cross-fades.
+            className="discovery-ring group inline-flex h-[50px] w-full items-center gap-2.5 rounded-[100px] bg-[linear-gradient(147deg,#000_0%,#000_100%)] pl-[17px] pr-5 md:pl-2 text-[15px] font-semibold uppercase tracking-[0.05em] text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black sm:ml-auto sm:w-auto md:h-[46px] md:border md:border-white/70"
           >
             <span className="flex size-[25px] items-center justify-center rounded-full bg-white text-black md:size-[32px]">
               {/* The design's own arrow (Icon.svg, re-supplied 2026-09-06):
@@ -1053,17 +1196,13 @@ export function TemplatesShowcase() {
       </div>
 
       {/* Pulled up under the heading so it sits just above the wall's first
-          tile row — the artwork's top region is empty black. */}
-      <div aria-hidden="true" className="mt-[37px] md:-mt-16">
-        {/* The phone gets its own crop of the wall (Mask group.png, supplied
-            2026-09-06): the desktop file is a 2400-wide band that reduces to
-            an unreadable strip at 375, and the artboard shows a taller,
-            two-row version instead. */}
-        <Img
-          src="templates/showcase-wall-phone.webp"
-          alt=""
-          className="w-full md:hidden"
-        />
+          tile row — the artwork's top region is empty black.
+          PHONE: Figma's 37 is from the heading's BASELINE to the first ad's
+          top edge (Žilvinas 2026-09-11), not box to box. The baseline sits
+          ~5 above the 36px line box's bottom, so the rows start 32 under
+          it. */}
+      <div aria-hidden="true" className="mt-[32px] md:-mt-16">
+        <ShowcaseRows />
         <Img
           src="templates/showcase-wall.webp"
           alt=""
@@ -1071,6 +1210,85 @@ export function TemplatesShowcase() {
         />
       </div>
     </section>
+  );
+}
+
+/**
+ * The phone showcase — PHONE ONLY (Žilvinas 2026-09-11). Two strips of
+ * 170 x 170 ads, radius 10, 15 apart both ways; the upper drifts RIGHT and
+ * the lower LEFT, forever — the hero's strips in the other directions
+ * (.tile-drift in globals.css). This replaces the phone's baked wall image.
+ *
+ * The first three of each row are the artboard's, in its order and at its
+ * positions: Oura cut by the left edge, Gadzhi, Huel cut by the right on top;
+ * the skincare ad showing only its right edge, Plenny, Gymshark underneath.
+ * The rest are the desktop wall's other fully visible ads, split between the
+ * two rows, so a loop is 5 on top and 6 below.
+ *
+ * Every tile is cut from the walls themselves — the desktop's 2400 export at
+ * ~384 a tile, Gadzhi and Plenny from the phone wall at ~510 — which is more
+ * resolution than the 300 exports in the supplied set.
+ *
+ * Positions are anchored to the centre, as the hero strips are, so the
+ * artboard's slice of each tile holds at every phone width. Both rows are
+ * laid out one whole set further left than the artboard: identical on
+ * screen, since the sets repeat, and it keeps both edges covered through
+ * the loop at up to 767 wide. Three sets per strip for the same reason.
+ */
+const SHOWCASE_ROWS = [
+  {
+    // Artboard at 375: Oura's left edge at -40, i.e. centre - 227.5.
+    left: -227.5,
+    drift: "right",
+    tiles: ["oura", "gadzhi", "huel", "tea", "lanolips"],
+  },
+  {
+    // Skincare's left edge at -140, i.e. centre - 327.5.
+    left: -327.5,
+    drift: "left",
+    tiles: ["skincare", "plenny", "gymshark", "pilot", "olipop", "mom"],
+  },
+] as const;
+
+/** 170 tile + 15 gutter. */
+const SHOWCASE_PITCH = 185;
+
+function ShowcaseRows() {
+  return (
+    <div className="relative h-[355px] overflow-hidden md:hidden">
+      {SHOWCASE_ROWS.map((row, r) => {
+        const set = row.tiles.length * SHOWCASE_PITCH;
+        return (
+          <div
+            key={row.drift}
+            className={`tile-drift absolute flex gap-[15px] ${row.drift === "right" ? "tile-drift-reverse" : ""}`}
+            style={
+              {
+                top: r * SHOWCASE_PITCH,
+                left: `calc(50% + ${row.left - set}px)`,
+                "--drift-set": `${set}px`,
+                // The hero's ~25px/s.
+                "--drift-duration": `${set / 25}s`,
+              } as React.CSSProperties
+            }
+          >
+            {[...row.tiles, ...row.tiles, ...row.tiles].map((name, i) => (
+              <span
+                key={`${name}-${i}`}
+                className="block size-[170px] shrink-0 overflow-hidden rounded-[10px]"
+              >
+                <Img
+                  src={`templates/showcase-tile-${name}.webp`}
+                  alt=""
+                  width={170}
+                  className="size-full object-cover"
+                />
+              </span>
+            ))}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -1112,30 +1330,24 @@ export function TemplatesInside() {
             three-column bento. */}
         <div className="mx-auto mt-[37px] grid max-w-[1080px] grid-cols-2 gap-[15px] md:mt-12 md:grid-cols-[1fr_1fr_1.2fr] md:grid-rows-[auto_auto] md:gap-3">
           {/* 24/7 support — the baked art carries the memoji cluster and the
-              "Need help?" bubble, so only the headline renders as text. */}
+              "Need help?" bubble, so only the headline renders as text.
+              PHONE has its own art (Žilvinas 2026-09-11): 660 x 476, exactly
+              4x the 165 x 119 card, supplied already dimmed — so the 45%
+              black this card used to lay over the desktop art is gone. */}
           <article
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:p-6 md:text-left`}
-            style={{ backgroundImage: "url(/images/templates/inside-support.webp)" }}
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[url(/images/templates/inside-support-phone.webp)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[url(/images/templates/inside-support.webp)] md:p-6 md:text-left`}
           >
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 bg-black/45 md:hidden"
-            />
             <p className="relative">
               <span className={BIG}>{s.support.big}</span>
               <span className={`${SMALL} block md:mt-1`}>{s.support.small}</span>
             </p>
           </article>
 
-          {/* 5 industries — chip rows baked into the background art. */}
+          {/* 5 industries — chip rows baked into the background art. Same
+              phone treatment as the support card: its own 4x, pre-dimmed. */}
           <article
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:p-6 md:text-left`}
-            style={{ backgroundImage: "url(/images/templates/inside-industries.webp)" }}
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[url(/images/templates/inside-industries-phone.webp)] p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[url(/images/templates/inside-industries.webp)] md:p-6 md:text-left`}
           >
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 bg-black/45 md:hidden"
-            />
             <p className="relative">
               <span className={BIG}>{s.industries.big}</span>
               <span className={`${SMALL} block md:mt-1`}>{s.industries.small}</span>
@@ -1193,28 +1405,31 @@ export function TemplatesInside() {
                 its own spacing, and the file already has it. Flattened from
                 Figma's raster-in-<pattern> the same way the brand chips are.
                 */}
+            {/* 126 x 34 on the phone, nudged 6 UP by transform rather than
+                margin (Žilvinas 2026-09-11, after trying 3, 9 and 0): the
+                file carries empty top inside its 34, so at rest the
+                wordmark's ink sat 18 under the stars. 6 up leaves it 12. A
+                margin would re-centre the whole stack and move the stars
+                too. */}
             <Img
               src="templates/trustpilot-lockup.webp"
               alt="Trustpilot"
               width={126}
-              className="relative mt-1.5 h-[34px] w-auto md:mt-3 md:h-[26px]"
+              className="relative mt-1.5 h-[34px] w-auto -translate-y-[6px] md:mt-3 md:h-[26px] md:translate-y-0"
             />
             <p className={`${SMALL} relative mt-1 md:mt-2 md:!text-[20px]`}>{s.reviews.caption}</p>
           </article>
 
           {/* 50+ new templates monthly — the dimmed collage is the baked
-              background, anchored to the card's bottom like the design. */}
+              background, anchored to the card's bottom like the design.
+              PHONE has its own art (Žilvinas 2026-09-11), cropped off its
+              drop shadow to the 345 x 222 card at 4x. Its fade to black is
+              in the art, so the gradient that used to be laid over it here
+              is gone. */}
           <article
-            className={`${CARD} col-span-2 flex h-[222px] flex-col items-center pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:items-stretch md:pt-6 md:text-left`}
-            style={{
-              backgroundImage: "url(/images/templates/inside-monthly.webp)",
-              backgroundPosition: "center bottom",
-            }}
+            className={`${CARD} col-span-2 flex h-[222px] flex-col items-center bg-[url(/images/templates/inside-monthly-phone.webp)] pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:items-stretch md:bg-[url(/images/templates/inside-monthly.webp)] md:pt-6 md:text-left`}
+            style={{ backgroundPosition: "center bottom" }}
           >
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.68)_55%,rgba(0,0,0,0.4)_100%)] md:hidden"
-            />
             <p className="relative">
               <span className={`${BIG} text-[48px] md:text-[40px]`}>{s.monthly.big}</span>
               <span className={`${SMALL} block md:mt-1`}>{s.monthly.small}</span>
@@ -1280,12 +1495,25 @@ export function TemplatesDifference() {
                   that machinery — and the pixel-perfect registration it
                   depended on — is gone. diff-ad-add, diff-ad-bad and
                   diff-can-front are no longer rendered. */}
-              {/* Smaller and lower on the phone: the artboard keeps the can
-                  inside the card and leaves real air under the chip row,
-                  where the desktop lets it run 5% past each edge and start
-                  higher. */}
-              <span className="absolute left-[4%] top-[15%] block w-[92%] md:left-[-5%] md:top-[8%] md:w-[110%]">
-                <Img src="templates/diff-trashcan.webp" alt="" className="w-full" />
+              {/* PHONE: its own master (Siuksline.png, Žilvinas 2026-09-11 —
+                  adds the "ADD heading" ad in the bin). The art hard-cuts the
+                  ads on the left and the lid on the right; the export is
+                  cropped to exactly those two cuts and drawn edge to edge, so
+                  they land on the card's own edges instead of as a visible
+                  line 14px inside it. The bin fades out at the bottom in the
+                  art itself, so the card's bottom edge cuts only the fade.
+                  59 from the top puts the green ad ~80 down, clear of the
+                  chips. */}
+              <span className="absolute inset-x-0 top-[59px] block md:hidden">
+                <Img src="templates/diff-trashcan-phone.webp" alt="" className="w-full" />
+              </span>
+              {/* DESKTOP, run 5% past each edge. Re-supplied 2026-09-11 ("bin
+                  with an ad.png"): the same composition at twice the
+                  resolution, with a transparent ground instead of a baked
+                  dark one — cropped to register 1:1 with the file it
+                  replaces, so the placement did not move. */}
+              <span className="absolute left-[-5%] top-[8%] hidden w-[110%] md:block">
+                <Img src="templates/diff-trashcan-v2.webp" alt="" className="w-full" />
               </span>
             </div>
             {/* Poppins 16/16 on the phone, and the lead is MEDIUM there —
@@ -1299,7 +1527,7 @@ export function TemplatesDifference() {
 
           {/* Mushi. justify-between: chip top, ad centred, caption pinned to
               the bottom so both cards' captions align. */}
-          <article className="flex h-[453px] flex-col justify-between overflow-hidden rounded-[20px] bg-[radial-gradient(ellipse_95%_75%_at_50%_38%,#9a81d6_0%,#7b54b5_80%)] px-6 pb-[18px] pt-5 md:h-auto md:rounded-[24px] md:p-7">
+          <article className="flex flex-col overflow-hidden rounded-[20px] bg-[radial-gradient(ellipse_95%_75%_at_50%_38%,#9a81d6_0%,#7b54b5_80%)] px-6 pb-[18px] pt-5 md:h-auto md:rounded-[24px] md:p-7">
             {/* White chip carrying the wordmark artwork — the design's one
                 black rendering of the mark. */}
             {/* Same pill as the competitors' three on the phone — 26 tall,
@@ -1330,14 +1558,16 @@ export function TemplatesDifference() {
                 />
               </span>
             </div>
-            {/* min-h-0 + object-contain: the card is a fixed 453 on the
-                phone, so the ad has to fit the space the chip and the caption
-                leave rather than overflow it. Desktop is height-free and the
-                ad keeps its natural size there. */}
+            {/* Full width of the caption below it, and the card grows to
+                carry it (Žilvinas 2026-09-11). This card used to be a fixed
+                453 with the ad object-contained inside, which only fits at the
+                345 artboard; anything wider letterboxed the ad and left it
+                narrower than the text — 18 short at 390, 59 at 430. Height
+                now follows width: 455 at the artboard, a couple of px over. */}
             <Img
               src="templates/diff-ad-good.webp"
               alt={d.good.alt}
-              className="mx-auto mt-[13px] min-h-0 w-full flex-1 object-contain md:mt-5 md:flex-none"
+              className="mt-[13px] h-auto w-full md:mt-5"
             />
             {/* Same 16/16 medium as the card beside it on the phone. */}
             <p className="mt-6 text-[16px] font-medium leading-4 text-white md:text-[24px] md:font-bold md:leading-tight">
@@ -1496,10 +1726,24 @@ function AppWindow() {
  * Decorative: aria-hidden, and no labels reach the accessibility tree — the
  * industries are named in the copy below.
  */
+/*
+ * THEY DRIFT (Žilvinas 2026-09-11): the upper row left, the lower row right,
+ * on an infinite loop — see .tile-drift in globals.css. Each row renders its
+ * five tiles three times and moves exactly one set (755) per loop, so the
+ * artboard's composition above is what every loop starts and ends on.
+ *
+ * The right-moving row is laid out one set further left than its artboard
+ * position (TILE_SET below): a strip that starts where the artboard has it
+ * and moves right would open a gap at the left edge within seconds. Shifting
+ * by a whole set changes nothing on screen, because the sets are identical.
+ */
 const PHONE_TILE_ROWS = [
-  { top: 100, left: -385, tiles: ["Beauty", "Drink", "Fashion", "Beauty", "Food"] },
-  { top: 252, left: -330, tiles: ["Food", "Fashion", "Beauty", "Food", "Drink"] },
+  { top: 100, left: -385, drift: "left", tiles: ["Beauty", "Drink", "Fashion", "Beauty", "Food"] },
+  { top: 252, left: -330, drift: "right", tiles: ["Food", "Fashion", "Beauty", "Food", "Drink"] },
 ] as const;
+
+/** One set of five tiles: 5 x (131 + 20). Must match @keyframes tile-drift. */
+const TILE_SET = 755;
 
 /**
  * The competitors' logos, as the design supplied them (2026-09-06): the three
@@ -1598,10 +1842,13 @@ function PhoneTiles() {
       {PHONE_TILE_ROWS.map((row) => (
         <div
           key={row.top}
-          className="absolute flex gap-5"
-          style={{ top: row.top, left: `calc(50% + ${row.left}px)` }}
+          className={`tile-drift absolute flex gap-5 ${row.drift === "right" ? "tile-drift-reverse" : ""}`}
+          style={{
+            top: row.top,
+            left: `calc(50% + ${row.left - (row.drift === "right" ? TILE_SET : 0)}px)`,
+          }}
         >
-          {row.tiles.map((label, i) => {
+          {[...row.tiles, ...row.tiles, ...row.tiles].map((label, i) => {
             const cat = TEMPLATES_PAGE.categories.find((c) => c.label === label)!;
             return (
               <span

@@ -3,19 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { Logo } from "./Logo";
-import { NAV } from "@/lib/content";
+import { NAV, navHref } from "@/lib/content";
 import { BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID, SITE_NAME } from "@/lib/site";
-
-/**
- * Which drawer row reads as selected.
- *
- * mushi-app derives this from the pathname; here every nav target is an anchor
- * on one page, so there is no route to compare against. Until a scroll-spy
- * exists the design's selected row is pinned to the first entry — the same
- * "one row is always lit" shape the app has, rather than a drawer where
- * nothing is selected until you scroll.
- */
-const ACTIVE_NAV = "Agency";
 
 /**
  * The phone's CTA label, which is NOT the desktop bar's "Book a Call" — the
@@ -47,12 +36,24 @@ export type MobileCtaConfig = {
   fromId: string;
   /** id of the element whose arrival on screen puts it back. Optional. */
   untilId?: string;
+  /**
+   * Put it back as that element reaches the BUTTON rather than the bottom of
+   * the screen — fully in by the time the element's top meets the button's
+   * bottom edge. /templates' scratch card; home's fit-check keeps the screen.
+   */
+  untilAtButton?: boolean;
+  /**
+   * id of an element further down whose passage under the bar brings the
+   * button out AGAIN after untilId put it away — the same edge as fromId.
+   * /templates hands the offer back at its team note.
+   */
+  againId?: string;
   /** Box height and label size in px at the design's phone width. */
   heightPx?: number;
   labelPx?: number;
   /** Corner radius in px — home's 7, /templates' 5. */
   radiusPx?: number;
-  /** Optional 1px INSIDE stroke; /templates rings its button in #7C54B5. */
+  /** Optional 1px INSIDE stroke. Nothing sets one since /templates dropped its #7C54B5 ring. */
   strokeColor?: string;
 };
 
@@ -222,7 +223,8 @@ function useCtaTravel(
   cta: MobileCtaConfig,
 ) {
   const [reachable, setReachable] = useState(false);
-  const { fromId, untilId } = cta;
+  const { fromId, untilId, untilAtButton, againId } = cta;
+  const heightPx = cta.heightPx ?? 52;
 
   useEffect(() => {
     const node = ctaRef.current;
@@ -230,6 +232,7 @@ function useCtaTravel(
 
     const fromEl = document.getElementById(fromId);
     const untilEl = untilId ? document.getElementById(untilId) : null;
+    const againEl = againId ? document.getElementById(againId) : null;
 
     // Reduced motion drops the follower and goes back to the exact 1:1: the
     // reveal is the page's own scroll and stays, but nothing keeps moving
@@ -270,7 +273,17 @@ function useCtaTravel(
         // grows, so the CTA cannot reappear over the footer after the page has
         // finished asking.
         const top = untilEl.getBoundingClientRect().top;
-        out *= 1 - clamp01((window.innerHeight - top) / SPAN_PX);
+        // At the button: the range ENDS where the element's top meets the
+        // parked-out button's bottom (bar + 8 gap + box), so it has gone by
+        // the time the element gets there instead of sliding over it.
+        const edge = untilAtButton ? barBottom + 8 + heightPx + SPAN_PX : window.innerHeight;
+        out *= 1 - clamp01((edge - top) / SPAN_PX);
+      }
+
+      if (againEl) {
+        // The fromId edge a second time, lower down. `max` rather than a
+        // product: past this point it is out whatever untilId says.
+        out = Math.max(out, clamp01((barBottom - againEl.getBoundingClientRect().top) / SPAN_PX));
       }
 
       return out;
@@ -338,7 +351,7 @@ function useCtaTravel(
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [barRef, ctaRef, fromId, untilId]);
+  }, [barRef, ctaRef, fromId, untilId, untilAtButton, againId, heightPx]);
 
   return reachable;
 }
@@ -364,7 +377,18 @@ function useCtaTravel(
  * Since these are same-page anchor links, where the pathname never changes,
  * the drawer closes on link tap instead of on route change.
  */
-export function MobileHeader({ cta = HOME_CTA }: { cta?: MobileCtaConfig }) {
+/*
+ * `activePath` is the page's own path, as the desktop bar gets it: the drawer
+ * lights the row whose href it is (Žilvinas 2026-09-11 — on /templates,
+ * TEMPLATES is the selected row). Home passes nothing and gets "/", Agency.
+ */
+export function MobileHeader({
+  cta = HOME_CTA,
+  activePath,
+}: {
+  cta?: MobileCtaConfig;
+  activePath?: string;
+}) {
   const [open, setOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
@@ -475,7 +499,7 @@ export function MobileHeader({ cta = HOME_CTA }: { cta?: MobileCtaConfig }) {
             // The box height, and the travel derived from it: the whole box
             // plus the 0.5rem gap it stands below the bar, so at 0 the button
             // sits exactly inside the bar's own footprint whatever height the
-            // page asked for. 52 is home's; /templates is 45.
+            // page asked for. 52 on both pages today.
             "--cta-h": `${cta.heightPx ?? 52}px`,
             translate: "0 calc((var(--cta-out, 0) - 1) * (var(--cta-h) + 0.5rem))",
           } as CSSProperties}
@@ -503,11 +527,12 @@ export function MobileHeader({ cta = HOME_CTA }: { cta?: MobileCtaConfig }) {
             className="absolute inset-x-0 top-full z-50 mt-2 flex flex-col gap-2.5 rounded-[0.3125rem] bg-[#181818] p-2.5 shadow-2xl"
           >
             {NAV.map((item) => {
-              const active = item.label === ACTIVE_NAV;
+              const href = navHref(item, activePath ?? "/");
+              const active = href !== null && href === (activePath ?? "/");
               // No href means the page does not exist yet — half strength, no
               // hover, no pointer, not focusable. Same treatment as the
               // desktop bar; see the note on NAV in content.ts.
-              if (!item.href) {
+              if (!href) {
                 return (
                   <span
                     key={item.label}
@@ -521,7 +546,7 @@ export function MobileHeader({ cta = HOME_CTA }: { cta?: MobileCtaConfig }) {
               return (
                 <a
                   key={item.label}
-                  href={item.href}
+                  href={href}
                   onClick={() => setOpen(false)}
                   aria-current={active ? "true" : undefined}
                   // 52 tall / 17px semibold, selected row on a #222 plate — the

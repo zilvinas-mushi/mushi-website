@@ -267,7 +267,7 @@ export function Hero() {
           The text classes stay on THIS element: the ring is sized in `em` and
           reads its font-size from here.
         */}
-        <span className="eyebrow-pill mb-[calc(var(--pu)*28)] inline-flex h-[calc(var(--pu)*34)] items-center justify-center rounded-[3.125rem] px-5 text-[length:calc(var(--pu)*14)] font-medium text-black md:mb-[calc(var(--hero-u)*0.28)] md:h-[calc(var(--hero-w)*0.45)] md:rounded-[calc(var(--hero-w)*0.5)] md:px-[calc(var(--hero-w)*0.28)] md:text-[length:calc(var(--hero-w)*0.2)]">
+        <span className="eyebrow-pill mb-[calc(var(--pu)*28)] inline-flex h-[calc(var(--pu)*34)] items-center justify-center rounded-[3.125rem] px-[calc(var(--pu)*14)] text-[length:calc(var(--pu)*14)] font-medium text-black md:mb-[calc(var(--hero-u)*0.28)] md:h-[calc(var(--hero-w)*0.45)] md:rounded-[calc(var(--hero-w)*0.5)] md:px-[calc(var(--hero-w)*0.28)] md:text-[length:calc(var(--hero-w)*0.2)]">
           {HERO.eyebrow}
         </span>
 

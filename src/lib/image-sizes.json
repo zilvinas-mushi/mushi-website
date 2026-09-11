@@ -331,6 +331,10 @@
     "w": 900,
     "h": 1595
   },
+  "templates/access-banner-emoji-glyph.webp": {
+    "w": 112,
+    "h": 108
+  },
   "templates/access-banner-phone.webp": {
     "w": 1035,
     "h": 450
@@ -351,9 +355,17 @@
     "w": 760,
     "h": 988
   },
+  "templates/access-emoji-bad-glyph.webp": {
+    "w": 166,
+    "h": 166
+  },
   "templates/access-emoji-bad.webp": {
     "w": 96,
     "h": 96
+  },
+  "templates/access-emoji-good-glyph.webp": {
+    "w": 99,
+    "h": 99
   },
   "templates/access-emoji-good.webp": {
     "w": 96,
@@ -387,6 +399,10 @@
     "w": 40,
     "h": 33
   },
+  "templates/cmp-creativeos-icon-phone.webp": {
+    "w": 108,
+    "h": 96
+  },
   "templates/cmp-creativeos-icon.webp": {
     "w": 48,
     "h": 43
@@ -399,9 +415,17 @@
     "w": 260,
     "h": 42
   },
+  "templates/cmp-kandy-phone.webp": {
+    "w": 176,
+    "h": 103
+  },
   "templates/cmp-kandy.webp": {
     "w": 200,
     "h": 116
+  },
+  "templates/cmp-konvert-icon-phone.webp": {
+    "w": 80,
+    "h": 80
   },
   "templates/cmp-konvert-icon.webp": {
     "w": 196,
@@ -459,9 +483,13 @@
     "w": 240,
     "h": 101
   },
-  "templates/diff-trashcan.webp": {
+  "templates/diff-trashcan-phone.webp": {
     "w": 1200,
-    "h": 1342
+    "h": 1366
+  },
+  "templates/diff-trashcan-v2.webp": {
+    "w": 1800,
+    "h": 2013
   },
   "templates/eyebrow-left.webp": {
     "w": 220,
@@ -519,13 +547,25 @@
     "w": 48,
     "h": 48
   },
+  "templates/inside-industries-phone.webp": {
+    "w": 660,
+    "h": 476
+  },
   "templates/inside-industries.webp": {
     "w": 1000,
     "h": 708
   },
+  "templates/inside-monthly-phone.webp": {
+    "w": 1380,
+    "h": 888
+  },
   "templates/inside-monthly.webp": {
     "w": 800,
     "h": 1078
+  },
+  "templates/inside-support-phone.webp": {
+    "w": 660,
+    "h": 476
   },
   "templates/inside-support.webp": {
     "w": 1000,
@@ -559,6 +599,10 @@
     "w": 500,
     "h": 1183
   },
+  "templates/process-phone-1.webp": {
+    "w": 1380,
+    "h": 1380
+  },
   "templates/process-phone-2.webp": {
     "w": 900,
     "h": 900
@@ -575,6 +619,50 @@
     "w": 253,
     "h": 176
   },
+  "templates/showcase-tile-gadzhi.webp": {
+    "w": 510,
+    "h": 510
+  },
+  "templates/showcase-tile-gymshark.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-huel.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-lanolips.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-mom.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-olipop.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-oura.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-pilot.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-plenny.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-skincare.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "templates/showcase-tile-tea.webp": {
+    "w": 680,
+    "h": 680
+  },
   "templates/showcase-wall-phone.webp": {
     "w": 1125,
     "h": 1260
@@ -583,17 +671,17 @@
     "w": 2400,
     "h": 1589
   },
-  "templates/team-noah-cut.webp": {
-    "w": 420,
-    "h": 328
+  "templates/team-noah-v2.webp": {
+    "w": 516,
+    "h": 540
   },
   "templates/team-noah.webp": {
     "w": 420,
     "h": 359
   },
-  "templates/team-urte-cut.webp": {
-    "w": 420,
-    "h": 361
+  "templates/team-urte-v2.webp": {
+    "w": 549,
+    "h": 520
   },
   "templates/team-urte.webp": {
     "w": 420,

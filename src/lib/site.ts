@@ -108,6 +108,13 @@ export const FINAL_CTA_ID = "final-fit-check";
  */
 export const TEMPLATES_HERO_CTA_ID = "templates-hero-cta";
 
+/**
+ * /templates "Ad creation from scratch" card. The phone header's REDEEM 50%
+ * OFF button goes back up as this card reaches it (Žilvinas 2026-09-11) — the
+ * card is the pain the offer answers, so the offer steps out of its way.
+ */
+export const TEMPLATES_SCRATCH_CARD_ID = "templates-scratch-card";
+
 export const FOOTER_PLATE_ID = "footer-plate";
 
 /**

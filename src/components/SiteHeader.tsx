@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { MobileHeader, type MobileCtaConfig } from "./MobileHeader";
-import { NAV } from "@/lib/content";
+import { NAV, navHref } from "@/lib/content";
 import { BOOKING_URL, SITE_NAME } from "@/lib/site";
 
 /**
@@ -80,7 +80,7 @@ export function SiteHeader({
   return (
     <>
       {/* Phone header with mushi-app's drawer motion; hidden from md up. */}
-      <MobileHeader cta={mobileCta} />
+      <MobileHeader cta={mobileCta} activePath={active} />
 
       <header
         className="sticky top-[1.375rem] z-50 hidden px-4 md:block"
@@ -210,9 +210,9 @@ export function SiteHeader({
               // rather than as a link that silently does nothing. `aria-
               // disabled` says the same thing to a screen reader.
               <li key={item.label} className="flex">
-                {item.href ? (
+                {navHref(item, active ?? "/") ? (
                   <a
-                    href={item.href}
+                    href={item.href ?? undefined}
                     aria-current={item.href === active ? "page" : undefined}
                     className={`cap-centered text-[length:calc(var(--u)*0.28)] font-semibold uppercase leading-none tracking-[0.01em] transition-colors ${
                       item.href === active

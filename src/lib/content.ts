@@ -26,12 +26,21 @@ import { BOOKING_ANCHOR } from "@/lib/site";
 export const NAV = [
   { label: "Agency", href: "/" },
   { label: "Case Studies", href: null },
-  // Back to null 2026-09-06: /templates is not ready to be linked from
-  // production. The page is still there and still works if you type the
-  // path — this only takes it out of both headers, where it renders as
-  // half-strength text instead of a link. Give it the href back to ship it.
-  { label: "Templates", href: null },
+  // LIVE ONLY ON ITS OWN PAGE (Žilvinas 2026-09-11): on /templates it is a
+  // link and the selected row; on the home page it stays the half-strength
+  // text it has been since 2026-09-06. See navHref.
+  { label: "Templates", href: "/templates", liveOn: ["/templates"] },
 ] as const;
+
+/**
+ * The href a nav entry has ON THIS PAGE, or null if it renders disabled
+ * there. One rule for both headers, so the desktop bar and the phone drawer
+ * cannot disagree about what is a link.
+ */
+export function navHref(item: (typeof NAV)[number], path: string): string | null {
+  if ("liveOn" in item && !(item.liveOn as readonly string[]).includes(path)) return null;
+  return item.href;
+}
 
 /**
  * Platform icons that float around the hero artwork in the design.
@@ -1016,7 +1025,7 @@ export const TEMPLATES_PAGE = {
       {
         name: "Noah Bakanas",
         role: "Founder",
-        image: "templates/team-noah-cut.webp",
+        image: "templates/team-noah-v2.webp",
         color: "#a78ae0",
         // The role reads as a GRADIENT, not a flat colour (Figma fill panel,
         // 2026-09-06): the house violet ramp for the founder, a salmon one
@@ -1034,7 +1043,11 @@ export const TEMPLATES_PAGE = {
       {
         name: "Urtė Balevičiūtė",
         role: "Product Developer",
-        image: "templates/team-urte-cut.webp",
+        image: "templates/team-urte-v2.webp",
+        // Drawn 127 tall on the phone, not 135 (Žilvinas 2026-09-11): her
+        // hair should clear the top of her own card by just a little (~5),
+        // not rise toward Noah's as it did at 135, nor stop inside it (119).
+        phoneImageH: 127,
         color: "#d0737f",
         roleGradient: "linear-gradient(90deg,#d07678 0%,#ffaeb0 100%)",
         backdrop: "linear-gradient(135deg,#c98a8c 0%,#96494c 100%)",
@@ -1125,7 +1138,8 @@ export const TEMPLATES_PAGE = {
     },
     banner: {
       emoji: "🤩",
-      title: "Done-for-you premium creatives",
+      // ", every week" added (Žilvinas 2026-09-11).
+      title: "Done-for-you premium creatives, every week",
       sub: "Growth partner for eCommerce, AI, SaaS.",
       cta: "Book Your Discovery Call",
     },
@@ -1170,6 +1184,10 @@ export const TEMPLATES_PAGE = {
         title: "Pick a Template",
         chip: "Easy Peasy!",
         image: "templates/process-pick.webp",
+        // Flattened phone card like steps two and three (Žilvinas
+        // 2026-09-11): the 600-wide process-pick shot upscaled soft on a
+        // 3x phone. Shipped at the supplied 1380, quality 95.
+        phoneCard: "templates/process-phone-1.webp",
         card: "process-card-1.webp",
         alt: "Cursor picking a Back In Stock ad template from the Mushi library",
         gradient: "linear-gradient(150deg,#5e3d8a 0%,#53347b 45%,#512e7e 100%)",
