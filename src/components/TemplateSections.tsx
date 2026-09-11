@@ -908,21 +908,28 @@ function AccessIcon({ name }: { name: string }) {
   if (!paths) {
     return <Img src={`templates/${name}.webp`} alt="" width={22} className="shrink-0" />;
   }
+  // PHONE: a 16 slot with the glyph filling it (~13 of ink), per the
+  // artboard — both lists on a 26 row pitch with text 19 from the left, the
+  // scratch card's crosses in the same 16 slot. Stroke 2 on the 24 grid is
+  // ~1.3px at 16, Poppins Regular's stem at 16px, so the line still matches
+  // the text. Desktop keeps 22 and 1.5.
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-[22px] shrink-0"
-    >
-      {paths.map((d) => (
-        <path key={d} d={d} />
-      ))}
-    </svg>
+    <span className="grid size-[16px] shrink-0 place-items-center md:size-[22px]">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="size-[16px] stroke-2 md:size-[22px] md:stroke-[1.5]"
+      >
+        {paths.map((d) => (
+          <path key={d} d={d} />
+        ))}
+      </svg>
+    </span>
   );
 }
 
@@ -997,27 +1004,30 @@ export function TemplatesAccess() {
             </p>
             <ul className="mt-6 flex-1 space-y-[10px] md:space-y-3">
               {a.scratch.items.map((item) => (
-                <li key={item} className="flex items-center gap-1.5 text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
-                  {/* The design's own cross ("cross icon.svg", re-supplied
-                      2026-09-11), inlined: a SQUARE 23 viewBox drawn into a
-                      square box, so it scales evenly and cannot stretch.
-                      Stroke weight is the file's, and scales with it.
-                      11 on the phone — the text's own cap height (Poppins
-                      caps are 0.7em of 16), so the cross is exactly as tall
-                      as the letters beside it (Žilvinas 2026-09-11). */}
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 23 23"
-                    fill="none"
-                    className="size-[11px] shrink-0 stroke-white md:size-[18px]"
-                    strokeWidth="3.84168"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M20.9209 1.9209L1.9209 20.9209M1.9209 1.9209L20.9209 20.9209"
-                    />
-                  </svg>
+                <li key={item} className="flex items-center gap-[3px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
+                  {/* The design's own cross ("cross icon.svg", supplied
+                      2026-09-11) — its path and its 3.84 stroke verbatim,
+                      square 23 viewBox so it cannot stretch. Drawn at 13,
+                      a touch over the text's cap height (Žilvinas asked for
+                      "a little bit" bigger than 11; 18 on desktop), centred in a
+                      22 slot: the same slot as the plan card's icons, so
+                      both lists share one row pitch (32) and one text
+                      start (Žilvinas 2026-09-11). */}
+                  <span className="grid size-[16px] shrink-0 place-items-center md:size-[22px]">
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 23 23"
+                      fill="none"
+                      className="size-[13px] stroke-white md:size-[18px]"
+                      strokeWidth="3.84168"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M20.9209 1.9209L1.9209 20.9209M1.9209 1.9209L20.9209 20.9209"
+                      />
+                    </svg>
+                  </span>
                   {item}
                 </li>
               ))}
@@ -1088,7 +1098,7 @@ export function TemplatesAccess() {
             </p>
             <ul className="mt-[15px] flex-1 space-y-[10px] md:mt-6 md:space-y-3">
               {a.templates.items.map((item) => (
-                <li key={item.label} className="flex items-center gap-1.5 text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
+                <li key={item.label} className="flex items-center gap-[3px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
                   <AccessIcon name={item.icon} />
                   {item.label}
                 </li>
