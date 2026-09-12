@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Roboto } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { CanvasTint } from "@/components/CanvasTint";
@@ -46,6 +46,24 @@ const poppins = Poppins({
   // plus next/font's metric-matched fallback means the headline paints on
   // time either way and swaps without moving, so the hop is invisible and
   // the stylesheet arrives about 1.3s sooner.
+  preload: false,
+});
+
+/**
+ * Roboto Black — ONLY the /templates hero category-tile labels. Matched
+ * against the client's supplied sample ("FASHION.png", 2026-09-10): oval O,
+ * pointed A apex, and a 5.8 width/height ratio for "FASHION" against the
+ * sample's 5.73 — Arial Black, Archivo Black, Inter Black and Helvetica
+ * Neue all measured visibly wider or narrower. Single weight; the tiles set
+ * it uppercase with tight tracking to close the last of that gap.
+ */
+const roboto = Roboto({
+  variable: "--font-roboto",
+  subsets: ["latin"],
+  weight: "900",
+  display: "swap",
+  // Decorative labels on one page, hidden below xl — same reasoning as the
+  // other faces: never ahead of the stylesheet.
   preload: false,
 });
 
@@ -182,7 +200,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${dutch801.variable} ${satoshi.variable} h-full antialiased`}
+      className={`${poppins.variable} ${dutch801.variable} ${satoshi.variable} ${roboto.variable} h-full antialiased`}
     >
       {/*
         NO BACKGROUND ON `body` — it is set in globals.css, and it is not the

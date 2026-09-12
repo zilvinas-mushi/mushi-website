@@ -730,5 +730,17 @@
   "used-by-10000.webp": {
     "w": 900,
     "h": 1595
+  },
+  "templates/eyebrow-rule-left.webp": {
+    "w": 322,
+    "h": 42
+  },
+  "templates/eyebrow-rule-right.webp": {
+    "w": 320,
+    "h": 42
+  },
+  "templates/diff-ad-peek.webp": {
+    "w": 520,
+    "h": 475
   }
 }

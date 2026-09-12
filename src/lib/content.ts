@@ -917,26 +917,18 @@ export const TEMPLATES_PAGE = {
   // it does not book a call.
   mobileCta: "Redeem 50% Off",
     /**
-   * Category tiles beside the window — decorative (aria-hidden). Pattern,
-   * size and layering follow the final hero reference (2026-09-03): one
-   * tile per side on the top row, two on the second, outer tiles cut by the
-   * viewport edge, inner second-row tiles sliding UNDER the MacBook.
-   *
-   * Positions are anchored to the CENTRE (calc(50% - Npx)), not the
-   * viewport edges: on wider screens the field stays put around the MacBook
-   * and the extra outer tiles (Food, second Drink) come into view, exactly
-   * as the wide-screen example shows. At 1440 those two sit fully outside
-   * the clip. Beauty genuinely appears three times in the reference.
+   * Category tiles beside the window — decorative (aria-hidden). The five
+   * industries, one tile each; CategoryTiles repeats the set into two
+   * marquee rows (top drifting right, bottom left, 2026-09-09) that run
+   * clear across the viewport and under the MacBook, so per-tile positions
+   * no longer exist.
    */
   categories: [
-    { label: "Drink", image: "templates/cat-drink.webp", pos: "left-[calc(50%_-_915px)] top-[523px]" },
-    { label: "Fashion", image: "templates/cat-fashion.webp", pos: "left-[calc(50%_-_692px)] top-[523px]" },
-    { label: "Health", image: "templates/cat-health.webp", pos: "left-[calc(50%_-_814px)] top-[719px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "left-[calc(50%_-_594px)] top-[719px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_715px)] top-[523px]" },
-    { label: "Food", image: "templates/cat-food.webp", pos: "right-[calc(50%_-_928px)] top-[523px]" },
-    { label: "Beauty", image: "templates/cat-beauty.webp", pos: "right-[calc(50%_-_600px)] top-[719px]" },
-    { label: "Drink", image: "templates/cat-drink.webp", pos: "right-[calc(50%_-_810px)] top-[719px]" },
+    { label: "Drink", image: "templates/cat-drink.webp" },
+    { label: "Fashion", image: "templates/cat-fashion.webp" },
+    { label: "Health", image: "templates/cat-health.webp" },
+    { label: "Beauty", image: "templates/cat-beauty.webp" },
+    { label: "Food", image: "templates/cat-food.webp" },
   ],
   /**
    * "Difference" comparison section. Rebuilt 2026-09-03 (late) from the

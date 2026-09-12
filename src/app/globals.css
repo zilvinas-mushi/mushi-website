@@ -257,6 +257,8 @@
   --font-serif: var(--font-dutch801);
   /* Satoshi (variable) — the Konvert wordmark only; exposed as font-satoshi. */
   --font-satoshi: var(--font-satoshi-v);
+  /* Roboto Black — the /templates hero tile labels only; see layout.tsx. */
+  --font-tile: var(--font-roboto);
 
   /* Slow horizontal pan for animated gradient text. Pair with
      bg-[length:200%_auto]. Ported from mushi-app. */
@@ -833,7 +835,14 @@ html[data-canvas="footer"] body {
   inset: 0;
   border-radius: inherit;
   padding: var(--ring-w, 1px);
-  background: var(--ring-fill, linear-gradient(180deg, #999999 0%, #ffffff 50%));
+  /* Default (desktop): the same soft top-light the phone artboard uses —
+     white at 28% catching the top edge, gone by 60% down — replacing the
+     hard #999-into-white stroke that read as a bright frame (client
+     2026-09-10, with the trash-card example). */
+  background: var(
+    --ring-fill,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 60%)
+  );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -976,7 +985,8 @@ html[data-canvas="footer"] body {
    — purple where the wording was salmon, and back. Here it is laid once across
    the badge, purple at the left end to salmon at the right, the same run the
    text inside makes. Doubled class so it outranks the utility's ::before,
-   which comes later in this file. */
+   which comes later in this file. (Supersedes the 2026-09-09 pan-together
+   .tpl-badge-text approach from the desktop branch.) */
 .tpl-badge.animated-gradient-border::before {
   animation: none;
   background-size: 100% 100%;
@@ -1143,6 +1153,24 @@ html[data-canvas="footer"] body {
 }
 
 .tile-drift-reverse {
+  animation-direction: reverse;
+}
+
+/* THE DESKTOP hero's category tiles (CategoryTiles): same two-half seamless
+   loop as the creatives marquee, same keyframes. The top row runs the
+   animation in reverse so it drifts right while the bottom row drifts left.
+   One half is wider than any viewport, so the loop point never shows. 90s is
+   a background drift, deliberately slower than the creatives rail: these
+   tiles sit behind the hero device and must not compete with it. No
+   hover-pause (pointer-events-none, purely decorative) and no fade mask —
+   the reference cuts the tiles hard at the viewport edge. */
+.tile-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x var(--tile-marquee-duration, 90s) linear infinite;
+  will-change: transform;
+}
+.tile-marquee-track--reverse {
   animation-direction: reverse;
 }
 
@@ -1561,6 +1589,10 @@ html[data-canvas="footer"] body {
     animation: none;
     width: auto;
     overflow-x: auto;
+  }
+  /* The tile rows just hold still — they are decorative and not scrollable. */
+  .tile-marquee-track {
+    animation: none;
   }
   *,
   *::before,

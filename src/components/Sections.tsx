@@ -456,7 +456,10 @@ export function SocialProof() {
             the two ornaments run to the screen edges instead of stopping at
             the content column. It also hands them the 40px they need to show
             the star at full size beside the headline. */}
-        <div className="-mx-[var(--gutter)] flex items-center justify-center gap-2 md:mx-0 md:gap-3">
+        {/* gap-3 at every breakpoint: the 12px between a header and its
+            flanking ornaments is site-wide (client 2026-09-11), matching
+            SectionEyebrow on /templates. */}
+        <div className="-mx-[var(--gutter)] flex items-center justify-center gap-3 md:mx-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/creatives/icons/divider-left.svg"
