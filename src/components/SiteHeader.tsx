@@ -2,6 +2,8 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { MobileHeader, type MobileCtaConfig } from "./MobileHeader";
+import { HeaderCtaSwap } from "./HeaderCtaSwap";
+import { CTA_FILL, type HeaderCta } from "./headerCta";
 import { NAV, navHref } from "@/lib/content";
 import { BOOKING_URL, SITE_NAME } from "@/lib/site";
 
@@ -44,26 +46,26 @@ const SCALE = { "--u": "var(--header-u)" } as CSSProperties;
  * Header CTA override. The default is the home page's violet "Book a Call";
  * /templates swaps in a light "Login" pointing at the webapp, per its design.
  * Each variant still inverts its OWN two colours on hover (CLAUDE.md).
+ * The type and the two liveries live in headerCta.ts, shared with the
+ * scroll-driven swap.
  */
-export type HeaderCta = {
-  label: string;
-  href: string;
-  variant?: "purple" | "light";
-};
-
-const CTA_FILL = {
-  purple:
-    "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5]",
-  light:
-    "bg-[linear-gradient(117.51deg,#fdfdfd_10.47%,#ececec_98.13%)] text-black hover:bg-[linear-gradient(117.51deg,#000_10.47%,#000_98.13%)] hover:text-white",
-} as const;
+export type { HeaderCta };
 
 export function SiteHeader({
   cta,
+  ctaSwap,
   mobileCta,
   active,
 }: {
   cta?: HeaderCta;
+  /**
+   * Scroll-driven second face for the CTA (client 2026-09-12): `to` slides
+   * in from the top as the viewport travels from the section containing
+   * `startId` to the one containing `endId`, and back out when scrolling
+   * up. /templates uses it to turn Login into Buy Now from the Difference
+   * section onward.
+   */
+  ctaSwap?: { to: HeaderCta; startId: string; endId: string };
   /**
    * The phone bar's sliding button — label, target, and the elements that
    * bring it out and put it away. Defaults to the home page's Schedule a Call;
@@ -258,17 +260,32 @@ export function SiteHeader({
             Hover inverts fill and text per the rule in CLAUDE.md — a gradient
             stays on both states so the fill cross-fades instead of snapping.
           */}
-          <a
-            href={cta?.href ?? BOOKING_URL}
-            className={`mr-[calc(var(--u)*0.15)] inline-flex shrink-0 items-center justify-center rounded-[calc(var(--u)*0.15)] font-semibold leading-none transition-all duration-300 ease-out ${CTA_FILL[cta?.variant ?? "purple"]}`}
-            style={{
-              width: "calc(var(--u) * 2.42)",
-              height: "calc(var(--u) * 0.7)",
-              fontSize: "calc(var(--u) * 0.3)",
-            }}
-          >
-            {cta?.label ?? "Book a Call"}
-          </a>
+          {ctaSwap ? (
+            <HeaderCtaSwap
+              from={cta ?? { label: "Book a Call", href: BOOKING_URL, variant: "purple" }}
+              to={ctaSwap.to}
+              startId={ctaSwap.startId}
+              endId={ctaSwap.endId}
+              className="mr-[calc(var(--u)*0.15)] shrink-0"
+              style={{
+                width: "calc(var(--u) * 2.42)",
+                height: "calc(var(--u) * 0.7)",
+                fontSize: "calc(var(--u) * 0.3)",
+              }}
+            />
+          ) : (
+            <a
+              href={cta?.href ?? BOOKING_URL}
+              className={`mr-[calc(var(--u)*0.15)] inline-flex shrink-0 items-center justify-center rounded-[calc(var(--u)*0.15)] font-semibold leading-none transition-all duration-300 ease-out ${CTA_FILL[cta?.variant ?? "purple"]}`}
+              style={{
+                width: "calc(var(--u) * 2.42)",
+                height: "calc(var(--u) * 0.7)",
+                fontSize: "calc(var(--u) * 0.3)",
+              }}
+            >
+              {cta?.label ?? "Book a Call"}
+            </a>
+          )}
         </nav>
       </header>
     </>

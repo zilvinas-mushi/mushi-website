@@ -1188,9 +1188,16 @@ export const TEMPLATES_PAGE = {
         step: "Step Two",
         title: "Customize in Canva",
         chip: "Super fast!",
+        // Re-cut 2026-09-12 from the flattened render at 750 x 473 — the
+        // same 1.59 aspect as step one's shot, so the two pictures sit at
+        // one size and one alignment on desktop (client request). The old
+        // 242-wide file upscaled soft.
         image: "templates/process-canva.webp",
         // Same flattened phone card as step three; see the note there.
+        // PHONE ONLY since 2026-09-12 (desktopShot below): on desktop the
+        // full-bleed render made this card's picture bigger than step one's.
         phoneCard: "templates/process-phone-2.webp",
+        desktopShot: true,
         card: "process-card-2.webp",
         alt: "The same template being edited in Canva",
         gradient: "linear-gradient(150deg,#8f3287 0%,#82296f 55%,#6d1a72 100%)",

@@ -336,7 +336,11 @@ export function TemplatesProcess() {
                 // leaves it, and a card that stayed 345 TALL while growing
                 // wider ran its own artwork out of the bottom. The desktop
                 // cards take their height from the grid row and keep the 20.
-                className="relative flex aspect-square flex-col overflow-hidden rounded-[25px] p-5 md:aspect-auto md:h-full md:rounded-[20px] md:p-6 min-[1330px]:h-[421.75px]!"
+                // aspect-square at EVERY width now (2026-09-12): the shot
+                // went absolute (full-bleed to the bottom), so it no longer
+                // gives the card intrinsic height — without the aspect the
+                // md cards collapsed to their text.
+                className="relative flex aspect-square flex-col overflow-hidden rounded-[25px] p-5 md:rounded-[20px] md:p-6 min-[1330px]:h-[421.75px]!"
                 // The design's own gradient panel (2026-09-04), with the
                 // sampled CSS gradient behind it as a loading fallback.
                 style={{
@@ -357,7 +361,13 @@ export function TemplatesProcess() {
                     carry leading-none padding of their own. 2 is what makes
                     the white space match the reference (Žilvinas 2026-09-06,
                     twice). */}
-                <h3 className="relative z-[1] mt-[2px] text-[26px] font-semibold leading-none text-white md:mt-1 md:text-[30px] md:leading-tight">
+                {/* ONE LINE at every width (client 2026-09-12): at 30px,
+                    "Customize in Canva" measures the fluid card's full
+                    content width and wraps on some renderers. 26px in the
+                    fluid band, the reference's 30 from 1330 up where the
+                    421.75 cards leave room; nowrap as the backstop. The `!`
+                    is the min-[...]-sorts-before-md: quirk again. */}
+                <h3 className="relative z-[1] mt-[2px] text-[26px] font-semibold leading-none text-white md:mt-1 md:whitespace-nowrap md:text-[26px] md:leading-tight min-[1330px]:text-[30px]!">
                   {s.title}
                 </h3>
                 {/* Negative margins run the visual to the card's edges; the
@@ -368,19 +378,39 @@ export function TemplatesProcess() {
                     full bleed); the crop-based shot below serves only steps
                     without one. Figma's blur-and-fade over the screenshot
                     came out close but never identical in CSS. */}
+                {/* desktopShot (client 2026-09-12): the flattened render is
+                    the PHONE's card only, and the desktop uses the inline
+                    crop shot below — cut to the same size and position as
+                    step one's, so the two pictures align. */}
                 {"phoneCard" in s && s.phoneCard ? (
                   <Img
                     src={s.phoneCard}
                     alt={s.alt}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className={`absolute inset-0 h-full w-full object-cover ${
+                      "desktopShot" in s && s.desktopShot ? "md:hidden" : ""
+                    }`}
                   />
                 ) : null}
+                {/* FULL BLEED TO THE CARD'S BOTTOM (client 2026-09-12, per
+                    their reference shot): the visual runs edge to edge and
+                    down under the chip, object-cover from the top, so no
+                    card gradient shows beneath it. The dimming at the
+                    shots' edges is baked into the exports; .process-shot's
+                    CSS mask is phone-only now. */}
                 <div
-                  className={`relative -mx-5 -mb-5 mt-3 flex-1 md:-mx-6 md:-mb-6 md:mt-[2px] ${
-                    "phoneCard" in s && s.phoneCard ? "hidden" : ""
+                  className={`relative -mx-5 -mb-5 mt-3 flex-1 overflow-hidden md:-mx-6 md:-mb-6 md:mt-[2px] ${
+                    "phoneCard" in s && s.phoneCard
+                      ? "desktopShot" in s && s.desktopShot
+                        ? "hidden md:block"
+                        : "hidden"
+                      : ""
                   }`}
                 >
-                  <Img src={s.image} alt={s.alt} className="process-shot w-full md:mx-auto md:w-[92%]" />
+                  <Img
+                    src={s.image}
+                    alt={s.alt}
+                    className="process-shot absolute inset-0 h-full w-full object-cover object-top"
+                  />
                 </div>
                 {/* THE CHIP HANGS OFF THE CARD, not off the visual. The card
                     is a fixed 345 on the phone and the shot is wider than the
@@ -705,7 +735,10 @@ export function TemplatesComparison() {
         >
           <div
             aria-hidden="true"
-            className="pointer-events-none relative z-[1] col-start-2 row-start-1 row-end-[var(--plate-end)] md:-mx-2.5 md:row-end-[var(--plate-end-md)]"
+            // md:mx-1.5 (6px INSET), not the old md:-mx-2.5 overhang: ~32px
+            // slimmer plate per the client's reference (2026-09-12). The
+            // artwork maps its card onto this box, so the box is the width.
+            className="pointer-events-none relative z-[1] col-start-2 row-start-1 row-end-[var(--plate-end)] md:mx-1.5 md:row-end-[var(--plate-end-md)]"
             style={
               {
                 "--plate-end": String(lastRow),
@@ -757,10 +790,10 @@ export function TemplatesComparison() {
           {c.competitors.map((name, i) => (
             <span
               key={name}
-              // Desktop only: nudge CreativeOS right so its enlarged emblem
-              // clears the purple column's glow. On the phone the mark is
-              // just centred in its column, as the artboard has it.
-              className={`z-10 row-start-1 flex items-center gap-1.5 self-center justify-self-center ${name === "CreativeOS" ? "md:ml-[22px]" : ""}`}
+              // No CreativeOS nudge any more (client 2026-09-12): the 22px
+              // shift made CreativeOS↔Kandy visibly tighter than
+              // Kandy↔Konvert, and the slimmer plate clears the glow anyway.
+              className="z-10 row-start-1 flex items-center gap-1.5 self-center justify-self-center"
               style={{ gridColumnStart: i + 3 }}
             >
               <CompetitorMark name={name} />
@@ -979,8 +1012,13 @@ export function TemplatesAccess() {
                   file's own 135deg gradient, sampled — and the emoji is a
                   separate high-res glyph (the supplied 181px 😔) at Figma's
                   64% of the square. Radius is Figma's 6.4 on a 64.33 square,
-                  i.e. 10%, which holds at 35 and 44 alike. */}
-              <span className="grid size-[35px] shrink-0 place-items-center rounded-[10%] bg-[linear-gradient(135deg,#d57e80_0%,#b45455_50%,#b45455_100%)] md:size-[44px]">
+                  i.e. 10%, which holds at 35 and 53 alike.
+
+                  53 on desktop, not the earlier 44 (client 2026-09-12): at
+                  53 the tile exactly spans the 27/20 text block beside it,
+                  so the title's top and the caption's bottom line up with
+                  the tile's edges, as the reference card has it. */}
+              <span className="grid size-[35px] shrink-0 place-items-center rounded-[10%] bg-[linear-gradient(135deg,#d57e80_0%,#b45455_50%,#b45455_100%)] md:size-[53px]">
                 <Img
                   src="templates/access-emoji-bad-glyph.webp"
                   alt=""
@@ -992,12 +1030,15 @@ export function TemplatesAccess() {
                   cap top to the caption's baseline sits dead on the square's
                   middle (Žilvinas 2026-09-11 asked; no nudge needed). */}
               <div>
-                {/* SemiBold 16 with the caption Regular 16 at 50% white
-                    directly under it (artboard 2026-09-06). */}
-                <h3 className="text-[16px] font-semibold leading-tight text-white md:text-[17px]">
+                {/* Phone: SemiBold 16 with the caption Regular 16 at 50%
+                    white directly under it (artboard 2026-09-06). Desktop:
+                    27 SemiBold over a 20 Regular caption, measured off the
+                    client's reference card (2026-09-12) — the earlier 32.01
+                    wrapped "Ad creation with templates" onto two lines. */}
+                <h3 className="text-[16px] font-semibold leading-tight text-white md:text-[27px]">
                   {a.scratch.title}
                 </h3>
-                <p className="text-[16px] font-normal leading-tight text-white/50 md:text-[13px] md:text-white/45">
+                <p className="text-[16px] font-normal leading-tight text-white/50 md:text-[20px] md:text-white/45">
                   {a.scratch.sub}
                 </p>
               </div>
@@ -1060,14 +1101,18 @@ export function TemplatesAccess() {
 
           {/* With templates — the highlighted plan. */}
           <article
-            className="access-card-ring relative flex flex-col rounded-[15px] border-0 md:rounded-[20px] bg-[#131017] bg-cover bg-center p-6 shadow-[0_30px_80px_-30px_rgba(110,84,181,0.5)] md:border md:border-[#8a5cf6]/50 md:p-7"
+            // No flat md:border any more (client 2026-09-12): the reference
+            // card's frame is the phone's bottom-lit gradient ring at every
+            // width — .access-card-ring now applies above md too.
+            className="access-card-ring relative flex flex-col rounded-[15px] md:rounded-[20px] bg-[#131017] bg-cover bg-center p-6 shadow-[0_30px_80px_-30px_rgba(110,84,181,0.5)] md:p-7"
             style={{ backgroundImage: "url(/images/templates/access-card-purple.webp)" }}
           >
             <header className="flex items-center gap-3.5">
               {/* Same build as the scratch card's square: CSS gradient
                   sampled off the old file, 10% radius, and the supplied
-                  99px 😎 ("cool glasses icon.png"). */}
-              <span className="grid size-[35px] shrink-0 place-items-center rounded-[10%] bg-[linear-gradient(135deg,#9a7ed5_0%,#7a53b5_50%,#7a53b5_100%)] md:size-[44px]">
+                  99px 😎 ("cool glasses icon.png"). 53 on desktop to span
+                  the 27/20 text block, like the card beside it. */}
+              <span className="grid size-[35px] shrink-0 place-items-center rounded-[10%] bg-[linear-gradient(135deg,#9a7ed5_0%,#7a53b5_50%,#7a53b5_100%)] md:size-[53px]">
                 <Img
                   src="templates/access-emoji-good-glyph.webp"
                   alt=""
@@ -1076,13 +1121,14 @@ export function TemplatesAccess() {
                 />
               </span>
               <div>
-                <h3 className="text-[16px] font-semibold leading-tight text-white md:text-[17px]">
+                {/* Same reference sizes as the dark card's header. */}
+                <h3 className="text-[16px] font-semibold leading-tight text-white md:text-[27px]">
                   {a.templates.title}
                 </h3>
                 {/* One line on the phone, as the artboard has it — at 16 it
                     only just fits beside the 35 emoji, and wrapping it put
                     "month." alone under the sentence. */}
-                <p className="whitespace-nowrap text-[16px] font-normal leading-tight text-white/50 md:whitespace-normal md:text-[13px] md:text-white/45">
+                <p className="whitespace-nowrap text-[16px] font-normal leading-tight text-white/50 md:whitespace-normal md:text-[20px] md:text-white/45">
                   {a.templates.sub}
                 </p>
               </div>
@@ -1133,7 +1179,11 @@ export function TemplatesAccess() {
           // hairs and rounded corners are baked in, so the box carries no
           // radius of its own there). The desktop keeps the rays layer over
           // its gradient.
-          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1080px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[url(/images/templates/access-banner-phone.webp)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:url(/images/templates/access-rays.webp),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:px-6"
+          // md:pr-[18px]: measured off the built page, the purple card's
+          // BUY NOW fill ends ~18px in from the container edge (its p-7 is
+          // offset by the card ring's inner geometry), and the CTA's right
+          // edge aligns to THAT, not to a theoretical 28 (client 2026-09-12).
+          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1080px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[url(/images/templates/access-banner-phone.webp)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:url(/images/templates/access-rays.webp),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:pl-6 md:pr-[18px]"
         >
           <div className="flex items-center gap-3.5">
             {/* Built like the two card squares (Žilvinas 2026-09-11): the
@@ -1206,7 +1256,9 @@ export function TemplatesShowcase() {
   const s = TEMPLATES_PAGE.showcase;
   return (
     // 60 from the monthly card to the eyebrow (artboard 2026-09-06).
-    <section aria-labelledby="showcase-heading" className="pt-[60px] md:pb-28 md:pt-0">
+    // md:pb-14, half the page's usual 28: the Access header under this
+    // section sits higher (client 2026-09-12).
+    <section aria-labelledby="showcase-heading" className="pt-[60px] md:pb-14 md:pt-0">
       <div className={SHELL}>
         <SectionEyebrow>{s.eyebrow}</SectionEyebrow>
         <h2
@@ -1218,13 +1270,18 @@ export function TemplatesShowcase() {
       </div>
 
       {/* Pulled up under the heading so it sits just above the wall's first
-          tile row — the artwork's top region is empty black.
+          tile row.
           PHONE: Figma's 37 is from the heading's BASELINE to the first ad's
           top edge (Žilvinas 2026-09-11), not box to box. The baseline sits
           ~5 above the 36px line box's bottom, so the rows start 32 under
           it. ShowcaseRows is the phone's animated strips; the flat wall
-          below is the desktop's. */}
-      <div aria-hidden="true" className="mt-[32px] md:-mt-[180px] md:-mb-16">
+          below is the desktop's.
+          DESKTOP: -104 per the client's reference crop (2026-09-12): the
+          heading laps onto the wall's black top region and clears the first
+          white tile by ~58px. NOT the old -180 — the current wall export
+          starts with tiles at its very top edge (no empty black band), and
+          -180 buried "1 cent = 1 design" behind the middle tile. */}
+      <div aria-hidden="true" className="mt-[32px] md:-mt-[104px] md:-mb-16">
         <ShowcaseRows />
         <Img
           src="templates/showcase-wall.webp"
@@ -1676,12 +1733,16 @@ function CategoryTiles() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-0 hidden xl:block"
+      // lg, not the earlier xl: scaled displays commonly land a maximised
+      // window a few CSS px UNDER 1280 (the client's sits at ~1272), where
+      // xl made the rows vanish entirely (client 2026-09-12).
+      className="pointer-events-none absolute inset-0 z-0 hidden lg:block"
     >
       {/* 160px tiles; the gap between the ROWS equals the 30px gap between
-          the squares within a row (client 2026-09-11): 370 + 160 + 30 = 560. */}
-      <CategoryTileRow top="top-[370px]" reverse />
-      <CategoryTileRow top="top-[560px]" offset={2} />
+          the squares within a row (client 2026-09-11): 410 + 160 + 30 = 600.
+          Dropped 40 from 370/560 (client 2026-09-12: "too high"). */}
+      <CategoryTileRow top="top-[410px]" reverse />
+      <CategoryTileRow top="top-[600px]" offset={2} />
     </div>
   );
 }

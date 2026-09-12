@@ -873,30 +873,30 @@ html[data-canvas="footer"] body {
   }
 }
 
-/* The templates card's stroke on the phone (Žilvinas 2026-09-06): 2 weight,
-   INSIDE at weight 4, running from #6E54B5 at the BOTTOM edge to #111111 at 0% opacity at
-   the top — so the card is lit along the edge nearest the button and fades
-   into the page above it. Same masked pseudo-element as .diff-card-ring; the
-   desktop reference keeps its flat 1px #8A5CF6 at 50%. */
-@media (max-width: 767px) {
-  .access-card-ring {
-    position: relative;
-  }
-  .access-card-ring::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 4px;
-    background: linear-gradient(0deg, #6e54b5 0%, rgba(17, 17, 17, 0) 100%);
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    z-index: 20;
-  }
+/* The templates card's stroke (Žilvinas 2026-09-06): 2 weight, INSIDE at
+   weight 4, running from #6E54B5 at the BOTTOM edge to #111111 at 0% opacity
+   at the top — so the card is lit along the edge nearest the button and
+   fades into the page above it. Same masked pseudo-element as
+   .diff-card-ring. EVERY width since 2026-09-12: the client's reference card
+   shows this same bottom-lit frame on desktop (top edge bare, purple only
+   below), replacing the earlier flat 1px #8A5CF6 at 50% there. */
+.access-card-ring {
+  position: relative;
+}
+.access-card-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 4px;
+  background: linear-gradient(0deg, #6e54b5 0%, rgba(17, 17, 17, 0) 100%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 20;
 }
 
 /* The discovery-call button's stroke (Žilvinas 2026-09-06): 1px, and white
@@ -1055,19 +1055,25 @@ html[data-canvas="footer"] body {
    masks intersected, same technique as .hero-grid) dissolves the cuts into
    the CSS gradient behind — which is sampled from the same reference, so the
    colours meet. */
-.process-shot {
-  -webkit-mask-image:
-    linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, #000 10%, #000 80%, transparent 100%);
-  -webkit-mask-repeat: no-repeat, no-repeat;
-  -webkit-mask-size: 100% 100%, 100% 100%;
-  -webkit-mask-composite: source-in;
-  mask-image:
-    linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, #000 10%, #000 80%, transparent 100%);
-  mask-repeat: no-repeat, no-repeat;
-  mask-size: 100% 100%, 100% 100%;
-  mask-composite: intersect;
+/* PHONE ONLY since 2026-09-12: the desktop shots are cut from the client's
+   reference render with their edge dimming baked in, and run full-bleed to
+   the card bottom — masking them again faded the bottom back to the card
+   gradient the client asked to remove. */
+@media (max-width: 767px) {
+  .process-shot {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, #000 10%, #000 80%, transparent 100%);
+    -webkit-mask-repeat: no-repeat, no-repeat;
+    -webkit-mask-size: 100% 100%, 100% 100%;
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, #000 10%, #000 80%, transparent 100%);
+    mask-repeat: no-repeat, no-repeat;
+    mask-size: 100% 100%, 100% 100%;
+    mask-composite: intersect;
+  }
 }
 
 /* The creatives row uses CSS scroll-snap rather than a JS carousel: this is a
