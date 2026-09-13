@@ -577,11 +577,13 @@ measured 11, not the 32 first eyeballed from a screenshot.
 
 ### Hero tile size (2026-09-13, fourth pass)
 
-The tile is `min(11.98vw, 38.4cqh)`. 11.98vw is the artboard's 230 over its
-1920, so a 1920 screen draws the tile at its designed size and everything
-narrower comes down with the viewport (client: "originally they were 230x230,
-scale them down proportionally"). 38.4cqh is the ceiling — the pair plus its
-gutter is 2.1875 tiles, which at 38.4 is 84% of the device's height, leaving a
+The tile is `min(10.9vw, 35cqh)`. The vw term carries the artboard's
+230-over-1920 down a notch: the ratio read straight off the artboard (11.98vw)
+landed at 181 on the client's 1512 and they called it too big, so this puts it
+at 165 there and 210 on a 1920 — between the old fixed 160 and the artboard's
+own figure (client: "originally they were 230x230, scale them down
+proportionally", then "a little bit too big now"). 35cqh is the ceiling — the pair plus its
+gutter is 2.1875 tiles, which at 35 is 76.6% of the device's height, leaving a
 margin above and below at any window size. A short window hits the ceiling
 first, which is the case that used to run the lower row out of the hero; a
 roomy one hits the vw and the tiles come up to the artboard's size instead of

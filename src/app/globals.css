@@ -1249,11 +1249,12 @@ html[data-canvas="footer"] body {
    (client 2026-09-13, twice: "originally they were 230x230, scale them down
    proportionally", then "at 100% on a Mac they seem a little bit small").
 
-   - 11.98vw is the artboard's 230 over its 1920, so a 1920 screen draws the
-     tile at the size it was designed at and everything narrower comes down
-     with the viewport.
-   - 38.4cqh is the ceiling: the pair plus its gutter is 2.1875 tiles, and at
-     38.4 that is 84% of the device's height, which keeps a margin above and
+   - 10.9vw carries the artboard's 230-over-1920 down a notch: 11.98 was the
+     ratio read straight off the artboard and landed at 181 on the client's
+     1512, which they called too big. This puts it at 165 there and 210 on a
+     1920, between the old fixed 160 and the artboard's own figure.
+   - 35cqh is the ceiling: the pair plus its gutter is 2.1875 tiles, and at 35
+     that is 76.6% of the device's height, which keeps a margin above and
      below whatever the window does. A short window hits this before it hits
      the vw, which is exactly the case that used to run the lower row out of
      the hero.
@@ -1270,7 +1271,7 @@ html[data-canvas="footer"] body {
 }
 
 .hero-tile-row {
-  --tile: min(11.98vw, 38.4cqh);
+  --tile: min(10.9vw, 35cqh);
   --tile-gap: calc(var(--tile) * 0.1875);
   --tile-block: calc(var(--tile) * 2 + var(--tile-gap));
   /* Centred on the device: the pair sits on its middle line at every size. */
