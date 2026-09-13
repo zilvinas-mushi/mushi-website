@@ -534,7 +534,7 @@ export function TemplatesTeam() {
                 // crosses the rounded corners.
                 className="flex h-[121px] items-center gap-4 rounded-[14px] bg-[#1b1b1b] sm:h-auto sm:gap-5"
               >
-                <span className="relative h-full w-[113px] shrink-0 sm:h-[126px] sm:w-[180px]">
+                <span className="relative h-full w-[113px] shrink-0 sm:h-[126px] sm:w-[150px]">
                   <span
                     aria-hidden="true"
                     // 65 wide with 15 on its left corners on the phone: the
@@ -560,7 +560,14 @@ export function TemplatesTeam() {
                     <Img
                       src={p.image}
                       alt={`${p.name}, ${p.role} at Mushi`}
-                      className="team-photo mx-auto h-[var(--portrait-h)] w-auto max-w-none sm:h-[160px]"
+                      // Desktop: the portrait spans the FULL width of its
+                      // plate rather than being centred in it. The crops are
+                      // taller than they are wide (516 x 540), so a
+                      // height-driven 160 left a ~13 purple sliver between the
+                      // plate's left edge and the shoulder — the "cut off"
+                      // Žilvinas saw against Figma, where the jacket reaches
+                      // the rounded corner. Width-driven, it is flush.
+                      className="team-photo mx-auto h-[var(--portrait-h)] w-auto max-w-none sm:h-auto sm:w-full"
                       style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
                     />
                   </span>

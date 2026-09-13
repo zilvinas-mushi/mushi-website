@@ -497,3 +497,22 @@ per-column content data were all removed.
   laurel is the real artwork applied as a CSS mask painted #221f26
   (`laurel-mask.webp`) so it reads on the dark card. The CSS-built emoji
   circles, chip rows, collage (and the `tpl-*` crops it used) were removed.
+
+### Team portrait pass (2026-09-13)
+
+The desktop portraits were height-driven (160 tall inside a 180-wide plate).
+The crops are taller than wide (Noah 516x540, Urtė 549x520), so 160 tall is
+only ~153 wide and the picture sat centred with ~13 of bare plate on either
+side — the left one read as the shoulder being cut off short of the rounded
+corner, which Figma does not show (Žilvinas 2026-09-13).
+
+Now width-driven: the plate is 150 and the portrait spans it (`sm:w-full
+sm:h-auto`), so the jacket reaches the corner. 150, not the old 180, because
+filling 180 makes Noah 188 tall — a 62 pop over a 126 card, which clears the
+outer panel's 32 pad and pushes his hair outside the panel. At 150 the pop is
+31, which is what the artboard reads.
+
+Desktop plate ramps were also the lighter pair (#8168d0/#4f3694 and
+#c98a8c/#96494c); they now use the same stops the phone already had from the
+Figma fill panel (#6e54b5 → #30254f, #d07678 → #4f2f30), so the plate no
+longer changes colour across the sm–md band.
