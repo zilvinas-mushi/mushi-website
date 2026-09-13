@@ -1036,17 +1036,25 @@ export const TEMPLATES_PAGE = {
         name: "Urtė Balevičiūtė",
         role: "Product Developer",
         image: "templates/team-urte-v2.webp",
+        // DESKTOP gets a tighter cut of the same frame (2026-09-13). The
+        // supplied crop carries about 70px of empty space down its left —
+        // her hair sits 14-18% into the file through the whole visible band,
+        // where Noah's jacket runs to his file's edge — so filling the plate
+        // with it still left a strip of salmon before her (Žilvinas: "there
+        // is still a gap between the left border and her? WHY?"). v3 is v2
+        // with those 70 columns removed, which also draws her a touch larger
+        // in the plate, as the reference has her. The PHONE keeps v2: its
+        // picture is centred in a narrower cell and laps over both edges, and
+        // that composition is signed off.
+        desktopImage: "templates/team-urte-v3.webp",
         // Drawn 127 tall on the phone, not 135 (Žilvinas 2026-09-11): her
         // hair should clear the top of her own card by just a little (~5),
         // not rise toward Noah's as it did at 135, nor stop inside it (119).
         phoneImageH: 127,
-        // DESKTOP ONLY, and it is 11 — the number the client measured off the
-        // Figma crop, not the 32 that was eyeballed from a screenshot first.
-        // She starts a hair inside her plate where Noah's jacket runs straight
-        // into the corner; this insets her box's LEFT edge, so she is drawn
-        // narrower and still ends on the plate's right edge rather than
-        // hanging over the card.
-        desktopShiftX: 11,
+        // No offset any more: the 11 was compensating for the old crop's
+        // empty left margin, and with v3 she reaches the plate's edge the way
+        // Noah does.
+        desktopShiftX: 0,
         color: "#d0737f",
         roleGradient: "linear-gradient(90deg,#d07678 0%,#ffaeb0 100%)",
         backdrop: "linear-gradient(135deg,#d07678 0%,#4f2f30 100%)",

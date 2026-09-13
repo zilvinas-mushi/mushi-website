@@ -576,19 +576,39 @@ export function TemplatesTeam() {
                       } as CSSProperties
                     }
                   >
+                    {/* TWO CUTS OF ONE FRAME where desktopImage is set (see
+                        the note on Urtė's entry in content.ts): the phone's
+                        picture is centred in a narrower cell and laps over
+                        both its edges, so a crop that suits the desktop plate
+                        moves her on the phone. They are separate <img>s
+                        rather than one with a breakpoint-swapped src —
+                        there is no server here to pick, and each needs its
+                        own intrinsic size for the paint gate and for layout.
+
+                        Desktop: the portrait spans the FULL width of its
+                        plate rather than being centred in it. The crops are
+                        taller than they are wide, so a height-driven 160 left
+                        a purple sliver between the plate's left edge and the
+                        shoulder — the "cut off" Žilvinas saw against Figma,
+                        where the jacket reaches the rounded corner.
+                        Width-driven, it is flush. */}
                     <Img
                       src={p.image}
                       alt={`${p.name}, ${p.role} at Mushi`}
-                      // Desktop: the portrait spans the FULL width of its
-                      // plate rather than being centred in it. The crops are
-                      // taller than they are wide (516 x 540), so a
-                      // height-driven 160 left a ~13 purple sliver between the
-                      // plate's left edge and the shoulder — the "cut off"
-                      // Žilvinas saw against Figma, where the jacket reaches
-                      // the rounded corner. Width-driven, it is flush.
-                      className="team-photo mx-auto h-[var(--portrait-h)] w-auto max-w-none sm:h-auto sm:w-full sm:rounded-bl-[14px]"
+                      className={`team-photo mx-auto h-[var(--portrait-h)] w-auto max-w-none ${
+                        "desktopImage" in p && p.desktopImage
+                          ? "sm:hidden"
+                          : "sm:h-auto sm:w-full sm:rounded-bl-[14px]"
+                      }`}
                       style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
                     />
+                    {"desktopImage" in p && p.desktopImage ? (
+                      <Img
+                        src={p.desktopImage}
+                        alt={`${p.name}, ${p.role} at Mushi`}
+                        className="team-photo mx-auto hidden h-auto w-full max-w-none sm:block sm:rounded-bl-[14px]"
+                      />
+                    ) : null}
                   </span>
                 </span>
                 <div className="min-w-0 pr-4">

@@ -601,3 +601,10 @@ Insetting her box drew her smaller than Noah; the reference has the two of
 them at one size, she simply starts a little further in. The box is the
 plate's full width with its left edge moved by `desktopShiftX`, so the 11 she
 runs over on the right lands inside the picture's own 90–100% fade.
+
+### Urtė reaches the edge (2026-09-13, fifth pass)
+
+The remaining gap was in the asset, not the layout: see team-urte-v3 in
+ASSETS.md. With the tighter cut she reaches the plate's left edge the way Noah
+does, and `desktopShiftX` goes back to 0 — the 11 was only ever compensating
+for the empty margin.

@@ -332,3 +332,16 @@ aspect the old crop had, so nothing moves on the card. WebP q90, 96 KB.
 
 If a higher-resolution flattened render of this card is ever supplied, it
 beats this reconstruction — use it.
+
+## templates/team-urte-v3.webp — added 2026-09-13
+
+v2 with 70 columns removed from the LEFT. The supplied crop carries about that
+much empty space down her left side — her hair sits 14-18% into the file
+through the whole visible band, where Noah's jacket runs to his file's own
+edge — so filling the plate with v2 still left a strip of salmon before her
+(client: "there is still a gap between the left border and her? WHY?"). The
+crop also draws her a touch larger in the plate, as the reference has her.
+
+DESKTOP ONLY. The phone's picture is centred in a narrower cell and laps over
+both its edges, so this crop moves her there; that composition is signed off,
+so the phone keeps v2 and the two ship as separate <img>s.
