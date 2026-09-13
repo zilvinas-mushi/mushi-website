@@ -42,7 +42,6 @@ const BADGE_GRADIENT =
 export function TemplatesHero() {
   return (
     <section aria-labelledby="templates-heading" className="relative">
-      <CategoryTiles />
 
       {/* 38, not 40: the phone artboard puts 46 between the header bar's
           bottom edge and the badge, and the bar's own 12px bottom inset (the
@@ -556,10 +555,20 @@ export function TemplatesTeam() {
                   />
                   {/* Bottom-anchored and taller than the card, so the hair
                       pops over the top edge as in the design. */}
-                  {/* sm:translate-x is per-person and desktop-only — see
-                      desktopShiftX in content.ts. */}
+                  {/* THE PICTURE STAYS INSIDE THE FRAME from sm up (Žilvinas
+                      2026-09-13, with the Figma crops): the box is pinned to
+                      the plate's own left and right edges, so a person who
+                      starts further in — see desktopShiftX — is drawn NARROWER
+                      rather than pushed out over the card. The phone keeps its
+                      centred, wider-than-the-cell picture.
+
+                      Only the bottom-left corner is rounded, and it is on the
+                      IMG: that corner is the one piece of evidence in the
+                      reference that the photo is inside the plate rather than
+                      laid over it. The top is left alone — the hair has to
+                      clear the card there. */}
                   <span
-                    className="absolute bottom-0 left-1/2 w-full -translate-x-1/2 sm:translate-x-[calc(-50%+var(--portrait-shift,0px))]"
+                    className="absolute bottom-0 left-1/2 w-full -translate-x-1/2 sm:left-[var(--portrait-shift,0px)] sm:right-0 sm:w-auto sm:translate-x-0"
                     style={
                       {
                         "--portrait-shift": `${"desktopShiftX" in p ? p.desktopShiftX : 0}px`,
@@ -576,7 +585,7 @@ export function TemplatesTeam() {
                       // plate's left edge and the shoulder — the "cut off"
                       // Žilvinas saw against Figma, where the jacket reaches
                       // the rounded corner. Width-driven, it is flush.
-                      className="team-photo mx-auto h-[var(--portrait-h)] w-auto max-w-none sm:h-auto sm:w-full"
+                      className="team-photo mx-auto h-[var(--portrait-h)] w-auto max-w-none sm:h-auto sm:w-full sm:rounded-bl-[14px]"
                       style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
                     />
                   </span>
@@ -1737,18 +1746,18 @@ function CategoryTileRow({
       className={`tile-marquee-track absolute left-0 ${top}${reverse ? " tile-marquee-track--reverse" : ""}`}
     >
       {[0, 1].map((h) => (
-        <div key={h} className="flex gap-[3.25cqh] pr-[3.25cqh]">
+        <div key={h} className="flex gap-[4.9cqh] pr-[4.9cqh]">
           {half.map((c, i) => (
             <span
               key={`${c.label}-${i}`}
-              className="flex h-[17.32cqh] w-[17.32cqh] flex-col items-center gap-[0.87cqh] rounded-[2.81cqh] bg-[radial-gradient(circle_at_50%_42%,#3a3a3a_0%,#1c1c1c_58%,#101010_100%)] pt-[2.17cqh] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]"
+              className="flex h-[26.14cqh] w-[26.14cqh] flex-col items-center gap-[1.31cqh] rounded-[4.25cqh] bg-[radial-gradient(circle_at_50%_42%,#3a3a3a_0%,#1c1c1c_58%,#101010_100%)] pt-[3.27cqh] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]"
             >
               {/* Roboto Black per the supplied FASHION.png sample; tight
                   tracking to match its near-touching letters. */}
-              <span className="font-tile text-[1.73cqh] font-black uppercase tracking-[-0.01em] text-white">
+              <span className="font-tile text-[2.61cqh] font-black uppercase tracking-[-0.01em] text-white">
                 {c.label}
               </span>
-              <Img src={c.image} alt="" width={84} className="h-auto w-[9.09cqh]" />
+              <Img src={c.image} alt="" width={84} className="h-auto w-[13.73cqh]" />
             </span>
           ))}
         </div>
@@ -1765,30 +1774,28 @@ function CategoryTiles() {
       // window a few CSS px UNDER 1280 (the client's sits at ~1272), where
       // xl made the rows vanish entirely (client 2026-09-12).
       //
-      // hero-tile-field makes this layer a SIZE container, which is what the
-      // cqh numbers below and in CategoryTileRow are read against.
-      className="hero-tile-field pointer-events-none absolute inset-0 z-0 hidden lg:block"
+      // THE FIELD IS THE DEVICE'S OWN BOX, not the section's. It renders
+      // inside AppWindow's wrapper — inset-y-0 so it is exactly as tall as
+      // the MacBook, and w-screen off the centre line so the rows still run
+      // clear across the viewport. hero-tile-field makes it a SIZE container,
+      // so 100cqh below IS the device's height.
+      className="hero-tile-field pointer-events-none absolute inset-y-0 left-1/2 z-0 hidden w-screen -translate-x-1/2 overflow-hidden lg:block"
     >
-      {/* EVERY NUMBER IN THIS FIELD IS A SHARE OF THE HERO'S OWN HEIGHT
-          (client 2026-09-13: the lower row was running under the next
-          section on a 15" Mac).
+      {/* CENTRED ON THE PICTURE OF THE COMPUTER (client 2026-09-13). Every
+          number here is a share of the DEVICE's height, which is the only
+          thing they should ever be measured against: the device sizes itself
+          off the height left under the text (`(100svh - 444px) * 1.6` on
+          AppWindow), so tiles pinned to the section — or, before that, to
+          fixed pixels — drifted up the device as the window got shorter and
+          on a 15" Mac ran out of the bottom of the hero altogether.
 
-          The device already sizes itself off the height left under the text
-          — `(100svh - 444px) * 1.6` on AppWindow — so on a short window it
-          shrinks while these tiles, at a fixed 410/600/160, stayed put and
-          walked straight out of the bottom of the section. They are the same
-          composition and have to shrink on the same curve.
-
-          cqh, not a transform: a scale() would need a unitless factor, and
-          CSS cannot divide one length by another to get one. The layer is
-          inset-0, so 100cqh IS the section, and every measurement below is
-          its old pixel value over the 924 the section stands at when the
-          MacBook is at its 978 cap — the signed-off reference. At that height
-          they resolve back to 410 / 600 / 160 / 30 exactly; under it they
-          come down together. The lower row ends at 82.25cqh, so it can never
-          reach the section's bottom edge whatever the window does. */}
-      <CategoryTileRow top="top-[44.37cqh]" reverse />
-      <CategoryTileRow top="top-[64.94cqh]" offset={2} />
+          At the 978 cap the device is 612 tall, and these resolve back to the
+          artboard's 160 tile, 30 gutter, 26 radius, 16 label and 84 emoji.
+          The pair spans 160 + 30 + 160 = 350, which is 57.2% of 612, so
+          (100 - 57.2) / 2 = 21.4 puts the two of them on the device's own
+          centre line at every size. */}
+      <CategoryTileRow top="top-[21.4cqh]" reverse />
+      <CategoryTileRow top="top-[52.45cqh]" offset={2} />
     </div>
   );
 }
@@ -1815,6 +1822,7 @@ function AppWindow() {
       className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-6 md:[width:min(100%,calc((100svh-444px)*1.6))]"
     >
       <PhoneTiles />
+      <CategoryTiles />
 
       {/* THE PHONE IS THE MOBILE HERO, not a shrunken MacBook (Žilvinas
           2026-09-06). The laptop's 2400px master reduces to a 358-wide strip
@@ -1880,7 +1888,11 @@ function AppWindow() {
       <Img
         src="templates/hero-macbook.webp"
         alt="The Mushi template library on a MacBook: a grid of ad templates with industry filters"
-        className="hidden w-full drop-shadow-[0_50px_140px_rgba(0,0,0,0.95)] md:block"
+        // relative z-[1]: the tile field beside it is a positioned z-0 layer
+        // inside this same wrapper, and a positioned element paints over
+        // in-flow content whatever the order. The device goes on top of the
+        // tiles, as it always has.
+        className="relative z-[1] hidden w-full drop-shadow-[0_50px_140px_rgba(0,0,0,0.95)] md:block"
         priority
       />
     </div>

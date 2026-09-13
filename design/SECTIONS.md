@@ -551,3 +551,26 @@ Two corrections once the portraits filled their plates:
   band of salmon runs down her left before her hair starts, where his jacket
   goes straight into the corner. `desktopShiftX: 32` on her entry only; the
   phone is untouched.
+
+### Hero tile field, second pass (2026-09-13)
+
+Centred on the DEVICE, not on the section (client 2026-09-13: "make those two
+lines go in the middle of the computer picture"). The field renders inside
+AppWindow's wrapper — `inset-y-0` so it is exactly the MacBook's height,
+`w-screen` off the centre line so the rows still cross the viewport — and is
+the size container. Shares of the device's 612 at the cap: rows 21.4 / 52.45,
+tile 26.14, gutter 4.9, radius 4.25, label 2.61, emoji 13.73. The pair spans
+57.2% of the height, so 21.4 is what centres it, at every window size.
+
+The MacBook img takes `relative z-[1]`: the field is a positioned z-0 layer in
+the same wrapper and would otherwise paint over in-flow content.
+
+### Team portraits, third pass (2026-09-13)
+
+The pictures are INSIDE the plate, and the reference proves it with the
+rounded bottom-left corner (client, with the Figma crops). From sm up the
+portrait box is pinned to the plate's left and right edges, so `desktopShiftX`
+insets the left edge and draws the person NARROWER instead of pushing them out
+over the card, and the img carries `rounded-bl-[14px]`. Only that corner: the
+hair still has to clear the card at the top. Urtė's inset is the client's
+measured 11, not the 32 first eyeballed from a screenshot.

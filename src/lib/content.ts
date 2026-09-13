@@ -1040,12 +1040,13 @@ export const TEMPLATES_PAGE = {
         // hair should clear the top of her own card by just a little (~5),
         // not rise toward Noah's as it did at 135, nor stop inside it (119).
         phoneImageH: 127,
-        // DESKTOP ONLY. She sits further right in her plate than Noah does in
-        // his (Žilvinas 2026-09-13, with the Figma crop): the reference shows
-        // a band of the salmon down her left before her hair starts, where
-        // his jacket runs straight into the corner. Her crop is the wider of
-        // the two, so filling the plate put her hard against the left edge.
-        desktopShiftX: 32,
+        // DESKTOP ONLY, and it is 11 — the number the client measured off the
+        // Figma crop, not the 32 that was eyeballed from a screenshot first.
+        // She starts a hair inside her plate where Noah's jacket runs straight
+        // into the corner; this insets her box's LEFT edge, so she is drawn
+        // narrower and still ends on the plate's right edge rather than
+        // hanging over the card.
+        desktopShiftX: 11,
         color: "#d0737f",
         roleGradient: "linear-gradient(90deg,#d07678 0%,#ffaeb0 100%)",
         backdrop: "linear-gradient(135deg,#d07678 0%,#4f2f30 100%)",
