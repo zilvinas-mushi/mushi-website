@@ -604,6 +604,10 @@ export function TemplatesTeam() {
                           : "sm:h-auto sm:w-full sm:rounded-bl-[14px]"
                       }`}
                       style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
+                      // The photo and the plate behind it read as one object;
+                      // a native drag peels the cut-out off its card as a
+                      // ghost (Žilvinas 2026-09-13).
+                      draggable={false}
                     />
                   </span>
                 </span>
@@ -630,6 +634,7 @@ export function TemplatesTeam() {
                     alt=""
                     className="pointer-events-none absolute bottom-0 left-0 hidden h-auto w-full sm:block"
                     sizes="(min-width: 1024px) 500px, 50vw"
+                    draggable={false}
                   />
                 ) : null}
                 <div className="relative min-w-0 pr-4">

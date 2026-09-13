@@ -25,6 +25,13 @@ type Props = {
    * which needs its vendor-prefixed twin and so cannot be an arbitrary class.
    */
   style?: CSSProperties;
+  /**
+   * Turn off the browser's native image drag. Artwork that is PART OF A
+   * SURFACE rather than content in its own right — the team cards' cut-out
+   * portraits, where the picture and the card behind it read as one object —
+   * looks broken when a drag peels the photo off its card as a ghost.
+   */
+  draggable?: boolean;
 };
 
 /**
@@ -51,6 +58,7 @@ export function Img({
   width,
   sizes: sizesAttr,
   style,
+  draggable,
 }: Props) {
   const dim = IMAGE_SIZES[src];
 
@@ -88,6 +96,7 @@ export function Img({
       height={h}
       className={className}
       style={style}
+      draggable={draggable}
       loading={priority ? "eager" : "lazy"}
       decoding={priority ? "sync" : "async"}
       {...(priority ? { fetchPriority: "high" as const } : {})}

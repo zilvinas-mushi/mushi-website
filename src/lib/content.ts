@@ -26,10 +26,11 @@ import { BOOKING_ANCHOR } from "@/lib/site";
 export const NAV = [
   { label: "Agency", href: "/" },
   { label: "Case Studies", href: null },
-  // LIVE ONLY ON ITS OWN PAGE (Žilvinas 2026-09-11): on /templates it is a
-  // link and the selected row; on the home page it stays the half-strength
-  // text it has been since 2026-09-06. See navHref.
-  { label: "Templates", href: "/templates", liveOn: ["/templates"] },
+  // LIVE EVERYWHERE since 2026-09-13 ("enable templates! we are done"): the
+  // page is finished, so the home page links to it like any other nav entry.
+  // It was held to its own page from 2026-09-11 while it was being built —
+  // `liveOn` stays on navHref for the next entry that needs it.
+  { label: "Templates", href: "/templates" },
 ] as const;
 
 /**
