@@ -574,3 +574,28 @@ insets the left edge and draws the person NARROWER instead of pushing them out
 over the card, and the img carries `rounded-bl-[14px]`. Only that corner: the
 hair still has to clear the card at the top. Urtė's inset is the client's
 measured 11, not the 32 first eyeballed from a screenshot.
+
+### Hero tile size (2026-09-13, fourth pass)
+
+The tile is `min(11.98vw, 38.4cqh)`. 11.98vw is the artboard's 230 over its
+1920, so a 1920 screen draws the tile at its designed size and everything
+narrower comes down with the viewport (client: "originally they were 230x230,
+scale them down proportionally"). 38.4cqh is the ceiling — the pair plus its
+gutter is 2.1875 tiles, which at 38.4 is 84% of the device's height, leaving a
+margin above and below at any window size. A short window hits the ceiling
+first, which is the case that used to run the lower row out of the hero; a
+roomy one hits the vw and the tiles come up to the artboard's size instead of
+staying at the 160 they were pinned to (client: "at 100% on a Mac they seem a
+little bit small").
+
+Everything else is a ratio of the tile, from the artboard's own 160: gutter
+30, radius 26, top pad 20, label-to-art 8, label 16, art 84. The custom
+properties sit on the ROW, not on the field — a container query unit used on
+the container itself measures against that container's ancestor.
+
+### Urtė is slid, not inset (2026-09-13, fourth pass)
+
+Insetting her box drew her smaller than Noah; the reference has the two of
+them at one size, she simply starts a little further in. The box is the
+plate's full width with its left edge moved by `desktopShiftX`, so the 11 she
+runs over on the right lands inside the picture's own 90–100% fade.

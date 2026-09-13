@@ -555,20 +555,21 @@ export function TemplatesTeam() {
                   />
                   {/* Bottom-anchored and taller than the card, so the hair
                       pops over the top edge as in the design. */}
-                  {/* THE PICTURE STAYS INSIDE THE FRAME from sm up (Žilvinas
-                      2026-09-13, with the Figma crops): the box is pinned to
-                      the plate's own left and right edges, so a person who
-                      starts further in — see desktopShiftX — is drawn NARROWER
-                      rather than pushed out over the card. The phone keeps its
-                      centred, wider-than-the-cell picture.
+                  {/* From sm up the box is the plate's own width, SLID right
+                      by desktopShiftX rather than inset by it (Žilvinas
+                      2026-09-13, third pass): insetting drew Urtė smaller than
+                      Noah, and the reference has the two of them at one size —
+                      she simply starts a little further in. The 11 she runs
+                      over on the right lands in the picture's own fade.
 
                       Only the bottom-left corner is rounded, and it is on the
                       IMG: that corner is the one piece of evidence in the
                       reference that the photo is inside the plate rather than
                       laid over it. The top is left alone — the hair has to
-                      clear the card there. */}
+                      clear the card there. The phone keeps its centred,
+                      wider-than-the-cell picture. */}
                   <span
-                    className="absolute bottom-0 left-1/2 w-full -translate-x-1/2 sm:left-[var(--portrait-shift,0px)] sm:right-0 sm:w-auto sm:translate-x-0"
+                    className="absolute bottom-0 left-1/2 w-full -translate-x-1/2 sm:left-[var(--portrait-shift,0px)] sm:w-full sm:translate-x-0"
                     style={
                       {
                         "--portrait-shift": `${"desktopShiftX" in p ? p.desktopShiftX : 0}px`,
@@ -1726,11 +1727,12 @@ export function TemplatesDifference() {
  * viewport, so the loop point can never show inside the clip.
  */
 function CategoryTileRow({
-  top,
+  row,
   reverse,
   offset = 0,
 }: {
-  top: string;
+  /** Which of the two rows this is; the CSS carries their positions. */
+  row: "top" | "bottom";
   reverse?: boolean;
   /* Rotates the set so the two rows never sit label-above-same-label at
      load, before the drift has separated them. */
@@ -1743,21 +1745,21 @@ function CategoryTileRow({
   const half = Array.from({ length: 3 }, () => set).flat();
   return (
     <div
-      className={`tile-marquee-track absolute left-0 ${top}${reverse ? " tile-marquee-track--reverse" : ""}`}
+      className={`tile-marquee-track hero-tile-row hero-tile-row--${row} absolute left-0${reverse ? " tile-marquee-track--reverse" : ""}`}
     >
       {[0, 1].map((h) => (
-        <div key={h} className="flex gap-[4.9cqh] pr-[4.9cqh]">
+        <div key={h} className="hero-tile-set flex">
           {half.map((c, i) => (
             <span
               key={`${c.label}-${i}`}
-              className="flex h-[26.14cqh] w-[26.14cqh] flex-col items-center gap-[1.31cqh] rounded-[4.25cqh] bg-[radial-gradient(circle_at_50%_42%,#3a3a3a_0%,#1c1c1c_58%,#101010_100%)] pt-[3.27cqh] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]"
+              className="hero-tile flex flex-col items-center bg-[radial-gradient(circle_at_50%_42%,#3a3a3a_0%,#1c1c1c_58%,#101010_100%)] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]"
             >
               {/* Roboto Black per the supplied FASHION.png sample; tight
                   tracking to match its near-touching letters. */}
-              <span className="font-tile text-[2.61cqh] font-black uppercase tracking-[-0.01em] text-white">
+              <span className="hero-tile-label font-tile font-black uppercase tracking-[-0.01em] text-white">
                 {c.label}
               </span>
-              <Img src={c.image} alt="" width={84} className="h-auto w-[13.73cqh]" />
+              <Img src={c.image} alt="" width={84} className="hero-tile-art" />
             </span>
           ))}
         </div>
@@ -1781,21 +1783,16 @@ function CategoryTiles() {
       // so 100cqh below IS the device's height.
       className="hero-tile-field pointer-events-none absolute inset-y-0 left-1/2 z-0 hidden w-screen -translate-x-1/2 overflow-hidden lg:block"
     >
-      {/* CENTRED ON THE PICTURE OF THE COMPUTER (client 2026-09-13). Every
-          number here is a share of the DEVICE's height, which is the only
-          thing they should ever be measured against: the device sizes itself
-          off the height left under the text (`(100svh - 444px) * 1.6` on
-          AppWindow), so tiles pinned to the section — or, before that, to
-          fixed pixels — drifted up the device as the window got shorter and
-          on a 15" Mac ran out of the bottom of the hero altogether.
-
-          At the 978 cap the device is 612 tall, and these resolve back to the
-          artboard's 160 tile, 30 gutter, 26 radius, 16 label and 84 emoji.
-          The pair spans 160 + 30 + 160 = 350, which is 57.2% of 612, so
-          (100 - 57.2) / 2 = 21.4 puts the two of them on the device's own
-          centre line at every size. */}
-      <CategoryTileRow top="top-[21.4cqh]" reverse />
-      <CategoryTileRow top="top-[52.45cqh]" offset={2} />
+      {/* CENTRED ON THE PICTURE OF THE COMPUTER (client 2026-09-13), and
+          sized between the artboard's own 230 and what the device can hold —
+          both rules live in .hero-tile-row in globals.css, which is also
+          where the reasoning is written down. The device sizes itself off the
+          height left under the text (`(100svh - 444px) * 1.6` on AppWindow),
+          so anything pinned to the section — or, before that, to fixed
+          pixels — drifted up the device as the window got shorter and on a
+          15" Mac ran out of the bottom of the hero altogether. */}
+      <CategoryTileRow row="top" reverse />
+      <CategoryTileRow row="bottom" offset={2} />
     </div>
   );
 }
