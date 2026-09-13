@@ -3,6 +3,7 @@ import { Poppins, Roboto } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { CanvasTint } from "@/components/CanvasTint";
+import { PaintGate } from "@/components/PaintGate";
 import {
   SITE_URL,
   SITE_NAME,
@@ -215,9 +216,33 @@ export default function RootLayout({
           // Static, build-time constant — no user input reaches this.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/*
+          NOTHING PAINTS HALF-BUILT. `page-shell` is the paint gate's handle:
+          its CHILDREN are hidden until <html> carries `data-ready`, while the
+          wrapper itself keeps painting the page's black. So the first thing a
+          visitor sees is either the finished first screen or an empty black
+          page — never the site mid-assembly. See PaintGate.tsx and the gate
+          block in globals.css.
+
+          The <noscript> below is the escape hatch, and it is a <style> rather
+          than anything conditional because there is no server here to decide:
+          with JavaScript off nothing will ever set `data-ready`, so the page
+          would stay hidden forever. This reveals it immediately instead, which
+          is exactly the behaviour the site had before the gate existed.
+        */}
+        <noscript>
+          <style
+            dangerouslySetInnerHTML={{
+              __html: ":root:not([data-ready]) .page-shell > *{opacity:1!important;pointer-events:auto!important}",
+            }}
+          />
+        </noscript>
         {/* flex-1 and the same column as body, so `main`'s own flex-1 still
             pushes the footer to the bottom on a short page. */}
-        <div className="flex min-h-full flex-1 flex-col bg-bg">{children}</div>
+        <div className="page-shell flex min-h-full flex-1 flex-col bg-bg">
+          {children}
+        </div>
+        <PaintGate />
         <CanvasTint />
       </body>
     </html>

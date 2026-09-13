@@ -360,6 +360,56 @@ html[data-canvas="footer"] body {
 }
 
 /*
+  THE PAINT GATE — nothing is shown until the first screen is finished.
+
+  The site must never be caught assembling itself: no headline sitting on flat
+  black while the hero's lighting is still on the wire, no fallback face
+  swapping to Poppins, no artwork fading in a layer at a time. See
+  PaintGate.tsx for what is waited on; this is the half that has to be in the
+  render-blocking stylesheet, so it is in force at the very FIRST paint rather
+  than after hydration.
+
+  It hides the SHELL'S CONTENTS, not the shell. layout.tsx's `bg-bg` wrapper
+  stays painted throughout, so what is on screen during the hold is the page's
+  own black — the same ground the hero fades up out of — and the gate itself
+  is invisible. Hiding the wrapper instead would show `body`'s canvas colour,
+  which is a different black and would flash.
+
+  `opacity`, not `visibility` or `display`: the page must still lay out and
+  the browser must still fetch and decode everything in it, because that is
+  precisely what we are waiting for. It is inert while hidden, so a stray
+  click during the hold cannot land on a button nobody can see.
+
+  PaintGate sets `data-ready` on <html>. If it never runs — JavaScript off,
+  a hydration failure, an old browser — the <noscript> override in layout.tsx
+  and PaintGate's own timeout both end with the page visible. The failure mode
+  is "shows early", never "never shows".
+*/
+.page-shell > * {
+  opacity: 1;
+  transition: opacity 400ms ease-out;
+}
+
+:root:not([data-ready]) .page-shell > * {
+  opacity: 0;
+  /* The 400ms fade is an arrival, not a dismissal: going out has no duration
+     because nothing is ever meant to see it go. */
+  transition: none;
+  pointer-events: none;
+}
+
+/*
+  Someone who has asked for less motion gets the same gate with no cross-fade.
+  The point of the rule is that the half-built state is never shown; the fade
+  is only how the finished one arrives, and that part is negotiable.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .page-shell > * {
+    transition: none;
+  }
+}
+
+/*
   DESKTOP: centre the hero in the field.
 
   The field is min-h-svh (page.tsx) so the next section can never peek in on

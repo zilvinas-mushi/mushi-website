@@ -87,6 +87,12 @@ export default function Home() {
           */}
           <div
             aria-hidden="true"
+            // THE ONE ASSET THE PAINT GATE MUST WAIT FOR ON THIS PAGE. It is a
+            // CSS background, so no <img> announces it and nothing else would
+            // know it is still on the wire — and it is the whole lighting of
+            // the first screen, so revealing the hero without it is revealing
+            // a different hero. See PaintGate.tsx.
+            data-await-bg=""
             className="hero-light pointer-events-none absolute inset-0"
           />
           <HeroPanels />

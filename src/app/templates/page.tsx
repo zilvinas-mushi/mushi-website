@@ -118,7 +118,13 @@ export default function Templates() {
         {/* No bottom padding: the burst artwork (see .tpl-bg) must end
             exactly where the MacBook image does — nothing colour-washed
             below it. */}
-        <div className="tpl-bg relative -mt-[82px] overflow-hidden pt-[82px]">
+        {/* data-await-bg: the burst is a CSS background and it IS this page's
+            first screen, so the paint gate holds until it has decoded. Same
+            reasoning as .hero-light on the home page. */}
+        <div
+          data-await-bg=""
+          className="tpl-bg relative -mt-[82px] overflow-hidden pt-[82px]"
+        >
           <TemplatesHero />
         </div>
 

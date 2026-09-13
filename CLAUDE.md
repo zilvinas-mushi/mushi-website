@@ -12,6 +12,36 @@ Static marketing site for mushi.agency. Deployed to Cloudflare Pages.
 - next/image optimization is off. Use explicit width/height, WebP sources,
   lazy-load below the fold, eager-load the hero.
 
+## Nothing paints half-built
+**A visitor must never watch this site assemble itself.** No headline on flat
+black while the hero's lighting is still on the wire, no fallback face swapping
+to Poppins, no artwork appearing a layer at a time. Until the first screen is
+finished, what is on screen is the page's own black and nothing else.
+
+The mechanism is the **paint gate**: `PaintGate.tsx` plus the gate block in
+`globals.css`. `.page-shell`'s children are `opacity: 0` until `<html>` carries
+`data-ready`, and the gate sets it once fonts, every eager `<img>` (decoded,
+not merely loaded) and every `[data-await-bg]` CSS artwork are ready — then the
+page cross-fades in over 400ms.
+
+When you build anything new:
+- Artwork that is a **CSS background** above the fold gets `data-await-bg` on
+  its element. An `<img>` needs nothing — eager ones are picked up
+  automatically, lazy ones are below the fold and must stay out of the gate.
+- **Never widen the gate to below-fold assets.** The rail's 23 creatives, the
+  videos, the case studies: those arrive as you scroll and have their own
+  posters and placeholders. Gating on them would hold a blank page on the
+  strength of bytes nobody has asked for yet.
+- **Anything that animates or reveals on its own** (shaders, canvases, video
+  first frames, scroll-driven fades) must start in its finished-looking state
+  or stay invisible. Never a visible default that corrects itself a frame
+  later.
+- The gate's failure mode is **"shows early", never "never shows"**: the 4s
+  timeout, the `.catch()` on every wait and the `<noscript>` override are all
+  load-bearing. Do not remove one without replacing what it guarantees.
+- This applies to **every page**, not just the home page — a new route's first
+  screen is gated the same way or it is not finished.
+
 ## Interaction rules
 - **Buttons invert their own colours on hover.** Foreground and background
   trade places — they do NOT swap schemes with a neighbouring button, and they
