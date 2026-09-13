@@ -1914,13 +1914,20 @@ function AppWindow() {
           section's own overflow-hidden takes the burst and the tiles with it,
           so all three end on the same line.
 
-          3x (807 across a 269 box), and NO -sm companion, deliberately. The
-          2x export was soft next to Figma's own render: the device is only
-          269 CSS wide, so 2x is 538 real pixels for a screenshot full of 10px
-          UI text. Handing every phone the 3x file means a DPR-2 screen
-          downsamples 807 to 538 rather than drawing a 538 file 1:1, and that
-          supersample is most of the difference. The master carries 1114
-          across the device, so even 3x is a downsample, not an upscale.
+          2x (538 across a 269 box), down from 3x on 2026-09-13, and NO -sm
+          companion. The 3x file was 134 KB and this is the ONE image the
+          paint gate holds the whole first screen for, so it was a third of
+          everything the page had to load before it was allowed to show
+          anything — and PageSpeed measures its Largest Contentful Paint over
+          exactly that budget. 66 KB now.
+
+          What that costs: 3x was not about resolution but about
+          supersampling. A DPR-3 phone drew 807 real pixels 1:1 and a DPR-2
+          one downsampled 807 to 538, which is sharper than drawing a 538 file
+          straight. At 2x both draw 538 — still exactly retina for the 269
+          box, and checked against the old export at DPR 3 before the swap.
+          The file is a Lanczos downsample of the 3x master, not a re-export
+          of anything softer.
 
           -mb-px: the section's height lands on a fractional pixel (the type
           above it does), and when the browser rounds the two apart a single
