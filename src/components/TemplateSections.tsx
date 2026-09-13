@@ -603,28 +603,29 @@ export function TemplatesTeam() {
                       style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
                     />
                   </span>
-                  {/* THE DESKTOP PICTURE IS FRAMED, NOT FADED (Žilvinas
-                      2026-09-13: "WHY ON HER RIGHT ARM THERE IS A SHADOW").
-                      The fade exists to keep a photo that stops mid-card from
-                      ending on a hard line; this one ends ON the plate's own
-                      right edge, so there is nothing to soften and the mask
-                      was only laying a gradient over her arm. It is clipped
-                      instead — which is what the rounded bottom-left corner
-                      in the reference is evidence of.
+                  {/* THE WHOLE PICTURE, INSIDE THE PLATE (Žilvinas
+                      2026-09-13: "she should be in the frame, in that
+                      squarish thing… why did you cut her right hand? paste
+                      her full").
 
-                      The clip opens 48 upward so the hair still clears the
-                      card, and closes 3 BELOW it so the very bottom of the
-                      picture is cut (his ask, "cut the bottom like 2-4
-                      pixels"). w-[106%] off the left edge draws her that bit
-                      larger without moving the position he signed off: she
-                      grows rightward into the clip rather than back across
-                      the salmon. */}
+                      So it is fitted by HEIGHT, not by width: the cut is
+                      1.096 wide-to-tall against the plate's 1.19, so at
+                      h-full she is 138 across a 150 plate and every edge of
+                      her — hair at the top, both shoulders at the sides — is
+                      inside it. Nothing is masked and nothing is clipped;
+                      there is no longer anything to soften, which is what put
+                      a gradient down her arm before.
+
+                      Right-aligned, because the 12 left over is what makes
+                      the band of salmon down her left that the position he
+                      signed off has. Her shoulder lands on the plate's right
+                      edge at the same time. */}
                   {"desktopImage" in p && p.desktopImage ? (
-                    <span className="absolute -bottom-[3px] -top-[48px] left-0 right-0 hidden overflow-hidden rounded-bl-[14px] sm:block">
+                    <span className="absolute inset-0 hidden sm:block">
                       <Img
                         src={p.desktopImage}
                         alt={`${p.name}, ${p.role} at Mushi`}
-                        className="absolute bottom-0 left-0 h-auto w-[106%] max-w-none"
+                        className="absolute bottom-0 right-0 h-full w-auto max-w-none"
                       />
                     </span>
                   ) : null}

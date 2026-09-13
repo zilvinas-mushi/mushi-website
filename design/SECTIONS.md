@@ -609,15 +609,20 @@ ASSETS.md. With the tighter cut she reaches the plate's left edge the way Noah
 does, and `desktopShiftX` goes back to 0 — the 11 was only ever compensating
 for the empty margin.
 
-### The desktop portrait is framed, not faded (2026-09-13, sixth pass)
+### The desktop portrait is whole, inside the plate (2026-09-13, sixth pass)
 
 `.team-photo`'s right-edge mask exists to keep a picture that stops mid-card
-from ending on a hard line. Once the picture ends ON the plate's own right
-edge there is nothing to soften, and the mask was just laying a gradient down
-Urtė's arm (client: "WHY ON HER RIGHT ARM THERE IS A SHADOW"). Where
-`desktopImage` is set the picture goes in a clip instead — `overflow-hidden`
-with the rounded bottom-left corner, opening 48 upward so the hair still
-clears the card and closing 3 below it so the very bottom is cut. The picture
-is `w-[106%]` off the clip's left edge, which draws her a little larger
-without moving the position that was signed off: she grows rightward into the
-clip rather than back across the salmon.
+from ending on a hard line, and it was laying a gradient down Urtė's arm
+(client: "WHY ON HER RIGHT ARM THERE IS A SHADOW"). Clipping it instead only
+moved the problem — it cut her shoulder (client: "she should be in the frame,
+in that squarish thing… why did you cut her right hand? paste her full").
+
+Where `desktopImage` is set the picture is fitted by HEIGHT, not by width: the
+cut is 1.096 wide-to-tall against the plate's 1.19, so at `h-full` she is 138
+across a 150 plate and every edge of her — hair at the top, both shoulders at
+the sides — is inside it. Nothing is masked and nothing is clipped, because
+with the picture inside the frame there is nothing left to soften.
+
+Right-aligned: the 12 left over is what makes the band of salmon down her left
+that the marked-up position has, and her shoulder lands on the plate's right
+edge at the same time.
