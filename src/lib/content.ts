@@ -1036,17 +1036,21 @@ export const TEMPLATES_PAGE = {
         name: "Urtė Balevičiūtė",
         role: "Product Developer",
         image: "templates/team-urte-v2.webp",
-        // DESKTOP gets a tighter cut of the same frame (2026-09-13). The
-        // supplied crop carries about 70px of empty space down its left —
-        // her hair sits 14-18% into the file through the whole visible band,
-        // where Noah's jacket runs to his file's edge — so filling the plate
-        // with it still left a strip of salmon before her (Žilvinas: "there
-        // is still a gap between the left border and her? WHY?"). v3 is v2
-        // with those 70 columns removed, which also draws her a touch larger
-        // in the plate, as the reference has her. The PHONE keeps v2: its
-        // picture is centred in a narrower cell and laps over both edges, and
-        // that composition is signed off.
-        desktopImage: "templates/team-urte-v3.webp",
+        // DESKTOP gets the master Žilvinas supplied on 2026-09-13
+        // (Documents/urte.png), trimmed to its own alpha: 796 x 726, hair at
+        // the top row, both shoulders running to the side edges at the
+        // bottom. Drawn at the plate's full width it lands on the position he
+        // marked up — her hair about 30% in, the salmon reading down her
+        // left, her shoulder ending on the plate's right edge and her lower
+        // left touching the rounded corner.
+        //
+        // v2 and v3 are both superseded for the desktop: v2 carried ~70
+        // columns of empty space down its left, and v3 was that margin cut
+        // away, which fixed the gap but cropped her tighter than the
+        // reference. The PHONE still keeps v2 — its picture is centred in a
+        // narrower cell and laps over both edges, and that composition is
+        // signed off.
+        desktopImage: "templates/team-urte-v4.webp",
         // Drawn 127 tall on the phone, not 135 (Žilvinas 2026-09-11): her
         // hair should clear the top of her own card by just a little (~5),
         // not rise toward Noah's as it did at 135, nor stop inside it (119).
