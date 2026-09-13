@@ -454,8 +454,17 @@ Values come typed from content.ts (string = score/price, boolean = ✓/✕).
 ## Section — Team (added 2026-09-03)
 
 `TemplatesTeam` in TemplateSections.tsx, after Comparison — the page's
-closing section. One #141414 panel: two #1b1b1b person cards (88px portrait
-crop + name + coloured role) over three h3-labelled paragraphs.
+closing section. One #141414 panel: two #1b1b1b person cards (portrait +
+name + coloured role) over three h3-labelled paragraphs.
+
+Desktop card, revised 2026-09-13: the row's proportions come from the supplied
+flattened card export (2316 x 718 — see templates/team-urte-card.webp in
+ASSETS.md), not from a portrait height. The product developer's card IS that
+export, laid over the whole row and bottom-anchored so the hair overhangs the
+top edge; only the name and role are markup. The founder's card is still built
+— plate + photo — at the same scale, 184 wide by the card's full height, which
+is the 1.19 the old 150 x 126 pair had, so nothing inside it moves. The phone
+is untouched: both people keep the stacked 121-tall cards and their own crops.
 
 ## Section — FAQ (added 2026-09-03)
 

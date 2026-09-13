@@ -1009,10 +1009,12 @@ html[data-canvas="footer"] body {
 
 @media (min-width: 640px) {
   /* From sm up the photo FILLS its plate rather than sitting narrow inside
-     it, so 72% now lands in the middle of the picture: it was taking Urtė's
-     right shoulder off into the card's black (Žilvinas 2026-09-13). The fade
-     is only there to take the hard edge off the crop line, so it starts at
-     the last tenth — the shoulder stays, the cut still doesn't show. */
+     it, so 72% would land in the middle of the picture — it was taking a
+     shoulder off into the card's black (Žilvinas 2026-09-13). The fade is
+     only there to take the hard edge off the crop line, so it starts at the
+     last tenth: the shoulder stays, the cut still doesn't show. Desktop, this
+     is the founder's card only; a person with a flattened cardImage draws no
+     <img> here above sm. */
   .team-photo {
     -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
     mask-image: linear-gradient(90deg, #000 90%, transparent 100%);

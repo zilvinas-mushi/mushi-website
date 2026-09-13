@@ -687,13 +687,13 @@
     "w": 420,
     "h": 359
   },
+  "templates/team-urte-card.webp": {
+    "w": 1158,
+    "h": 440
+  },
   "templates/team-urte-v2.webp": {
     "w": 549,
     "h": 520
-  },
-  "templates/team-urte-v4.webp": {
-    "w": 796,
-    "h": 726
   },
   "templates/team-urte.webp": {
     "w": 420,

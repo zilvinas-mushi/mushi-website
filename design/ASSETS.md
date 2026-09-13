@@ -333,20 +333,24 @@ aspect the old crop had, so nothing moves on the card. WebP q90, 96 KB.
 If a higher-resolution flattened render of this card is ever supplied, it
 beats this reconstruction — use it.
 
-## templates/team-urte-v4.webp — added 2026-09-13
+## templates/team-urte-card.webp — added 2026-09-13
 
-The master the client supplied that day (Documents/urte.png), trimmed to its
-own alpha: 796 x 726, hair on the top row, both shoulders running to the side
-edges at the bottom. Drawn at the plate's full width it lands on the position
-he marked up — hair about 30% in, the salmon reading down her left, her
-shoulder ending on the plate's right edge, her lower left touching the rounded
-corner.
+THE WHOLE DESKTOP CARD, FLATTENED. Žilvinas supplied `Documents/urte whol
+section.png` (2316 x 880, alpha) with "either reuse this OR replicate it 1 to
+1" — plate, portrait and the #1b1b1b card behind them already composited.
+Reusing it is the only way the position is guaranteed, so the desktop card is
+this file and the markup adds nothing but the name and role.
 
-DESKTOP ONLY. The phone's picture is centred in a narrower cell and laps over
-both its edges, so this crop moves her there; that composition is signed off,
-so the phone keeps v2 and the two ship as separate <img>s.
+Reading the file: the card occupies y163..880, flush with the bottom edge;
+above it is the hair that overhangs the card's top. Corner radius measures 69,
+which is 14.9 at the card's 500px column width — the row's own
+`rounded-[14px]`, so the export is the card at 1:1 and 2316:718 is the card's
+true aspect (taller than the 126 the hand-built row used). Her portrait runs
+to 42.2% of the width; the markup's spacer is that number.
 
-Superseded on the way here: v2 alone carried ~70 columns of empty space down
-its left, which is why filling the plate with it still showed a strip of
-salmon before her; v3 was that margin cut away, which closed the gap but
-framed her tighter than the reference. v3 is deleted.
+Shipped at 1158 x 440 (half the master, ~2.3x the display size), WebP q92
+with alpha, 30 KB.
+
+Supersedes team-urte-v2/v3/v4 on the DESKTOP. v4 is deleted. The phone keeps
+v2 — its picture is centred in a narrower cell and laps over both edges, a
+composition that is signed off — so the two ship as separate <img>s.

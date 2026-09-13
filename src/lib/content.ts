@@ -1036,29 +1036,31 @@ export const TEMPLATES_PAGE = {
         name: "Urtė Balevičiūtė",
         role: "Product Developer",
         image: "templates/team-urte-v2.webp",
-        // DESKTOP gets the master Žilvinas supplied on 2026-09-13
-        // (Documents/urte.png), trimmed to its own alpha: 796 x 726, hair at
-        // the top row, both shoulders running to the side edges at the
-        // bottom. Drawn at the plate's full width it lands on the position he
-        // marked up — her hair about 30% in, the salmon reading down her
-        // left, her shoulder ending on the plate's right edge and her lower
-        // left touching the rounded corner.
+        // DESKTOP is no longer assembled here at all. Žilvinas supplied the
+        // finished card as one flattened export (Documents/urte whol
+        // section.png, 2026-09-13) — plate, portrait and the #1b1b1b card
+        // behind them, already composited — with "either reuse this OR
+        // replicate it 1 to 1". Reusing it is the only way the position is
+        // guaranteed, so the desktop draws the export and the markup supplies
+        // nothing but the name and role over it.
         //
-        // v2 and v3 are both superseded for the desktop: v2 carried ~70
-        // columns of empty space down its left, and v3 was that margin cut
-        // away, which fixed the gap but cropped her tighter than the
-        // reference. The PHONE still keeps v2 — its picture is centred in a
-        // narrower cell and laps over both edges, and that composition is
-        // signed off.
-        desktopImage: "templates/team-urte-v4.webp",
+        // The export is the card at its 500px column width: its corner radius
+        // measures 69/2316 of the width, which is 14.9 at 500 — the row's own
+        // rounded-[14px]. That also fixes the row's proportions: the card is
+        // 718 tall against 2316 wide there, taller than the 126 the hand-built
+        // version used, and her portrait reaches 42.2% across it rather than
+        // the 30% the old plate allowed. Both cards follow the export now, so
+        // the founder's plate grew with it.
+        //
+        // Her hair rises past the card's top edge in the export, so the image
+        // is bottom-anchored and the row cannot clip. The PHONE is untouched —
+        // its picture is centred in a narrower cell and laps over both edges,
+        // and that composition is signed off, so it keeps the v2 cut.
+        cardImage: "templates/team-urte-card.webp",
         // Drawn 127 tall on the phone, not 135 (Žilvinas 2026-09-11): her
         // hair should clear the top of her own card by just a little (~5),
         // not rise toward Noah's as it did at 135, nor stop inside it (119).
         phoneImageH: 127,
-        // No offset any more: the 11 was compensating for the old crop's
-        // empty left margin, and with v3 she reaches the plate's edge the way
-        // Noah does.
-        desktopShiftX: 0,
         color: "#d0737f",
         roleGradient: "linear-gradient(90deg,#d07678 0%,#ffaeb0 100%)",
         backdrop: "linear-gradient(135deg,#d07678 0%,#4f2f30 100%)",

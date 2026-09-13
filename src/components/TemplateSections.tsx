@@ -531,16 +531,33 @@ export function TemplatesTeam() {
                 // cannot clip. The plate carries the row's own left radius and
                 // the photos are narrower than the plate, so nothing square
                 // crosses the rounded corners.
-                className="flex h-[121px] items-center gap-4 rounded-[14px] bg-[#1b1b1b] sm:h-auto sm:gap-5"
+                // sm+ takes its proportions from the supplied card export —
+                // 2316 x 718 — rather than from a portrait height, so both
+                // cards are the shape the design draws them. `relative`
+                // because that export is laid over the whole card.
+                className="relative flex h-[121px] items-center gap-4 rounded-[14px] bg-[#1b1b1b] sm:h-auto sm:aspect-[2316/718] sm:gap-5"
               >
-                <span className="relative h-full w-[113px] shrink-0 sm:h-[126px] sm:w-[150px]">
+                {/* On sm+ the founder keeps the built plate — at the export's
+                    scale, 184 x the card's full height, which is the same
+                    1.19 the 150 x 126 pair had, so nothing inside it moves.
+                    A cardImage person has no plate to build: the cell is a
+                    spacer as wide as the portrait runs in the export (42.2%
+                    of the card), and the gap-5 after it puts the name where
+                    the export leaves room for it. */}
+                <span
+                  className={`relative h-full w-[113px] shrink-0 sm:h-full ${
+                    "cardImage" in p && p.cardImage ? "sm:w-[42.2%]" : "sm:w-[184px]"
+                  }`}
+                >
                   <span
                     aria-hidden="true"
                     // 65 wide with 15 on its left corners on the phone: the
                     // plate is narrower than the photo's cell and the picture
                     // laps over its right edge, which is the artboard's own
                     // construction.
-                    className="team-portrait-fade absolute inset-y-0 left-0 w-[65px] overflow-hidden rounded-l-[15px] sm:inset-0 sm:w-auto sm:rounded-l-[14px]"
+                    className={`team-portrait-fade absolute inset-y-0 left-0 w-[65px] overflow-hidden rounded-l-[15px] sm:inset-0 sm:w-auto sm:rounded-l-[14px] ${
+                      "cardImage" in p && p.cardImage ? "sm:hidden" : ""
+                    }`}
                     // Every colour here goes through a custom property, and
                     // none of them is set as a plain declaration: an inline
                     // `background` or `color` beats the class that the
@@ -555,12 +572,7 @@ export function TemplatesTeam() {
                   />
                   {/* Bottom-anchored and taller than the card, so the hair
                       pops over the top edge as in the design. */}
-                  {/* From sm up the box is the plate's own width, SLID right
-                      by desktopShiftX rather than inset by it (Žilvinas
-                      2026-09-13, third pass): insetting drew Urtė smaller than
-                      Noah, and the reference has the two of them at one size —
-                      she simply starts a little further in. The 11 she runs
-                      over on the right lands in the picture's own fade.
+                  {/* From sm up the box is the plate's own width.
 
                       Only the bottom-left corner is rounded, and it is on the
                       IMG: that corner is the one piece of evidence in the
@@ -568,69 +580,59 @@ export function TemplatesTeam() {
                       laid over it. The top is left alone — the hair has to
                       clear the card there. The phone keeps its centred,
                       wider-than-the-cell picture. */}
-                  <span
-                    className="absolute bottom-0 left-1/2 w-full -translate-x-1/2 sm:left-[var(--portrait-shift,0px)] sm:w-full sm:translate-x-0"
-                    style={
-                      {
-                        "--portrait-shift": `${"desktopShiftX" in p ? p.desktopShiftX : 0}px`,
-                      } as CSSProperties
-                    }
-                  >
-                    {/* TWO CUTS OF ONE FRAME where desktopImage is set (see
-                        the note on Urtė's entry in content.ts): the phone's
-                        picture is centred in a narrower cell and laps over
-                        both its edges, so a crop that suits the desktop plate
-                        moves her on the phone. They are separate <img>s
-                        rather than one with a breakpoint-swapped src —
-                        there is no server here to pick, and each needs its
-                        own intrinsic size for the paint gate and for layout.
+                  <span className="absolute bottom-0 left-1/2 w-full -translate-x-1/2 sm:left-0 sm:translate-x-0">
+                    {/* PHONE ONLY where cardImage is set: that person's
+                        desktop is the flattened export below, and this cut is
+                        centred in a narrower cell and laps over both its
+                        edges, which is the phone's own signed-off
+                        composition.
 
-                        Desktop: the portrait spans the FULL width of its
-                        plate rather than being centred in it. The crops are
-                        taller than they are wide, so a height-driven 160 left
-                        a purple sliver between the plate's left edge and the
-                        shoulder — the "cut off" Žilvinas saw against Figma,
-                        where the jacket reaches the rounded corner.
-                        Width-driven, it is flush. */}
+                        Everyone else draws this same file on both: the
+                        portrait spans the FULL width of its plate rather than
+                        being centred in it. The crops are taller than they are
+                        wide, so a height-driven fit left a purple sliver
+                        between the plate's left edge and the shoulder — the
+                        "cut off" Žilvinas saw against Figma, where the jacket
+                        reaches the rounded corner. Width-driven, it is
+                        flush. */}
                     <Img
                       src={p.image}
                       alt={`${p.name}, ${p.role} at Mushi`}
                       className={`team-photo mx-auto h-[var(--portrait-h)] w-auto max-w-none ${
-                        "desktopImage" in p && p.desktopImage
+                        "cardImage" in p && p.cardImage
                           ? "sm:hidden"
                           : "sm:h-auto sm:w-full sm:rounded-bl-[14px]"
                       }`}
                       style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
                     />
                   </span>
-                  {/* THE WHOLE PICTURE, INSIDE THE PLATE (Žilvinas
-                      2026-09-13: "she should be in the frame, in that
-                      squarish thing… why did you cut her right hand? paste
-                      her full").
-
-                      So it is fitted by HEIGHT, not by width: the cut is
-                      1.096 wide-to-tall against the plate's 1.19, so at
-                      h-full she is 138 across a 150 plate and every edge of
-                      her — hair at the top, both shoulders at the sides — is
-                      inside it. Nothing is masked and nothing is clipped;
-                      there is no longer anything to soften, which is what put
-                      a gradient down her arm before.
-
-                      Right-aligned, because the 12 left over is what makes
-                      the band of salmon down her left that the position he
-                      signed off has. Her shoulder lands on the plate's right
-                      edge at the same time. */}
-                  {"desktopImage" in p && p.desktopImage ? (
-                    <span className="absolute inset-0 hidden sm:block">
-                      <Img
-                        src={p.desktopImage}
-                        alt={`${p.name}, ${p.role} at Mushi`}
-                        className="absolute bottom-0 right-0 h-full w-auto max-w-none"
-                      />
-                    </span>
-                  ) : null}
                 </span>
-                <div className="min-w-0 pr-4">
+                {/* THE SUPPLIED CARD, VERBATIM (Žilvinas 2026-09-13: "either
+                    reuse this OR replicate it 1 to 1"). Plate, portrait and
+                    the #1b1b1b behind them are already composited in the
+                    export, so on sm+ it is laid over the whole row and the
+                    markup contributes nothing to the picture — there is
+                    nothing left to get wrong by eye.
+
+                    Its BOTTOM edge is the card's bottom edge and it is anchored
+                    there: the hair rising past the top is the part of the file
+                    that sits outside the card, and the row does not clip, so
+                    it overhangs exactly as the export draws it. The card's own
+                    rounded-[14px] is the radius the export was cut at, so the
+                    two corners agree.
+
+                    Empty alt: it is decorative here. The name and role beside
+                    it already say who this is, and the phone's <img> carries
+                    the portrait's own alt text. */}
+                {"cardImage" in p && p.cardImage ? (
+                  <Img
+                    src={p.cardImage}
+                    alt=""
+                    className="pointer-events-none absolute bottom-0 left-0 hidden h-auto w-full sm:block"
+                    sizes="(min-width: 1024px) 500px, 50vw"
+                  />
+                ) : null}
+                <div className="relative min-w-0 pr-4">
                   <p className="truncate text-[20px] font-semibold leading-tight text-white md:text-[28px]">
                     {p.name}
                   </p>
