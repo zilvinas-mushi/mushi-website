@@ -258,16 +258,15 @@ export function TemplatesProcess() {
 
         {/* A real ordered list — the arrows only draw what the markup already
             says. Discs are hidden on phones, where the cards stack. */}
-        {/* Fixed 421.75px square cards (client 2026-09-11): the columns carry
-            the width, the article below carries the height. The row totals
-            ~1281px with the two 8px gutters — wider than SHELL's 1200 — so it
-            centres itself and overhangs the shell symmetrically. ONLY from
-            1330 up, where it fits: at md the row would be wider than the
-            screen itself, so tablets keep the fluid three-column grid. */}
-        {/* The `!`s are load-bearing: Tailwind sorts arbitrary min-[...]
-            variants BEFORE the md: rules, so at equal specificity the md:
-            fluid grid wins even past 1330 without them. */}
-        <ol className="mx-auto mt-[37px] grid max-w-none gap-[15px] md:mt-10 md:max-w-[1080px] md:grid-cols-3 md:gap-2">
+        {/* FLUID EVERYWHERE (client 2026-09-13, per their reference shot):
+            three equal columns with 12px gutters in an 1128 cap — at the cap
+            each square is (1128 - 24) / 3 = 368, the reference's own card
+            size, and below it the squares just shrink. The earlier fixed
+            421.75 columns are GONE: they were wider than SHELL and, when the
+            merge dropped the column rule but kept the cards' forced height,
+            the aspect-square cards overflowed their columns and swallowed
+            the gaps entirely. No fixed sizes means no overflow mode. */}
+        <ol className="mx-auto mt-[37px] grid max-w-none gap-[15px] md:mt-10 md:max-w-[1160px] md:grid-cols-3 md:gap-2.5">
           {p.steps.map((s, i) => (
             <li key={s.title} className="relative">
               {/* THE PHONE'S JOIN between two steps: a 66 black disc centred
@@ -306,9 +305,12 @@ export function TemplatesProcess() {
                    the phone join's own construction turned sideways. */
                 <span
                   aria-hidden="true"
-                  className="absolute -left-[36px] top-1/2 z-10 hidden size-[64px] -translate-y-1/2 items-center justify-center rounded-full bg-black md:flex"
+                  // 52 outer / 40 inner / 21-wide arrow — one step smaller than the
+                  // earlier 64/50/26, per the client's reference (2026-09-13).
+                  // -left-[32px] keeps it centred on the 12px gutter: 26 + 6.
+                  className="absolute -left-[31px] top-1/2 z-10 hidden size-[52px] -translate-y-1/2 items-center justify-center rounded-full bg-black md:flex"
                 >
-                  <span className="flex size-[50px] items-center justify-center rounded-full bg-[#222222]">
+                  <span className="flex size-[40px] items-center justify-center rounded-full bg-[#222222]">
                     {/* The supplied arrow ("arrrr.png", 2026-09-11), traced:
                         90 x 70 with a full-width shaft and a chevron nearly
                         the full height — 45° arms, round caps, stroke 10.
@@ -318,7 +320,7 @@ export function TemplatesProcess() {
                       viewBox="0 0 90 70"
                       fill="none"
                       strokeWidth="10"
-                      className="h-[20px] w-[26px] stroke-white"
+                      className="h-[16px] w-[21px] stroke-white"
                     >
                       <path
                         strokeLinecap="round"
@@ -336,11 +338,12 @@ export function TemplatesProcess() {
                 // leaves it, and a card that stayed 345 TALL while growing
                 // wider ran its own artwork out of the bottom. The desktop
                 // cards take their height from the grid row and keep the 20.
-                // aspect-square at EVERY width now (2026-09-12): the shot
-                // went absolute (full-bleed to the bottom), so it no longer
-                // gives the card intrinsic height — without the aspect the
-                // md cards collapsed to their text.
-                className="relative flex aspect-square flex-col overflow-hidden rounded-[25px] p-5 md:rounded-[20px] md:p-6 min-[1330px]:h-[421.75px]!"
+                // aspect-square at EVERY width (2026-09-12): the shot is
+                // absolute (full-bleed to the bottom), so it no longer gives
+                // the card intrinsic height — without the aspect the cards
+                // collapse to their text. No fixed height either (2026-09-13):
+                // the square takes the column's width, whatever it is.
+                className="relative flex aspect-square flex-col overflow-hidden rounded-[25px] p-5 md:rounded-[20px] md:p-6"
                 // The design's own gradient panel (2026-09-04), with the
                 // sampled CSS gradient behind it as a loading fallback.
                 style={{
@@ -362,12 +365,13 @@ export function TemplatesProcess() {
                     the white space match the reference (Žilvinas 2026-09-06,
                     twice). */}
                 {/* ONE LINE at every width (client 2026-09-12): at 30px,
-                    "Customize in Canva" measures the fluid card's full
+                    "Customize in Canva" measures a narrow fluid card's full
                     content width and wraps on some renderers. 26px in the
-                    fluid band, the reference's 30 from 1330 up where the
-                    421.75 cards leave room; nowrap as the backstop. The `!`
-                    is the min-[...]-sorts-before-md: quirk again. */}
-                <h3 className="relative z-[1] mt-[2px] text-[26px] font-semibold leading-none text-white md:mt-1 md:whitespace-nowrap md:text-[26px] md:leading-tight min-[1330px]:text-[30px]!">
+                    fluid band, the reference's 30 from 1160 up — where the
+                    grid is at its 1128 cap and the 368 squares leave room;
+                    nowrap as the backstop. The `!` is the
+                    min-[...]-sorts-before-md: quirk. */}
+                <h3 className="relative z-[1] mt-[2px] text-[26px] font-semibold leading-none text-white md:mt-1 md:whitespace-nowrap md:text-[26px] md:leading-tight min-[1160px]:text-[30px]!">
                   {s.title}
                 </h3>
                 {/* Negative margins run the visual to the card's edges; the
@@ -421,7 +425,7 @@ export function TemplatesProcess() {
 
                     20 off the card's bottom edge, 15 either side of the
                     label, radius 50, Poppins Medium 14. */}
-                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black shadow-[0_6px_18px_-6px_rgba(0,0,0,0.6)] md:bottom-5 md:left-6 md:px-[18px] md:py-[10px] md:text-[18px] md:font-medium">
+                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black shadow-[0_6px_18px_-6px_rgba(0,0,0,0.6)] md:bottom-5 md:left-6 md:px-[14px] md:py-2 md:text-[16px] md:font-medium">
                   {s.chip}
                 </span>
               </article>
@@ -523,6 +527,11 @@ export function TemplatesTeam() {
             {t.people.map((p) => (
               <div
                 key={p.name}
+                // NO overflow-hidden (client 2026-09-13, third pass): the reference
+                // keeps the HAIR rising over the row's top edge, so the row
+                // cannot clip. The plate carries the row's own left radius and
+                // the photos are narrower than the plate, so nothing square
+                // crosses the rounded corners.
                 className="flex h-[121px] items-center gap-4 rounded-[14px] bg-[#1b1b1b] sm:h-auto sm:gap-5"
               >
                 <span className="relative h-full w-[113px] shrink-0 sm:h-[126px] sm:w-[180px]">
@@ -551,13 +560,13 @@ export function TemplatesTeam() {
                     <Img
                       src={p.image}
                       alt={`${p.name}, ${p.role} at Mushi`}
-                      className="mx-auto h-[var(--portrait-h)] w-auto max-w-none sm:h-[160px]"
+                      className="team-photo mx-auto h-[var(--portrait-h)] w-auto max-w-none sm:h-[160px]"
                       style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
                     />
                   </span>
                 </span>
                 <div className="min-w-0 pr-4">
-                  <p className="truncate text-[20px] font-semibold leading-tight text-white md:text-[22px]">
+                  <p className="truncate text-[20px] font-semibold leading-tight text-white md:text-[28px]">
                     {p.name}
                   </p>
                   <p
@@ -1019,11 +1028,14 @@ export function TemplatesAccess() {
                   so the title's top and the caption's bottom line up with
                   the tile's edges, as the reference card has it. */}
               <span className="grid size-[35px] shrink-0 place-items-center rounded-[10%] bg-[linear-gradient(135deg,#d57e80_0%,#b45455_50%,#b45455_100%)] md:size-[53px]">
+                {/* 70%, not the sunglasses' 64 (client 2026-09-13): this
+                    face is round where 😎 runs edge to edge, so at equal
+                    canvas widths it read smaller. */}
                 <Img
                   src="templates/access-emoji-bad-glyph.webp"
                   alt=""
                   width={28}
-                  className="h-auto w-[64%]"
+                  className="h-auto w-[70%]"
                 />
               </span>
               {/* Centred on the square as it stands: measured, the title's
@@ -1422,7 +1434,11 @@ export function TemplatesInside() {
               4x the 165 x 119 card, supplied already dimmed — so the 45%
               black this card used to lay over the desktop art is gone. */}
           <article
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[url(/images/templates/inside-support-phone.webp)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[url(/images/templates/inside-support.webp)] md:p-6 md:text-left`}
+            // md:bg oversized 108.6% and pinned right (client 2026-09-13): the
+            // art's baked "Need help?" pill sat 28px right of the headline's
+            // inset; sliding the art left puts the pill's left edge on the
+            // same 24px line as "24/7", as the reference card has it.
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[url(/images/templates/inside-support-phone.webp)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[url(/images/templates/inside-support.webp)] md:bg-no-repeat md:bg-[length:108.6%_auto] md:bg-[position:right_center] md:p-6 md:text-left`}
           >
             <p className="relative">
               <span className={BIG}>{s.support.big}</span>
@@ -1463,26 +1479,22 @@ export function TemplatesInside() {
               }}
             />
             <span
-              className="relative inline-flex gap-1"
+              className="relative inline-flex gap-1 md:gap-1.5"
               role="img"
               aria-label="5 out of 5 stars"
             >
+              {/* ONE BAKED TILE per star (client 2026-09-13): the square
+                  and the notched Trustpilot star cut as one 121px tile from
+                  the client's reference — the old 42px star webp drew soft
+                  and its notch never survived the downscale. */}
               {Array.from({ length: 5 }, (_, i) => (
-                <span
+                <Img
                   key={i}
-                  aria-hidden="true"
-                  className="flex size-[14px] items-center justify-center bg-[#7c54b5] md:size-[19px]"
-                >
-                  {/* The design's own star (image 130.svg, a raster in a
-                      <pattern> — flattened, see BRAND_LOGOS), white on the
-                      artboard's purple square. */}
-                  <Img
-                    src="templates/trustpilot-star.webp"
-                    alt=""
-                    width={11}
-                    className="size-[11px] md:size-[14px]"
-                  />
-                </span>
+                  src="templates/trustpilot-star-tile.webp"
+                  alt=""
+                  width={26}
+                  className="size-[14px] md:size-[26px]"
+                />
               ))}
             </span>
             {/* THE WHOLE LOCKUP AS ONE FILE (Trustpilot.svg, supplied
@@ -1502,7 +1514,7 @@ export function TemplatesInside() {
               src="templates/trustpilot-lockup.webp"
               alt="Trustpilot"
               width={126}
-              className="relative mt-1.5 h-[34px] w-auto -translate-y-[6px] md:mt-3 md:h-[26px] md:translate-y-0"
+              className="relative mt-1.5 h-[34px] w-auto -translate-y-[6px] md:mt-3 md:h-[33px] md:translate-y-0"
             />
             <p className={`${SMALL} relative mt-1 md:mt-2 md:!text-[20px]`}>{s.reviews.caption}</p>
           </article>

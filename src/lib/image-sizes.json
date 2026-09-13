@@ -360,16 +360,16 @@
     "h": 166
   },
   "templates/access-emoji-bad.webp": {
-    "w": 96,
-    "h": 96
+    "w": 258,
+    "h": 258
   },
   "templates/access-emoji-good-glyph.webp": {
     "w": 99,
     "h": 99
   },
   "templates/access-emoji-good.webp": {
-    "w": 96,
-    "h": 96
+    "w": 258,
+    "h": 258
   },
   "templates/access-rays.webp": {
     "w": 2400,
@@ -499,6 +499,14 @@
     "w": 234,
     "h": 28
   },
+  "templates/eyebrow-rule-left.webp": {
+    "w": 322,
+    "h": 42
+  },
+  "templates/eyebrow-rule-right.webp": {
+    "w": 320,
+    "h": 42
+  },
   "templates/hero-burst-phone.webp": {
     "w": 750,
     "h": 2140
@@ -573,7 +581,7 @@
   },
   "templates/laurel-mask.webp": {
     "w": 1200,
-    "h": 506
+    "h": 414
   },
   "templates/logo-creativeos.webp": {
     "w": 300,
@@ -584,8 +592,8 @@
     "h": 78
   },
   "templates/process-canva.webp": {
-    "w": 242,
-    "h": 176
+    "w": 750,
+    "h": 636
   },
   "templates/process-card-1.webp": {
     "w": 500,
@@ -612,8 +620,8 @@
     "h": 900
   },
   "templates/process-pick.webp": {
-    "w": 600,
-    "h": 378
+    "w": 364,
+    "h": 325
   },
   "templates/process-test.webp": {
     "w": 253,
@@ -688,8 +696,12 @@
     "h": 359
   },
   "templates/trustpilot-lockup.webp": {
-    "w": 378,
-    "h": 102
+    "w": 292,
+    "h": 60
+  },
+  "templates/trustpilot-star-tile.webp": {
+    "w": 121,
+    "h": 121
   },
   "templates/trustpilot-star.webp": {
     "w": 42,
@@ -730,17 +742,5 @@
   "used-by-10000.webp": {
     "w": 900,
     "h": 1595
-  },
-  "templates/eyebrow-rule-left.webp": {
-    "w": 322,
-    "h": 42
-  },
-  "templates/eyebrow-rule-right.webp": {
-    "w": 320,
-    "h": 42
-  },
-  "templates/diff-ad-peek.webp": {
-    "w": 520,
-    "h": 475
   }
 }
