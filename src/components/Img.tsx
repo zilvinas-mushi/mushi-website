@@ -109,11 +109,22 @@ export function Img({
      export (CLAUDE.md), so <Image> would ship extra runtime for no benefit.
      The LCP concern the rule targets is handled by the explicit width/height
      and eager/lazy loading below. */
+  const url = `/images/${src}`;
+
+  /* BELOW THE FOLD, THE URL IS NOT AN ATTRIBUTE THE BROWSER READS.
+     `loading="lazy"` asks Chrome to wait and Chrome mostly does not: its
+     threshold runs to ~8000px on a slow connection, so /templates put 1.8 MB
+     on the wire before the first screen was allowed to paint. The real URL
+     rides in `data-src` and the inline script (src/lib/paint-gate-script.ts)
+     moves it across when the image comes within a screen and a half. The
+     <noscript> twin below is the same image with a real src, so a visitor or
+     a crawler without JavaScript still gets every picture. */
+  const deferred = !priority;
+
   const img = (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/images/${src}`}
-      srcSet={srcSet}
+      {...(deferred ? { "data-src": url, "data-srcset": srcSet } : { src: url, srcSet })}
       sizes={srcSet ? sizesAttr : undefined}
       alt={alt}
       width={w}
@@ -127,7 +138,31 @@ export function Img({
     />
   );
 
-  if (!alternate || !alt2) return img;
+  const withFallback = deferred ? (
+    <>
+      {img}
+      <noscript>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          srcSet={srcSet}
+          sizes={srcSet ? sizesAttr : undefined}
+          alt={alt}
+          width={w}
+          height={h}
+          className={className}
+          style={style}
+          draggable={draggable}
+          loading="lazy"
+          decoding="async"
+        />
+      </noscript>
+    </>
+  ) : (
+    img
+  );
+
+  if (!alternate || !alt2) return withFallback;
 
   const aw = alternate.width ?? alt2.w;
   const ah = alternate.width
@@ -147,7 +182,32 @@ export function Img({
         width={aw}
         height={ah}
       />
-      {img}
+      {withFallback}
     </picture>
+  );
+}
+
+/**
+ * The no-JavaScript twin of a DEFERRED CSS BACKGROUND.
+ *
+ * Artwork that is a background rather than an <img> keeps its URL in
+ * `data-bg`, out of anything the browser will fetch, until the inline script
+ * (src/lib/paint-gate-script.ts) puts it into `--bg` as the element comes into
+ * range. With JavaScript off that never happens, so this renders the one rule
+ * that does it unconditionally — matched on the data attribute, so it needs no
+ * id and cannot drift from the element it belongs to.
+ *
+ * Drop it beside (or inside) the element. It renders nothing at all when
+ * JavaScript is on.
+ */
+export function BgFallback({ bg, md }: { bg: string; md?: string }) {
+  const rules =
+    (bg ? `[data-bg="${bg}"]{background-image:${bg}}` : "") +
+    (md ? `@media (min-width:768px){[data-bg-md="${md}"]{background-image:${md}}}` : "");
+  return (
+    <noscript>
+      {/* Build-time constants only — no user input reaches this. */}
+      <style dangerouslySetInnerHTML={{ __html: rules }} />
+    </noscript>
   );
 }

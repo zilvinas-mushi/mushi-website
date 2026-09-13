@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
   TemplatesAccess,
+  TemplatesBgFallbacks,
   TemplatesComparison,
   TemplatesDifference,
   TemplatesFaq,
@@ -162,6 +163,9 @@ export default function Templates() {
         }}
         active="/templates"
       />
+      {/* The <noscript> rules for this page's deferred background artwork —
+          see TemplatesBgFallbacks. Nothing renders with JavaScript on. */}
+      <TemplatesBgFallbacks />
       <main className="flex-1">
         {/* No bottom padding: the burst artwork (see .tpl-bg) must end
             exactly where the MacBook image does — nothing colour-washed

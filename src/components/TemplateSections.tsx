@@ -1,5 +1,5 @@
 import { Fragment, type CSSProperties } from "react";
-import { Img } from "./Img";
+import { BgFallback, Img } from "./Img";
 import { Logo } from "./Logo";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { APP_URL, BOOKING_URL, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID } from "@/lib/site";
@@ -345,8 +345,14 @@ export function TemplatesProcess() {
                 className="relative flex aspect-square flex-col overflow-hidden rounded-[25px] p-5 md:rounded-[20px] md:p-6"
                 // The design's own gradient panel (2026-09-04), with the
                 // sampled CSS gradient behind it as a loading fallback.
+                // DEFERRED (see BgFallback / paint-gate-script.ts): the URL
+                // lives in data-bg, not in a property the browser can fetch
+                // from. `var(--bg, none)` keeps the gradient painting while
+                // the artwork is still nothing — the fallback this pair was
+                // always meant to be.
+                data-bg={`url(/images/templates/${s.card})`}
                 style={{
-                  backgroundImage: `url(/images/templates/${s.card}), ${s.gradient}`,
+                  backgroundImage: `var(--bg, none), ${s.gradient}`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
@@ -849,9 +855,10 @@ export function TemplatesComparison() {
                 right: "-60.8%",
                 top: "-18.1%",
                 bottom: "-18.3%",
-                backgroundImage: "url(/images/templates/compare-card.webp)",
+                backgroundImage: "var(--bg, none)",
                 backgroundSize: "100% 100%",
               }}
+              data-bg="url(/images/templates/compare-card.webp)"
             />
           </div>
 
@@ -901,9 +908,10 @@ export function TemplatesComparison() {
                       right: "-4.9%",
                       top: "-72.7%",
                       bottom: "-72.7%",
-                      backgroundImage: "url(/images/templates/cmp-row-band.webp)",
+                      backgroundImage: "var(--bg, none)",
                       backgroundSize: "100% 100%",
                     }}
+                      data-bg="url(/images/templates/cmp-row-band.webp)"
                   />
                 </div>
               )}
@@ -1083,7 +1091,8 @@ export function TemplatesAccess() {
           <article
             id={TEMPLATES_SCRATCH_CARD_ID}
             className="flex flex-col rounded-[15px] bg-[#111111] bg-cover bg-center p-6 md:rounded-[20px] md:p-7"
-            style={{ backgroundImage: "url(/images/templates/access-card-dark.webp)" }}
+            style={{ backgroundImage: "var(--bg, none)" }}
+            data-bg="url(/images/templates/access-card-dark.webp)"
           >
             <header className="flex items-center gap-3.5">
               {/* 35 square on the phone (artboard 2026-09-06), 44 on the
@@ -1177,7 +1186,8 @@ export function TemplatesAccess() {
               // Phone: Regular 20 with no tracking, a 2 INSIDE stroke and a
               // 15 radius, 24 below the list (artboard 2026-09-06). The
               // desktop reference keeps its 24/1px/12.
-              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] border-2 border-white bg-[url(/images/templates/access-btn-dark.webp)] bg-cover text-[20px] font-normal uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black md:mt-8 md:rounded-[12px] md:border md:text-[24px] md:tracking-[0.06em]"
+              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] border-2 border-white bg-[image:var(--bg,none)] bg-cover text-[20px] font-normal uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black md:mt-8 md:rounded-[12px] md:border md:text-[24px] md:tracking-[0.06em]"
+              data-bg="url(/images/templates/access-btn-dark.webp)"
             >
               {a.scratch.cta}
             </a>
@@ -1189,7 +1199,8 @@ export function TemplatesAccess() {
             // card's frame is the phone's bottom-lit gradient ring at every
             // width — .access-card-ring now applies above md too.
             className="access-card-ring relative flex flex-col rounded-[15px] md:rounded-[20px] bg-[#131017] bg-cover bg-center p-6 shadow-[0_30px_80px_-30px_rgba(110,84,181,0.5)] md:p-7"
-            style={{ backgroundImage: "url(/images/templates/access-card-purple.webp)" }}
+            style={{ backgroundImage: "var(--bg, none)" }}
+            data-bg="url(/images/templates/access-card-purple.webp)"
           >
             <header className="flex items-center gap-3.5">
               {/* Same build as the scratch card's square: CSS gradient
@@ -1248,7 +1259,8 @@ export function TemplatesAccess() {
             </ul>
             <a
               href={APP_URL}
-              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] bg-[url(/images/templates/access-btn-purple.webp)] bg-cover text-[20px] font-semibold uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:rounded-[12px] md:text-[24px] md:tracking-[0.06em]"
+              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] bg-[image:var(--bg,none)] bg-cover text-[20px] font-semibold uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:rounded-[12px] md:text-[24px] md:tracking-[0.06em]"
+              data-bg="url(/images/templates/access-btn-purple.webp)"
             >
               {a.templates.cta}
             </a>
@@ -1267,7 +1279,9 @@ export function TemplatesAccess() {
           // BUY NOW fill ends ~18px in from the container edge (its p-7 is
           // offset by the card ring's inner geometry), and the CTA's right
           // edge aligns to THAT, not to a theoretical 28 (client 2026-09-12).
-          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1080px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[url(/images/templates/access-banner-phone.webp)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:url(/images/templates/access-rays.webp),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:pl-6 md:pr-[18px]"
+          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1080px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[image:var(--bg,none)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:var(--bg-md,none),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:pl-6 md:pr-[18px]"
+          data-bg="url(/images/templates/access-banner-phone.webp)"
+          data-bg-md="url(/images/templates/access-rays.webp)"
         >
           <div className="flex items-center gap-3.5">
             {/* Built like the two card squares (Žilvinas 2026-09-11): the
@@ -1510,7 +1524,9 @@ export function TemplatesInside() {
             // art's baked "Need help?" pill sat 28px right of the headline's
             // inset; sliding the art left puts the pill's left edge on the
             // same 24px line as "24/7", as the reference card has it.
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[url(/images/templates/inside-support-phone.webp)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[url(/images/templates/inside-support.webp)] md:bg-no-repeat md:bg-[length:108.6%_auto] md:bg-[position:right_center] md:p-6 md:text-left`}
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[image:var(--bg-md,none)] md:bg-no-repeat md:bg-[length:108.6%_auto] md:bg-[position:right_center] md:p-6 md:text-left`}
+            data-bg="url(/images/templates/inside-support-phone.webp)"
+            data-bg-md="url(/images/templates/inside-support.webp)"
           >
             <p className="relative">
               <span className={BIG}>{s.support.big}</span>
@@ -1521,7 +1537,9 @@ export function TemplatesInside() {
           {/* 5 industries — chip rows baked into the background art. Same
               phone treatment as the support card: its own 4x, pre-dimmed. */}
           <article
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[url(/images/templates/inside-industries-phone.webp)] p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[url(/images/templates/inside-industries.webp)] md:p-6 md:text-left`}
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[image:var(--bg-md,none)] md:p-6 md:text-left`}
+            data-bg="url(/images/templates/inside-industries-phone.webp)"
+            data-bg-md="url(/images/templates/inside-industries.webp)"
           >
             <p className="relative">
               <span className={BIG}>{s.industries.big}</span>
@@ -1598,7 +1616,9 @@ export function TemplatesInside() {
               in the art, so the gradient that used to be laid over it here
               is gone. */}
           <article
-            className={`${CARD} col-span-2 flex h-[222px] flex-col items-center bg-[url(/images/templates/inside-monthly-phone.webp)] pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:items-stretch md:bg-[url(/images/templates/inside-monthly.webp)] md:pt-6 md:text-left`}
+            className={`${CARD} col-span-2 flex h-[222px] flex-col items-center bg-[image:var(--bg,none)] pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:items-stretch md:bg-[image:var(--bg-md,none)] md:pt-6 md:text-left`}
+            data-bg="url(/images/templates/inside-monthly-phone.webp)"
+            data-bg-md="url(/images/templates/inside-monthly.webp)"
             style={{ backgroundPosition: "center bottom" }}
           >
             <p className="relative">
@@ -1651,7 +1671,8 @@ export function TemplatesDifference() {
               beside it (grid stretch). */}
           <article
             className="diff-card-ring relative flex h-[453px] flex-col overflow-hidden rounded-[20px] bg-[#101010] bg-cover bg-center px-6 pb-[18px] pt-5 md:h-auto md:min-h-[560px] md:rounded-[24px] md:p-7"
-            style={{ backgroundImage: "url(/images/templates/diff-card-dark.webp)" }}
+            style={{ backgroundImage: "var(--bg, none)" }}
+            data-bg="url(/images/templates/diff-card-dark.webp)"
           >
             <BrandChips brands={d.bad.brands} />
             <div role="img" aria-label={d.bad.alt} className="absolute inset-0">
@@ -1805,7 +1826,9 @@ function CategoryTileRow({
               <span className="hero-tile-label font-tile font-black uppercase tracking-[-0.01em] text-white">
                 {c.label}
               </span>
-              <Img src={c.image} alt="" width={84} className="hero-tile-art" />
+              {/* priority, for the reason on the phone field below: the
+                  tiles are part of the hero, not of the scroll. */}
+              <Img src={c.image} alt="" width={84} className="hero-tile-art" priority />
             </span>
           ))}
         </div>
@@ -2116,7 +2139,12 @@ function PhoneTiles() {
                     are one and two words. mt-auto takes up whatever the
                     label leaves above it. */}
                 <span className="mt-auto mb-[30px] grid w-full place-items-center">
-                  <Img src={cat.image} alt="" width={58} />
+                  {/* priority: these five glyphs are ON the first screen —
+                      the drifting field beside the device — so they are
+                      gated with it rather than deferred to the observer.
+                      Five files, ~47 KB between them, and each tile is the
+                      same file over again. */}
+                  <Img src={cat.image} alt="" width={58} priority />
                 </span>
               </span>
             );
@@ -2124,5 +2152,58 @@ function PhoneTiles() {
         </div>
       ))}
     </div>
+  );
+}
+
+/**
+ * THE NO-JAVASCRIPT TWIN OF THIS PAGE'S DEFERRED BACKGROUNDS.
+ *
+ * Every card, band and panel artwork below the fold keeps its URL in
+ * `data-bg` rather than in a property the browser can fetch from, and the
+ * inline script moves it into `--bg` as the element comes into range (see
+ * src/lib/paint-gate-script.ts). That is 900 KB the phone no longer spends
+ * before the first screen is allowed to paint.
+ *
+ * With JavaScript off nothing ever moves it, so this renders the rules that
+ * do it unconditionally. They match on the data attribute, so no element
+ * needs an id and nothing here can point at the wrong box — but a NEW
+ * deferred background does have to be added to this list, or it simply will
+ * not appear for a visitor without JavaScript.
+ *
+ * Renders nothing at all when JavaScript is on.
+ */
+export function TemplatesBgFallbacks() {
+  const files = [
+    "process-card-1.webp",
+    "process-card-2.webp",
+    "process-card-3.webp",
+    "compare-card.webp",
+    "cmp-row-band.webp",
+    "access-card-dark.webp",
+    "access-btn-dark.webp",
+    "access-card-purple.webp",
+    "access-btn-purple.webp",
+    "access-banner-phone.webp",
+    "diff-card-dark.webp",
+    "inside-support-phone.webp",
+    "inside-industries-phone.webp",
+    "inside-monthly-phone.webp",
+  ];
+  // The desktop twins, which the class only uses above md.
+  const wide = [
+    "access-rays.webp",
+    "inside-support.webp",
+    "inside-industries.webp",
+    "inside-monthly.webp",
+  ];
+  return (
+    <>
+      {files.map((f) => (
+        <BgFallback key={f} bg={`url(/images/templates/${f})`} />
+      ))}
+      {wide.map((f) => (
+        <BgFallback key={f} bg="" md={`url(/images/templates/${f})`} />
+      ))}
+    </>
   );
 }
