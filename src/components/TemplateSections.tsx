@@ -1908,16 +1908,8 @@ function AppWindow() {
           where the bezel does — 269 wide, the artboard's number.
 
 */}
-      <Img
-        src="templates/hero-phone.webp"
-        alt="The Mushi template library on a phone: ad templates with industry and sort filters"
-        width={269}
-        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full md:hidden"
-        priority
-      />
-
-      {/* NO ROUNDED CLIP, NO SCALE (Žilvinas 2026-09-05: "as the mac
-          screenshot attached — not you added some stupid corners").
+      {/* NO ROUNDED CLIP, NO SCALE on the MacBook (Žilvinas 2026-09-05: "as
+          the mac screenshot attached — not you added some stupid corners").
 
           The master draws the device frame and the screen's own corners
           itself. Wrapping it in `overflow-hidden rounded-[22px]` added a
@@ -1927,15 +1919,28 @@ function AppWindow() {
 
           The file is the supplied master ("Macbook 1.png", re-supplied
           2026-09-05) at 5200 x 3256, straight down to 2400 x 1503 and
-          nothing else done to it. */}
+          nothing else done to it.
+
+          ONE <picture>, NOT TWO BREAKPOINT-HIDDEN <img>s. `hidden md:block`
+          hides an image; it does not stop the browser fetching it. Both were
+          eager, so a phone pulled the 397 KB MacBook at high priority, never
+          painted a pixel of it, and the paint gate sat waiting on it before
+          it would show the phone hero — the single biggest number on the
+          phone's clock. As a <picture> the browser takes the matching entry
+          and only that one.
+
+          The two devices are the same element now, so the classes fork at md
+          instead of the markup: 269 wide and centred below, full width with
+          the deep drop shadow above. `relative z-[1]` at both ends — the tile
+          field beside it is a positioned z-0 layer inside this same wrapper,
+          and a positioned element paints over in-flow content whatever the
+          order, so the device has to be positioned to stay on top of it. */}
       <Img
-        src="templates/hero-macbook.webp"
-        alt="The Mushi template library on a MacBook: a grid of ad templates with industry filters"
-        // relative z-[1]: the tile field beside it is a positioned z-0 layer
-        // inside this same wrapper, and a positioned element paints over
-        // in-flow content whatever the order. The device goes on top of the
-        // tiles, as it always has.
-        className="relative z-[1] hidden w-full drop-shadow-[0_50px_140px_rgba(0,0,0,0.95)] md:block"
+        src="templates/hero-phone.webp"
+        alt="The Mushi template library: ad templates with industry and sort filters"
+        width={269}
+        alternate={{ src: "templates/hero-macbook.webp", media: "(min-width: 768px)" }}
+        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full md:mb-0 md:w-full md:max-w-none md:drop-shadow-[0_50px_140px_rgba(0,0,0,0.95)]"
         priority
       />
     </div>

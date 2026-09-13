@@ -79,6 +79,54 @@ export default function Templates() {
       <style
         dangerouslySetInnerHTML={{ __html: "body{--canvas-top:#000000}" }}
       />
+      {/* THE FIRST SCREEN'S FOUR FILES, DISCOVERABLE IN THE HTML.
+          React hoists these into <head>, so they are on the wire while the
+          stylesheet is still parsing rather than after it.
+
+          The burst is the LCP element and it is a CSS BACKGROUND: nothing
+          points at it until the 20 KB stylesheet has been fetched and parsed,
+          which Lighthouse reports as "request is not discoverable in the
+          initial document" and which costs the whole width of that hop. The
+          device beside it is the other half of the same screen and the paint
+          gate waits on both.
+
+          `media` on every one of them, because the phone and the desktop draw
+          DIFFERENT artwork: an unconditional preload would hand each device
+          the other's files at high priority — the mistake that was already
+          costing the phone 397 KB before the hero became one <picture>. A
+          preload whose media does not match is never fetched.
+
+          Keep these four in step with .tpl-bg (globals.css) and with the
+          hero <picture> (TemplateSections). A preload for a file nothing
+          then uses is a warning in the console and pure waste on the wire. */}
+      <link
+        rel="preload"
+        as="image"
+        href="/images/templates/hero-burst-phone.webp"
+        media="(max-width: 767px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/images/templates/hero-burst.webp"
+        media="(min-width: 768px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/images/templates/hero-phone.webp"
+        media="(max-width: 767px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/images/templates/hero-macbook.webp"
+        media="(min-width: 768px)"
+        fetchPriority="high"
+      />
       <SiteHeader
         cta={{ label: TEMPLATES_PAGE.login, href: APP_URL, variant: "light" }}
         // The header CTA turns into the purple Buy Now as the visitor scrolls

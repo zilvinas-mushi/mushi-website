@@ -24,6 +24,15 @@
     "typescript": "^5"
   },
   "_comment_overrides": "postcss/sharp are pinned to patched releases. brace-expansion is NOT overridden: v5 changed to a named `expand` export and eslint's minimatch@3 chain calls it as a function, which breaks linting. eslint-plugin-{import,react,jsx-a11y} all still require minimatch@^3 at their latest versions, so there is no upstream fix. That advisory is dev-only (DoS via attacker-controlled glob patterns, which this repo does not have) and never reaches the static output.",
+  "_comment_browserslist": "Modern targets only, so SWC stops transpiling and polyfilling what every browser this site actually sees already has. Lighthouse flagged 13.5 KB of Array.prototype.at/flat/flatMap, Object.fromEntries/hasOwn and String trimStart/End shims in the framework chunk. Safari 15.4 is March 2022 and is the floor for all of them; nothing older than these can run the site's own CSS (@property, :has, colour-mix) either, so this is not a real narrowing of support.",
+  "browserslist": [
+    "chrome >= 100",
+    "edge >= 100",
+    "firefox >= 100",
+    "safari >= 15.4",
+    "ios_saf >= 15.4",
+    "not dead"
+  ],
   "overrides": {
     "postcss": "^8.5.24",
     "sharp": "^0.35.3"

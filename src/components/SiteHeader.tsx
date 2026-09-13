@@ -73,9 +73,11 @@ export function SiteHeader({
    */
   mobileCta?: MobileCtaConfig;
   /**
-   * href of the NAV item for the page being viewed (e.g. "/templates") —
+   * href of the NAV item for the page being viewed ("/" or "/templates") —
    * that link renders at full white and its siblings drop to 70% so the
-   * visitor can see where they are. Unset on home, whose links keep 85%.
+   * visitor can see where they are. EVERY page passes it: left unset the bar
+   * puts every live link at 85%, which reads as two white rows and says
+   * nothing about where you are.
    */
   active?: string;
 }) {

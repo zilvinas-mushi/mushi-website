@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * THE PAINT GATE. Nothing is shown until the first screen is actually ready
@@ -57,21 +57,26 @@ import { useEffect } from "react";
  */
 
 /**
- * The ceiling on the hold. 4s is past the 95th percentile of the measured
- * Slow-4G first load (FCP 2275ms with everything on the wire) and still
- * inside the window where a visitor reads a blank tab as "loading" rather
- * than as "broken".
+ * ## Where it runs
+ *
+ * NOT HERE, on the first paint. The waiting and the reveal are an inline
+ * <head> script (src/lib/paint-gate-script.ts) so that they start while the
+ * HTML is still arriving. Inside this component they could not start until
+ * the bundle had been fetched, parsed and hydrated — on a simulated Slow-4G
+ * phone that held the reveal, and with it Largest Contentful Paint, at 7.2s
+ * on a page whose hero had been decoded since 1.4s.
+ *
+ * What is left here is the ROUTE CHANGE. The inline script hangs its engine
+ * off `window.__mushiGate`; this calls it again whenever the pathname
+ * changes, with the shorter ceiling. The ceilings, the waits and the reveal
+ * all live in that one file — do not grow a second copy here.
  */
-const TIMEOUT_MS = 4000;
-
-/**
- * The same ceiling for a route change. Much shorter, because by then the
- * fonts are in, the runtime is warm and next/link has prefetched the route —
- * all that can still be outstanding is the new page's own artwork. A visitor
- * who has already seen one screen reads a long hold as the click not having
- * registered.
- */
-const NAV_TIMEOUT_MS = 1500;
+declare global {
+  interface Window {
+    /** The inline gate's engine — `true` on a first paint, `false` on a nav. */
+    __mushiGate?: (firstPaint: boolean) => void;
+  }
+}
 
 export function PaintGate() {
   // The gate re-arms on every route change. /templates links back to the home
@@ -81,112 +86,16 @@ export function PaintGate() {
   // unlit hero and watch the light arrive. The layout does not remount across
   // routes, so nothing but this dependency would re-run it.
   const pathname = usePathname();
+  // The first pathname this sees is the one the inline script already gated;
+  // re-arming for it would hide a finished screen and fade it back in.
+  const first = useRef(true);
 
   useEffect(() => {
-    const root = document.documentElement;
-    // Re-arm. A no-op on first mount (the attribute has never been set) and
-    // the point of the exercise on every route change after it. The closed
-    // state carries `transition: none`, so this hides instantly rather than
-    // fading the old page out — what is wanted is the new page arriving, not
-    // the old one leaving.
-    const isFirstPaint = !root.hasAttribute("data-ready");
-    delete root.dataset.ready;
-
-    let opened = false;
-    let revealed = false;
-    const timers: number[] = [];
-
-    const reveal = () => {
-      if (revealed) return;
-      revealed = true;
-      root.dataset.ready = "";
-    };
-
-    const open = () => {
-      if (opened) return;
-      opened = true;
-
-      // A HIDDEN TAB GETS NO FRAMES. Chrome suspends requestAnimationFrame
-      // entirely in a background tab, so a page opened in one (cmd-click, a
-      // restored session, a link opened in the background) would sit gated
-      // until it was looked at — and the failsafe below would be suspended
-      // with it. Measured here: rAF did not fire once in a full second in a
-      // hidden tab. Nothing needs easing in where nobody is watching, so this
-      // reveals outright and the fade is skipped.
-      if (document.visibilityState === "hidden") {
-        reveal();
-        return;
-      }
-
-      // Two frames: the first lets the browser commit the decoded artwork,
-      // the second flips the attribute so the fade starts from a finished
-      // picture rather than racing the last paint.
-      requestAnimationFrame(() => requestAnimationFrame(reveal));
-      // And a timer behind them, because the tab can be hidden between the
-      // check above and the frame that never comes. `reveal` is idempotent —
-      // whichever arrives first wins and the other is a no-op.
-      timers.push(window.setTimeout(reveal, 150));
-    };
-
-    timers.push(
-      window.setTimeout(open, isFirstPaint ? TIMEOUT_MS : NAV_TIMEOUT_MS),
-    );
-
-    /**
-     * Ready to be painted: DECODED if this browser will decode it, and
-     * otherwise merely arrived.
-     *
-     * `decode()` is the better signal — it resolves only when the bitmap is
-     * ready, so the reveal cannot catch a frame where the pixels are not
-     * there yet. But it does NOT resolve in a hidden tab: Chrome defers the
-     * decode until the document is visible, so a page opened in a background
-     * tab hung on every one of these and only ever opened on the timeout
-     * (measured here: no resolution in 3.5s on a hidden tab, instant when
-     * visible). The load event fires either way, so the two are raced. In a
-     * hidden tab that means "the bytes are in", which is the most that can be
-     * known there — and the browser decodes before it paints anyway, so
-     * nothing half-drawn can reach a visitor who switches to the tab later.
-     */
-    const painted = (img: HTMLImageElement): Promise<unknown> => {
-      const arrived = img.complete
-        ? Promise.resolve()
-        : new Promise<void>((resolve) => {
-            img.addEventListener("load", () => resolve(), { once: true });
-            img.addEventListener("error", () => resolve(), { once: true });
-          });
-      return Promise.race([img.decode().catch(() => {}), arrived]);
-    };
-
-    const waits: Promise<unknown>[] = [];
-
-    if (document.fonts) waits.push(document.fonts.ready.catch(() => {}));
-
-    for (const img of Array.from(document.images)) {
-      if (img.loading === "lazy") continue;
-      waits.push(painted(img));
+    if (first.current) {
+      first.current = false;
+      return;
     }
-
-    for (const el of Array.from(
-      document.querySelectorAll<HTMLElement>("[data-await-bg]"),
-    )) {
-      // No boxes means display:none somewhere up the tree, which means the
-      // background is never fetched. Waiting on it would never resolve.
-      if (!el.getClientRects().length) continue;
-      const layers = getComputedStyle(el).backgroundImage;
-      for (const match of layers.matchAll(/url\((['"]?)(.*?)\1\)/g)) {
-        const url = match[2];
-        if (!url || url.startsWith("data:")) continue;
-        const probe = new Image();
-        probe.src = url;
-        waits.push(painted(probe));
-      }
-    }
-
-    Promise.all(waits).then(open);
-
-    return () => {
-      for (const t of timers) window.clearTimeout(t);
-    };
+    window.__mushiGate?.(false);
   }, [pathname]);
 
   return null;

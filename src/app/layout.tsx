@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { CanvasTint } from "@/components/CanvasTint";
 import { PaintGate } from "@/components/PaintGate";
+import { PAINT_GATE_SCRIPT } from "@/lib/paint-gate-script";
 import {
   SITE_URL,
   SITE_NAME,
@@ -30,23 +31,18 @@ const poppins = Poppins({
   // 300 is here for the testimonial meta line, which the design sets in Light.
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
-  // NOT preloaded, and this is the single biggest thing on the phone's clock.
+  // NOT preloaded. next/font emits its `<link rel="preload" as="font">` tags
+  // at the very top of the head, so on a bandwidth-limited connection the
+  // fonts take the pipe ahead of everything the first screen is actually
+  // waiting on. That used to be the stylesheet (measured on the live site
+  // over Slow 4G: five Poppins subsets and Dutch801 ran 636ms to ~1940ms
+  // while the render-blocking CSS did not land until 2073ms, FCP 2275ms).
+  // The CSS is inlined now (next.config.ts), so the thing they would now
+  // queue in front of is the hero artwork — and measured both ways, over
+  // real Slow-4G throttling, preloading them changed neither page's score.
   //
-  // next/font emits its `<link rel="preload" as="font">` tags BEFORE the
-  // stylesheet link in the head, so on a bandwidth-limited connection the
-  // fonts get the pipe first. Measured on the live site over Slow 4G: five
-  // Poppins subsets and Dutch801 started at 636ms and finished between 1898
-  // and 1945ms, and the 16 KB stylesheet — which blocks rendering, and which
-  // every one of those font files is only useful AFTER — did not land until
-  // after 2073ms. First Contentful Paint was 2275ms on a page whose HTML had
-  // arrived at 745ms. The hero sat black for a second and a half waiting for
-  // fonts to get out of the way of the CSS.
-  //
-  // Dropping the preload costs the fonts one hop: they are discovered when
-  // the stylesheet parses instead of when the HTML does. `display: "swap"`
-  // plus next/font's metric-matched fallback means the headline paints on
-  // time either way and swaps without moving, so the hop is invisible and
-  // the stylesheet arrives about 1.3s sooner.
+  // With the CSS in the HTML the faces are discovered as soon as the document
+  // is parsed anyway, so there is no hop left to save.
   preload: false,
 });
 
@@ -90,8 +86,7 @@ const dutch801 = localFont({
   weight: "400",
   style: "normal",
   display: "swap",
-  // Same reason as Poppins above: 15 KB of wordmark is not worth going ahead
-  // of the stylesheet the whole page is blocked on.
+  // Not preloaded, for the reason set out on Poppins above.
   preload: false,
 });
 
@@ -211,6 +206,13 @@ export default function RootLayout({
         the whole document, so body's is never seen except in the overscroll.
       */}
       <body className="min-h-full flex flex-col font-sans text-white">
+        {/* THE PAINT GATE'S ENGINE, first thing in the document and inline.
+            It has to run before React exists: gated behind hydration it could
+            not start until ~370 KB of bundle had landed, which on a Slow-4G
+            phone is most of the page's Largest Contentful Paint. Under a
+            kilobyte, build-time constant, no user input. See
+            src/lib/paint-gate-script.ts. */}
+        <script dangerouslySetInnerHTML={{ __html: PAINT_GATE_SCRIPT }} />
         <script
           type="application/ld+json"
           // Static, build-time constant — no user input reaches this.

@@ -26,6 +26,22 @@ type Props = {
    */
   style?: CSSProperties;
   /**
+   * A SECOND FILE FOR A SECOND BREAKPOINT, chosen by the browser rather than
+   * by CSS — `{ src, media, width? }`, emitted as the <source> of a <picture>
+   * whose <img> is the `src` above.
+   *
+   * This exists because `hidden md:block` does NOT save the bytes. An eager
+   * <img> that a breakpoint hides is still fetched, at high priority, and the
+   * paint gate then waits for it: the phone was spending 397 KB on the
+   * desktop hero's MacBook before it was allowed to show the phone hero. A
+   * <picture> fetches the matching entry ONLY, so each device pays for its
+   * own artwork and the gate waits for exactly what it will paint.
+   *
+   * Both entries carry width/height, so whichever the browser takes brings
+   * its own aspect ratio and neither can shift the layout.
+   */
+  alternate?: { src: string; media: string; width?: number };
+  /**
    * Turn off the browser's native image drag. Artwork that is PART OF A
    * SURFACE rather than content in its own right — the team cards' cut-out
    * portraits, where the picture and the card behind it read as one object —
@@ -59,6 +75,7 @@ export function Img({
   sizes: sizesAttr,
   style,
   draggable,
+  alternate,
 }: Props) {
   const dim = IMAGE_SIZES[src];
 
@@ -81,11 +98,18 @@ export function Img({
     ? `/images/${smallSrc} ${small.w}w, /images/${src} ${dim.w}w`
     : undefined;
 
+  const alt2 = alternate ? IMAGE_SIZES[alternate.src] : undefined;
+  if (alternate && !alt2) {
+    throw new Error(
+      `Img: no dimensions for "${alternate.src}". Add the file to public/images and regenerate src/lib/image-sizes.json.`,
+    );
+  }
+
   /* next/image is deliberately unused: optimization is off for the static
      export (CLAUDE.md), so <Image> would ship extra runtime for no benefit.
      The LCP concern the rule targets is handled by the explicit width/height
      and eager/lazy loading below. */
-  return (
+  const img = (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={`/images/${src}`}
@@ -101,5 +125,29 @@ export function Img({
       decoding={priority ? "sync" : "async"}
       {...(priority ? { fetchPriority: "high" as const } : {})}
     />
+  );
+
+  if (!alternate || !alt2) return img;
+
+  const aw = alternate.width ?? alt2.w;
+  const ah = alternate.width
+    ? Math.round((alt2.h / alt2.w) * alternate.width)
+    : alt2.h;
+
+  /* `contents`: the <picture> box itself must not exist. The two files it
+     chooses between sit in flex and flow contexts that were written for a
+     bare <img>, and an inline wrapper around a block image changes where both
+     land. With display:contents the <img> stays the parent's own child and
+     nothing about the layout moves. */
+  return (
+    <picture className="contents">
+      <source
+        media={alternate.media}
+        srcSet={`/images/${alternate.src}`}
+        width={aw}
+        height={ah}
+      />
+      {img}
+    </picture>
   );
 }

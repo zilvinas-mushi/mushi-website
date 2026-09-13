@@ -21,7 +21,12 @@ import {
 export default function Home() {
   return (
     <>
-      <SiteHeader />
+      {/* The home page names itself as the active row too (Žilvinas
+          2026-09-13, once Templates went live): Agency reads at full white
+          and Templates drops to 70% — a little grey, nowhere near the 40% a
+          page that does not exist yet gets. Without `active` both live links
+          sat at 85% and the bar stopped saying which page you were on. */}
+      <SiteHeader active="/" />
       <main className="flex-1">
         {/*
           One violet field covering the hero and brand strip, pulled up behind
