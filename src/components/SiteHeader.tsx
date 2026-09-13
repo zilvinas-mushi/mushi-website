@@ -156,7 +156,19 @@ export function SiteHeader({
             height: "var(--u)",
           }}
         >
-          <Link href="/" aria-label={`${SITE_NAME} home`} className="ml-[calc(var(--u)*0.3)] flex shrink-0 items-center">
+          <Link
+            href="/"
+            aria-label={`${SITE_NAME} home`}
+            // NO PREFETCH. next/link pulls the other route's RSC payload as
+            // soon as this is in view: four requests and 38 KB, arriving
+            // while the first screen is still on the wire and, on a fast
+            // connection, landing before the first paint — where Lighthouse
+            // charges them to Largest Contentful Paint. There are two routes
+            // here and both are static; fetching on click costs a beat a
+            // visitor spends clicking anyway.
+            prefetch={false}
+            className="ml-[calc(var(--u)*0.3)] flex shrink-0 items-center"
+          >
             {/*
               Figma 3803:1570: the wordmark measures 150 x 45. It is live text,
               so that box is not set on the element — it is produced by the font

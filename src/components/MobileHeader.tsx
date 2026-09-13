@@ -445,7 +445,17 @@ export function MobileHeader({
             52 + 8 gap, so the hidden position is fully covered — which is what
             lets the hidden state be a pure slide with no fade propping it up. */}
         <header className="relative z-20 flex items-center justify-between overflow-hidden rounded-[0.3125rem] bg-[#181818] px-4 py-3">
-          <Link href="/" aria-label={`${SITE_NAME} home`}>
+          <Link
+            href="/"
+            aria-label={`${SITE_NAME} home`}
+            // NO PREFETCH. next/link pulls the other route's RSC payload as
+            // soon as this is in view: four requests and 38 KB, arriving
+            // while the first screen is still on the wire and, on a fast
+            // connection, landing before the first paint — where Lighthouse
+            // charges them to Largest Contentful Paint. There are two routes
+            // here and both are static; fetching on click costs a beat a
+            // visitor spends clicking anyway.
+            prefetch={false}>
             <Logo className="text-[2.375rem]" />
           </Link>
 
