@@ -1728,18 +1728,18 @@ function CategoryTileRow({
       className={`tile-marquee-track absolute left-0 ${top}${reverse ? " tile-marquee-track--reverse" : ""}`}
     >
       {[0, 1].map((h) => (
-        <div key={h} className="flex gap-[30px] pr-[30px]">
+        <div key={h} className="flex gap-[3.25cqh] pr-[3.25cqh]">
           {half.map((c, i) => (
             <span
               key={`${c.label}-${i}`}
-              className="flex h-[160px] w-[160px] flex-col items-center gap-2 rounded-[26px] bg-[radial-gradient(circle_at_50%_42%,#3a3a3a_0%,#1c1c1c_58%,#101010_100%)] pt-5 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]"
+              className="flex h-[17.32cqh] w-[17.32cqh] flex-col items-center gap-[0.87cqh] rounded-[2.81cqh] bg-[radial-gradient(circle_at_50%_42%,#3a3a3a_0%,#1c1c1c_58%,#101010_100%)] pt-[2.17cqh] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]"
             >
               {/* Roboto Black per the supplied FASHION.png sample; tight
                   tracking to match its near-touching letters. */}
-              <span className="font-tile text-[16px] font-black uppercase tracking-[-0.01em] text-white">
+              <span className="font-tile text-[1.73cqh] font-black uppercase tracking-[-0.01em] text-white">
                 {c.label}
               </span>
-              <Img src={c.image} alt="" width={84} />
+              <Img src={c.image} alt="" width={84} className="h-auto w-[9.09cqh]" />
             </span>
           ))}
         </div>
@@ -1755,13 +1755,31 @@ function CategoryTiles() {
       // lg, not the earlier xl: scaled displays commonly land a maximised
       // window a few CSS px UNDER 1280 (the client's sits at ~1272), where
       // xl made the rows vanish entirely (client 2026-09-12).
-      className="pointer-events-none absolute inset-0 z-0 hidden lg:block"
+      //
+      // hero-tile-field makes this layer a SIZE container, which is what the
+      // cqh numbers below and in CategoryTileRow are read against.
+      className="hero-tile-field pointer-events-none absolute inset-0 z-0 hidden lg:block"
     >
-      {/* 160px tiles; the gap between the ROWS equals the 30px gap between
-          the squares within a row (client 2026-09-11): 410 + 160 + 30 = 600.
-          Dropped 40 from 370/560 (client 2026-09-12: "too high"). */}
-      <CategoryTileRow top="top-[410px]" reverse />
-      <CategoryTileRow top="top-[600px]" offset={2} />
+      {/* EVERY NUMBER IN THIS FIELD IS A SHARE OF THE HERO'S OWN HEIGHT
+          (client 2026-09-13: the lower row was running under the next
+          section on a 15" Mac).
+
+          The device already sizes itself off the height left under the text
+          — `(100svh - 444px) * 1.6` on AppWindow — so on a short window it
+          shrinks while these tiles, at a fixed 410/600/160, stayed put and
+          walked straight out of the bottom of the section. They are the same
+          composition and have to shrink on the same curve.
+
+          cqh, not a transform: a scale() would need a unitless factor, and
+          CSS cannot divide one length by another to get one. The layer is
+          inset-0, so 100cqh IS the section, and every measurement below is
+          its old pixel value over the 924 the section stands at when the
+          MacBook is at its 978 cap — the signed-off reference. At that height
+          they resolve back to 410 / 600 / 160 / 30 exactly; under it they
+          come down together. The lower row ends at 82.25cqh, so it can never
+          reach the section's bottom edge whatever the window does. */}
+      <CategoryTileRow top="top-[44.37cqh]" reverse />
+      <CategoryTileRow top="top-[64.94cqh]" offset={2} />
     </div>
   );
 }

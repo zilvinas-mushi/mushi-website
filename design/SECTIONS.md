@@ -516,3 +516,24 @@ Desktop plate ramps were also the lighter pair (#8168d0/#4f3694 and
 #c98a8c/#96494c); they now use the same stops the phone already had from the
 Figma fill panel (#6e54b5 → #30254f, #d07678 → #4f2f30), so the plate no
 longer changes colour across the sm–md band.
+
+### Hero tile field goes proportional (2026-09-13)
+
+The device already sizes itself off the height left under the text
+(`(100svh - 444px) * 1.6` on AppWindow), but the category tiles were fixed at
+410 / 600 / 160. On a short window — a 15" Mac with a bookmarks bar is the
+case the client hit — the device shrank while the tiles stayed, so the lower
+row ran out of the bottom of the section and the next section's black painted
+over it.
+
+The tile layer is now a size container (`.hero-tile-field`) and every number
+in it is a share of the section's own height in `cqh`: rows at 44.37 / 64.94,
+tile 17.32, gap 3.25, radius 2.81, label 1.73, emoji 9.09. Those are the old
+pixel values over 924 — the section's height when the MacBook is at its 978
+cap, which is the signed-off reference — so at that height they resolve back
+to 410 / 600 / 160 / 30 / 26 / 16 / 84 exactly and come down together below
+it. The lower row ends at 82.25cqh, so it cannot reach the section's bottom
+edge at any window size.
+
+cqh rather than a transform: `scale()` needs a unitless factor and CSS cannot
+divide one length by another to produce one.

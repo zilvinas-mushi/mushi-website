@@ -957,6 +957,18 @@ html[data-canvas="footer"] body {
   mask-image: linear-gradient(90deg, #000 72%, transparent 98%);
 }
 
+@media (min-width: 640px) {
+  /* From sm up the photo FILLS its plate rather than sitting narrow inside
+     it, so 72% now lands in the middle of the picture: it was taking Urtė's
+     right shoulder off into the card's black (Žilvinas 2026-09-13). The fade
+     is only there to take the hard edge off the crop line, so it starts at
+     the last tenth — the shoulder stays, the cut still doesn't show. */
+  .team-photo {
+    -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
+  }
+}
+
 .team-portrait-fade {
   background-image: var(--plate-desktop);
   /* On BOTH sizes the colour stops after the face (Žilvinas 2026-09-07):
@@ -1178,6 +1190,15 @@ html[data-canvas="footer"] body {
    tiles sit behind the hero device and must not compete with it. No
    hover-pause (pointer-events-none, purely decorative) and no fade mask —
    the reference cuts the tiles hard at the viewport edge. */
+/* The hero's category-tile field is measured in its OWN height, not in
+   fixed pixels: see CategoryTiles in TemplateSections.tsx. The layer is
+   absolutely inset-0 in the hero section, so 100cqh is the section and the
+   rows scale with the device instead of walking out of the bottom of it on a
+   short window. */
+.hero-tile-field {
+  container-type: size;
+}
+
 .tile-marquee-track {
   display: flex;
   width: max-content;
