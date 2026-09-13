@@ -556,7 +556,16 @@ export function TemplatesTeam() {
                   />
                   {/* Bottom-anchored and taller than the card, so the hair
                       pops over the top edge as in the design. */}
-                  <span className="absolute bottom-0 left-1/2 w-full -translate-x-1/2">
+                  {/* sm:translate-x is per-person and desktop-only — see
+                      desktopShiftX in content.ts. */}
+                  <span
+                    className="absolute bottom-0 left-1/2 w-full -translate-x-1/2 sm:translate-x-[calc(-50%+var(--portrait-shift,0px))]"
+                    style={
+                      {
+                        "--portrait-shift": `${"desktopShiftX" in p ? p.desktopShiftX : 0}px`,
+                      } as CSSProperties
+                    }
+                  >
                     <Img
                       src={p.image}
                       alt={`${p.name}, ${p.role} at Mushi`}

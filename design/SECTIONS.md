@@ -537,3 +537,17 @@ edge at any window size.
 
 cqh rather than a transform: `scale()` needs a unitless factor and CSS cannot
 divide one length by another to produce one.
+
+### Team portrait pass 2 (2026-09-13, same day)
+
+Two corrections once the portraits filled their plates:
+
+- `.team-photo`'s right-edge fade starts at 72%, which was fine when the
+  picture sat narrow inside its cell but now lands in the middle of it — it
+  was taking Urtė's right shoulder off into the card's black. From sm up the
+  fade is 90% → 100%: enough to take the hard edge off the crop line, not
+  enough to touch her.
+- She sits further right in her plate than Noah does in his (Figma crop): a
+  band of salmon runs down her left before her hair starts, where his jacket
+  goes straight into the corner. `desktopShiftX: 32` on her entry only; the
+  phone is untouched.
