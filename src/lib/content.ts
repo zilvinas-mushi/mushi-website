@@ -1195,10 +1195,21 @@ export const TEMPLATES_PAGE = {
         step: "Step Two",
         title: "Customize in Canva",
         chip: "Super fast!",
-        // Re-cut 2026-09-12 from the flattened render at 750 x 473 — the
-        // same 1.59 aspect as step one's shot, so the two pictures sit at
-        // one size and one alignment on desktop (client request). The old
-        // 242-wide file upscaled soft.
+        // REBUILT FROM THE CLEAN MASTER, 2026-09-13 (Žilvinas: "make sure
+        // this picture IS THE HIGHEST QUALITY THAT YOU CAN MAKE"). The file
+        // was a 750-wide re-cut of the 900 phone card, which is itself the
+        // screenshot at about 590 — so the desktop card was drawing a ~400px
+        // region at 736 device px and read soft at every zoom.
+        //
+        // The clean 1035 x 1114 screenshot is still in the history (d000d69).
+        // The card's treatment over it is a smooth colour wash, so it was
+        // recovered rather than guessed: the card's gradient was fitted from
+        // the purple outside the shot, then per-pixel opacity solved from
+        // T = B(1-a) + Ca across the three channels (reconstruction lands
+        // within 5/255 of the shipped card). Re-composited over the master at
+        // its NATIVE resolution and cut to the same frame, which is 1115 x
+        // 946 — the same 1.179 the old crop had, so nothing moves on the
+        // card; there is simply 2.2x the real detail behind it.
         image: "templates/process-canva.webp",
         // Same flattened phone card as step three; see the note there.
         // PHONE ONLY since 2026-09-12 (desktopShot below): on desktop the

@@ -314,3 +314,21 @@ As sections get built, rename files to something meaningful and update
 | `vector1.svg` | svg | 2.5 | `imgVector1` |
 | `vector2.svg` | svg | 2.5 | `imgVector2` |
 | `vector4.svg` | svg | 2.5 | `imgVector4` |
+
+## templates/process-canva.webp — rebuilt 2026-09-13
+
+Was a 750-wide re-cut of the 900 phone card, which is itself the screenshot at
+about 590, so the desktop card drew a ~400px region at 736 device px and read
+soft (client: "make sure this picture IS THE HIGHEST QUALITY THAT YOU CAN
+MAKE").
+
+The clean 1035 x 1114 screenshot is in the history at d000d69. The card's
+treatment over it is a smooth colour wash, so it was recovered rather than
+guessed: fit the card's gradient from the purple outside the shot, then solve
+per-pixel opacity from T = B(1-a) + Ca across the three channels — the model
+reconstructs the shipped card to within 5/255. Re-composited over the master
+at its NATIVE resolution and cut to the same frame: 1115 x 946, the same 1.179
+aspect the old crop had, so nothing moves on the card. WebP q90, 96 KB.
+
+If a higher-resolution flattened render of this card is ever supplied, it
+beats this reconstruction — use it.
