@@ -129,9 +129,18 @@ export const PAINT_GATE_SCRIPT = `
       // inside the window. The timer stays as the floor for a page that is
       // already loaded (a route change) and as the ceiling if load never
       // comes.
-      var armed=false,arm=function(){ if(armed)return; armed=true; setTimeout(defer,300) };
-      if(d.readyState==='complete')setTimeout(arm,450);
-      else{ window.addEventListener('load',arm,{once:true}); setTimeout(arm,5000) }
+      // BOTH conditions, not either: the load event and the end of the fade.
+      // They run neck and neck — load fires when the first screen's last eager
+      // byte lands, the fade ends 400ms after the reveal — and on a quick run
+      // load wins, which let half a megabyte back inside the window Largest
+      // Contentful Paint is measured over (measured: 930 KB on one run, 429
+      // KB on the next, five points apart). The 5s ceiling is the failsafe.
+      var armed=false,loaded=d.readyState==='complete',faded=false;
+      function arm(){ if(armed||!loaded||!faded)return; armed=true; setTimeout(defer,300) }
+      function force(){ loaded=faded=true; arm() }
+      if(!loaded)window.addEventListener('load',function(){loaded=true;arm()},{once:true});
+      setTimeout(function(){faded=true;arm()},450);
+      setTimeout(force,5000)
     }
     function open(){
       if(opened)return; opened=true;
