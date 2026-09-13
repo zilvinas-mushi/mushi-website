@@ -1557,9 +1557,13 @@ export function TemplatesInside() {
             <span
               aria-hidden="true"
               className="absolute inset-0 bg-[#221f26]"
+              // Deferred like the backgrounds: a mask-image is fetched as
+              // eagerly as any other CSS url(), and this card is six screens
+              // down. var(--bg, none) is the same handle the script sets.
+              data-bg="url(/images/templates/laurel-mask.webp)"
               style={{
-                WebkitMaskImage: "url(/images/templates/laurel-mask.webp)",
-                maskImage: "url(/images/templates/laurel-mask.webp)",
+                WebkitMaskImage: "var(--bg, none)",
+                maskImage: "var(--bg, none)",
                 WebkitMaskSize: "contain",
                 maskSize: "contain",
                 WebkitMaskRepeat: "no-repeat",
@@ -2058,7 +2062,11 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
               {logo.svg ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={`/images/templates/${logo.src}`}
+                  // data-src, like every other below-fold picture: this is
+                  // the one raw <img> on the page (Img sizes from the webp
+                  // table and this is a vector), so it opts in by hand. The
+                  // 16 KB was landing before the first screen had painted.
+                  data-src={`/images/templates/${logo.src}`}
                   alt={brand}
                   width={67}
                   height={13}
@@ -2204,6 +2212,8 @@ export function TemplatesBgFallbacks() {
       {wide.map((f) => (
         <BgFallback key={f} bg="" md={`url(/images/templates/${f})`} />
       ))}
+      {/* The laurel behind the Trustpilot card is a MASK, not a fill. */}
+      <BgFallback bg="url(/images/templates/laurel-mask.webp)" mask />
     </>
   );
 }
