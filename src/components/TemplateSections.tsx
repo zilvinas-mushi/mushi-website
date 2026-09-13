@@ -602,14 +602,32 @@ export function TemplatesTeam() {
                       }`}
                       style={{ "--portrait-h": `${"phoneImageH" in p ? p.phoneImageH : 135}px` } as CSSProperties}
                     />
-                    {"desktopImage" in p && p.desktopImage ? (
+                  </span>
+                  {/* THE DESKTOP PICTURE IS FRAMED, NOT FADED (Žilvinas
+                      2026-09-13: "WHY ON HER RIGHT ARM THERE IS A SHADOW").
+                      The fade exists to keep a photo that stops mid-card from
+                      ending on a hard line; this one ends ON the plate's own
+                      right edge, so there is nothing to soften and the mask
+                      was only laying a gradient over her arm. It is clipped
+                      instead — which is what the rounded bottom-left corner
+                      in the reference is evidence of.
+
+                      The clip opens 48 upward so the hair still clears the
+                      card, and closes 3 BELOW it so the very bottom of the
+                      picture is cut (his ask, "cut the bottom like 2-4
+                      pixels"). w-[106%] off the left edge draws her that bit
+                      larger without moving the position he signed off: she
+                      grows rightward into the clip rather than back across
+                      the salmon. */}
+                  {"desktopImage" in p && p.desktopImage ? (
+                    <span className="absolute -bottom-[3px] -top-[48px] left-0 right-0 hidden overflow-hidden rounded-bl-[14px] sm:block">
                       <Img
                         src={p.desktopImage}
                         alt={`${p.name}, ${p.role} at Mushi`}
-                        className="team-photo mx-auto hidden h-auto w-full max-w-none sm:block sm:rounded-bl-[14px]"
+                        className="absolute bottom-0 left-0 h-auto w-[106%] max-w-none"
                       />
-                    ) : null}
-                  </span>
+                    </span>
+                  ) : null}
                 </span>
                 <div className="min-w-0 pr-4">
                   <p className="truncate text-[20px] font-semibold leading-tight text-white md:text-[28px]">
