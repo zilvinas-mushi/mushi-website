@@ -67,9 +67,28 @@ export const PAINT_GATE_SCRIPT = `
         el.removeAttribute('data-bg');el.removeAttribute('data-bg-md');
       }
     }
-    var all=d.querySelectorAll(sel);
+    // A MARQUEE LOADS AS A GROUP. The showcase wall and the creatives rail
+    // drift sideways for ever: a tile four screens to the right is a few
+    // seconds away, not a scroll away, so per-tile intersection would have it
+    // arrive blank and fill in under the reader. An element marked
+    // data-defer-group loads everything inside it the moment the GROUP comes
+    // into range, and its children are left off the individual pass.
+    var groups=d.querySelectorAll('[data-defer-group]');
+    function loadGroup(g){
+      var kids=g.querySelectorAll(sel);
+      for(var k=0;k<kids.length;k++)load(kids[k]);
+      load(g);
+    }
+    // The creatives rail arms itself two viewports out, on its own reasoning
+    // (CreativesRail.tsx); this is the handle it pulls.
+    window.__mushiLoadGroup=loadGroup;
+    var all=[],cand=d.querySelectorAll(sel);
+    for(var c=0;c<cand.length;c++){
+      if(!cand[c].closest('[data-defer-group]'))all.push(cand[c]);
+    }
     if(!('IntersectionObserver' in window)){
       for(var i=0;i<all.length;i++)load(all[i]);
+      for(var g0=0;g0<groups.length;g0++)loadGroup(groups[g0]);
       return;
     }
     var io=new IntersectionObserver(function(entries){
@@ -84,6 +103,14 @@ export const PAINT_GATE_SCRIPT = `
     // a scroll away, and 0 here would pop it in mid-marquee.
     },{rootMargin:'600px 3000px'});
     for(var j=0;j<all.length;j++)io.observe(all[j]);
+    var gio=new IntersectionObserver(function(entries){
+      for(var i=0;i<entries.length;i++){
+        if(entries[i].isIntersecting){gio.unobserve(entries[i].target);loadGroup(entries[i].target)}
+      }
+    // A group is loaded on the vertical margin alone — its own width is the
+    // horizontal reach, and that is the point of grouping it.
+    },{rootMargin:'600px 0px'});
+    for(var g=0;g<groups.length;g++)gio.observe(groups[g]);
   }
   // The ceiling on the hold, first paint and route change. See PaintGate.tsx.
   function gate(first){
@@ -93,13 +120,18 @@ export const PAINT_GATE_SCRIPT = `
       if(revealed)return; revealed=true;
       root.setAttribute('data-ready','');
       // AFTER the first screen has not only been revealed but finished
-      // ARRIVING. Anything below the fold that starts loading while the gate
-      // is shut is bandwidth taken from the screen the visitor is waiting on,
-      // and the 400ms cross-fade is part of that screen: measured on the live
-      // site, the next section's 400 KB landed inside the fade, and Largest
-      // Contentful Paint is recorded when a fade FINISHES, so every one of
-      // those bytes was charged to it. The wait is the fade plus a frame.
-      setTimeout(defer,450);
+      // ARRIVING, which is what the load event means on a page whose only
+      // eager assets are the first screen's. Anything below the fold that
+      // starts before then is bandwidth taken from the screen the visitor is
+      // waiting on — and on a fast connection it also lands before the paint,
+      // where Lighthouse charges it to Largest Contentful Paint. A fixed
+      // delay was not enough: PageSpeed still had the next section's 298 KB
+      // inside the window. The timer stays as the floor for a page that is
+      // already loaded (a route change) and as the ceiling if load never
+      // comes.
+      var armed=false,arm=function(){ if(armed)return; armed=true; setTimeout(defer,300) };
+      if(d.readyState==='complete')setTimeout(arm,450);
+      else{ window.addEventListener('load',arm,{once:true}); setTimeout(arm,5000) }
     }
     function open(){
       if(opened)return; opened=true;

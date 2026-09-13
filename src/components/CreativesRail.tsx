@@ -211,9 +211,14 @@ export function CreativesRail() {
     if (!view) return;
 
     const load = () => {
+      // The images carry data-src now, so eager alone would load nothing; the
+      // inline script's group loader is what actually swaps them in. This
+      // still flips `loading`, which is what decides priority once a src is
+      // there, and it is harmless if the group has already been loaded.
       for (const img of view.querySelectorAll<HTMLImageElement>('img[loading="lazy"]')) {
         img.loading = "eager";
       }
+      window.__mushiLoadGroup?.(view);
     };
 
     let io: IntersectionObserver | undefined;
@@ -413,6 +418,14 @@ export function CreativesRail() {
           runs off the end from turning into a browser back-swipe. */}
       <div
         ref={viewRef}
+        // data-defer-group: the rail's own images are deferred like every
+        // other below-fold picture (data-src, see Img), and a marquee cannot
+        // be loaded card by card as each crosses the viewport — the ones
+        // arriving from the right would glide in blank. The inline script
+        // loads the whole group the moment the rail is in range, which is the
+        // same thing the effect below was doing when the cards still had a
+        // real src to flip.
+        data-defer-group=""
         style={{ scrollPaddingLeft: RAIL_GUTTER }}
         className={
           enhanced && !native

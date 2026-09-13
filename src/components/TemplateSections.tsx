@@ -1433,7 +1433,10 @@ const SHOWCASE_PITCH = 185;
 
 function ShowcaseRows() {
   return (
-    <div className="relative h-[355px] overflow-hidden md:hidden">
+    // data-defer-group: the rows drift sideways without end, so their tiles
+    // load as one block when the wall comes into range rather than each as it
+    // happens to cross the viewport — see paint-gate-script.ts.
+    <div data-defer-group="" className="relative h-[355px] overflow-hidden md:hidden">
       {SHOWCASE_ROWS.map((row, r) => {
         const set = row.tiles.length * SHOWCASE_PITCH;
         return (
@@ -1832,7 +1835,7 @@ function CategoryTileRow({
               </span>
               {/* priority, for the reason on the phone field below: the
                   tiles are part of the hero, not of the scroll. */}
-              <Img src={c.image} alt="" width={84} className="hero-tile-art" priority />
+              <Img src={c.image} alt="" width={84} className="hero-tile-art" priority="gate" />
             </span>
           ))}
         </div>
@@ -2152,7 +2155,7 @@ function PhoneTiles() {
                       gated with it rather than deferred to the observer.
                       Five files, ~47 KB between them, and each tile is the
                       same file over again. */}
-                  <Img src={cat.image} alt="" width={58} priority />
+                  <Img src={cat.image} alt="" width={58} priority="gate" />
                 </span>
               </span>
             );

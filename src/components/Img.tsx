@@ -9,8 +9,21 @@ type Props = {
   src: string;
   alt: string;
   className?: string;
-  /** Hero imagery only — everything below the fold stays lazy. */
-  priority?: boolean;
+  /**
+   * On the first screen, so it loads with the page and the paint gate waits
+   * for it instead of the observer deferring it.
+   *
+   *   true    — the screen's ONE lead image: fetchpriority=high and a
+   *             synchronous decode, so it is in the frame the gate reveals.
+   *   "gate"  — everything else up there. Eager and gated, but at normal
+   *             priority and decoded off-thread: the hero's tile field is 90
+   *             <img> elements over five files, and 90 synchronous decodes at
+   *             high priority is main-thread time PageSpeed counts as Total
+   *             Blocking Time while the one image that matters queues behind
+   *             them. The gate awaits decode() either way, so nothing can
+   *             paint half-decoded.
+   */
+  priority?: boolean | "gate";
   /** Override the intrinsic width; height scales to preserve aspect ratio. */
   width?: number;
   /**
@@ -133,8 +146,8 @@ export function Img({
       style={style}
       draggable={draggable}
       loading={priority ? "eager" : "lazy"}
-      decoding={priority ? "sync" : "async"}
-      {...(priority ? { fetchPriority: "high" as const } : {})}
+      decoding={priority === true ? "sync" : "async"}
+      {...(priority === true ? { fetchPriority: "high" as const } : {})}
     />
   );
 

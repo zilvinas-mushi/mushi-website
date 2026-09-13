@@ -75,6 +75,8 @@ declare global {
   interface Window {
     /** The inline gate's engine — `true` on a first paint, `false` on a nav. */
     __mushiGate?: (firstPaint: boolean) => void;
+    /** Load every deferred image and background inside one element at once. */
+    __mushiLoadGroup?: (el: Element) => void;
   }
 }
 
