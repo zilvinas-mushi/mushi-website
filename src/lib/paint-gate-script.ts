@@ -92,12 +92,14 @@ export const PAINT_GATE_SCRIPT = `
     function reveal(){
       if(revealed)return; revealed=true;
       root.setAttribute('data-ready','');
-      // AFTER the first screen, never before it. Anything below the fold that
-      // starts loading while the gate is still shut is bandwidth taken from
-      // the screen the visitor is waiting on — and on a fast connection it
-      // also lands before the first paint, which is how Lighthouse ends up
-      // charging the whole page's artwork to Largest Contentful Paint.
-      defer();
+      // AFTER the first screen has not only been revealed but finished
+      // ARRIVING. Anything below the fold that starts loading while the gate
+      // is shut is bandwidth taken from the screen the visitor is waiting on,
+      // and the 400ms cross-fade is part of that screen: measured on the live
+      // site, the next section's 400 KB landed inside the fade, and Largest
+      // Contentful Paint is recorded when a fade FINISHES, so every one of
+      // those bytes was charged to it. The wait is the fade plus a frame.
+      setTimeout(defer,450);
     }
     function open(){
       if(opened)return; opened=true;
