@@ -18,16 +18,32 @@ black while the hero's lighting is still on the wire, no fallback face swapping
 to Poppins, no artwork appearing a layer at a time. Until the first screen is
 finished, what is on screen is the page's own black and nothing else.
 
-The mechanism is the **paint gate**: `PaintGate.tsx` plus the gate block in
-`globals.css`. `.page-shell`'s children are `opacity: 0` until `<html>` carries
-`data-ready`, and the gate sets it once fonts, every eager `<img>` (decoded,
-not merely loaded) and every `[data-await-bg]` CSS artwork are ready — then the
-page cross-fades in over 400ms.
+The mechanism is the **paint gate**: `src/lib/paint-gate-script.ts`, an inline
+`<head>` script, plus the gate block in `globals.css`. `.page-shell`'s children
+are `opacity: 0` until `<html>` carries `data-ready`, and the gate sets it once
+fonts, every eager `<img>` (decoded, not merely loaded) and every
+`[data-await-bg]` CSS artwork are ready — then the page cross-fades in over
+400ms. It is INLINE and not a component for a reason: inside React it could not
+start until the bundle had hydrated, which put the reveal — and Largest
+Contentful Paint with it — seconds behind the artwork it was waiting for.
+`PaintGate.tsx` is now only the thing that re-arms it on a route change.
+
+The same script owns the other half of the bargain: **below the fold, nothing
+is fetched until it is nearly in view.** `loading="lazy"` does not deliver that
+(Chrome's threshold runs to ~8000px on a slow connection) and a CSS background
+cannot ask for it at all, so the URL is kept out of anything the browser will
+fetch from — `data-src` on an image, `data-bg` + `background-image: var(--bg,
+none)` on a background — and swapped in by an IntersectionObserver that arms
+itself after the cross-fade, never before.
 
 When you build anything new:
 - Artwork that is a **CSS background** above the fold gets `data-await-bg` on
-  its element. An `<img>` needs nothing — eager ones are picked up
-  automatically, lazy ones are below the fold and must stay out of the gate.
+  its element. An `<img>` needs nothing — eager (`priority`) ones are picked up
+  automatically and lazy ones stay out of the gate.
+- Artwork **below** the fold is deferred, and `Img` does it for you. A raw
+  `<img>`, a `background-image` or a `mask-image` you write by hand does not:
+  give it `data-src` / `data-bg` and add its no-JavaScript rule to
+  `TemplatesBgFallbacks`, or it is on the wire before the first screen is.
 - **Never widen the gate to below-fold assets.** The rail's 23 creatives, the
   videos, the case studies: those arrive as you scroll and have their own
   posters and placeholders. Gating on them would hold a blank page on the
