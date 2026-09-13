@@ -354,3 +354,21 @@ with alpha, 30 KB.
 Supersedes team-urte-v2/v3/v4 on the DESKTOP. v4 is deleted. The phone keeps
 v2 — its picture is centred in a narrower cell and laps over both edges, a
 composition that is signed off — so the two ship as separate <img>s.
+
+## templates/hero-phone.webp — re-cut at 2x, 2026-09-13
+
+538 x 869, WebP q92, 66 KB — a Lanczos downsample of the 807 x 1303 export
+that shipped before it, not a re-export of anything softer.
+
+It is the one image the paint gate holds the entire first screen for, so its
+134 KB was a third of everything /templates had to load before it could show
+anything, and that budget is exactly what PageSpeed measures Largest
+Contentful Paint over.
+
+3x was never about resolution — the device draws at 269 CSS px, so even 2x is
+retina. It was about supersampling: a DPR-2 phone downsampling 807 to 538 is
+sharper than drawing a 538 file 1:1. At 2x both DPR-2 and DPR-3 draw 538.
+Compared against the 3x export at DPR 3 before the swap.
+
+If a higher-resolution master is ever supplied, a fresh 538-wide export from
+it beats this downsample — use it.
