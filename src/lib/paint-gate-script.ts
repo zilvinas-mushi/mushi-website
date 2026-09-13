@@ -152,7 +152,35 @@ export const PAINT_GATE_SCRIPT = `
     }
     function collect(){
       var waits=[];
-      if(d.fonts)waits.push(d.fonts.ready.catch(function(){}));
+      // THE FACES THE FIRST SCREEN ACTUALLY USES, not every face the document
+      // asks for anywhere. document.fonts.ready waits for all of them —
+      // Poppins in five weights here, of which the hero uses two — and each
+      // one is a request the reveal is held behind. What the rule says is
+      // that nothing may paint in a fallback and swap; a weight that only
+      // appears six screens down will have arrived long before anyone reads
+      // it, and holding the hero for it buys nothing.
+      //
+      // So: walk what is in the viewport, collect the (style, weight, family)
+      // triples it is set in, and wait for exactly those. If anything here
+      // throws, or nothing is found, fall back to waiting for all of them.
+      var fontWaits=[];
+      try{
+        if(d.fonts&&d.fonts.load){
+          var seen={},h=window.innerHeight,els=d.body.querySelectorAll('*');
+          for(var f=0;f<els.length;f++){
+            var e=els[f];
+            if(!e.firstChild||e.firstChild.nodeType!==3)continue;
+            if(!e.firstChild.data||!e.firstChild.data.trim())continue;
+            var r=e.getBoundingClientRect();
+            if(r.top>h||r.bottom<0||!r.width)continue;
+            var cs=getComputedStyle(e);
+            seen[cs.fontStyle+' '+cs.fontWeight+' 1em '+cs.fontFamily]=1;
+          }
+          for(var spec in seen)fontWaits.push(d.fonts.load(spec).catch(function(){}));
+        }
+      }catch(err){fontWaits=[]}
+      if(fontWaits.length)for(var q=0;q<fontWaits.length;q++)waits.push(fontWaits[q]);
+      else if(d.fonts)waits.push(d.fonts.ready.catch(function(){}));
       var imgs=d.images;
       for(var i=0;i<imgs.length;i++){
         // Lazy images are below the fold and have not started.
