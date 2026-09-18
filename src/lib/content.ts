@@ -1127,7 +1127,7 @@ export const TEMPLATES_PAGE = {
       title: "Ad creation from scratch",
       sub: "This sucks…",
       figure: "-520 hours",
-      unit: "/ year",
+      unit: "/year",
       items: [
         "Spend hours finding ad ideas",
         "Writing everything from zero",
@@ -1147,7 +1147,7 @@ export const TEMPLATES_PAGE = {
       // (Žilvinas 2026-09-06).
       sub: "Cost of one coffee per month.",
       figure: "$5",
-      unit: "/ month",
+      unit: "/month",
       chip: "50% Discount",
       items: [
         { icon: "icon-layers", label: "500 winner static templates" },

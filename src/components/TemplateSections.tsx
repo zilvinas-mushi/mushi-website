@@ -1228,13 +1228,13 @@ export function TemplatesAccess() {
                 </p>
               </div>
             </header>
-            {/* PHONE SPACING, loosened 4 at each seam (Žilvinas 2026-09-18,
-                "especially between the hours/price and 'this sucks'"):
-                32 from the header to the figure and 28 from the figure to
-                the list, where 28/24 read tight beside the artboard's ~35
-                and ~36 of ink-to-ink air. The plan card below moves by the
-                same 4s so the two stay in step. Desktop is untouched. */}
-            <p className="mt-8 flex items-baseline gap-0.5 md:mt-7 md:gap-1.5">
+            {/* PHONE SPACING off the artboard (Žilvinas 2026-09-18, measured
+                24 x 22 and 24 x 25): 22 from the header to the figure's line
+                box and 25 from it to the list. The plan card below takes the
+                same two numbers ("do the same gapping"). Desktop untouched.
+                The unit is "/year" with no space — the slash sits against
+                the word, as the artboard sets it. */}
+            <p className="mt-[22px] flex items-baseline gap-0.5 md:mt-7 md:gap-1.5">
               <span className="bg-[linear-gradient(180deg,#dd898b_0%,#c5696a_55%,#b65556_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[44px]">
                 {a.scratch.figure}
               </span>
@@ -1250,7 +1250,7 @@ export function TemplatesAccess() {
                 like 7-8 pixels"): a 16 line box plus 18 is the artboard's
                 ~34 row pitch; 10 gave 26 and read cramped. The plan card's
                 list below takes the same, so the two keep one pitch. */}
-            <ul className="mt-7 flex-1 space-y-[18px] md:mt-6 md:space-y-3">
+            <ul className="mt-[25px] flex-1 space-y-[18px] md:mt-6 md:space-y-3">
               {a.scratch.items.map((item) => (
                 <li key={item} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
                   {/* gap 5 on the phone (Žilvinas 2026-09-18, "bigger by 1-2
@@ -1336,7 +1336,7 @@ export function TemplatesAccess() {
                 </p>
               </div>
             </header>
-            <p className="mt-8 flex items-center gap-3 md:mt-7">
+            <p className="mt-[22px] flex items-center gap-3 md:mt-7">
               {/* The figure and its unit share a BASELINE; the chip beside
                   them centres on the row. Centring all three put "/month"
                   halfway up the 40 and left the chip riding high. */}
@@ -1357,7 +1357,7 @@ export function TemplatesAccess() {
                 {a.templates.chip}
               </span>
             </p>
-            <ul className="mt-[19px] flex-1 space-y-[18px] md:mt-6 md:space-y-3">
+            <ul className="mt-[25px] flex-1 space-y-[18px] md:mt-6 md:space-y-3">
               {a.templates.items.map((item) => (
                 <li key={item.label} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
                   <AccessIcon name={item.icon} />

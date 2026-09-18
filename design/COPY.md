@@ -290,7 +290,7 @@ Source: sixth supplied screenshot, 2026-09-03.
 
 - Eyebrow: ✦ ACCESS ✦ · **H2: Save 10+ Hours Weekly** *(centred)*
 - Left card (dark): 🥺 **Ad creation from scratch** · This sucks… ·
-  **-520 hours** / year *(red)* · ✕ Spend hours finding ad ideas · ✕ Writing
+  **-520 hours** /year *(red)* · ✕ Spend hours finding ad ideas · ✕ Writing
   everything from zero · ✕ Daily designing disasters · ✕ Harder to stay
   consistent · ✕ Slower creative testing · ✕ Wasted ad spend · ✕ Chaos every
   day · CTA: TRY AN ALTERNATIVE *(outlined → booking)*
