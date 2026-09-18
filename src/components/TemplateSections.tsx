@@ -1233,8 +1233,9 @@ export function TemplatesAccess() {
                 box and 25 from it to the list. The plan card below takes the
                 same two numbers ("do the same gapping"). Desktop untouched.
                 The unit is "/year" with no space — the slash sits against
-                the word, as the artboard sets it. */}
-            <p className="mt-[22px] flex items-baseline gap-0.5 md:mt-7 md:gap-1.5">
+                the word, as the artboard sets it — and 5 off the figure
+                (Žilvinas 2026-09-19, "add like 3 pixels" to the 2). */}
+            <p className="mt-[22px] flex items-baseline gap-[5px] md:mt-7 md:gap-1.5">
               <span className="bg-[linear-gradient(180deg,#dd898b_0%,#c5696a_55%,#b65556_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[44px]">
                 {a.scratch.figure}
               </span>
@@ -1340,7 +1341,7 @@ export function TemplatesAccess() {
               {/* The figure and its unit share a BASELINE; the chip beside
                   them centres on the row. Centring all three put "/month"
                   halfway up the 40 and left the chip riding high. */}
-              <span className="flex shrink-0 items-baseline gap-0.5 whitespace-nowrap md:gap-1.5">
+              <span className="flex shrink-0 items-baseline gap-[5px] whitespace-nowrap md:gap-1.5">
                 <span className="bg-[linear-gradient(180deg,#a08ade_0%,#9275ce_50%,#7f56b6_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[44px]">
                   {a.templates.figure}
                 </span>
