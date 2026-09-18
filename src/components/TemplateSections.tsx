@@ -1806,15 +1806,23 @@ export function TemplatesDifference() {
                   that machinery — and the pixel-perfect registration it
                   depended on — is gone. diff-ad-add, diff-ad-bad and
                   diff-can-front are no longer rendered. */}
-              {/* PHONE: its own master (Siuksline.png, Žilvinas 2026-09-11 —
-                  adds the "ADD heading" ad in the bin). The art hard-cuts the
-                  ads on the left and the lid on the right; the export is
-                  cropped to exactly those two cuts and drawn edge to edge, so
-                  they land on the card's own edges instead of as a visible
-                  line 14px inside it. The bin fades out at the bottom in the
-                  art itself, so the card's bottom edge cuts only the fade.
-                  59 from the top puts the green ad ~80 down, clear of the
-                  chips. */}
+              {/* PHONE: the art hard-cuts the ads on the left and the lid on
+                  the right; the export is cropped to exactly those two cuts
+                  and drawn edge to edge, so they land on the card's own edges
+                  instead of as a visible line 14px inside it. The bin fades
+                  out at the bottom in the art itself, so the card's bottom
+                  edge cuts only the fade. 59 from the top puts the green ad
+                  ~80 down, clear of the chips.
+
+                  BOTH CUTS COME FROM ONE MASTER NOW (Žilvinas 2026-09-18,
+                  "bin with an ad.png", 2520 x 3107, "the highest quality"):
+                  each was registered against it by template match (0.92 and
+                  0.93) and turned out to be the master less its empty top —
+                  237 rows for this one, 292 for the desktop's — so they are
+                  re-cut from it at the same windows and nothing moved. The
+                  phone's is 1380 wide, 4x its 345 span, from a source that
+                  had 2.1x the pixels of the Siuksline.png export it replaces;
+                  alpha_quality 90 keeps the bottom fade within one level. */}
               <span className="absolute inset-x-0 top-[59px] block md:hidden">
                 <Img src="templates/diff-trashcan-phone.webp" alt="" className="w-full" />
               </span>
@@ -1822,7 +1830,9 @@ export function TemplatesDifference() {
                   with an ad.png"): the same composition at twice the
                   resolution, with a transparent ground instead of a baked
                   dark one — cropped to register 1:1 with the file it
-                  replaces, so the placement did not move. */}
+                  replaces, so the placement did not move. Re-cut 2026-09-18
+                  from the master at 2000 wide (was 1800 at 1.4x fewer source
+                  pixels); see the phone note above. */}
               <span className="absolute left-[-5%] top-[8%] hidden w-[110%] md:block">
                 <Img src="templates/diff-trashcan-v2.webp" alt="" className="w-full" />
               </span>
