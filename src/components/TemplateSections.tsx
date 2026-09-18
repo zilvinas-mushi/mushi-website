@@ -18,8 +18,12 @@ import { APP_URL, BOOKING_URL, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID 
  * measure only; the desktop's 48 is laid out at a width where balancing would
  * start second-guessing breaks that are already right.
  */
+// mt 17 on the phone: the artboard's gap from the eyebrow row's bottom edge to
+// the heading's text box (Žilvinas 2026-09-18, measured 16 x 17 under
+// SHOWCASE; the eyebrow and title are one recipe, so every section takes it).
+// It was 23 against the old 18-tall eyebrow; the rules are 21 tall now.
 const SECTION_TITLE =
-  "mt-[23px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-4 md:text-wrap md:text-[48px] md:leading-tight md:tracking-tight";
+  "mt-[17px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-4 md:text-wrap md:text-[48px] md:leading-tight md:tracking-tight";
 
 const SHELL = "mx-auto w-full max-w-[1200px] px-[15px] md:px-5";
 
@@ -149,15 +153,14 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
     <div className="flex items-center justify-center gap-3">
       {/* PHONES GET THE ARTBOARD'S OWN RULES (Žilvinas 2026-09-06): a line
           that fades from black into the star's colour, with a four-pointed
-          star ON its inner end — supplied as "left line + star.png" and
-          "right star + line.png". The CSS pair below draws a hairline and a
-          text glyph, which is close at 30px and obviously not the same shape
-          at 18.
-
-          Both files are scaled by ONE factor (110 / the left file's 425), so
-          the two stars come out the same size; that leaves the right rule at
-          117, which is the asymmetry the exports themselves have. */}
-      <Img src="templates/eyebrow-left.webp" alt="" width={110} className="md:hidden" />
+          star ON its inner end. Since 2026-09-18 ("both of these to improve
+          the quality") they are the client's own VECTOR exports — "Left side
+          of process.svg" 126 x 21 and "right side star of process title.svg"
+          127 x 21, a gradient <line> and a star <path>, nothing rasterised —
+          replacing the PNG-derived WebPs that went soft at 3x DPR. Real
+          vectors, so they ship as SVG at their natural size, the way Konvert's
+          logo does; the one-pixel width asymmetry is the exports' own. */}
+      <EyebrowRule src="eyebrow-left.svg" width={126} />
 
       {/* The DESKTOP's own exported rules too (2026-09-10): black fading
           into the ramp's end colour with a chunky star on the inner tip —
@@ -186,8 +189,34 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
         className="hidden md:block"
       />
 
-      <Img src="templates/eyebrow-right.webp" alt="" width={117} className="md:hidden" />
+      <EyebrowRule src="eyebrow-right.svg" width={127} />
     </div>
+  );
+}
+
+/**
+ * One phone eyebrow rule, as a raw <img> since Img sizes from the WebP table
+ * and these are vectors. Below the fold like everything after the hero, so
+ * the URL rides in data-src for the observer (see Img's note) with the
+ * <noscript> twin carrying a real src.
+ *
+ * shrink-0: the row is 126 + 12 + PROCESS + 12 + 127, a hair over the 360
+ * content box, and without it the rules were the flex items that gave way —
+ * 115 wide and 19 tall instead of the artboard's 127 x 21. The word cannot
+ * shrink, so the row overhangs the padding by a couple of px each side,
+ * centred; body clips sideways overflow, so nothing can scroll to it.
+ */
+function EyebrowRule({ src, width }: { src: string; width: number }) {
+  const url = `/images/templates/${src}`;
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img data-src={url} alt="" width={width} height={21} loading="lazy" decoding="async" className="shrink-0 md:hidden" />
+      <noscript>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt="" width={width} height={21} loading="lazy" decoding="async" className="shrink-0 md:hidden" />
+      </noscript>
+    </>
   );
 }
 
@@ -244,6 +273,10 @@ function BreakAtComma({ text }: { text: string }) {
 export function TemplatesProcess() {
   const p = TEMPLATES_PAGE.process;
   return (
+    // pt 61: the artboard's gap from the Difference card's bottom edge to the
+    // top of the eyebrow row (Žilvinas 2026-09-18, measured 51 x 61). The row
+    // is the 21-tall rules now, so the gap lands on their box, not on a text
+    // line the stars used to overhang.
     <section aria-labelledby="process-heading" className="pt-[61px] md:pb-28 md:pt-0">
       <div className={SHELL}>
         <SectionEyebrow>{p.eyebrow}</SectionEyebrow>
@@ -265,7 +298,10 @@ export function TemplatesProcess() {
             merge dropped the column rule but kept the cards' forced height,
             the aspect-square cards overflowed their columns and swallowed
             the gaps entirely. No fixed sizes means no overflow mode. */}
-        <ol className="mx-auto mt-[37px] grid max-w-none gap-[15px] md:mt-10 md:max-w-[1160px] md:grid-cols-3 md:gap-2.5">
+        {/* mt 30 on the phone: the artboard's gap from the heading's text
+            box to the first card (Žilvinas 2026-09-18, "in here only 30" —
+            it had been 37, and read as too loose beside the 61 above). */}
+        <ol className="mx-auto mt-[30px] grid max-w-none gap-[15px] md:mt-10 md:max-w-[1160px] md:grid-cols-3 md:gap-2.5">
           {p.steps.map((s, i) => (
             <li key={s.title} className="relative">
               {/* THE PHONE'S JOIN between two steps: a 66 black disc centred
@@ -430,7 +466,10 @@ export function TemplatesProcess() {
 
                     20 off the card's bottom edge, 15 either side of the
                     label, radius 50, Poppins Medium 14. */}
-                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black shadow-[0_6px_18px_-6px_rgba(0,0,0,0.6)] md:bottom-5 md:left-6 md:px-[14px] md:py-2 md:text-[16px] md:font-medium">
+                {/* NO SHADOW under the chip (2026-09-18, the client's boss:
+                    Figma has none, the web had one). The pill sits flat on
+                    the step's artwork. */}
+                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black md:bottom-5 md:left-6 md:px-[14px] md:py-2 md:text-[16px] md:font-medium">
                   {s.chip}
                 </span>
               </article>
@@ -467,7 +506,10 @@ export function TemplatesFaq() {
         {/* 65 under the title here, not the page's usual 37 (artboard
             2026-09-06). */}
         {/* Row gap halved to 15 (client 2026-09-11), from the reference's 30. */}
-        <div className="mx-auto mt-[65px] max-w-[880px] space-y-3 md:mt-12 md:max-w-[1080px] md:space-y-[15px]">
+        {/* mt 28 on the phone: the artboard's gap from the heading's text box
+            to the first question (Žilvinas 2026-09-18, measured 32 x 28,
+            "make this gap a bit smaller"). It had been 65. */}
+        <div className="mx-auto mt-[28px] max-w-[880px] space-y-3 md:mt-12 md:max-w-[1080px] md:space-y-[15px]">
           {f.items.map((item) => (
             <details key={item.q} className="disclosure group rounded-[14px] bg-[#1b1b1b] md:rounded-[17px] md:bg-[#222222]">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-[17px] text-[16px] font-medium text-white md:px-6 md:py-[19px] md:text-[18px] md:font-medium [&::-webkit-details-marker]:hidden">
@@ -763,13 +805,33 @@ function CompareValue({ v, mushi }: { v: string | boolean; mushi?: boolean }) {
       </span>
     );
   }
+  // THE DESIGN'S OWN MARKS, inline (Žilvinas 2026-09-18, "check mark
+  // icon.svg" 15 x 13 and "cross icon.svg" 13 x 13): one round-capped path
+  // each at stroke 2, pasted verbatim, replacing the 40 x 33 and 32 x 32
+  // bitmaps that drew soft at 3x. The phone shows them at the files' own
+  // size; the desktop keeps the 20 / 15 widths it had, with the stroke
+  // scaled back so the line stays 2px on screen.
   return v ? (
     <span role="img" aria-label="Yes">
-      <Img src="templates/cmp-check.webp" alt="" width={20} className="w-[14px] md:w-[20px]" />
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 15 13"
+        fill="none"
+        className="h-auto w-[15px] stroke-white stroke-2 md:w-[20px] md:stroke-[1.5]"
+      >
+        <path strokeLinecap="round" d="M1 6.65217L6.15517 11L14 1" />
+      </svg>
     </span>
   ) : (
     <span role="img" aria-label="No">
-      <Img src="templates/cmp-x.webp" alt="" width={15} className="w-[11px] md:w-[15px]" />
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 13 13"
+        fill="none"
+        className="h-auto w-[13px] stroke-[#ff5b5b] stroke-2 md:w-[15px] md:stroke-[1.73]"
+      >
+        <path strokeLinecap="round" d="M1 1L12 12M1 12L12 1" />
+      </svg>
     </span>
   );
 }
@@ -988,78 +1050,104 @@ export function TemplatesComparison() {
   );
 }
 
-/** The supplied white icon artwork for the Access benefit list. */
 /**
  * The plan card's list icons, INLINE SVG (Žilvinas 2026-09-11: "best
- * quality", stroke "the same as the text"). They were 48px bitmaps, soft at
- * 3x. All on a 24 grid at stroke 1.5 with round ends, which drawn at 22 is
- * ~1.4px — Poppins Regular's own stem weight at 16.
+ * quality", stroke "the same as the text").
  *
- * Sources: card, target, tools and shield are Hugeicons' free set
- * (CreditCardAccept, Target02, Tools, SecurityCheck); layers is Tabler's
- * stack-2; sparkles and the "00" headset matched neither set, so they are
- * drawn on the same grid from the bitmaps they replace.
+ * Six of the seven are THE DESIGN'S OWN FILES (Žilvinas 2026-09-18, "replace
+ * the icons according to its name which matches its title"): 16-grid
+ * outlines at stroke 1.5 with round ends, one path each, pasted verbatim —
+ * the viewBox is the file's own, the 0.75 inset it carries is the stroke's
+ * half width. Drawn at 16 on the phone they are exactly the artboard's; the
+ * desktop's 22 slot scales the grid up and thins the stroke back to ~1.5px.
+ * Target is still Hugeicons' Target02 on its 24 grid, since no file came for
+ * that row.
  */
-const ACCESS_ICONS: Record<string, string[]> = {
-  "icon-layers": ["M12 4l-8 4l8 4l8 -4l-8 -4", "M4 12l8 4l8 -4", "M4 16l8 4l8 -4"],
-  "icon-sparkles": [
-    // Two concave four-point stars, top-left and bottom-right…
-    "M7 2.5Q7 7 11.5 7Q7 7 7 11.5Q7 7 2.5 7Q7 7 7 2.5Z",
-    "M17 11.5Q17 17 22 17Q17 17 17 22.5Q17 17 12 17Q17 17 17 11.5Z",
-    // …and two plus signs in the other corners.
-    "M17.5 2.5v5M15 5h5",
-    "M5.5 15.5v5M3 18h5",
-  ],
-  "icon-card": [
-    "M11 20H10.5C6.74142 20 4.86213 20 3.60746 19.0091C3.40678 18.8506 3.22119 18.676 3.0528 18.4871C2 17.3062 2 15.5375 2 12C2 8.46252 2 6.69377 3.0528 5.5129C3.22119 5.32403 3.40678 5.14935 3.60746 4.99087C4.86213 4 6.74142 4 10.5 4H13.5C17.2586 4 19.1379 4 20.3925 4.99087C20.5932 5.14935 20.7788 5.32403 20.9472 5.5129C21.8957 6.57684 21.9897 8.11799 21.999 11",
-    "M2 9H22",
-    "M14 18C14 18 15 18 16 20C16 20 19.1765 15 22 14",
-  ],
-  "icon-headset": [
-    "M2.75 20v-8a9.25 9.25 0 0 1 18.5 0v8",
-    "M6.5 15.5a2 2 0 0 1 4 0v3a2 2 0 0 1 -4 0z",
-    "M13.5 15.5a2 2 0 0 1 4 0v3a2 2 0 0 1 -4 0z",
-  ],
-  "icon-target": [
-    "M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12C7 9.23858 9.23858 7 12 7",
-    "M14 2.20004C13.3538 2.06886 12.6849 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 11.3151 21.9311 10.6462 21.8 10",
-    "M12.0303 11.9625L16.5832 7.4096M19.7404 4.34462L19.1872 2.35748C19.0853 2.03011 18.6914 1.89965 18.4259 2.11662C16.9898 3.29018 15.4254 4.87091 16.703 7.36419C19.2771 8.56455 20.7466 6.94584 21.8733 5.5853C22.0975 5.3146 21.9623 4.90767 21.6247 4.81005L19.7404 4.34462Z",
-  ],
-  "icon-tools": [
-    "M13 11L18 6",
-    "M19 7L17 5L19.5 3.5L20.5 4.5L19 7Z",
-    "M4.02513 8.97487C3.01416 7.96391 2.75095 6.48836 3.23548 5.23548L4.65748 6.65748H6.65748V4.65748L5.23548 3.23548C6.48836 2.75095 7.96391 3.01416 8.97487 4.02513C9.98621 5.03647 10.2493 6.51274 9.76398 7.76593L16.2341 14.236C17.4873 13.7507 18.9635 14.0138 19.9749 15.0251C20.9858 16.0361 21.2491 17.5116 20.7645 18.7645L19.3425 17.3425L17.3425 17.3425V19.3425L18.7645 20.7645C17.5116 21.2491 16.0361 20.9858 15.0251 19.9749C14.0145 18.9643 13.7511 17.4895 14.2349 16.2369L7.76312 9.76507C6.51053 10.2489 5.03571 9.98546 4.02513 8.97487Z",
-    "M12.203 14.5L6.59897 20.1041C6.07115 20.6319 5.2154 20.6319 4.68758 20.1041L3.89586 19.3124C3.36805 18.7846 3.36805 17.9288 3.89586 17.401L9.49994 11.7969",
-  ],
-  "icon-shield": [
-    "M18.7088 3.49534C16.8165 2.55382 14.5009 2 12 2C9.4991 2 7.1835 2.55382 5.29116 3.49534C4.36318 3.95706 3.89919 4.18792 3.4496 4.91378C3 5.63965 3 6.34248 3 7.74814V11.2371C3 16.9205 7.54236 20.0804 10.173 21.4338C10.9067 21.8113 11.2735 22 12 22C12.7265 22 13.0933 21.8113 13.8269 21.4338C16.4576 20.0804 21 16.9205 21 11.2371L21 7.74814C21 6.34249 21 5.63966 20.5504 4.91378C20.1008 4.18791 19.6368 3.95706 18.7088 3.49534Z",
-    "M9 11.5C9 11.5 10.4079 11.7519 11 13.5C11 13.5 12.5 10.5 15 9.5",
-  ],
+const ACCESS_ICONS: Record<string, { viewBox: string; d: string[] }> = {
+  // "500 winner static templates icon.svg"
+  "icon-layers": {
+    viewBox: "0 0 16 15",
+    d: [
+      "M0.75 7.25L7.49956 10.4023C7.59139 10.4452 7.6373 10.4667 7.68546 10.4751C7.72811 10.4826 7.77189 10.4826 7.81454 10.4751C7.8627 10.4667 7.90861 10.4452 8.00044 10.4023L14.75 7.25M0.75 10.5193L7.49956 13.6716C7.59139 13.7145 7.6373 13.736 7.68546 13.7444C7.72811 13.7519 7.77189 13.7519 7.81454 13.7444C7.8627 13.736 7.90861 13.7145 8.00044 13.6716L14.75 10.5193M0.75 3.98071L7.49956 0.828377C7.59139 0.78549 7.6373 0.764046 7.68546 0.755606C7.72811 0.748131 7.77189 0.748131 7.81454 0.755606C7.8627 0.764046 7.90861 0.78549 8.00044 0.828377L14.75 3.98071L8.00044 7.13303C7.90861 7.17592 7.8627 7.19737 7.81454 7.20581C7.77189 7.21328 7.72811 7.21328 7.68546 7.20581C7.6373 7.19737 7.59139 7.17592 7.49956 7.13303L0.75 3.98071Z",
+    ],
+  },
+  // "50+ new templates month icon.svg"
+  "icon-sparkles": {
+    viewBox: "0 0 16 16",
+    d: [
+      "M12.3 4.95V1.45M3.2 14.05V10.55M10.55 3.2H14.05M1.45 12.3H4.95M3.9 0.75L3.35088 1.84824C3.16504 2.21993 3.07212 2.40577 2.94798 2.56681C2.83783 2.70971 2.70971 2.83783 2.56681 2.94798C2.40577 3.07212 2.21993 3.16504 1.84824 3.35088L0.75 3.9L1.84824 4.44912C2.21993 4.63496 2.40577 4.72788 2.56681 4.85202C2.70972 4.96217 2.83783 5.09028 2.94798 5.23319C3.07212 5.39423 3.16504 5.58007 3.35088 5.95176L3.9 7.05L4.44912 5.95176C4.63496 5.58007 4.72788 5.39423 4.85202 5.23319C4.96217 5.09028 5.09028 4.96217 5.23319 4.85202C5.39423 4.72788 5.58007 4.63496 5.95176 4.44912L7.05 3.9L5.95176 3.35088C5.58007 3.16504 5.39423 3.07212 5.23319 2.94798C5.09028 2.83783 4.96217 2.70972 4.85202 2.56681C4.72788 2.40577 4.63496 2.21993 4.44912 1.84824L3.9 0.75ZM11.25 7.75L10.5842 9.08157C10.3984 9.45326 10.3054 9.6391 10.1813 9.80015C10.0712 9.94305 9.94305 10.0712 9.80015 10.1813C9.6391 10.3054 9.45326 10.3984 9.08158 10.5842L7.75 11.25L9.08158 11.9158C9.45326 12.1016 9.6391 12.1946 9.80015 12.3187C9.94305 12.4288 10.0712 12.557 10.1813 12.6999C10.3054 12.8609 10.3984 13.0467 10.5842 13.4184L11.25 14.75L11.9158 13.4184C12.1016 13.0467 12.1946 12.8609 12.3187 12.6999C12.4288 12.557 12.557 12.4288 12.6999 12.3187C12.8609 12.1946 13.0467 12.1016 13.4184 11.9158L14.75 11.25L13.4184 10.5842C13.0467 10.3984 12.8609 10.3054 12.6999 10.1813C12.557 10.0712 12.4288 9.94305 12.3187 9.80015C12.1946 9.6391 12.1016 9.45326 11.9158 9.08158L11.25 7.75Z",
+    ],
+  },
+  // "14-day money-back guaruanntee icon.svg"
+  "icon-card": {
+    viewBox: "0 0 16 13",
+    d: [
+      "M10.55 10.2833L11.95 11.75L14.75 8.81667M14.75 4.41667H0.75M14.75 5.88333V3.09667C14.75 2.27526 14.75 1.86455 14.5974 1.55082C14.4632 1.27484 14.249 1.05047 13.9856 0.909858C13.6861 0.75 13.2941 0.75 12.51 0.75H2.99C2.20593 0.75 1.81389 0.75 1.51441 0.909857C1.25099 1.05047 1.03681 1.27484 0.902591 1.55081C0.75 1.86455 0.75 2.27526 0.75 3.09667V8.67C0.75 9.49141 0.75 9.90211 0.902591 10.2159C1.03681 10.4918 1.25099 10.7162 1.51441 10.8568C1.81389 11.0167 2.20593 11.0167 2.99 11.0167H7.75",
+    ],
+  },
+  // "customer support icon.svg"
+  "icon-headset": {
+    viewBox: "0 0 16 14",
+    d: [
+      "M14.75 10.0833V7.41667C14.75 3.73477 11.616 0.75 7.75 0.75C3.88401 0.75 0.75 3.73477 0.75 7.41667V10.0833M4.6 12.75C3.6335 12.75 2.85 12.0038 2.85 11.0833V9.08333C2.85 8.16286 3.6335 7.41667 4.6 7.41667C5.5665 7.41667 6.35 8.16286 6.35 9.08333V11.0833C6.35 12.0038 5.5665 12.75 4.6 12.75ZM10.9 12.75C9.9335 12.75 9.15 12.0038 9.15 11.0833V9.08333C9.15 8.16286 9.9335 7.41667 10.9 7.41667C11.8665 7.41667 12.65 8.16286 12.65 9.08333V11.0833C12.65 12.0038 11.8665 12.75 10.9 12.75Z",
+    ],
+  },
+  // No file was supplied for "5 industries covered"; Hugeicons' Target02
+  // stays, on its 24 grid.
+  "icon-target": {
+    viewBox: "0 0 24 24",
+    d: [
+      "M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12C7 9.23858 9.23858 7 12 7",
+      "M14 2.20004C13.3538 2.06886 12.6849 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 11.3151 21.9311 10.6462 21.8 10",
+      "M12.0303 11.9625L16.5832 7.4096M19.7404 4.34462L19.1872 2.35748C19.0853 2.03011 18.6914 1.89965 18.4259 2.11662C16.9898 3.29018 15.4254 4.87091 16.703 7.36419C19.2771 8.56455 20.7466 6.94584 21.8733 5.5853C22.0975 5.3146 21.9623 4.90767 21.6247 4.81005L19.7404 4.34462Z",
+    ],
+  },
+  // "wrench icon.svg"
+  "icon-tools": {
+    viewBox: "0 0 16 16",
+    d: [
+      "M3.55 3.67867L6.7 6.97342M3.55 3.67867H1.45L0.75 1.48217L1.45 0.75L3.55 1.48217V3.67867ZM12.8313 1.29255L10.992 3.2164C10.7147 3.50635 10.5761 3.65133 10.5242 3.8185C10.4785 3.96555 10.4785 4.12396 10.5242 4.27101C10.5761 4.43818 10.7147 4.58316 10.992 4.87311L11.158 5.04682C11.4353 5.33677 11.5739 5.48175 11.7337 5.53606C11.8743 5.58384 12.0257 5.58384 12.1663 5.53606C12.3261 5.48175 12.4647 5.33677 12.742 5.04682L14.4625 3.24722C14.6478 3.71886 14.75 4.23541 14.75 4.77692C14.75 7.00093 13.0263 8.80384 10.9 8.80384C10.6437 8.80384 10.3932 8.77764 10.1508 8.72765C9.81053 8.65745 9.64038 8.62235 9.53723 8.6331C9.42757 8.64453 9.37352 8.66173 9.27636 8.71612C9.18496 8.76728 9.09328 8.86317 8.90992 9.05496L3.9 14.2951C3.3201 14.9016 2.3799 14.9016 1.8 14.2951C1.2201 13.6885 1.2201 12.7051 1.8 12.0986L6.80992 6.85845C6.99328 6.66667 7.08496 6.57077 7.13387 6.47518C7.18587 6.37354 7.20231 6.31701 7.21324 6.20231C7.22352 6.09442 7.18996 5.91645 7.12285 5.56052C7.07505 5.30705 7.05 5.04505 7.05 4.77692C7.05 2.55291 8.7737 0.75 10.9 0.75C11.6039 0.75 12.2636 0.947556 12.8313 1.29255ZM7.75004 10.2681L11.6 14.295C12.1799 14.9016 13.1201 14.9016 13.7 14.295C14.2799 13.6885 14.2799 12.7051 13.7 12.0985L10.5327 8.78576C10.3085 8.76356 10.0899 8.72126 9.87855 8.66058C9.60621 8.5824 9.30746 8.63915 9.10776 8.84802L7.75004 10.2681Z",
+    ],
+  },
+  // "secure checkpoint icon.svg"
+  "icon-shield": {
+    viewBox: "0 0 14 16",
+    d: [
+      "M4.5 7.42124L6 8.83584L9.375 5.65299M12.75 7.77489C12.75 11.2466 8.73453 13.7717 7.27349 14.5755C7.10745 14.6668 7.02443 14.7125 6.90726 14.7362C6.81633 14.7546 6.68367 14.7546 6.59274 14.7362C6.47557 14.7125 6.39255 14.6668 6.22651 14.5755C4.76547 13.7717 0.75 11.2466 0.75 7.77489V4.39231C0.75 3.82681 0.75 3.54407 0.84807 3.30102C0.934706 3.08631 1.07549 2.89473 1.25824 2.74284C1.46512 2.5709 1.74585 2.47162 2.3073 2.27306L6.32865 0.850913C6.48457 0.795771 6.56253 0.7682 6.64274 0.757271C6.71388 0.747576 6.78612 0.747576 6.85726 0.757271C6.93747 0.7682 7.01543 0.795771 7.17135 0.850913L11.1927 2.27306C11.7542 2.47162 12.0349 2.5709 12.2418 2.74284C12.4245 2.89473 12.5653 3.08631 12.6519 3.30102C12.75 3.54407 12.75 3.82681 12.75 4.39231V7.77489Z",
+    ],
+  },
 };
 
 function AccessIcon({ name }: { name: string }) {
-  const paths = ACCESS_ICONS[name];
-  if (!paths) {
+  const icon = ACCESS_ICONS[name];
+  if (!icon) {
     return <Img src={`templates/${name}.webp`} alt="" width={22} className="shrink-0" />;
   }
-  // PHONE: a 16 slot with the glyph filling it (~13 of ink), per the
-  // artboard — both lists on a 26 row pitch with text 19 from the left, the
-  // scratch card's crosses in the same 16 slot. Stroke 2 on the 24 grid is
-  // ~1.3px at 16, Poppins Regular's stem at 16px, so the line still matches
-  // the text. Desktop keeps 22 and 1.5.
+  // PHONE: a 16 slot, the glyph at its file's own width inside it (the
+  // files are 16 wide or 14, and 13 to 16 tall — a 16-tall viewBox height
+  // is NOT forced, so the guarantee card stays 16 x 13 rather than being
+  // stretched). Stroke is the file's 1.5 on its 16 grid, i.e. 1.5px at 16 —
+  // Poppins Regular's stem at 16px. Desktop scales the slot to 22 and takes
+  // the stroke to 1.1 grid units so it is still ~1.5px on screen. The 24-grid
+  // target keeps the old 2 / 1.5 pair, which is ~1.3px at either size.
+  const grid16 = !icon.viewBox.endsWith(" 24 24");
   return (
     <span className="grid size-[16px] shrink-0 place-items-center md:size-[22px]">
       <svg
         aria-hidden="true"
-        viewBox="0 0 24 24"
+        viewBox={icon.viewBox}
         fill="none"
         stroke="currentColor"
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="size-[16px] stroke-2 md:size-[22px] md:stroke-[1.5]"
+        className={
+          grid16
+            ? "h-auto w-[16px] max-h-[16px] stroke-[1.5] md:w-[22px] md:max-h-[22px] md:stroke-[1.1]"
+            : "size-[16px] stroke-2 md:size-[22px] md:stroke-[1.5]"
+        }
       >
-        {paths.map((d) => (
+        {icon.d.map((d) => (
           <path key={d} d={d} />
         ))}
       </svg>
@@ -1136,7 +1224,13 @@ export function TemplatesAccess() {
                 </p>
               </div>
             </header>
-            <p className="mt-7 flex items-baseline gap-0.5 md:gap-1.5">
+            {/* PHONE SPACING, loosened 4 at each seam (Žilvinas 2026-09-18,
+                "especially between the hours/price and 'this sucks'"):
+                32 from the header to the figure and 28 from the figure to
+                the list, where 28/24 read tight beside the artboard's ~35
+                and ~36 of ink-to-ink air. The plan card below moves by the
+                same 4s so the two stay in step. Desktop is untouched. */}
+            <p className="mt-8 flex items-baseline gap-0.5 md:mt-7 md:gap-1.5">
               <span className="bg-[linear-gradient(180deg,#dd898b_0%,#c5696a_55%,#b65556_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[44px]">
                 {a.scratch.figure}
               </span>
@@ -1148,9 +1242,19 @@ export function TemplatesAccess() {
                 {a.scratch.unit}
               </span>
             </p>
-            <ul className="mt-6 flex-1 space-y-[10px] md:space-y-3">
+            {/* space-y 18 on the phone (Žilvinas 2026-09-18, "a bit bigger,
+                like 7-8 pixels"): a 16 line box plus 18 is the artboard's
+                ~34 row pitch; 10 gave 26 and read cramped. The plan card's
+                list below takes the same, so the two keep one pitch. */}
+            <ul className="mt-7 flex-1 space-y-[18px] md:mt-6 md:space-y-3">
               {a.scratch.items.map((item) => (
-                <li key={item} className="flex items-center gap-[3px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
+                <li key={item} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
+                  {/* gap 5 on the phone (Žilvinas 2026-09-18, "bigger by 1-2
+                      pixels"): the 13 cross sits 1.5 inside its 16 slot, so
+                      5 puts ~6.5 of air between the cross and the text
+                      against the artboard's 7. The plan card's rows take the
+                      same gap, so both lists still start their text on one
+                      line. */}
                   {/* The design's own cross ("cross icon.svg", supplied
                       2026-09-11) — its path and its 3.84 stroke verbatim,
                       square 23 viewBox so it cannot stretch. Drawn at 13,
@@ -1228,7 +1332,7 @@ export function TemplatesAccess() {
                 </p>
               </div>
             </header>
-            <p className="mt-7 flex items-center gap-3">
+            <p className="mt-8 flex items-center gap-3 md:mt-7">
               {/* The figure and its unit share a BASELINE; the chip beside
                   them centres on the row. Centring all three put "/month"
                   halfway up the 40 and left the chip riding high. */}
@@ -1249,9 +1353,9 @@ export function TemplatesAccess() {
                 {a.templates.chip}
               </span>
             </p>
-            <ul className="mt-[15px] flex-1 space-y-[10px] md:mt-6 md:space-y-3">
+            <ul className="mt-[19px] flex-1 space-y-[18px] md:mt-6 md:space-y-3">
               {a.templates.items.map((item) => (
-                <li key={item.label} className="flex items-center gap-[3px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
+                <li key={item.label} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
                   <AccessIcon name={item.icon} />
                   {item.label}
                 </li>
@@ -1575,8 +1679,10 @@ export function TemplatesInside() {
                 maskPosition: "center",
               }}
             />
+            {/* gap 5 between the tiles on the phone (Žilvinas 2026-09-18,
+                off the artboard); the desktop keeps its 6. */}
             <span
-              className="relative inline-flex gap-1 md:gap-1.5"
+              className="relative inline-flex gap-[5px] md:gap-1.5"
               role="img"
               aria-label="5 out of 5 stars"
             >
@@ -1601,17 +1707,19 @@ export function TemplatesInside() {
                 its own spacing, and the file already has it. Flattened from
                 Figma's raster-in-<pattern> the same way the brand chips are.
                 */}
-            {/* 126 x 34 on the phone, nudged 6 UP by transform rather than
-                margin (Žilvinas 2026-09-11, after trying 3, 9 and 0): the
-                file carries empty top inside its 34, so at rest the
-                wordmark's ink sat 18 under the stars. 6 up leaves it 12. A
-                margin would re-centre the whole stack and move the stars
-                too. */}
+            {/* 126 WIDE on the phone (Žilvinas 2026-09-18, "trustpilot should
+                be 126 x 34"). The artboard's 126 x 34 frame is the lockup's
+                box with empty top inside it; the file here is cropped to the
+                ink, 292 x 60, so 126 wide is 26 tall and sits 8 under the
+                stars, where the frame's ink sits. It had been set by HEIGHT
+                (h-34 with w-auto), which made it 165 wide, a third bigger
+                than the artboard, and then nudged up 6 to compensate — that
+                nudge is gone with the cause. */}
             <Img
               src="templates/trustpilot-lockup.webp"
               alt="Trustpilot"
               width={126}
-              className="relative mt-1.5 h-[34px] w-auto -translate-y-[6px] md:mt-3 md:h-[33px] md:translate-y-0"
+              className="relative mt-2 h-auto w-[126px] md:mt-3 md:h-[33px] md:w-auto"
             />
             <p className={`${SMALL} relative mt-1 md:mt-2 md:!text-[20px]`}>{s.reviews.caption}</p>
           </article>
@@ -2050,9 +2158,13 @@ const BRAND_LOGOS: Record<string, { src: string; w: number; svg?: boolean }> = {
   // Konvert's file is a real vector path, so it stays an SVG. The other two
   // are Figma raster-in-<pattern> exports — a single PNG sliced by two <use>
   // transforms in CreativeOS's case — which Chrome rasterises at the pattern
-  // tile's size and draws visibly soft. They are flattened to WebP at 3x
-  // instead (the same pass scripts/svg-raster-to-webp.py does for the award
-  // badges), which is both sharper and a tenth of the bytes.
+  // tile's size and draws visibly soft. They are flattened to WebP instead
+  // (the same pass scripts/svg-raster-to-webp.py does for the award badges),
+  // which is both sharper and a tenth of the bytes. CreativeOS's is the
+  // client's own "Creative OS ogo.svg" (2026-09-18, "highest quality as it
+  // can be" — and PHONE ONLY, the desktop chip stays its SVG export):
+  // scripts/svg-pattern-composite.py at 4x and LOSSLESS, since the 3x lossy
+  // cut rang round the letters at 3x DPR.
   Konvert: { src: "logo-konvert.svg", w: 67, svg: true },
   Kandy: { src: "logo-kandy.webp", w: 45 },
   CreativeOS: { src: "logo-creativeos.webp", w: 100 },

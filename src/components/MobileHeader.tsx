@@ -537,7 +537,7 @@ export function MobileHeader({
             className="absolute inset-x-0 top-full z-50 mt-2 flex flex-col gap-2.5 rounded-[0.3125rem] bg-[#181818] p-2.5 shadow-2xl"
           >
             {NAV.map((item) => {
-              const href = navHref(item, activePath ?? "/");
+              const href = navHref(item, activePath ?? "/", { phone: true });
               const active = href !== null && href === (activePath ?? "/");
               // No href means the page does not exist yet — half strength, no
               // hover, no pointer, not focusable. Same treatment as the

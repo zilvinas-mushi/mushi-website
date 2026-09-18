@@ -395,10 +395,6 @@
     "w": 200,
     "h": 200
   },
-  "templates/cmp-check.webp": {
-    "w": 40,
-    "h": 33
-  },
   "templates/cmp-creativeos-icon-phone.webp": {
     "w": 108,
     "h": 96
@@ -443,10 +439,6 @@
     "w": 1600,
     "h": 244
   },
-  "templates/cmp-x.webp": {
-    "w": 32,
-    "h": 32
-  },
   "templates/compare-card.webp": {
     "w": 600,
     "h": 1237
@@ -490,14 +482,6 @@
   "templates/diff-trashcan-v2.webp": {
     "w": 1800,
     "h": 2013
-  },
-  "templates/eyebrow-left.webp": {
-    "w": 220,
-    "h": 28
-  },
-  "templates/eyebrow-right.webp": {
-    "w": 234,
-    "h": 28
   },
   "templates/eyebrow-rule-left.webp": {
     "w": 322,
@@ -584,8 +568,8 @@
     "h": 414
   },
   "templates/logo-creativeos.webp": {
-    "w": 300,
-    "h": 54
+    "w": 596,
+    "h": 108
   },
   "templates/logo-kandy.webp": {
     "w": 135,

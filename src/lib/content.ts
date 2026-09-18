@@ -26,20 +26,30 @@ import { BOOKING_ANCHOR } from "@/lib/site";
 export const NAV = [
   { label: "Agency", href: "/" },
   { label: "Case Studies", href: null },
-  // LIVE EVERYWHERE since 2026-09-13 ("enable templates! we are done"): the
-  // page is finished, so the home page links to it like any other nav entry.
-  // It was held to its own page from 2026-09-11 while it was being built —
-  // `liveOn` stays on navHref for the next entry that needs it.
-  { label: "Templates", href: "/templates" },
+  // HELD BACK ON THE PHONE ONLY (Žilvinas 2026-09-18, "disable templates
+  // button … this will only be for phone"): the desktop bar links to it on
+  // every page as it has since 2026-09-13; in the phone drawer the home page
+  // shows it as the half-strength text a not-yet page gets, and /templates
+  // itself keeps it as a link and the selected row. See navHref.
+  { label: "Templates", href: "/templates", phoneLiveOn: ["/templates"] },
 ] as const;
 
 /**
  * The href a nav entry has ON THIS PAGE, or null if it renders disabled
  * there. One rule for both headers, so the desktop bar and the phone drawer
- * cannot disagree about what is a link.
+ * cannot disagree about what is a link — except where an entry says so:
+ * `liveOn` restricts it on both surfaces, `phoneLiveOn` only in the phone
+ * drawer, which passes `phone: true`.
  */
-export function navHref(item: (typeof NAV)[number], path: string): string | null {
+export function navHref(
+  item: (typeof NAV)[number],
+  path: string,
+  { phone = false }: { phone?: boolean } = {},
+): string | null {
   if ("liveOn" in item && !(item.liveOn as readonly string[]).includes(path)) return null;
+  if (phone && "phoneLiveOn" in item && !(item.phoneLiveOn as readonly string[]).includes(path)) {
+    return null;
+  }
   return item.href;
 }
 

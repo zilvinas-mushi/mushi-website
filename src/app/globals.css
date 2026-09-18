@@ -360,6 +360,32 @@ html[data-canvas="footer"] body {
 }
 
 /*
+  NO SIDEWAYS SCROLL, EVER (Žilvinas 2026-09-18: on a phone the page could be
+  dragged left and right of the first screen — "user can get out of bounds").
+
+  Nothing here lays out wider than the viewport in desktop Chrome at 390px,
+  so the offender is something Mobile Safari alone counts: a transformed
+  marquee tile, a rotated icon or a drawer edge that the layout engine does not
+  clip but the scrolling one does. Rather than chase each one as it appears,
+  the document itself refuses to pan sideways. `clip` and not `hidden` on
+  purpose: hidden turns body into a scroll container, which quietly breaks
+  sticky and scroll-margin against the viewport, while clip only clips. iOS
+  needs it on BOTH html and body — on html alone Safari still lets the page be
+  panned. The @supports fallback is for Safari before 16, which has no clip.
+*/
+html,
+body {
+  overflow-x: clip;
+}
+
+@supports not (overflow-x: clip) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/*
   THE PAINT GATE — nothing is shown until the first screen is finished.
 
   The site must never be caught assembling itself: no headline sitting on flat
