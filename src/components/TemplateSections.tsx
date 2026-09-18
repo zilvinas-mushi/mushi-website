@@ -566,7 +566,10 @@ export function TemplatesTeam() {
             121-tall plate with a 113-wide portrait; the panel around them keeps
             its 20 radius but tightens to a 15 pad. Everything below md is the
             same markup the desktop uses — only the numbers change. */}
-        <div className="mx-auto mt-[37px] max-w-[880px] rounded-[20px] bg-[#141414] p-[15px] pb-[25px] md:mt-12 md:max-w-[1080px] md:rounded-[16px] md:bg-[#111111] md:p-8">
+        {/* mt 33 on the phone (Žilvinas 2026-09-18, "a bit smaller"): the
+            artboard measures 28 box-to-box here as it does for the FAQ, and
+            33 is where he settled that one, so the two match. It had been 37. */}
+        <div className="mx-auto mt-[33px] max-w-[880px] rounded-[20px] bg-[#141414] p-[15px] pb-[25px] md:mt-12 md:max-w-[1080px] md:rounded-[16px] md:bg-[#111111] md:p-8">
           {/* 15 between the phone cards, card to card (Žilvinas
               2026-09-11, Figma). Urte's portrait is drawn smaller instead
               (see phoneImageH in content.ts) so her hair stays inside her
