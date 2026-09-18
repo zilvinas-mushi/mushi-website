@@ -506,10 +506,11 @@ export function TemplatesFaq() {
         {/* 65 under the title here, not the page's usual 37 (artboard
             2026-09-06). */}
         {/* Row gap halved to 15 (client 2026-09-11), from the reference's 30. */}
-        {/* mt 28 on the phone: the artboard's gap from the heading's text box
-            to the first question (Žilvinas 2026-09-18, measured 32 x 28,
-            "make this gap a bit smaller"). It had been 65. */}
-        <div className="mx-auto mt-[28px] max-w-[880px] space-y-3 md:mt-12 md:max-w-[1080px] md:space-y-[15px]">
+        {/* mt 33 on the phone (Žilvinas 2026-09-18): the artboard measured
+            28 from the heading's text box to the first question, and 37 from
+            its ink; 28 read tight on the page and he settled on 33. It had
+            been 65. */}
+        <div className="mx-auto mt-[33px] max-w-[880px] space-y-3 md:mt-12 md:max-w-[1080px] md:space-y-[15px]">
           {f.items.map((item) => (
             <details key={item.q} className="disclosure group rounded-[14px] bg-[#1b1b1b] md:rounded-[17px] md:bg-[#222222]">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-[17px] text-[16px] font-medium text-white md:px-6 md:py-[19px] md:text-[18px] md:font-medium [&::-webkit-details-marker]:hidden">
