@@ -1247,11 +1247,12 @@ export function TemplatesAccess() {
                 {a.scratch.unit}
               </span>
             </p>
-            {/* space-y 18 on the phone (Žilvinas 2026-09-18, "a bit bigger,
-                like 7-8 pixels"): a 16 line box plus 18 is the artboard's
-                ~34 row pitch; 10 gave 26 and read cramped. The plan card's
-                list below takes the same, so the two keep one pitch. */}
-            <ul className="mt-[25px] flex-1 space-y-[18px] md:mt-6 md:space-y-3">
+            {/* space-y 15 on the phone: 18 was "a bit bigger, like 7-8
+                pixels" over the old 10 (Žilvinas 2026-09-18), then "the gaps
+                are lower 3 pixels" against the artboard (2026-09-19) — a 16
+                line box plus 15 is a 31 row pitch. The plan card's list below
+                takes the same, so the two keep one pitch. */}
+            <ul className="mt-[25px] flex-1 space-y-[15px] md:mt-6 md:space-y-3">
               {a.scratch.items.map((item) => (
                 <li key={item} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
                   {/* gap 5 on the phone (Žilvinas 2026-09-18, "bigger by 1-2
@@ -1358,7 +1359,7 @@ export function TemplatesAccess() {
                 {a.templates.chip}
               </span>
             </p>
-            <ul className="mt-[25px] flex-1 space-y-[18px] md:mt-6 md:space-y-3">
+            <ul className="mt-[25px] flex-1 space-y-[15px] md:mt-6 md:space-y-3">
               {a.templates.items.map((item) => (
                 <li key={item.label} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
                   <AccessIcon name={item.icon} />
