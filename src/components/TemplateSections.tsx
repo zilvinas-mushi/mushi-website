@@ -1113,26 +1113,15 @@ export function TemplatesComparison() {
               DESKTOP ONLY — see the phone's own button below the grid. */}
           <a
             href={APP_URL}
-            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-3 py-2.5 text-[12px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5 md:text-[14px]"
+            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-5 py-3 text-[23px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5 md:text-[14px]"
             style={{ gridRowStart: lastRow }}
           >
-            {/* The supplied label artwork, masked with currentColor so it
-                follows the pill's hover inversion (black -> white). */}
-            <span
-              aria-hidden="true"
-              className="inline-block h-[17px] w-[105px] bg-current"
-              style={{
-                WebkitMaskImage: "url(/images/templates/cmp-get-mushi.webp)",
-                maskImage: "url(/images/templates/cmp-get-mushi.webp)",
-                WebkitMaskSize: "contain",
-                maskSize: "contain",
-                WebkitMaskRepeat: "no-repeat",
-                maskRepeat: "no-repeat",
-                WebkitMaskPosition: "center",
-                maskPosition: "center",
-              }}
-            />
-            <span className="sr-only">{c.cta}</span>
+            {/* LIVE TYPE (Žilvinas 2026-09-19, "looks distorted"): the label
+                was a 260 x 42 raster stretched through a mask to 105 x 17,
+                and Poppins SemiBold at that size beat any bitmap of it. It
+                is text now, in currentColor, so it still inverts with the
+                pill. */}
+            {c.cta}
           </a>
         </div>
 
