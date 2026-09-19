@@ -1181,12 +1181,13 @@ function AccessIcon({ name }: { name: string }) {
   // target keeps the old 2 / 1.5 pair, which is ~1.3px at either size.
   const grid16 = !icon.viewBox.endsWith(" 24 24");
   return (
-    // md: 25 (Žilvinas 2026-09-19, the artboard's 25 x 25), up from 22.
+    // md: 28 (Žilvinas 2026-09-19: the artboard's 25, then "a little little
+    // bit bigger"), up from 22. Stroke units rescaled so it stays 2px.
     // Stroke: 2px on screen (Žilvinas 2026-09-19 — first "0.2 more" over
     // the 1.5 it had, then "they look fuller" against the artboard, whose
     // icons read as a 2 stroke at 25) — 1.28 grid units on the 16 grid at
     // 25, 1.92 on the 24 grid.
-    <span className="grid size-[16px] shrink-0 place-items-center md:size-[25px]">
+    <span className="grid size-[16px] shrink-0 place-items-center md:size-[28px]">
       <svg
         aria-hidden="true"
         viewBox={icon.viewBox}
@@ -1197,8 +1198,8 @@ function AccessIcon({ name }: { name: string }) {
         strokeLinejoin="round"
         className={
           grid16
-            ? "h-auto w-[16px] max-h-[16px] stroke-[1.5] md:w-[25px] md:max-h-[25px] md:stroke-[1.28]"
-            : "size-[16px] stroke-2 md:size-[25px] md:stroke-[1.92]"
+            ? "h-auto w-[16px] max-h-[16px] stroke-[1.5] md:w-[28px] md:max-h-[28px] md:stroke-[1.14]"
+            : "size-[16px] stroke-2 md:size-[28px] md:stroke-[1.71]"
         }
       >
         {icon.d.map((d) => (
@@ -1326,7 +1327,7 @@ export function TemplatesAccess() {
                       start (Žilvinas 2026-09-11). */}
                   {/* md slot 25, matching the plan card's icons (2026-09-19)
                       so both lists keep one text start; the cross stays 18. */}
-                  <span className="grid size-[16px] shrink-0 place-items-center md:size-[25px]">
+                  <span className="grid size-[16px] shrink-0 place-items-center md:size-[28px]">
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 23 23"
