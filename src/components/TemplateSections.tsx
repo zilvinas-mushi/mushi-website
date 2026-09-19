@@ -1412,7 +1412,7 @@ export function TemplatesAccess() {
                   Regular 16 with NO tracking — the 0.04em it carried is
                   what made it 172 wide. 16 either side of ~117 of type is
                   the 149. Desktop keeps its own tracked 18. */}
-              <span className="ml-auto flex h-[34px] shrink-0 items-center whitespace-nowrap rounded-full bg-[#232323] px-4 text-[16px] font-normal uppercase tracking-normal text-white md:h-auto md:px-6 md:py-3 md:text-[18px] md:tracking-[0.04em]">
+              <span className="ml-auto flex h-[34px] shrink-0 items-center whitespace-nowrap rounded-full bg-[#232323] px-4 text-[16px] font-normal uppercase tracking-normal text-white md:h-auto md:px-6 md:py-3 md:text-[24px] md:tracking-normal">
                 {a.templates.chip}
               </span>
             </p>
