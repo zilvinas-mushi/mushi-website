@@ -1637,7 +1637,11 @@ export function TemplatesShowcase() {
           white tile by ~58px. NOT the old -180 — the current wall export
           starts with tiles at its very top edge (no empty black band), and
           -180 buried "1 cent = 1 design" behind the middle tile. */}
-      <div aria-hidden="true" className="mt-[32px] md:-mt-[104px] md:-mb-16">
+      {/* md: NO LAP any more (Žilvinas 2026-09-19): the wall's top row
+          starts at the export's own top edge, so the title-to-first-picture
+          gap is the section's 48 like everywhere else — the -104 had the
+          72px title sitting between the topmost tiles. */}
+      <div aria-hidden="true" className="mt-[32px] md:mt-12 md:-mb-16">
         <ShowcaseRows />
         <Img
           src="templates/showcase-wall.webp"
