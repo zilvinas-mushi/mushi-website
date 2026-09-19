@@ -1684,6 +1684,10 @@ export function TemplatesInside() {
             the artboard's, so the type in them is 0.9 of the inspector's
             too: 63 / 36 / 30 for 70 / 40 / 33. */}
         <div className="mx-auto mt-[37px] grid max-w-[1160px] grid-cols-2 gap-[15px] md:mt-12 md:grid-cols-[1fr_1fr_1.074fr] md:grid-rows-[261px_259px] md:gap-[15px]">
+          {/* INSETS from md up (Žilvinas 2026-09-19, off the artboard): the
+              type sits 45 from the card's side and 48 from its top (24/7)
+              or bottom (industries) — 40 and 43 at the 0.9 these cards are
+              drawn at. */}
           {/* 24/7 support — the baked art carries the memoji cluster and the
               "Need help?" bubble, so only the headline renders as text.
               PHONE has its own art (Žilvinas 2026-09-11): 660 x 476, exactly
@@ -1697,7 +1701,7 @@ export function TemplatesInside() {
             // already sits on the headline's 24px line, so the 108.6%
             // right-pinned oversizing that dragged the OLD art into place
             // would now cut the pill's left edge off.
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[image:var(--bg-md,none)] md:p-6 md:text-left`}
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[image:var(--bg-md,none)] md:p-6 md:pl-[40px] md:pt-[43px] md:text-left`}
             data-bg="url(/images/templates/inside-support-phone.webp)"
             data-bg-md="url(/images/templates/inside-support.webp)"
           >
@@ -1710,7 +1714,7 @@ export function TemplatesInside() {
           {/* 5 industries — chip rows baked into the background art. Same
               phone treatment as the support card: its own 4x, pre-dimmed. */}
           <article
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[image:var(--bg-md,none)] md:p-6 md:text-left`}
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[image:var(--bg-md,none)] md:p-6 md:pb-[43px] md:pl-[40px] md:text-left`}
             data-bg="url(/images/templates/inside-industries-phone.webp)"
             data-bg-md="url(/images/templates/inside-industries.webp)"
           >
