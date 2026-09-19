@@ -1730,13 +1730,24 @@ export function TemplatesInside() {
             // md:h-auto, not a fixed 241: the card takes its row (259 since
             // the bento went to 1160), so its bottom lines up with the
             // monthly card's (Žilvinas 2026-09-19).
-            className={`${CARD} col-span-2 flex flex-col items-center justify-center text-center md:h-auto`}
+            // DESKTOP IS THE SUPPLIED CARD (Žilvinas 2026-09-19, "truspilot
+            // background.svg", 831 x 287 — the #111111 panel with its eight
+            // #222222 leaves, as vectors): drawn as the card's own
+            // background, edge to edge. Our card is 748 x 259, the same
+            // 2.895 aspect, so cover is exact. The phone keeps its laurel
+            // mask below. The stack inside is the artboard's at the bento's
+            // 0.9: 64 → 58 from the top to the stars, 30 → 27 stars to
+            // wordmark, 35 → 31.5 wordmark to caption, and the 72 under
+            // the caption is what the row leaves.
+            className={`${CARD} col-span-2 flex flex-col items-center justify-center text-center md:h-auto md:justify-start md:bg-[#111111] md:bg-[image:var(--bg,none)] md:p-0 md:pt-[58px]`}
+            data-bg="url(/images/templates/reviews-card.svg)"
           >
             {/* The laurel export as a mask painted with the design grey —
-                the artwork itself is black, invisible on this card. */}
+                the artwork itself is black, invisible on this card. Phone
+                only now; the desktop's leaves are in the card's own SVG. */}
             <span
               aria-hidden="true"
-              className="absolute inset-0 bg-[#221f26]"
+              className="absolute inset-0 bg-[#221f26] md:hidden"
               // Deferred like the backgrounds: a mask-image is fetched as
               // eagerly as any other CSS url(), and this card is six screens
               // down. var(--bg, none) is the same handle the script sets.
@@ -1796,9 +1807,9 @@ export function TemplatesInside() {
               src="templates/trustpilot-lockup.webp"
               alt="Trustpilot"
               width={126}
-              className="relative mt-2 h-auto w-[126px] md:mt-3 md:h-[33px] md:w-auto"
+              className="relative mt-2 h-auto w-[126px] md:mt-[27px] md:h-[33px] md:w-auto"
             />
-            <p className={`${SMALL} relative mt-1 md:mt-2 md:text-[36px]`}>{s.reviews.caption}</p>
+            <p className={`${SMALL} relative mt-1 md:mt-[31.5px] md:text-[36px]`}>{s.reviews.caption}</p>
           </article>
 
           {/* 50+ new templates monthly — the dimmed collage is the baked
@@ -2509,6 +2520,7 @@ export function TemplatesBgFallbacks() {
     "access-btn-purple.webp",
     "access-banner-phone.webp",
     "diff-card-dark.webp",
+    "reviews-card.svg",
     "inside-support-phone.webp",
     "inside-industries-phone.webp",
     "inside-monthly-phone.webp",
