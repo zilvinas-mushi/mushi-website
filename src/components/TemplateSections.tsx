@@ -101,7 +101,15 @@ export function TemplatesHero() {
           // (CLAUDE.md): a 2-stop white against a 4-stop violet cannot
           // interpolate, so the fill jumped instead of cross-fading — which
           // read as the invert having been dropped altogether.
-          className="group mt-[1.875rem] md:!mt-5 inline-flex h-[54px] items-center gap-2.5 rounded-[8px] bg-[linear-gradient(104deg,#ab95e3_0%,#8a64c6_45%,#7a5ec0_100%)] px-7 text-[17px] font-semibold text-white shadow-[0_10px_30px_-10px_rgba(110,84,181,0.9)] transition-all duration-150 hover:bg-[linear-gradient(104deg,#fff_0%,#fff_45%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:h-[56px] md:px-8 md:text-[19px]"
+          //
+          // DESKTOP SIZE AND GAPS ARE THE ARTBOARD'S AT 0.7 (Žilvinas
+          // 2026-09-19: "the proportions should stay"). Figma draws the
+          // button 385 x 96 with 64 above it to the headline and 64 below
+          // it to the device, against an 80px headline; the headline is 56
+          // here, so everything takes the same 56/80: 270 x 67, 45 and 45.
+          // min-w rather than a fixed width, so the label can never clip if
+          // the copy grows. No shadow: the button does not glow (same note).
+          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[54px] items-center justify-center gap-2.5 rounded-[8px] bg-[linear-gradient(104deg,#ab95e3_0%,#8a64c6_45%,#7a5ec0_100%)] px-7 text-[17px] font-semibold text-white transition-all duration-150 hover:bg-[linear-gradient(104deg,#fff_0%,#fff_45%,#fff_100%)] hover:text-[#6e54b5] md:h-[67px] md:min-w-[270px] md:px-8 md:text-[19px]"
         >
           {TEMPLATES_PAGE.cta}
           {/* The design's own arrow, from the supplied "arrow icon.svg"
@@ -2049,7 +2057,9 @@ function AppWindow() {
     // not reach the fold" the change is for. Laptops never get near the cap
     // (706 at 1440 x 800, 955 at 1920 x 995); it only rules on tall monitors,
     // where the 2400px master is still above 1x.
-    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-6 md:min-h-0 md:flex-1 md:max-w-[1440px]">
+    // md:mt-[45px]: the artboard's 64 from button to device, at the same 0.7
+    // the button itself is drawn at (see the CTA in TemplatesHero).
+    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[45px] md:min-h-0 md:flex-1 md:max-w-[1440px]">
       {/* The device box. The tile field is inset-y-0 INSIDE it, so 100cqh is
           the device's own height whichever axis bound above — not the row's,
           which is taller than the device whenever the width wins. */}
