@@ -1796,7 +1796,9 @@ export function TemplatesDifference() {
         {/* 27 between the cards on the phone, and each is 345 x 453 there —
             345 is the artboard's 375 less its 15 gutters, which is what SHELL
             already leaves. */}
-        <div className="mx-auto mt-[37px] grid max-w-[1080px] gap-[27px] md:mt-12 md:grid-cols-2 md:gap-[125px]">
+        {/* 24 between the cards from md up (Žilvinas 2026-09-19, measured on
+            the artboard); it was a 125 nobody had drawn. */}
+        <div className="mx-auto mt-[37px] grid max-w-[1080px] gap-[27px] md:mt-12 md:grid-cols-2 md:gap-6">
           {/* Competitors. Card panel, trash composition and the Kandy /
               CreativeOS chips are the design's own exports (2026-09-03);
               only Konvert's chip remains drawn — no asset was supplied.
@@ -1806,7 +1808,10 @@ export function TemplatesDifference() {
               reference. The card takes its height from the Mushi card
               beside it (grid stretch). */}
           <article
-            className="diff-card-ring relative flex h-[453px] flex-col overflow-hidden rounded-[20px] bg-[#101010] bg-cover bg-center px-6 pb-[18px] pt-5 md:h-auto md:min-h-[560px] md:rounded-[24px] md:p-7"
+            // 27 at the sides and bottom from md up (Žilvinas 2026-09-19,
+            // artboard: 26 x 27 in the corner, and a 29 read off the text
+            // box); the top keeps its 28.
+            className="diff-card-ring relative flex h-[453px] flex-col overflow-hidden rounded-[20px] bg-[#101010] bg-cover bg-center px-6 pb-[18px] pt-5 md:h-auto md:min-h-[560px] md:rounded-[24px] md:px-[27px] md:pb-[27px] md:pt-7"
             style={{ backgroundImage: "var(--bg, none)" }}
             data-bg="url(/images/templates/diff-card-dark.webp)"
           >
@@ -1860,7 +1865,7 @@ export function TemplatesDifference() {
                 off the client's reference crop (2026-09-11) — a 27.5px line
                 pitch at their ~1.3x screen scale is 21 CSS px on the 24px
                 face, tighter than even leading-none. */}
-            <p className="relative z-10 mt-auto text-[16px] font-medium leading-4 text-white md:text-[24px] md:leading-[21px]">
+            <p className="relative z-10 mt-auto text-[16px] font-medium leading-4 text-white md:text-[30px] md:leading-[30px]">
               {d.bad.lead}{" "}
               <span className="font-normal text-white/50">{d.bad.rest}</span>
             </p>
@@ -1868,7 +1873,7 @@ export function TemplatesDifference() {
 
           {/* Mushi. justify-between: chip top, ad centred, caption pinned to
               the bottom so both cards' captions align. */}
-          <article className="flex flex-col overflow-hidden rounded-[20px] bg-[radial-gradient(ellipse_95%_75%_at_50%_38%,#9a81d6_0%,#7b54b5_80%)] px-6 pb-[18px] pt-5 md:h-auto md:rounded-[24px] md:p-7">
+          <article className="flex flex-col overflow-hidden rounded-[20px] bg-[radial-gradient(ellipse_95%_75%_at_50%_38%,#9a81d6_0%,#7b54b5_80%)] px-6 pb-[18px] pt-5 md:h-auto md:rounded-[24px] md:px-[27px] md:pb-[27px] md:pt-7">
             {/* White chip carrying the wordmark artwork — the design's one
                 black rendering of the mark. */}
             {/* Same pill as the competitors' three on the phone — 26 tall,
@@ -1910,13 +1915,15 @@ export function TemplatesDifference() {
               alt={d.good.alt}
               className="mt-[13px] h-auto w-full md:mt-5"
             />
-            {/* Same treatment as the card beside it: medium at every size,
-                same measured 21px leading above md. */}
-            <p className="mt-6 text-[16px] font-medium leading-4 text-white md:text-[24px] md:leading-[21px]">
+            {/* Poppins 30/30 from md up, straight off the Figma typography
+                panel (Žilvinas 2026-09-19) — it was 24 on a 21 leading read
+                off a scaled screenshot. The card beside it takes the same
+                face so the two captions still sit on one line. */}
+            <p className="mt-6 text-[16px] font-medium leading-4 text-white md:text-[30px] md:leading-[30px]">
               {d.good.lead}{" "}
-              {/* 50% white on the phone (artboard 2026-09-06); the desktop
-                  reference's own 75 stays above md. */}
-              <span className="font-normal text-white/50 md:text-white/75">{d.good.rest}</span>
+              {/* 50% white at every size now (the same note): the desktop's
+                  75 came from an older reference. */}
+              <span className="font-normal text-white/50">{d.good.rest}</span>
             </p>
           </article>
         </div>
