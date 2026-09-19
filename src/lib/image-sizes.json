@@ -475,9 +475,9 @@
     "w": 900,
     "h": 595
   },
-  "templates/diff-card-dark.webp": {
-    "w": 800,
-    "h": 1054
+  "templates/diff-card-dark-v2.webp": {
+    "w": 792,
+    "h": 1050
   },
   "templates/diff-mushi-mark-phone.webp": {
     "w": 190,

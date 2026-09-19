@@ -1934,7 +1934,11 @@ export function TemplatesDifference() {
             // box); the top keeps its 28.
             className="diff-card-ring relative flex h-[453px] flex-col overflow-hidden rounded-[20px] bg-[#101010] bg-cover bg-center px-6 pb-[18px] pt-5 md:h-auto md:min-h-[560px] md:rounded-[24px] md:px-[27px] md:pb-[27px] md:pt-7"
             style={{ backgroundImage: "var(--bg, none)" }}
-            data-bg="url(/images/templates/diff-card-dark.webp)"
+            // -v2 (Žilvinas 2026-09-19): the export carried its own 3px
+            // lighter stroke baked along the top and sides, and under the
+            // CSS ring that read as a thick, smeared top edge. Those rows are
+            // cropped off, so the ring's 1px is the only edge there is.
+            data-bg="url(/images/templates/diff-card-dark-v2.webp)"
           >
             <BrandChips brands={d.bad.brands} />
             <div role="img" aria-label={d.bad.alt} className="absolute inset-0">
@@ -2554,7 +2558,7 @@ export function TemplatesBgFallbacks() {
     "access-card-purple.webp",
     "access-btn-purple.webp",
     "access-banner-phone.webp",
-    "diff-card-dark.webp",
+    "diff-card-dark-v2.webp",
     "reviews-card.svg",
     "inside-support-phone.webp",
     "inside-industries-phone.webp",
