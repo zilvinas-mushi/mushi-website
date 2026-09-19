@@ -1476,8 +1476,12 @@ export function TemplatesAccess() {
             // DESKTOP GEOMETRY off the artboard (Žilvinas 2026-09-19): a 35
             // disc with 15 around it on every side but the label's — so the
             // button is 65 tall and the disc 15 in — and a 10 x 10 arrow.
+            // The artboard's button is 450 wide: measured in the browser the
+            // 15px label left it at 308, and the artboard's label reads as
+            // 20 with 0.1em tracking (cap height 13, 357 wide) and 31 to the
+            // button's right edge — which lands the width at ~450.
             // cursor-pointer is explicit, though an <a href> already is one.
-            className="discovery-ring group inline-flex h-[50px] w-full cursor-pointer items-center gap-2.5 rounded-[100px] bg-[linear-gradient(147deg,#000_0%,#000_100%)] pl-[17px] pr-5 text-[15px] font-semibold uppercase tracking-[0.05em] text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black sm:ml-auto sm:w-auto md:h-[65px] md:pl-[15px]"
+            className="discovery-ring group inline-flex h-[50px] w-full cursor-pointer items-center gap-2.5 rounded-[100px] bg-[linear-gradient(147deg,#000_0%,#000_100%)] pl-[17px] pr-5 text-[15px] font-semibold uppercase tracking-[0.05em] text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black sm:ml-auto sm:w-auto md:h-[65px] md:pl-[15px] md:pr-[31px] md:text-[20px] md:tracking-[0.1em]"
           >
             {/* The disc inverts WITH the button (same note): white on black
                 at rest, black on white on hover, cross-faded like the fill —
