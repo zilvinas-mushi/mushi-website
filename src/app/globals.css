@@ -980,20 +980,23 @@ img[data-src] {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 4px;
-  /* THE RING FADES WITH THE CARD (Žilvinas 2026-09-19, "the stroke
-     transition should go with the background colour"). The plate is flat
-     #111 down to ~15% and only then ramps into violet, reaching full at the
-     bottom; the ring was a straight bottom-to-top ramp, so it was still
-     half-lit against the black upper half. Stops sampled off the export
-     (0 / 20 / 50 / 100%: none / 15% / 50% / full), so the frame appears
-     exactly where the colour does. */
+  /* Figma: stroke INSIDE, weight 6.4 on the 629 card — 6 at the 0.9 the
+     cards are drawn at. */
+  padding: 6px;
+  /* THE FIGMA STROKE VERBATIM (Žilvinas 2026-09-19, off its gradient
+     panel): linear, #6E54B5 at 100% at the bottom to #111111 at 0% at the
+     top. The middle stops are there because Figma blends in
+     NON-premultiplied space and CSS in premultiplied: a two-stop CSS ramp
+     keeps the full violet hue at half alpha, which is the "too visible"
+     purple; Figma's midpoint is the grey-violet (63,52,99) at 50%, and
+     these stops pin the ramp to that. */
   background: linear-gradient(
     0deg,
     #6e54b5 0%,
-    rgba(110, 84, 181, 0.5) 50%,
-    rgba(110, 84, 181, 0.15) 80%,
-    rgba(110, 84, 181, 0) 88%
+    rgba(87, 68, 140, 0.75) 25%,
+    rgba(63, 52, 99, 0.5) 50%,
+    rgba(40, 35, 58, 0.25) 75%,
+    rgba(17, 17, 17, 0) 100%
   );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
