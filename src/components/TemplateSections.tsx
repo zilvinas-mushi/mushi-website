@@ -26,7 +26,9 @@ const SECTION_TITLE =
   // md: the inspector's Poppins SemiBold 80/80 at the page's 0.9 (Žilvinas
   // 2026-09-19, "title 80 semibold") — 72 on a 72 leading, no tracking. It
   // was 48 with tracking-tight, read off a scaled screenshot.
-  "mt-[17px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-4 md:text-wrap md:text-[72px] md:leading-[72px] md:tracking-normal";
+  // md:mt 43: the artboard's 48 from the eyebrow to the title (Žilvinas
+  // 2026-09-19, measured 31 x 48), at the page's 0.9. Every section.
+  "mt-[17px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-[43px] md:text-wrap md:text-[72px] md:leading-[72px] md:tracking-normal";
 
 const SHELL = "mx-auto w-full max-w-[1200px] px-[15px] md:px-5";
 
