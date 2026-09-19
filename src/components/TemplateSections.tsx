@@ -2002,7 +2002,10 @@ export function TemplatesDifference() {
 
           {/* Mushi. justify-between: chip top, ad centred, caption pinned to
               the bottom so both cards' captions align. */}
-          <article className="flex flex-col overflow-hidden rounded-[20px] bg-[radial-gradient(ellipse_95%_75%_at_50%_38%,#9a81d6_0%,#7b54b5_80%)] px-6 pb-[18px] pt-5 md:h-auto md:rounded-[24px] md:px-[27px] md:pb-[27px] md:pt-7">
+          {/* md: the artboard's drop shadow (Žilvinas 2026-09-19, Figma
+              effects panel): 0 / 0, blur 126.25, spread 0, #A08ADE at 65% —
+              a violet glow all round the card. */}
+          <article className="flex flex-col overflow-hidden rounded-[20px] bg-[radial-gradient(ellipse_95%_75%_at_50%_38%,#9a81d6_0%,#7b54b5_80%)] px-6 pb-[18px] pt-5 md:h-auto md:rounded-[24px] md:px-[27px] md:pb-[27px] md:pt-7 md:shadow-[0_0_126px_rgba(160,138,222,0.65)]">
             {/* White chip carrying the wordmark artwork — the design's one
                 black rendering of the mark. */}
             {/* Same pill as the competitors' three on the phone — 26 tall,
