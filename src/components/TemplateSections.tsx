@@ -1957,7 +1957,14 @@ function CategoryTileRow({
           {half.map((c, i) => (
             <span
               key={`${c.label}-${i}`}
-              className="hero-tile flex flex-col items-center bg-[radial-gradient(circle_at_50%_42%,#3a3a3a_0%,#1c1c1c_58%,#101010_100%)] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.95)]"
+              // The artboard's own fill (Žilvinas 2026-09-19, Figma fill
+              // panel): ONE radial, #393939 at the centre to #000000 at the
+              // edge, both stops at 100% opacity, and no effect layer. Figma's
+              // default radial handle reaches the box's side, which is
+              // `closest-side` here — so the corners are dead black and the
+              // ramp is as wide as the tile. The three-stop grey-to-#101010
+              // with a cast shadow that this replaces was built by eye.
+              className="hero-tile flex flex-col items-center bg-[radial-gradient(closest-side_at_50%_50%,#393939_0%,#000_100%)]"
             >
               {/* Roboto Black per the supplied FASHION.png sample; tight
                   tracking to match its near-touching letters. */}
@@ -1966,7 +1973,11 @@ function CategoryTileRow({
               </span>
               {/* priority, for the reason on the phone field below: the
                   tiles are part of the hero, not of the scroll. */}
-              <Img src={c.image} alt="" width={84} className="hero-tile-art" priority="gate" />
+              {/* 100 x 100, always, from md up (Žilvinas 2026-09-19, the
+                  artboard's own frame) — .hero-tile-art in globals.css, not a
+                  ratio of the tile any more. The 200px masters are exactly
+                  its 2x. */}
+              <Img src={c.image} alt="" width={100} className="hero-tile-art" priority="gate" />
             </span>
           ))}
         </div>
@@ -2126,7 +2137,10 @@ function AppWindow() {
         alt="The Mushi template library: ad templates with industry and sort filters"
         width={269}
         alternate={{ src: "templates/hero-macbook.webp", media: "(min-width: 768px)" }}
-        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full md:mb-0 md:h-full md:w-full md:max-w-none md:drop-shadow-[0_50px_140px_rgba(0,0,0,0.95)]"
+        // No drop-shadow on the MacBook (Žilvinas 2026-09-19, via the
+        // client): the 140px blur reached up over the CTA and read as a
+        // smudge sitting on the button.
+        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full md:mb-0 md:h-full md:w-full md:max-w-none"
         priority
       />
       </div>

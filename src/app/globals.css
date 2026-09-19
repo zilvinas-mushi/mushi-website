@@ -1288,7 +1288,8 @@ body {
      the hero.
 
    Every other measurement is a ratio of the tile, taken from the artboard's
-   own 160: gutter 30, radius 26, top pad 20, label-to-art 8, label 16, art 84.
+   own 160: gutter 30, radius 26, top pad 20, label-to-art 8, label 16. The
+   art is a fixed 100 (see .hero-tile-art).
 
    The custom properties live on the ROW, not on the field: a container query
    unit used on the container itself resolves against that container's own
@@ -1325,9 +1326,13 @@ body {
 .hero-tile-label {
   font-size: calc(var(--tile) * 0.1);
 }
+/* The emoji is a fixed 100 x 100 whatever the tile does (Žilvinas
+   2026-09-19: the artboard's frame is 100 x 100, "always"). Only the tile
+   itself scales with the window. */
 .hero-tile-art {
-  width: calc(var(--tile) * 0.525);
-  height: auto;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
 }
 
 .tile-marquee-track {
