@@ -108,8 +108,9 @@ export function TemplatesHero() {
           // it to the device, against an 80px headline; the headline is 56
           // here, so everything takes the same 56/80: 270 x 67, 45 and 45.
           // min-w rather than a fixed width, so the label can never clip if
-          // the copy grows. No shadow: the button does not glow (same note).
-          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[54px] items-center justify-center gap-2.5 rounded-[8px] bg-[linear-gradient(104deg,#ab95e3_0%,#8a64c6_45%,#7a5ec0_100%)] px-7 text-[17px] font-semibold text-white transition-all duration-150 hover:bg-[linear-gradient(104deg,#fff_0%,#fff_45%,#fff_100%)] hover:text-[#6e54b5] md:h-[67px] md:min-w-[270px] md:px-8 md:text-[19px]"
+          // the copy grows. The label is the artboard's 30 at the same 0.7:
+          // 21. No shadow: the button does not glow (same note).
+          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[54px] items-center justify-center gap-2.5 rounded-[8px] bg-[linear-gradient(104deg,#ab95e3_0%,#8a64c6_45%,#7a5ec0_100%)] px-7 text-[17px] font-semibold text-white transition-all duration-150 hover:bg-[linear-gradient(104deg,#fff_0%,#fff_45%,#fff_100%)] hover:text-[#6e54b5] md:h-[67px] md:min-w-[270px] md:px-8 md:text-[21px]"
         >
           {TEMPLATES_PAGE.cta}
           {/* The design's own arrow, from the supplied "arrow icon.svg"

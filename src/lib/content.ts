@@ -26,12 +26,13 @@ import { BOOKING_ANCHOR } from "@/lib/site";
 export const NAV = [
   { label: "Agency", href: "/" },
   { label: "Case Studies", href: null },
-  // HELD BACK ON THE PHONE ONLY (Žilvinas 2026-09-18, "disable templates
-  // button … this will only be for phone"): the desktop bar links to it on
-  // every page as it has since 2026-09-13; in the phone drawer the home page
-  // shows it as the half-strength text a not-yet page gets, and /templates
-  // itself keeps it as a link and the selected row. See navHref.
-  { label: "Templates", href: "/templates", phoneLiveOn: ["/templates"] },
+  // HELD BACK EVERYWHERE FOR NOW (Žilvinas 2026-09-19, "disable so templates
+  // from the menu wouldn't be reachable for now"): on the home page both
+  // bars show it as the half-strength text a not-yet page gets; /templates
+  // itself keeps it as a link and the selected row. The phone had been held
+  // back alone since 2026-09-18 (phoneLiveOn); liveOn now covers both, and
+  // dropping it puts the desktop link back with no other change. See navHref.
+  { label: "Templates", href: "/templates", liveOn: ["/templates"], phoneLiveOn: ["/templates"] },
 ] as const;
 
 /**
