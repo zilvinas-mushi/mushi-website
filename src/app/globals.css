@@ -257,8 +257,8 @@
   --font-serif: var(--font-dutch801);
   /* Satoshi (variable) — the Konvert wordmark only; exposed as font-satoshi. */
   --font-satoshi: var(--font-satoshi-v);
-  /* Roboto Black — the /templates hero tile labels only; see layout.tsx. */
-  --font-tile: var(--font-roboto);
+  /* Inter Bold — the /templates hero tile labels only; see layout.tsx. */
+  --font-tile: var(--font-inter);
 
   /* Slow horizontal pan for animated gradient text. Pair with
      bg-[length:200%_auto]. Ported from mushi-app. */
@@ -1339,11 +1339,18 @@ img[data-src] {
      so the corner stays the same shape as the tile scales: 21.5 at 165, 27
      at 210, 30 at 230. It was 26/160. */
   border-radius: calc(var(--tile) * 0.1304);
-  padding-top: calc(var(--tile) * 0.125);
+  /* 33 on 230: the artboard's 29 to the label's text box, plus the 4 that
+     box (33 tall at Inter's auto leading) has above a leading-none em. */
+  padding-top: calc(var(--tile) * 0.1435);
   gap: calc(var(--tile) * 0.05);
 }
+/* Inter Bold 25 on the 230 artboard tile, 0% tracking, its text box 29 down
+   (Žilvinas 2026-09-19). leading-none makes the box the em itself, so the
+   29-plus-the-box's-own-4 is a 33 top pad — see .hero-tile. */
 .hero-tile-label {
-  font-size: calc(var(--tile) * 0.1);
+  font-size: calc(var(--tile) * 0.1087);
+  line-height: 1;
+  letter-spacing: 0;
 }
 /* THE EMOJI IS 100 AT MOST, AND THE ARTBOARD'S SHARE OF THE TILE BELOW THAT
    (Žilvinas 2026-09-19, twice: "always 100", then "max 100 — they are

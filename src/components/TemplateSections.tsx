@@ -2040,9 +2040,9 @@ function CategoryTileRow({
               // with a cast shadow that this replaces was built by eye.
               className="hero-tile flex flex-col items-center bg-[radial-gradient(closest-side_at_50%_50%,#393939_0%,#000_100%)]"
             >
-              {/* Roboto Black per the supplied FASHION.png sample; tight
-                  tracking to match its near-touching letters. */}
-              <span className="hero-tile-label font-tile font-black uppercase tracking-[-0.01em] text-white">
+              {/* Inter Bold, caps, no tracking — the artboard's own
+                  (2026-09-19); size and top inset in .hero-tile-label. */}
+              <span className="hero-tile-label font-tile font-bold uppercase text-white">
                 {c.label}
               </span>
               {/* priority, for the reason on the phone field below: the

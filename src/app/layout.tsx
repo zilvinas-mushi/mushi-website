@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Roboto } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { CanvasTint } from "@/components/CanvasTint";
@@ -47,19 +47,17 @@ const poppins = Poppins({
 });
 
 /**
- * Roboto Black — ONLY the /templates hero category-tile labels. Matched
- * against the client's supplied sample ("FASHION.png", 2026-09-10): oval O,
- * pointed A apex, and a 5.8 width/height ratio for "FASHION" against the
- * sample's 5.73 — Arial Black, Archivo Black, Inter Black and Helvetica
- * Neue all measured visibly wider or narrower. Single weight; the tiles set
- * it uppercase with tight tracking to close the last of that gap.
+ * Inter Bold — ONLY the /templates hero category-tile labels. The artboard's
+ * own face (Žilvinas 2026-09-19, off the Figma inspector: Inter Bold 25,
+ * 0% letter spacing), replacing the Roboto Black that had been matched by
+ * eye against a PNG sample. Single weight.
  */
-const roboto = Roboto({
-  variable: "--font-roboto",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: "900",
+  weight: "700",
   display: "swap",
-  // Decorative labels on one page, hidden below xl — same reasoning as the
+  // Decorative labels on one page, hidden below lg — same reasoning as the
   // other faces: never ahead of the stylesheet.
   preload: false,
 });
@@ -196,7 +194,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${dutch801.variable} ${satoshi.variable} ${roboto.variable} h-full antialiased`}
+      className={`${poppins.variable} ${dutch801.variable} ${satoshi.variable} ${inter.variable} h-full antialiased`}
     >
       {/*
         NO BACKGROUND ON `body` — it is set in globals.css, and it is not the
