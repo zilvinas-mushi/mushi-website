@@ -340,7 +340,12 @@ export function TemplatesProcess() {
         {/* mt 30 on the phone: the artboard's gap from the heading's text
             box to the first card (Žilvinas 2026-09-18, "in here only 30" —
             it had been 37, and read as too loose beside the 61 above). */}
-        <ol className="mx-auto mt-[30px] grid max-w-none gap-[15px] md:mt-10 md:max-w-[1160px] md:grid-cols-3 md:gap-2.5">
+        {/* md:mt 48, like every other section's first block: the artboard's
+            75 from the title box (66 from its baseline) to the section, at
+            0.9 — 59 ink to card, which on the 72/72 title's 10.8 of box
+            under the baseline is 48 (Žilvinas 2026-09-19, "exactly 75").
+            This one was 40. */}
+        <ol className="mx-auto mt-[30px] grid max-w-none gap-[15px] md:mt-12 md:max-w-[1160px] md:grid-cols-3 md:gap-2.5">
           {p.steps.map((s, i) => (
             <li key={s.title} className="relative">
               {/* THE PHONE'S JOIN between two steps: a 66 black disc centred
