@@ -201,7 +201,10 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
       {/* Figma panel 2026-09-07: Poppins Regular 30 over an 80 line height
           at the desktop reference; the phone keeps its artboard's 18. */}
       <p
-        className="bg-clip-text text-[18px] font-normal uppercase leading-none text-transparent md:text-[30px]"
+        // md 27: the panel's Regular 30 at the page's 0.9, like every other
+        // size on it (Žilvinas 2026-09-19, "why does it seem bigger") — the
+        // literal 30 was the one thing drawn at 1:1.
+        className="bg-clip-text text-[18px] font-normal uppercase leading-none text-transparent md:text-[27px]"
         style={{ backgroundImage: EYEBROW_GRADIENT }}
       >
         {children}
