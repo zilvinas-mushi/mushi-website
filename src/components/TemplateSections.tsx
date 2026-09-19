@@ -419,7 +419,13 @@ export function TemplatesProcess() {
                     tracking — the desktop reference's own 12/semibold/0.08em
                     is a different label at a different size. 7 to the title
                     below it, which is SemiBold 26 in full white. */}
-                <p className="relative z-[1] text-[18px] font-medium uppercase leading-none text-white/50 md:text-[20px] md:font-medium md:leading-normal md:tracking-[0.02em] md:text-white/55">
+                {/* DESKTOP: 30 from the card's top and 30 from its left
+                    (Žilvinas 2026-09-19, artboard 9 x 29 / 30). The card's
+                    own padding stays 24 because the shot below runs to the
+                    card's edges through matching -24 margins; the extra 6 is
+                    on the type itself. leading-none, as on the phone, so the
+                    gap to the title is the ink's own and not a line box's. */}
+                <p className="relative z-[1] text-[18px] font-medium uppercase leading-none text-white/50 md:ml-[6px] md:mt-[6px] md:text-[20px] md:font-medium md:leading-none md:tracking-[0.02em] md:text-white/55">
                   {s.step}
                 </p>
                 {/* 2, not the 7 the artboard's own guide reports: that 7 is
@@ -434,7 +440,12 @@ export function TemplatesProcess() {
                     grid is at its 1128 cap and the 368 squares leave room;
                     nowrap as the backstop. The `!` is the
                     min-[...]-sorts-before-md: quirk. */}
-                <h3 className="relative z-[1] mt-[2px] text-[26px] font-semibold leading-none text-white md:mt-1 md:whitespace-nowrap md:text-[26px] md:leading-tight min-[1160px]:text-[30px]!">
+                {/* md: the phone's 2 / leading-none pair, which is what
+                    "almost nonexistent" (Žilvinas 2026-09-19, the artboard's
+                    9 x 6 between the two) measures as once both line boxes
+                    are the ink's own height. The 4 on a 1.25 leading it
+                    replaces read as 13. */}
+                <h3 className="relative z-[1] mt-[2px] text-[26px] font-semibold leading-none text-white md:ml-[6px] md:mt-[2px] md:whitespace-nowrap md:text-[26px] md:leading-none min-[1160px]:text-[30px]!">
                   {s.title}
                 </h3>
                 {/* Negative margins run the visual to the card's edges; the
