@@ -460,12 +460,17 @@ export function TemplatesProcess() {
                     the PHONE's card only, and the desktop uses the inline
                     crop shot below — cut to the same size and position as
                     step one's, so the two pictures align. */}
+                {/* desktopCard (2026-09-19): the desktop card's background
+                    IS the whole picture, so from md up neither the phone
+                    render nor the crop shot is drawn over it. */}
                 {"phoneCard" in s && s.phoneCard ? (
                   <Img
                     src={s.phoneCard}
                     alt={s.alt}
                     className={`absolute inset-0 h-full w-full object-cover ${
-                      "desktopShot" in s && s.desktopShot ? "md:hidden" : ""
+                      ("desktopShot" in s && s.desktopShot) || ("desktopCard" in s && s.desktopCard)
+                        ? "md:hidden"
+                        : ""
                     }`}
                   />
                 ) : null}
@@ -2465,7 +2470,7 @@ function PhoneTiles() {
 export function TemplatesBgFallbacks() {
   const files = [
     "process-card-1.webp",
-    "process-card-2.webp",
+    "process-canva-card.webp",
     "process-card-3.webp",
     "compare-card.webp",
     "cmp-row-band.webp",

@@ -1241,8 +1241,15 @@ export const TEMPLATES_PAGE = {
         // PHONE ONLY since 2026-09-12 (desktopShot below): on desktop the
         // full-bleed render made this card's picture bigger than step one's.
         phoneCard: "templates/process-phone-2.webp",
-        desktopShot: true,
-        card: "process-card-2.webp",
+        // THE DESKTOP CARD IS ONE SUPPLIED PICTURE NOW (Žilvinas 2026-09-19,
+        // "rozinis pic.png", 3312 square, "full background"): the magenta
+        // panel, the Canva screenshot and the hand, flattened — shipped as
+        // an 800 square webp (35 KB), 2x the 368 card. It is the card's own
+        // background, so the desktop draws neither the phone render nor the
+        // inline shot over it (desktopCard below); the phone still covers
+        // this background with its own render, as before.
+        desktopCard: true,
+        card: "process-canva-card.webp",
         alt: "The same template being edited in Canva",
         gradient: "linear-gradient(150deg,#8f3287 0%,#82296f 55%,#6d1a72 100%)",
       },
