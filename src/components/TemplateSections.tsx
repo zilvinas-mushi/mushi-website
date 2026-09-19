@@ -1226,7 +1226,12 @@ export function TemplatesAccess() {
           {a.heading}
         </h2>
 
-        <div className="mx-auto mt-[37px] grid max-w-[980px] gap-5 md:mt-12 md:max-w-[1080px] md:grid-cols-2 md:gap-6">
+        {/* THE SHELL'S 1160 from md up (Žilvinas 2026-09-19, "their sides
+            should match the other sides"): the same outer edges as the
+            Difference cards, the step cards and the bento above — the
+            artboard's 1284 at the 0.9 the whole page is drawn at, which puts
+            each card at 568 for its 630. It was a 1080 cap of its own. */}
+        <div className="mx-auto mt-[37px] grid max-w-[980px] gap-5 md:mt-12 md:max-w-[1160px] md:grid-cols-2 md:gap-6">
           {/* From scratch. */}
           <article
             id={TEMPLATES_SCRATCH_CARD_ID}
@@ -1346,7 +1351,7 @@ export function TemplatesAccess() {
               // Phone: Regular 20 with no tracking, a 2 INSIDE stroke and a
               // 15 radius, 24 below the list (artboard 2026-09-06). The
               // desktop reference keeps its 24/1px/12.
-              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] border-2 border-white bg-[image:var(--bg,none)] bg-cover text-[20px] font-normal uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black md:mt-8 md:rounded-[12px] md:border md:text-[24px] md:tracking-[0.06em]"
+              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] md:h-[93px] border-2 border-white bg-[image:var(--bg,none)] bg-cover text-[20px] font-normal uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black md:mt-8 md:rounded-[12px] md:border md:text-[24px] md:tracking-[0.06em]"
               data-bg="url(/images/templates/access-btn-dark.webp)"
             >
               {a.scratch.cta}
@@ -1419,7 +1424,7 @@ export function TemplatesAccess() {
             </ul>
             <a
               href={APP_URL}
-              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] bg-[image:var(--bg,none)] bg-cover text-[20px] font-semibold uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:rounded-[12px] md:text-[24px] md:tracking-[0.06em]"
+              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] md:h-[93px] bg-[image:var(--bg,none)] bg-cover text-[20px] font-semibold uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:rounded-[12px] md:text-[24px] md:tracking-[0.06em]"
               data-bg="url(/images/templates/access-btn-purple.webp)"
             >
               {a.templates.cta}
@@ -1439,7 +1444,7 @@ export function TemplatesAccess() {
           // BUY NOW fill ends ~18px in from the container edge (its p-7 is
           // offset by the card ring's inner geometry), and the CTA's right
           // edge aligns to THAT, not to a theoretical 28 (client 2026-09-12).
-          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1080px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[image:var(--bg,none)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:var(--bg-md,none),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:pl-6 md:pr-[18px]"
+          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1160px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[image:var(--bg,none)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:var(--bg-md,none),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:pl-6 md:pr-[18px]"
           data-bg="url(/images/templates/access-banner-phone.webp)"
           data-bg-md="url(/images/templates/access-rays.webp)"
         >
