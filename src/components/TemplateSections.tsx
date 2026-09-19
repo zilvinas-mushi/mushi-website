@@ -1653,16 +1653,18 @@ export function TemplatesShowcase() {
           from the title's baseline is what should be there. So the margin
           is 65 minus the title's 10.8 of box under its baseline, minus the
           file's own black band: 54px - 12.33vw of the shell. */}
-      <div aria-hidden="true" className="showcase-wall mt-[32px] md:mt-[54px] md:-mb-16 md:overflow-hidden">
+      <div aria-hidden="true" className="showcase-wall mt-[32px] md:mt-[calc(54px-8.33cqw)] md:-mb-16 md:overflow-hidden">
         <ShowcaseRows />
-        {/* The pull-up is on the image, measured against the wrapper's own
-            width (.showcase-wall is a size container in globals.css), so
-            the black band above the Huel ad is exactly what is hidden at
-            any width. */}
+        {/* Pulled up by the file's own empty top only — the side columns'
+            tiles start 4% of the width down, the Huel ad in the middle at
+            12.33% (Žilvinas 2026-09-19, "don't cut anything"): the image
+            loses the 4 and NOTHING of any tile, and the wrapper's margin
+            gives back the other 8.33 so Huel still lands 65 under the
+            title. The wrapper is the size container (.showcase-wall). */}
         <Img
           src="templates/showcase-wall.webp"
           alt=""
-          className="hidden w-full md:block md:-mt-[12.33cqw]"
+          className="hidden w-full md:block md:-mt-[4cqw]"
         />
       </div>
     </section>
