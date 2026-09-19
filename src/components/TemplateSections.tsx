@@ -1308,7 +1308,7 @@ export function TemplatesAccess() {
                 and 2 lower again against the artboard (2026-09-19) — a 16
                 line box plus 13 is a 29 row pitch. The plan card's list below
                 takes the same, so the two keep one pitch. */}
-            <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-[18px]">
+            <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-4">
               {a.scratch.items.map((item) => (
                 <li key={item} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[29px] md:leading-[36px]">
                   {/* gap 5 on the phone (Žilvinas 2026-09-18, "bigger by 1-2
@@ -1417,7 +1417,7 @@ export function TemplatesAccess() {
                 {a.templates.chip}
               </span>
             </p>
-            <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-[18px]">
+            <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-4">
               {a.templates.items.map((item) => (
                 <li key={item.label} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[29px] md:leading-[36px]">
                   <AccessIcon name={item.icon} />
