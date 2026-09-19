@@ -1798,8 +1798,14 @@ export function TemplatesDifference() {
             345 is the artboard's 375 less its 15 gutters, which is what SHELL
             already leaves. */}
         {/* 24 between the cards from md up (Žilvinas 2026-09-19, measured on
-            the artboard); it was a 125 nobody had drawn. */}
-        <div className="mx-auto mt-[37px] grid max-w-[1080px] gap-[27px] md:mt-12 md:grid-cols-2 md:gap-6">
+            the artboard); it was a 125 nobody had drawn.
+
+            THE SHELL'S FULL 1160, not the 1080 cap it had (same day): the
+            artboard's cards are 630 wide and their captions run three lines
+            at 30px; at 1080 each card was 528 and both captions broke to
+            four. At 1160 they are 568 — 514 inside the 27s — and measured
+            in the browser both sit on three lines again. */}
+        <div className="mx-auto mt-[37px] grid max-w-[1160px] gap-[27px] md:mt-12 md:grid-cols-2 md:gap-6">
           {/* Competitors. Card panel, trash composition and the Kandy /
               CreativeOS chips are the design's own exports (2026-09-03);
               only Konvert's chip remains drawn — no asset was supplied.
