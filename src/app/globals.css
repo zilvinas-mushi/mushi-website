@@ -1304,8 +1304,8 @@ img[data-src] {
      the hero.
 
    Every other measurement is a ratio of the tile, taken from the artboard's
-   own 160: gutter 30, radius 26, top pad 20, label-to-art 8, label 16. The
-   art is a fixed 100 (see .hero-tile-art).
+   own 160: gutter 30, top pad 20, label-to-art 8, label 16. The radius is
+   the 230 artboard's 30 and the art its 100, both as ratios (see below).
 
    The custom properties live on the ROW, not on the field: a container query
    unit used on the container itself resolves against that container's own
@@ -1335,19 +1335,27 @@ img[data-src] {
 .hero-tile {
   width: var(--tile);
   height: var(--tile);
-  border-radius: calc(var(--tile) * 0.1625);
+  /* 30 on the artboard's 230 tile (Žilvinas 2026-09-19), kept as that ratio
+     so the corner stays the same shape as the tile scales: 21.5 at 165, 27
+     at 210, 30 at 230. It was 26/160. */
+  border-radius: calc(var(--tile) * 0.1304);
   padding-top: calc(var(--tile) * 0.125);
   gap: calc(var(--tile) * 0.05);
 }
 .hero-tile-label {
   font-size: calc(var(--tile) * 0.1);
 }
-/* The emoji is a fixed 100 x 100 whatever the tile does (Žilvinas
-   2026-09-19: the artboard's frame is 100 x 100, "always"). Only the tile
-   itself scales with the window. */
+/* THE EMOJI IS 100 AT MOST, AND THE ARTBOARD'S SHARE OF THE TILE BELOW THAT
+   (Žilvinas 2026-09-19, twice: "always 100", then "max 100 — they are
+   bigger in yours"). The artboard draws it 100 inside a 230 tile, 43.5%. A
+   fixed 100 was that same 100 inside the 165 tile a 1512 screen draws, 60%
+   of it, which is what read as too big. So: the artboard's ratio, capped
+   at its 100 — 72 on a 1512, 91 on a 1920, 100 from the width the tile
+   reaches 230 at. */
 .hero-tile-art {
-  width: 100px;
-  height: 100px;
+  width: min(100px, calc(var(--tile) * 0.4348));
+  height: auto;
+  aspect-ratio: 1;
   object-fit: contain;
 }
 
