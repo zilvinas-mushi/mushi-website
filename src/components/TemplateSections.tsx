@@ -1792,20 +1792,24 @@ export function TemplatesInside() {
               in the art, so the gradient that used to be laid over it here
               is gone. */}
           <article
-            // CENTRED on desktop too, 30 down from the card's top (Žilvinas
-            // 2026-09-19, off the artboard); it was left-set under a 24.
-            className={`${CARD} col-span-2 flex h-[222px] flex-col items-center bg-[image:var(--bg,none)] pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:bg-[image:var(--bg-md,none)] md:pt-[30px]`}
+            // CENTRED on desktop too, 45 down from the card's top (Žilvinas
+            // 2026-09-19, off the artboard's inspector); it was left-set
+            // under a 24.
+            className={`${CARD} col-span-2 flex h-[222px] flex-col items-center bg-[image:var(--bg,none)] pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:bg-[image:var(--bg-md,none)] md:pt-[45px]`}
             data-bg="url(/images/templates/inside-monthly-phone.webp)"
             data-bg-md="url(/images/templates/inside-monthly.webp)"
             style={{ backgroundPosition: "center bottom" }}
           >
             <p className="relative">
-              <span className={`${BIG} text-[48px] md:text-[40px]`}>{s.monthly.big}</span>
-              {/* md:mt 6: the artboard's 16 from the "50+ NEW" baseline to the
-                  top of "templates" (25 x 16), less what the two leading-none
-                  boxes already hold — ~8.5 under the 40px baseline, ~2 above
-                  the 24px ascenders. */}
-              <span className={`${SMALL} block md:mt-[6px]`}>{s.monthly.small}</span>
+              {/* THE INSPECTOR'S OWN NUMBERS from md up (Žilvinas 2026-09-19):
+                  Poppins Medium 70 on a 75.1 leading for "50+ NEW", Medium
+                  33 for "templates monthly", 15 between them and 45 from the
+                  card's top. The 15 is ink to ink (the 6 x 16 sits between
+                  the "0+" and the "mpla"), so on a 75px box whose baseline
+                  leaves ~17 under it and a leading-none 33 with ~2 above its
+                  ascenders it is a -4 margin. */}
+              <span className={`${BIG} text-[48px] md:text-[70px] md:leading-[75px]`}>{s.monthly.big}</span>
+              <span className={`${SMALL} block md:-mt-[4px] md:text-[33px]`}>{s.monthly.small}</span>
             </p>
           </article>
         </div>
