@@ -1766,7 +1766,9 @@ export function TemplatesInside() {
             {/* gap 5 between the tiles on the phone (Žilvinas 2026-09-18,
                 off the artboard); the desktop keeps its 6. */}
             <span
-              className="relative inline-flex gap-[5px] md:gap-1.5"
+              // md: the artboard's 5 between 20.41 tiles, at the bento's 0.9
+              // (Žilvinas 2026-09-19): 4.5 and 18.4.
+              className="relative inline-flex gap-[5px] md:gap-[4.5px]"
               role="img"
               aria-label="5 out of 5 stars"
             >
@@ -1780,7 +1782,7 @@ export function TemplatesInside() {
                   src="templates/trustpilot-star-tile.webp"
                   alt=""
                   width={26}
-                  className="size-[14px] md:size-[26px]"
+                  className="size-[14px] md:size-[18.4px]"
                 />
               ))}
             </span>
