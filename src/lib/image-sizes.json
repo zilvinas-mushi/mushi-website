@@ -347,13 +347,13 @@
     "w": 1100,
     "h": 205
   },
-  "templates/access-card-dark.webp": {
-    "w": 760,
-    "h": 988
+  "templates/access-card-dark-v2.webp": {
+    "w": 744,
+    "h": 980
   },
-  "templates/access-card-purple.webp": {
-    "w": 760,
-    "h": 988
+  "templates/access-card-purple-v2.webp": {
+    "w": 744,
+    "h": 980
   },
   "templates/access-emoji-bad-glyph.webp": {
     "w": 166,

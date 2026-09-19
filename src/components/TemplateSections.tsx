@@ -1240,7 +1240,7 @@ export function TemplatesAccess() {
             id={TEMPLATES_SCRATCH_CARD_ID}
             className="flex flex-col rounded-[15px] bg-[#111111] bg-cover bg-center p-6 md:rounded-[20px] md:p-7"
             style={{ backgroundImage: "var(--bg, none)" }}
-            data-bg="url(/images/templates/access-card-dark.webp)"
+            data-bg="url(/images/templates/access-card-dark-v2.webp)"
           >
             <header className="flex items-center gap-3.5">
               {/* 35 square on the phone (artboard 2026-09-06), 44 on the
@@ -1368,7 +1368,7 @@ export function TemplatesAccess() {
             // width — .access-card-ring now applies above md too.
             className="access-card-ring relative flex flex-col rounded-[15px] md:rounded-[20px] bg-[#131017] bg-cover bg-center p-6 shadow-[0_30px_80px_-30px_rgba(110,84,181,0.5)] md:p-7"
             style={{ backgroundImage: "var(--bg, none)" }}
-            data-bg="url(/images/templates/access-card-purple.webp)"
+            data-bg="url(/images/templates/access-card-purple-v2.webp)"
           >
             <header className="flex items-center gap-3.5">
               {/* Same build as the scratch card's square: CSS gradient
@@ -2573,9 +2573,9 @@ export function TemplatesBgFallbacks() {
     "process-card-3.webp",
     "compare-card.webp",
     "cmp-row-band.webp",
-    "access-card-dark.webp",
+    "access-card-dark-v2.webp",
     "access-btn-dark.webp",
-    "access-card-purple.webp",
+    "access-card-purple-v2.webp",
     "access-btn-purple.webp",
     "access-banner-phone.webp",
     "diff-card-dark-v2.webp",
