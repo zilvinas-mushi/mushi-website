@@ -987,7 +987,13 @@ export function TemplatesComparison() {
           // picture"): the table's edges match every section above, and the
           // rows are the artboard's 80 / 65 / 76 rather than the 72 / 56 the
           // 1080 cap had. Everything inside scales with them, ~1.2.
-          className="mx-auto mt-[37px] grid max-w-[880px] md:max-w-[1160px] grid-cols-[minmax(0,115fr)_minmax(0,68fr)_repeat(3,minmax(0,54fr))] grid-rows-[var(--cmp-rows)] gap-y-1.5 md:gap-y-2 md:mt-12 md:grid-cols-[minmax(0,1.7fr)_repeat(4,minmax(0,1fr))] md:grid-rows-[var(--cmp-rows-md)]"
+          // md:mt 55, not the 48 every other section's first block takes:
+          // the purple plate's artwork rises ~7 above the grid's first row
+          // (its card edge sits a touch inside the 13.3% the oversize
+          // assumes), and the plate's top is what reads as the section's
+          // start. 55 puts THAT at the shared 48 (Žilvinas 2026-09-19,
+          // "the gap is a bit smaller, not universalised").
+          className="mx-auto mt-[37px] grid max-w-[880px] md:max-w-[1160px] grid-cols-[minmax(0,115fr)_minmax(0,68fr)_repeat(3,minmax(0,54fr))] grid-rows-[var(--cmp-rows)] gap-y-1.5 md:gap-y-2 md:mt-[55px] md:grid-cols-[minmax(0,1.7fr)_repeat(4,minmax(0,1fr))] md:grid-rows-[var(--cmp-rows-md)]"
           style={
             {
               "--cmp-rows": `44px repeat(${c.rows.length}, 48px)`,
@@ -1121,7 +1127,7 @@ export function TemplatesComparison() {
               DESKTOP ONLY — see the phone's own button below the grid. */}
           <a
             href={APP_URL}
-            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-5 py-3 text-[23px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5 md:text-[14px]"
+            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-5 py-3 text-[26px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5 md:text-[14px]"
             style={{ gridRowStart: lastRow }}
           >
             {/* LIVE TYPE (Žilvinas 2026-09-19, "looks distorted"): the label
