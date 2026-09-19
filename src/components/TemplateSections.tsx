@@ -814,7 +814,7 @@ function CompetitorMark({ name }: { name: string }) {
             side): the artboard draws Kandy at half the CreativeOS lockup's
             width, which is 134 here (Žilvinas 2026-09-19, "why so small").
             It was 54, i.e. 46 of ink. */}
-        <Img src="templates/cmp-kandy.webp" alt={name} width={115} className="hidden md:block" />
+        <Img src="templates/cmp-kandy.webp" alt={name} width={104} className="hidden md:block" />
       </>
     );
   }
