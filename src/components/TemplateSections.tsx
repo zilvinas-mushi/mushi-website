@@ -23,7 +23,10 @@ import { APP_URL, BOOKING_URL, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID 
 // SHOWCASE; the eyebrow and title are one recipe, so every section takes it).
 // It was 23 against the old 18-tall eyebrow; the rules are 21 tall now.
 const SECTION_TITLE =
-  "mt-[17px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-4 md:text-wrap md:text-[48px] md:leading-tight md:tracking-tight";
+  // md: the inspector's Poppins SemiBold 80/80 at the page's 0.9 (Žilvinas
+  // 2026-09-19, "title 80 semibold") — 72 on a 72 leading, no tracking. It
+  // was 48 with tracking-tight, read off a scaled screenshot.
+  "mt-[17px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-4 md:text-wrap md:text-[72px] md:leading-[72px] md:tracking-normal";
 
 const SHELL = "mx-auto w-full max-w-[1200px] px-[15px] md:px-5";
 
@@ -795,7 +798,7 @@ function CompetitorMark({ name }: { name: string }) {
             side): the artboard draws Kandy at half the CreativeOS lockup's
             width, which is 134 here (Žilvinas 2026-09-19, "why so small").
             It was 54, i.e. 46 of ink. */}
-        <Img src="templates/cmp-kandy.webp" alt={name} width={79} className="hidden md:block" />
+        <Img src="templates/cmp-kandy.webp" alt={name} width={95} className="hidden md:block" />
       </>
     );
   }
@@ -806,13 +809,13 @@ function CompetitorMark({ name }: { name: string }) {
         <Img
           src="templates/cmp-creativeos-icon.webp"
           alt=""
-          width={40}
-          className="-mr-2.5 hidden md:block"
+          width={48}
+          className="-mr-3 hidden md:block"
         />
         <Img
           src="templates/cmp-creativeos.webp"
           alt={name}
-          width={104}
+          width={125}
           className="hidden md:block"
         />
       </>
@@ -835,10 +838,10 @@ function CompetitorMark({ name }: { name: string }) {
       <Img
         src="templates/cmp-konvert-icon.webp"
         alt=""
-        width={22}
-        className="hidden rounded-[6px] md:block"
+        width={26}
+        className="hidden rounded-[7px] md:block"
       />
-      <Img src="templates/cmp-konvert.webp" alt={name} width={82} className="hidden md:block" />
+      <Img src="templates/cmp-konvert.webp" alt={name} width={98} className="hidden md:block" />
     </>
   );
 }
@@ -870,7 +873,7 @@ function CompareValue({ v, mushi }: { v: string | boolean; mushi?: boolean }) {
         aria-hidden="true"
         viewBox="0 0 15 13"
         fill="none"
-        className="h-auto w-[15px] stroke-white stroke-2 md:w-[20px] md:stroke-[1.5]"
+        className="h-auto w-[15px] stroke-white stroke-2 md:w-[24px] md:stroke-[1.25]"
       >
         <path strokeLinecap="round" d="M1 6.65217L6.15517 11L14 1" />
       </svg>
@@ -881,7 +884,7 @@ function CompareValue({ v, mushi }: { v: string | boolean; mushi?: boolean }) {
         aria-hidden="true"
         viewBox="0 0 13 13"
         fill="none"
-        className="h-auto w-[13px] stroke-[#ff5b5b] stroke-2 md:w-[15px] md:stroke-[1.73]"
+        className="h-auto w-[13px] stroke-[#ff5b5b] stroke-2 md:w-[18px] md:stroke-[1.44]"
       >
         <path strokeLinecap="round" d="M1 1L12 12M1 12L12 1" />
       </svg>
@@ -927,11 +930,16 @@ export function TemplatesComparison() {
             something Tailwind can see, and an inline style would beat any
             md: class trying to override it. */}
         <div
-          className="mx-auto mt-[37px] grid max-w-[880px] md:max-w-[1080px] grid-cols-[minmax(0,115fr)_minmax(0,68fr)_repeat(3,minmax(0,54fr))] grid-rows-[var(--cmp-rows)] gap-y-1.5 md:gap-y-2 md:mt-12 md:grid-cols-[minmax(0,1.7fr)_repeat(4,minmax(0,1fr))] md:grid-rows-[var(--cmp-rows-md)]"
+          // THE SHELL'S 1160 from md up, one to one with the artboard
+          // (Žilvinas 2026-09-19, "a bit squeezy, make it as in the
+          // picture"): the table's edges match every section above, and the
+          // rows are the artboard's 80 / 65 / 76 rather than the 72 / 56 the
+          // 1080 cap had. Everything inside scales with them, ~1.2.
+          className="mx-auto mt-[37px] grid max-w-[880px] md:max-w-[1160px] grid-cols-[minmax(0,115fr)_minmax(0,68fr)_repeat(3,minmax(0,54fr))] grid-rows-[var(--cmp-rows)] gap-y-1.5 md:gap-y-2 md:mt-12 md:grid-cols-[minmax(0,1.7fr)_repeat(4,minmax(0,1fr))] md:grid-rows-[var(--cmp-rows-md)]"
           style={
             {
               "--cmp-rows": `44px repeat(${c.rows.length}, 48px)`,
-              "--cmp-rows-md": `72px repeat(${c.rows.length}, 56px) 76px`,
+              "--cmp-rows-md": `80px repeat(${c.rows.length}, 65px) 76px`,
             } as CSSProperties
           }
         >
@@ -986,8 +994,8 @@ export function TemplatesComparison() {
             <Img
               src="templates/cmp-mushi.webp"
               alt="Mushi"
-              width={82}
-              className="hidden md:block md:w-[82px]"
+              width={98}
+              className="hidden md:block md:w-[98px]"
             />
           </span>
           {c.competitors.map((name, i) => (
@@ -1034,7 +1042,7 @@ export function TemplatesComparison() {
                 // 12/14 on the phone, balanced so each label breaks where the
                 // artboard breaks it ("Trustpilot / Review Score", not
                 // "Trustpilot Review / Score").
-                className="z-10 col-start-1 self-center text-balance pl-3 text-[12px] leading-[14px] text-white/90 md:pl-5 md:text-[16px] md:leading-tight"
+                className="z-10 col-start-1 self-center text-balance pl-3 text-[12px] leading-[14px] text-white/90 md:pl-6 md:text-[22px] md:leading-tight"
                 style={{ gridRowStart: r + 2 }}
               >
                 {row.label}
@@ -1068,7 +1076,7 @@ export function TemplatesComparison() {
                 follows the pill's hover inversion (black -> white). */}
             <span
               aria-hidden="true"
-              className="inline-block h-[14px] w-[87px] bg-current"
+              className="inline-block h-[17px] w-[105px] bg-current"
               style={{
                 WebkitMaskImage: "url(/images/templates/cmp-get-mushi.webp)",
                 maskImage: "url(/images/templates/cmp-get-mushi.webp)",
