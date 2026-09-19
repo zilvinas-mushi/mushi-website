@@ -1887,27 +1887,25 @@ export function TemplatesDifference() {
                 7 either side of the mark, radius 6 — 62 x 26 on the
                 artboard. The mark is 20 of the pill's 26, not the 15 it was:
                 at 15 the wordmark read as shrunken next to the competitors'
-                logos, which sit at 13 to 18 in the same box. The desktop
-                reference keeps its 36-tall pill. */}
+                logos, which sit at 13 to 18 in the same box.
+
+                DESKTOP IS THE ARTBOARD'S OWN GUTTERS (Žilvinas 2026-09-19):
+                the ink is 72.92 x 22.15 with 9 above and below it and 10
+                either side, so the pill is 40 tall and sizes itself off a
+                22-tall mark plus the two 10s. That only works with the file
+                trimmed to the ink — the untrimmed export is ~45% transparent
+                margin, which is why the desktop's old 36-tall pill with 16
+                gutters never measured as anything on the artboard. */}
             <div className="flex justify-center">
-              <span className="flex h-[26px] items-center rounded-[6px] bg-white px-[7px] md:h-9 md:rounded-[10px] md:px-4">
-                {/* TWO FILES, one mark. The phone draws it 14 tall inside the
-                    26 pill (with the 7 gutters, the artboard's 62 x 26), and
-                    a height set on the export as supplied would spend most of
-                    that on its ~45% transparent margin — so the phone gets a
-                    copy trimmed to the ink. The desktop keeps the file it was
-                    signed off with, at its own 68. */}
+              <span className="flex h-[26px] items-center rounded-[6px] bg-white px-[7px] md:h-10 md:rounded-[10px] md:px-[10px]">
+                {/* The copy trimmed to the ink, at every size now: 14 tall in
+                    the phone's 26 pill (with the 7 gutters, the artboard's
+                    62 x 26), 22 tall in the desktop's 40. */}
                 <Img
                   src="templates/diff-mushi-mark-phone.webp"
                   alt="Mushi"
                   width={47}
-                  className="h-[14px] w-auto md:hidden"
-                />
-                <Img
-                  src="templates/diff-mushi-mark.webp"
-                  alt="Mushi"
-                  width={68}
-                  className="hidden md:block"
+                  className="h-[14px] w-auto md:h-[22px]"
                 />
               </span>
             </div>
