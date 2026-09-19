@@ -1291,7 +1291,7 @@ export function TemplatesAccess() {
                 the word, as the artboard sets it — and 5 off the figure
                 (Žilvinas 2026-09-19, "add like 3 pixels" to the 2). */}
             <p className="mt-[22px] flex items-baseline gap-[5px] md:mt-7 md:gap-1.5">
-              <span className="bg-[linear-gradient(180deg,#dd898b_0%,#c5696a_55%,#b65556_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[44px]">
+              <span className="bg-[linear-gradient(180deg,#dd898b_0%,#c5696a_55%,#b65556_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[69px]">
                 {a.scratch.figure}
               </span>
               {/* SemiBold 20, no tracking, and tight to the figure — the
@@ -1309,7 +1309,7 @@ export function TemplatesAccess() {
                 takes the same, so the two keep one pitch. */}
             <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-3">
               {a.scratch.items.map((item) => (
-                <li key={item} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
+                <li key={item} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[29px] md:leading-normal">
                   {/* gap 5 on the phone (Žilvinas 2026-09-18, "bigger by 1-2
                       pixels"): the 13 cross sits 1.5 inside its 16 slot, so
                       5 puts ~6.5 of air between the cross and the text
@@ -1400,7 +1400,7 @@ export function TemplatesAccess() {
                   them centres on the row. Centring all three put "/month"
                   halfway up the 40 and left the chip riding high. */}
               <span className="flex shrink-0 items-baseline gap-[5px] whitespace-nowrap md:gap-1.5">
-                <span className="bg-[linear-gradient(180deg,#a08ade_0%,#9275ce_50%,#7f56b6_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[44px]">
+                <span className="bg-[linear-gradient(180deg,#a08ade_0%,#9275ce_50%,#7f56b6_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[69px]">
                   {a.templates.figure}
                 </span>
                 {/* 1.5 below the figure's baseline on the phone (Figma). */}
@@ -1418,7 +1418,7 @@ export function TemplatesAccess() {
             </p>
             <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-3">
               {a.templates.items.map((item) => (
-                <li key={item.label} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[20px] md:leading-normal">
+                <li key={item.label} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[29px] md:leading-normal">
                   <AccessIcon name={item.icon} />
                   {item.label}
                 </li>
