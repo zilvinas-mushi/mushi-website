@@ -881,8 +881,8 @@ function CompareValue({ v, mushi }: { v: string | boolean; mushi?: boolean }) {
       <span
         className={
           mushi
-            ? "text-[20px] font-semibold text-white md:text-[33px]"
-            : "text-[20px] font-semibold text-[#ff5b5b] md:text-[33px]"
+            ? "text-[20px] font-semibold text-white md:text-[36px]"
+            : "text-[20px] font-semibold text-[#ff5b5b] md:text-[36px]"
         }
       >
         {v}
@@ -1100,7 +1100,7 @@ export function TemplatesComparison() {
                 // 12/14 on the phone, balanced so each label breaks where the
                 // artboard breaks it ("Trustpilot / Review Score", not
                 // "Trustpilot Review / Score").
-                className="z-10 col-start-1 self-center text-balance pl-3 text-[12px] leading-[14px] text-white/90 md:pl-6 md:text-[22px] md:leading-tight"
+                className="z-10 col-start-1 self-center text-balance pl-3 text-[12px] leading-[14px] text-white/90 md:pl-6 md:text-[23px] md:font-medium md:leading-tight"
                 style={{ gridRowStart: r + 2 }}
               >
                 {row.label}
