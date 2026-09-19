@@ -1458,6 +1458,7 @@ export function TemplatesAccess() {
                   23.61 Regular (client 2026-09-07). */}
               <p className="text-[16px] font-semibold leading-4 text-white md:text-[24px] md:leading-tight">
                 <BreakBefore text={a.banner.title} word="creatives" />
+                <span className="md:hidden">{a.banner.titleTail}</span>
               </p>
               <p className="hidden text-[13px] font-normal text-white/45 md:block md:text-[17px] md:leading-snug">{a.banner.sub}</p>
             </div>

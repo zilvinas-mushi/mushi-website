@@ -1163,8 +1163,12 @@ export const TEMPLATES_PAGE = {
     },
     banner: {
       emoji: "🤩",
-      // ", every week" added (Žilvinas 2026-09-11).
-      title: "Done-for-you premium creatives, every week",
+      // ", every week" added (Žilvinas 2026-09-11) — and PHONE ONLY since
+      // 2026-09-19 ("only for desktop remove 'every week'"): it is a
+      // separate tail so the desktop can leave it out without touching the
+      // phone's line break.
+      title: "Done-for-you premium creatives",
+      titleTail: ", every week",
       sub: "Growth partner for eCommerce, AI, SaaS.",
       cta: "Book Your Discovery Call",
     },
