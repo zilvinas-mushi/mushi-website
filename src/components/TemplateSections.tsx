@@ -2290,19 +2290,46 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
         })}
       </ul>
 
-      {/* THE DESKTOP ROW IS UNTOUCHED (the phone work of 2026-09-06 was
-          explicitly phone-only): 36-tall chips, Konvert set in Satoshi beside
-          its own blue mark, the other two as the chip-*.svg exports. */}
+      {/* THE DESKTOP ROW IS THE ARTBOARD'S (Žilvinas 2026-09-19, off the
+          Figma inspector): 40-tall chips. Konvert is set live in Satoshi
+          Variable Bold at the panel's 24.78 — the wordmark measures 90.32 x
+          20 there — beside its 22-square mark, 10 in from either end with 6
+          between mark and word. The other two stay the chip-*.svg exports,
+          scaled to the same 40. */}
       <ul className="relative z-10 hidden flex-wrap items-center justify-center gap-2.5 md:flex">
         {brands.map((brand) => (
           <li key={brand} className="flex items-center">
             {brand === "Konvert" ? (
-              <span className="flex h-9 items-center gap-1.5 rounded-[10px] bg-white px-3 font-satoshi text-[16px] font-bold text-black">
+              <span className="flex h-10 items-center gap-[6px] rounded-[10px] bg-white px-[10px] font-satoshi text-[24.78px] font-bold leading-none text-black">
+                {/* The mark: a 22 rounded square in the artboard's violet
+                    (#6831ef, lifting to #8e6bf3 at the lower right, sampled
+                    off the inspector) with the supplied sparkle inside it at
+                    14 — "Star for convert logo.png", a 4-point star baked at
+                    50% white, exported at 4x with its alpha intact. */}
                 <span
                   aria-hidden="true"
-                  className="flex size-4 items-center justify-center rounded-[5px] bg-[#5b5bf0] text-[11px] font-bold leading-none text-white"
+                  className="flex size-[22px] shrink-0 items-center justify-center rounded-[6px] bg-[linear-gradient(135deg,#6831ef_0%,#6831ef_40%,#8e6bf3_100%)]"
                 >
-                  +
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    data-src="/images/templates/chip-konvert-star.webp"
+                    alt=""
+                    width={14}
+                    height={14}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <noscript>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/templates/chip-konvert-star.webp"
+                      alt=""
+                      width={14}
+                      height={14}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </noscript>
                 </span>
                 {brand}
               </span>
@@ -2311,11 +2338,11 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
               <img
                 src={`/images/templates/chip-${brand.toLowerCase()}.svg`}
                 alt={brand}
-                width={brand === "Kandy" ? 79 : 155}
-                height={36}
+                width={brand === "Kandy" ? 88 : 172}
+                height={40}
                 loading="lazy"
                 decoding="async"
-                className="h-9 w-auto"
+                className="h-10 w-auto"
               />
             )}
           </li>

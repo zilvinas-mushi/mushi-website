@@ -425,6 +425,22 @@ body {
 }
 
 /*
+  A DEFERRED IMAGE SHOWS NOTHING UNTIL IT HAS ITS URL. Below the fold every
+  <img> carries its address in data-src and gets `src` only when the observer
+  in paint-gate-script reaches it — after load, the cross-fade and a beat. An
+  <img> with no src at all is one Chrome draws as its broken-picture glyph
+  plus the alt text, so a refresh landed mid-page showed "The same ad as a
+  finished, fully editable Mushi template…" in the Difference card for the
+  second before the picture arrived (Žilvinas 2026-09-19). The attribute
+  goes away the moment the URL moves across, so this holds exactly that
+  window and no longer; the box keeps its size (visibility, not display),
+  and the <noscript> twin has no data-src and is unaffected.
+*/
+img[data-src] {
+  visibility: hidden;
+}
+
+/*
   Someone who has asked for less motion gets the same gate with no cross-fade.
   The point of the rule is that the half-built state is never shown; the fade
   is only how the finished one arrives, and that part is negotiable.
