@@ -1472,9 +1472,16 @@ export function TemplatesAccess() {
             // 70% white ring on top of .discovery-ring's corner-lit one —
             // white at the top-left and bottom-right, nothing between —
             // which is the phone's and the design's. One ring, both sizes.
-            className="discovery-ring group inline-flex h-[50px] w-full items-center gap-2.5 rounded-[100px] bg-[linear-gradient(147deg,#000_0%,#000_100%)] pl-[17px] pr-5 md:pl-2 text-[15px] font-semibold uppercase tracking-[0.05em] text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black sm:ml-auto sm:w-auto md:h-[46px]"
+            // DESKTOP GEOMETRY off the artboard (Žilvinas 2026-09-19): a 35
+            // disc with 15 around it on every side but the label's — so the
+            // button is 65 tall and the disc 15 in — and a 10 x 10 arrow.
+            // cursor-pointer is explicit, though an <a href> already is one.
+            className="discovery-ring group inline-flex h-[50px] w-full cursor-pointer items-center gap-2.5 rounded-[100px] bg-[linear-gradient(147deg,#000_0%,#000_100%)] pl-[17px] pr-5 text-[15px] font-semibold uppercase tracking-[0.05em] text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black sm:ml-auto sm:w-auto md:h-[65px] md:pl-[15px]"
           >
-            <span className="flex size-[25px] items-center justify-center rounded-full bg-white text-black md:size-[32px]">
+            {/* The disc inverts WITH the button (same note): white on black
+                at rest, black on white on hover, cross-faded like the fill —
+                it used to stay white on the white hover and vanish. */}
+            <span className="flex size-[25px] items-center justify-center rounded-full bg-white text-black transition-colors duration-150 group-hover:bg-black group-hover:text-white md:size-[35px]">
               {/* The design's own arrow (Icon.svg, re-supplied 2026-09-06):
                   a 13 x 13 path at weight 2, drawn at its own size inside a
                   25 disc — which is nearly the whole disc, as the artboard
@@ -1483,7 +1490,7 @@ export function TemplatesAccess() {
                 viewBox="0 0 13 13"
                 fill="none"
                 strokeWidth="2"
-                className="size-[13px] stroke-current md:size-[15px]"
+                className="size-[13px] stroke-current md:size-[10px]"
                 aria-hidden="true"
               >
                 <path
