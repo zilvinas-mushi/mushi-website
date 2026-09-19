@@ -869,24 +869,48 @@ function CompareValue({ v, mushi }: { v: string | boolean; mushi?: boolean }) {
   // scaled back so the line stays 2px on screen.
   return v ? (
     <span role="img" aria-label="Yes">
+      {/* THE PHONE'S MARK — "check mark icon.svg" (2026-09-18), 15 x 13 at
+          stroke 2, at the file's own size. */}
       <svg
         aria-hidden="true"
         viewBox="0 0 15 13"
         fill="none"
-        className="h-auto w-[15px] stroke-white stroke-2 md:w-[24px] md:stroke-[1.25]"
+        className="h-auto w-[15px] stroke-white stroke-2 md:hidden"
       >
         <path strokeLinecap="round" d="M1 6.65217L6.15517 11L14 1" />
+      </svg>
+      {/* THE DESKTOP'S — "check.svg" (Žilvinas 2026-09-19), its path and
+          5.29 stroke verbatim on a 36 x 30 box, drawn at 30 wide ("around
+          30ish"). */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 36 30"
+        fill="none"
+        className="hidden h-auto w-[30px] stroke-white stroke-[5.29412] md:block"
+      >
+        <path strokeLinecap="round" d="M2.64697 15.6142L14.5435 25.5886L32.647 2.64746" />
       </svg>
     </span>
   ) : (
     <span role="img" aria-label="No">
+      {/* The phone's "cross icon.svg" (2026-09-18), 13 x 13 at stroke 2. */}
       <svg
         aria-hidden="true"
         viewBox="0 0 13 13"
         fill="none"
-        className="h-auto w-[13px] stroke-[#ff5b5b] stroke-2 md:w-[18px] md:stroke-[1.44]"
+        className="h-auto w-[13px] stroke-[#ff5b5b] stroke-2 md:hidden"
       >
         <path strokeLinecap="round" d="M1 1L12 12M1 12L12 1" />
+      </svg>
+      {/* The desktop's "cross.svg" (2026-09-19): path and 3.79 stroke
+          verbatim on a 23 box, drawn at 20 ("around 20ish"). */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 23 23"
+        fill="none"
+        className="hidden h-auto w-[20px] stroke-[#ff5b5b] stroke-[3.78761] md:block"
+      >
+        <path strokeLinecap="round" d="M1.89404 1.89355L20.8321 20.8316M1.89404 20.8316L20.8321 1.89355" />
       </svg>
     </span>
   );
