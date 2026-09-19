@@ -1308,9 +1308,9 @@ export function TemplatesAccess() {
                 and 2 lower again against the artboard (2026-09-19) — a 16
                 line box plus 13 is a 29 row pitch. The plan card's list below
                 takes the same, so the two keep one pitch. */}
-            <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-3">
+            <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-[18px]">
               {a.scratch.items.map((item) => (
-                <li key={item} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[29px] md:leading-normal">
+                <li key={item} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[29px] md:leading-[36px]">
                   {/* gap 5 on the phone (Žilvinas 2026-09-18, "bigger by 1-2
                       pixels"): the 13 cross sits 1.5 inside its 16 slot, so
                       5 puts ~6.5 of air between the cross and the text
@@ -1332,7 +1332,7 @@ export function TemplatesAccess() {
                       aria-hidden="true"
                       viewBox="0 0 23 23"
                       fill="none"
-                      className="size-[13px] stroke-white md:size-[18px]"
+                      className="size-[13px] stroke-white md:size-[17px]"
                       strokeWidth="3.84168"
                     >
                       <path
@@ -1417,9 +1417,9 @@ export function TemplatesAccess() {
                 {a.templates.chip}
               </span>
             </p>
-            <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-3">
+            <ul className="mt-[25px] flex-1 space-y-[13px] md:mt-6 md:space-y-[18px]">
               {a.templates.items.map((item) => (
-                <li key={item.label} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[29px] md:leading-normal">
+                <li key={item.label} className="flex items-center gap-[5px] text-[16px] font-normal leading-none text-white/90 md:gap-2.5 md:text-[29px] md:leading-[36px]">
                   <AccessIcon name={item.icon} />
                   {item.label}
                 </li>
