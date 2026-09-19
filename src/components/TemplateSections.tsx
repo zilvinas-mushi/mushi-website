@@ -1727,7 +1727,10 @@ export function TemplatesInside() {
           {/* Trustpilot, spanning under both cards. Wordmark is styled text —
               see the note on TEMPLATES_PAGE.inside. */}
           <article
-            className={`${CARD} col-span-2 flex flex-col items-center justify-center text-center md:h-[241px]`}
+            // md:h-auto, not a fixed 241: the card takes its row (259 since
+            // the bento went to 1160), so its bottom lines up with the
+            // monthly card's (Žilvinas 2026-09-19).
+            className={`${CARD} col-span-2 flex flex-col items-center justify-center text-center md:h-auto`}
           >
             {/* The laurel export as a mask painted with the design grey —
                 the artwork itself is black, invisible on this card. */}
