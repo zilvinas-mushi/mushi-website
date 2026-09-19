@@ -1934,7 +1934,10 @@ export function TemplatesInside() {
               src="templates/trustpilot-lockup.webp"
               alt="Trustpilot"
               width={126}
-              className="relative mt-2 h-auto w-[126px] md:mt-[27px] md:h-[33px] md:w-auto"
+              // md: the artboard's wordmark plus star measures ~213 x 59;
+              // at the bento's 0.9 that is 53 tall ("bigger, like 60%",
+              // Žilvinas 2026-09-19 — it was 33).
+              className="relative mt-2 h-auto w-[126px] md:mt-[27px] md:h-[53px] md:w-auto"
             />
             <p className={`${SMALL} relative mt-1 md:mt-[31.5px] md:text-[36px]`}>{s.reviews.caption}</p>
           </article>
