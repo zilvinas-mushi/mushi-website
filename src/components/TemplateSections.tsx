@@ -1645,11 +1645,14 @@ export function TemplatesInside() {
               4x the 165 x 119 card, supplied already dimmed — so the 45%
               black this card used to lay over the desktop art is gone. */}
           <article
-            // md:bg oversized 108.6% and pinned right (client 2026-09-13): the
-            // art's baked "Need help?" pill sat 28px right of the headline's
-            // inset; sliding the art left puts the pill's left edge on the
-            // same 24px line as "24/7", as the reference card has it.
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[image:var(--bg-md,none)] md:bg-no-repeat md:bg-[length:108.6%_auto] md:bg-[position:right_center] md:p-6 md:text-left`}
+            // THE DESKTOP ART IS THE SUPPLIED "24:7 background.png" (Žilvinas
+            // 2026-09-19), a 3924 x 2780 master shipped as an 800-wide webp
+            // — 6 MB down to 12 KB, and 800 is 2x what the card draws at. It
+            // is drawn edge to edge (cover, centred): its "Need help?" pill
+            // already sits on the headline's 24px line, so the 108.6%
+            // right-pinned oversizing that dragged the OLD art into place
+            // would now cut the pill's left edge off.
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[image:var(--bg-md,none)] md:p-6 md:text-left`}
             data-bg="url(/images/templates/inside-support-phone.webp)"
             data-bg-md="url(/images/templates/inside-support.webp)"
           >
@@ -1748,6 +1751,9 @@ export function TemplatesInside() {
 
           {/* 50+ new templates monthly — the dimmed collage is the baked
               background, anchored to the card's bottom like the design.
+              Desktop art re-supplied 2026-09-19 ("50+ new templates
+              monthyl.png", 2768 x 3737, 9.6 MB) and shipped as the same
+              800 x 1080 webp the card was already framed for: 56 KB.
               PHONE has its own art (Žilvinas 2026-09-11), cropped off its
               drop shadow to the 345 x 222 card at 4x. Its fade to black is
               in the art, so the gradient that used to be laid over it here
@@ -2333,12 +2339,23 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                 </span>
                 {brand}
               </span>
+            ) : brand === "Kandy" ? (
+              /* KANDY IS THE SUPPLIED LOGO ON A LIVE PILL (Žilvinas 2026-09-19,
+                 "use these kandy"): chip-kandy.svg was a white rect with a
+                 600px PNG embedded in it, and at 40 tall the script's
+                 hairlines were going soft. The new file is the 1200-wide
+                 logo-red.webp with its flat #f3f3f3 ground keyed out to
+                 alpha and cropped to the ink, at 3x of the 58 it draws at —
+                 the artboard's 91 x 40 chip, 16 either side. */
+              <span className="flex h-10 items-center rounded-[10px] bg-white px-4">
+                <Img src="templates/chip-kandy.webp" alt="Kandy" width={58} />
+              </span>
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={`/images/templates/chip-${brand.toLowerCase()}.svg`}
                 alt={brand}
-                width={brand === "Kandy" ? 88 : 172}
+                width={172}
                 height={40}
                 loading="lazy"
                 decoding="async"

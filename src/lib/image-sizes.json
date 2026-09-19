@@ -395,6 +395,14 @@
     "w": 200,
     "h": 200
   },
+  "templates/chip-kandy.webp": {
+    "w": 174,
+    "h": 89
+  },
+  "templates/chip-konvert-star.webp": {
+    "w": 56,
+    "h": 56
+  },
   "templates/cmp-creativeos-icon-phone.webp": {
     "w": 108,
     "h": 96
@@ -553,15 +561,15 @@
   },
   "templates/inside-monthly.webp": {
     "w": 800,
-    "h": 1078
+    "h": 1080
   },
   "templates/inside-support-phone.webp": {
     "w": 660,
     "h": 476
   },
   "templates/inside-support.webp": {
-    "w": 1000,
-    "h": 708
+    "w": 800,
+    "h": 567
   },
   "templates/laurel-mask.webp": {
     "w": 1200,
