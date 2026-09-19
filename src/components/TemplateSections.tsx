@@ -1182,9 +1182,10 @@ function AccessIcon({ name }: { name: string }) {
   const grid16 = !icon.viewBox.endsWith(" 24 24");
   return (
     // md: 25 (Žilvinas 2026-09-19, the artboard's 25 x 25), up from 22.
-    // Stroke: ~1.7px on screen (Žilvinas 2026-09-19, "increase the width
-    // like 0.2 pixels" over the 1.5 it had) — 1.09 grid units on the 16
-    // grid at 25, 1.7 on the 24 grid.
+    // Stroke: 2px on screen (Žilvinas 2026-09-19 — first "0.2 more" over
+    // the 1.5 it had, then "they look fuller" against the artboard, whose
+    // icons read as a 2 stroke at 25) — 1.28 grid units on the 16 grid at
+    // 25, 1.92 on the 24 grid.
     <span className="grid size-[16px] shrink-0 place-items-center md:size-[25px]">
       <svg
         aria-hidden="true"
@@ -1196,8 +1197,8 @@ function AccessIcon({ name }: { name: string }) {
         strokeLinejoin="round"
         className={
           grid16
-            ? "h-auto w-[16px] max-h-[16px] stroke-[1.5] md:w-[25px] md:max-h-[25px] md:stroke-[1.09]"
-            : "size-[16px] stroke-2 md:size-[25px] md:stroke-[1.7]"
+            ? "h-auto w-[16px] max-h-[16px] stroke-[1.5] md:w-[25px] md:max-h-[25px] md:stroke-[1.28]"
+            : "size-[16px] stroke-2 md:size-[25px] md:stroke-[1.92]"
         }
       >
         {icon.d.map((d) => (
