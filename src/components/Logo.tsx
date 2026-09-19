@@ -30,12 +30,24 @@
  * px nudge would only be right at one width. Remeasure if the face ever
  * changes; nothing about this number is derivable from the CSS.
  */
-export function Logo({ className }: { className?: string }) {
+export function Logo({
+  className,
+  tone = "white",
+}: {
+  className?: string;
+  /**
+   * The ink. White everywhere the mark sits on the site's black; black for
+   * the one white pill it sits in (the /templates Difference card). A prop
+   * rather than a `text-black` in className, because two colour utilities
+   * on one element resolve by stylesheet order, not by class order.
+   */
+  tone?: "white" | "black";
+}) {
   return (
     <span
-      className={`inline-flex -translate-y-[0.0376em] items-baseline font-serif leading-none tracking-tight text-white ${
-        className ?? "text-5xl"
-      }`}
+      className={`inline-flex -translate-y-[0.0376em] items-baseline font-serif leading-none tracking-tight ${
+        tone === "black" ? "text-black" : "text-white"
+      } ${className ?? "text-5xl"}`}
     >
       Mushi
     </span>

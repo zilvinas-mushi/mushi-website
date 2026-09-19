@@ -1898,15 +1898,24 @@ export function TemplatesDifference() {
                 gutters never measured as anything on the artboard. */}
             <div className="flex justify-center">
               <span className="flex h-[26px] items-center rounded-[6px] bg-white px-[7px] md:h-10 md:rounded-[10px] md:px-[10px]">
-                {/* The copy trimmed to the ink, at every size now: 14 tall in
-                    the phone's 26 pill (with the 7 gutters, the artboard's
-                    62 x 26), 22 tall in the desktop's 40. */}
+                {/* The phone keeps the copy trimmed to the ink, 14 tall in
+                    its 26 pill (with the 7 gutters, the artboard's 62 x 26). */}
                 <Img
                   src="templates/diff-mushi-mark-phone.webp"
                   alt="Mushi"
                   width={47}
-                  className="h-[14px] w-auto md:h-[22px]"
+                  className="h-[14px] w-auto md:hidden"
                 />
+                {/* THE DESKTOP DRAWS THE WORDMARK AS TYPE (Žilvinas
+                    2026-09-19): Dutch801 is already loaded for the header,
+                    and live glyphs beat any raster. 30px puts the ink at the
+                    artboard's 22.15 — Logo measures Dutch801's "Mushi" at
+                    0.735em of ink, top of the h to the bottom of the round
+                    letters' overshoot — and Logo's own em nudge centres that
+                    ink in the 40-tall pill. */}
+                <span className="hidden md:flex">
+                  <Logo tone="black" className="text-[30px]" />
+                </span>
               </span>
             </div>
             {/* Full width of the caption below it, and the card grows to
