@@ -555,7 +555,7 @@
     "w": 1380,
     "h": 888
   },
-  "templates/inside-monthly.webp": {
+  "templates/inside-monthly-v2.webp": {
     "w": 2000,
     "h": 2700
   },
@@ -563,7 +563,7 @@
     "w": 660,
     "h": 476
   },
-  "templates/inside-support.webp": {
+  "templates/inside-support-v2.webp": {
     "w": 2800,
     "h": 1984
   },
@@ -579,7 +579,7 @@
     "w": 135,
     "h": 78
   },
-  "templates/process-canva-card.webp": {
+  "templates/process-canva-card-v2.webp": {
     "w": 2800,
     "h": 2800
   },

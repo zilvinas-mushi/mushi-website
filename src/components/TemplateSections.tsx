@@ -1703,7 +1703,7 @@ export function TemplatesInside() {
             // would now cut the pill's left edge off.
             className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[image:var(--bg-md,none)] md:p-6 md:pl-[40px] md:pt-[43px] md:text-left`}
             data-bg="url(/images/templates/inside-support-phone.webp)"
-            data-bg-md="url(/images/templates/inside-support.webp)"
+            data-bg-md="url(/images/templates/inside-support-v2.webp)"
           >
             <p className="relative">
               <span className={BIG}>{s.support.big}</span>
@@ -1813,7 +1813,7 @@ export function TemplatesInside() {
             // under a 24.
             className={`${CARD} col-span-2 flex h-[222px] flex-col items-center bg-[image:var(--bg,none)] pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:bg-[image:var(--bg-md,none)] md:pt-[40px]`}
             data-bg="url(/images/templates/inside-monthly-phone.webp)"
-            data-bg-md="url(/images/templates/inside-monthly.webp)"
+            data-bg-md="url(/images/templates/inside-monthly-v2.webp)"
             style={{ backgroundPosition: "center bottom" }}
           >
             <p className="relative">
@@ -2496,7 +2496,7 @@ function PhoneTiles() {
 export function TemplatesBgFallbacks() {
   const files = [
     "process-card-1.webp",
-    "process-canva-card.webp",
+    "process-canva-card-v2.webp",
     "process-card-3.webp",
     "compare-card.webp",
     "cmp-row-band.webp",
@@ -2513,9 +2513,9 @@ export function TemplatesBgFallbacks() {
   // The desktop twins, which the class only uses above md.
   const wide = [
     "access-rays.webp",
-    "inside-support.webp",
+    "inside-support-v2.webp",
     "inside-industries.webp",
-    "inside-monthly.webp",
+    "inside-monthly-v2.webp",
   ];
   return (
     <>

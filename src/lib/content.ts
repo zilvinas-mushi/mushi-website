@@ -1249,7 +1249,7 @@ export const TEMPLATES_PAGE = {
         // inline shot over it (desktopCard below); the phone still covers
         // this background with its own render, as before.
         desktopCard: true,
-        card: "process-canva-card.webp",
+        card: "process-canva-card-v2.webp",
         alt: "The same template being edited in Canva",
         gradient: "linear-gradient(150deg,#8f3287 0%,#82296f 55%,#6d1a72 100%)",
       },
