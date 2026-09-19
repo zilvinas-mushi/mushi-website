@@ -1706,13 +1706,17 @@ export function TemplatesInside() {
                 />
               ))}
             </span>
-            {/* THE WHOLE LOCKUP AS ONE FILE (Trustpilot.svg, supplied
-                2026-09-06), 34 tall. Star and wordmark used to be two
-                elements aligned against each other, which is a fight the
+            {/* THE WHOLE LOCKUP AS ONE FILE. Star and wordmark used to be
+                two elements aligned against each other, which is a fight the
                 design never asked for: the mark is a licensed lockup with
-                its own spacing, and the file already has it. Flattened from
-                Figma's raster-in-<pattern> the same way the brand chips are.
-                */}
+                its own spacing, and the file already has it. Since
+                2026-09-19 it is the client's "trustpilot logo.png" (3088 x
+                820, "such a better quality"), cropped to its ink and shipped
+                as an 800-wide LOSSLESS WebP — white on alpha compresses to
+                9 KB, and lossy ringing on a white edge is the whole problem
+                it replaces. Same file for the phone and the desktop. The
+                source clips the p's descender flush at its bottom edge; that
+                is in the file as supplied. */}
             {/* 126 WIDE on the phone (Žilvinas 2026-09-18, "trustpilot should
                 be 126 x 34"). The artboard's 126 x 34 frame is the lockup's
                 box with empty top inside it; the file here is cropped to the
