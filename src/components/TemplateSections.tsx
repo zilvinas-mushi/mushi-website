@@ -221,16 +221,24 @@ function EyebrowRule({
   /** Which breakpoint draws it; the phone's rules by default. */
   className?: string;
 }) {
-  const url = `/images/templates/${src}`;
+  // A REAL src, NOT data-src (Žilvinas 2026-09-19, "there are no those
+  // arrows no more"): the rules are ~900-byte vectors, so deferring them
+  // saved nothing and cost the one thing that matters — they showed only
+  // once the below-fold observer had reached them, and in a tab that had
+  // not been reloaded since the markup changed that was never. loading=lazy
+  // keeps them off the paint gate's list (it skips lazy images), and the
+  // browser fetches them on its own terms.
   return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img data-src={url} alt="" width={width} height={21} loading="lazy" decoding="async" className={className} />
-      <noscript>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt="" width={width} height={21} loading="lazy" decoding="async" className={className} />
-      </noscript>
-    </>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/images/templates/${src}`}
+      alt=""
+      width={width}
+      height={21}
+      loading="lazy"
+      decoding="async"
+      className={className}
+    />
   );
 }
 
