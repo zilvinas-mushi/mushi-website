@@ -981,7 +981,20 @@ img[data-src] {
   inset: 0;
   border-radius: inherit;
   padding: 4px;
-  background: linear-gradient(0deg, #6e54b5 0%, rgba(17, 17, 17, 0) 100%);
+  /* THE RING FADES WITH THE CARD (Žilvinas 2026-09-19, "the stroke
+     transition should go with the background colour"). The plate is flat
+     #111 down to ~15% and only then ramps into violet, reaching full at the
+     bottom; the ring was a straight bottom-to-top ramp, so it was still
+     half-lit against the black upper half. Stops sampled off the export
+     (0 / 20 / 50 / 100%: none / 15% / 50% / full), so the frame appears
+     exactly where the colour does. */
+  background: linear-gradient(
+    0deg,
+    #6e54b5 0%,
+    rgba(110, 84, 181, 0.5) 50%,
+    rgba(110, 84, 181, 0.15) 80%,
+    rgba(110, 84, 181, 0) 88%
+  );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
