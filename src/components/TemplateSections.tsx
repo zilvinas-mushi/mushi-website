@@ -791,7 +791,11 @@ function CompetitorMark({ name }: { name: string }) {
     return (
       <>
         <Img src="templates/cmp-kandy-phone.webp" alt={name} width={44} className="md:hidden" />
-        <Img src="templates/cmp-kandy.webp" alt={name} width={54} className="hidden md:block" />
+        {/* 79 box → 68 of ink (the file has ~14% of clear margin either
+            side): the artboard draws Kandy at half the CreativeOS lockup's
+            width, which is 134 here (Žilvinas 2026-09-19, "why so small").
+            It was 54, i.e. 46 of ink. */}
+        <Img src="templates/cmp-kandy.webp" alt={name} width={79} className="hidden md:block" />
       </>
     );
   }
@@ -846,8 +850,8 @@ function CompareValue({ v, mushi }: { v: string | boolean; mushi?: boolean }) {
       <span
         className={
           mushi
-            ? "text-[20px] font-semibold text-white md:text-[21px]"
-            : "text-[20px] font-semibold text-[#ff5b5b]"
+            ? "text-[20px] font-semibold text-white md:text-[33px]"
+            : "text-[20px] font-semibold text-[#ff5b5b] md:text-[33px]"
         }
       >
         {v}
