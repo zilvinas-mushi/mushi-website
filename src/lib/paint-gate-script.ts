@@ -111,6 +111,34 @@ export const PAINT_GATE_SCRIPT = `
     // horizontal reach, and that is the point of grouping it.
     },{rootMargin:'600px 0px'});
     for(var g=0;g<groups.length;g++)gio.observe(groups[g]);
+    // ANYTHING ADDED LATER IS WATCHED TOO. The pass above only knows the
+    // elements that existed when it ran; a picture React renders afterwards
+    // — a client-side re-render, or dev's hot reload swapping in an edited
+    // subtree — carried its URL in data-src with nothing ever moving it
+    // across, and sat invisible for good (the Konvert star and the Kandy
+    // logo, 2026-09-19, after an edit while the tab was open). One observer
+    // per arming; a re-arm on a route change replaces it.
+    if('MutationObserver' in window){
+      if(window.__mushiMO)window.__mushiMO.disconnect();
+      window.__mushiMO=new MutationObserver(function(recs){
+        for(var r=0;r<recs.length;r++){
+          var added=recs[r].addedNodes;
+          for(var a=0;a<added.length;a++){
+            var n=added[a];
+            if(n.nodeType!==1)continue;
+            var list=[];
+            if(n.matches&&n.matches(sel))list.push(n);
+            var inner=n.querySelectorAll?n.querySelectorAll(sel):[];
+            for(var q=0;q<inner.length;q++)list.push(inner[q]);
+            for(var l=0;l<list.length;l++){
+              if(list[l].closest('[data-defer-group]'))continue;
+              io.observe(list[l]);
+            }
+          }
+        }
+      });
+      window.__mushiMO.observe(d.body,{childList:true,subtree:true});
+    }
   }
   // The ceiling on the hold, first paint and route change. See PaintGate.tsx.
   function gate(first){
