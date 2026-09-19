@@ -1298,7 +1298,7 @@ export function TemplatesAccess() {
                   slash is part of the price, not a separate label. */}
               {/* 3 below the figure's baseline on the phone, as Figma sets
                   it (Žilvinas 2026-09-11) — sharing the baseline read high. */}
-              <span className="translate-y-[3px] text-[20px] font-semibold tracking-normal text-[#c5696a] md:translate-y-0 md:text-[16px] md:font-medium">
+              <span className="translate-y-[3px] text-[20px] font-semibold tracking-normal text-[#c5696a] md:translate-y-0 md:text-[29px] md:font-semibold">
                 {a.scratch.unit}
               </span>
             </p>
@@ -1404,7 +1404,7 @@ export function TemplatesAccess() {
                   {a.templates.figure}
                 </span>
                 {/* 1.5 below the figure's baseline on the phone (Figma). */}
-                <span className="translate-y-[1.5px] text-[20px] font-semibold tracking-normal text-[#9b79e2] md:translate-y-0 md:text-[16px] md:font-medium">
+                <span className="translate-y-[1.5px] text-[20px] font-semibold tracking-normal text-[#9b79e2] md:translate-y-0 md:text-[29px] md:font-semibold">
                   {a.templates.unit}
                 </span>
               </span>
