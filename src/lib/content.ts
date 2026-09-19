@@ -26,13 +26,15 @@ import { BOOKING_ANCHOR } from "@/lib/site";
 export const NAV = [
   { label: "Agency", href: "/" },
   { label: "Case Studies", href: null },
-  // HELD BACK EVERYWHERE FOR NOW (Žilvinas 2026-09-19, "disable so templates
-  // from the menu wouldn't be reachable for now"): on the home page both
-  // bars show it as the half-strength text a not-yet page gets; /templates
-  // itself keeps it as a link and the selected row. The phone had been held
-  // back alone since 2026-09-18 (phoneLiveOn); liveOn now covers both, and
-  // dropping it puts the desktop link back with no other change. See navHref.
-  { label: "Templates", href: "/templates", liveOn: ["/templates"], phoneLiveOn: ["/templates"] },
+  // HELD BACK FOR NOW (Žilvinas 2026-09-19, "disable so templates from the
+  // menu wouldn't be reachable for now", then "this one" on /templates
+  // itself): the DESKTOP bar shows it as the half-strength text a not-yet
+  // page gets on every page, /templates included (liveOn: []). The phone
+  // drawer keeps its 2026-09-18 rule — held back on the home page, a link
+  // and the selected row on /templates (phoneLiveOn). Put "/templates" in
+  // liveOn to light the desktop link there, drop liveOn to restore it
+  // everywhere. See navHref.
+  { label: "Templates", href: "/templates", liveOn: [], phoneLiveOn: ["/templates"] },
 ] as const;
 
 /**
@@ -47,7 +49,9 @@ export function navHref(
   path: string,
   { phone = false }: { phone?: boolean } = {},
 ): string | null {
-  if ("liveOn" in item && !(item.liveOn as readonly string[]).includes(path)) return null;
+  // liveOn is the DESKTOP bar's rule; the phone drawer answers to phoneLiveOn
+  // alone, so the two can differ (2026-09-19).
+  if (!phone && "liveOn" in item && !(item.liveOn as readonly string[]).includes(path)) return null;
   if (phone && "phoneLiveOn" in item && !(item.phoneLiveOn as readonly string[]).includes(path)) {
     return null;
   }
