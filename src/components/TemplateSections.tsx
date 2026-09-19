@@ -1651,7 +1651,10 @@ export function TemplatesInside() {
   // painted pixels) lifts the numbers off the dark cards.
   const SHINE =
     "bg-[linear-gradient(135deg,#a08add_0%,#7c54b5_40%,#7155b5_100%)] bg-clip-text text-transparent drop-shadow-[0_5px_12px_rgba(0,0,0,0.45)]";
-  const BIG = `${SHINE} text-[36px] font-medium leading-none md:text-[40px]`;
+  // md: Poppins Medium 70 on a 75.1 leading for EVERY card's number — 24/7,
+  // 5, 50+ NEW (Žilvinas 2026-09-19, off the inspector); the labels under
+  // them are 40 (33 on the monthly card), set per use below.
+  const BIG = `${SHINE} text-[36px] font-medium leading-none md:text-[70px] md:leading-[75px]`;
   const SMALL = `${SHINE} text-[24px] font-medium leading-none`;
   return (
     // 60 from the last step card to the eyebrow (artboard 2026-09-06).
@@ -1691,7 +1694,7 @@ export function TemplatesInside() {
           >
             <p className="relative">
               <span className={BIG}>{s.support.big}</span>
-              <span className={`${SMALL} block md:mt-1`}>{s.support.small}</span>
+              <span className={`${SMALL} block md:mt-1 md:text-[40px]`}>{s.support.small}</span>
             </p>
           </article>
 
@@ -1704,7 +1707,7 @@ export function TemplatesInside() {
           >
             <p className="relative">
               <span className={BIG}>{s.industries.big}</span>
-              <span className={`${SMALL} block md:mt-1`}>{s.industries.small}</span>
+              <span className={`${SMALL} block md:mt-1 md:text-[40px]`}>{s.industries.small}</span>
             </p>
           </article>
 
@@ -1779,7 +1782,7 @@ export function TemplatesInside() {
               width={126}
               className="relative mt-2 h-auto w-[126px] md:mt-3 md:h-[33px] md:w-auto"
             />
-            <p className={`${SMALL} relative mt-1 md:mt-2 md:!text-[20px]`}>{s.reviews.caption}</p>
+            <p className={`${SMALL} relative mt-1 md:mt-2 md:text-[40px]`}>{s.reviews.caption}</p>
           </article>
 
           {/* 50+ new templates monthly — the dimmed collage is the baked
@@ -1808,7 +1811,7 @@ export function TemplatesInside() {
                   the "0+" and the "mpla"), so on a 75px box whose baseline
                   leaves ~17 under it and a leading-none 33 with ~2 above its
                   ascenders it is a -4 margin. */}
-              <span className={`${BIG} text-[48px] md:text-[70px] md:leading-[75px]`}>{s.monthly.big}</span>
+              <span className={`${BIG} text-[48px]`}>{s.monthly.big}</span>
               <span className={`${SMALL} block md:-mt-[4px] md:text-[33px]`}>{s.monthly.small}</span>
             </p>
           </article>
