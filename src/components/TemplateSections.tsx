@@ -1127,7 +1127,7 @@ export function TemplatesComparison() {
               DESKTOP ONLY — see the phone's own button below the grid. */}
           <a
             href={APP_URL}
-            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-5 py-3 text-[26px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5 md:text-[14px]"
+            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-5 py-3 text-[25px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5"
             style={{ gridRowStart: lastRow }}
           >
             {/* LIVE TYPE (Žilvinas 2026-09-19, "looks distorted"): the label
