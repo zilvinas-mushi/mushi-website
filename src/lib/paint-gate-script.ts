@@ -122,6 +122,14 @@ export const PAINT_GATE_SCRIPT = `
       if(window.__mushiMO)window.__mushiMO.disconnect();
       window.__mushiMO=new MutationObserver(function(recs){
         for(var r=0;r<recs.length;r++){
+          // A data-src / data-bg SET ON AN EXISTING ELEMENT counts too: a
+          // re-render that only swaps the URL (dev's hot reload after the
+          // Canva card's art changed, 2026-09-19) adds no node.
+          if(recs[r].type==='attributes'){
+            var t=recs[r].target;
+            if(t.matches&&t.matches(sel)&&!t.closest('[data-defer-group]'))io.observe(t);
+            continue;
+          }
           var added=recs[r].addedNodes;
           for(var a=0;a<added.length;a++){
             var n=added[a];
@@ -137,7 +145,7 @@ export const PAINT_GATE_SCRIPT = `
           }
         }
       });
-      window.__mushiMO.observe(d.body,{childList:true,subtree:true});
+      window.__mushiMO.observe(d.body,{childList:true,subtree:true,attributes:true,attributeFilter:['data-src','data-bg']});
     }
   }
   // The ceiling on the hold, first paint and route change. See PaintGate.tsx.
