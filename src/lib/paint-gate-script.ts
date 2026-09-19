@@ -46,9 +46,8 @@ export const PAINT_GATE_SCRIPT = `
   // The failure mode is the same as the gate's: show it anyway. No
   // IntersectionObserver, or an error, and everything is restored at once;
   // with JavaScript off the <noscript> block in layout.tsx does the same.
-  function defer(){
-    var sel='[data-src],[data-bg]';
-    function load(el){
+  var sel='[data-src],[data-bg]';
+  function load(el){
       var s=el.getAttribute('data-src');
       if(s){
         var ss=el.getAttribute('data-srcset');
@@ -66,7 +65,13 @@ export const PAINT_GATE_SCRIPT = `
         if(bm)el.style.setProperty('--bg-md',bm);
         el.removeAttribute('data-bg');el.removeAttribute('data-bg-md');
       }
-    }
+  }
+  function loadGroup(g){
+    var kids=g.querySelectorAll(sel);
+    for(var k=0;k<kids.length;k++)load(kids[k]);
+    load(g);
+  }
+  function defer(){
     // A MARQUEE LOADS AS A GROUP. The showcase wall and the creatives rail
     // drift sideways for ever: a tile four screens to the right is a few
     // seconds away, not a scroll away, so per-tile intersection would have it
@@ -74,11 +79,6 @@ export const PAINT_GATE_SCRIPT = `
     // data-defer-group loads everything inside it the moment the GROUP comes
     // into range, and its children are left off the individual pass.
     var groups=d.querySelectorAll('[data-defer-group]');
-    function loadGroup(g){
-      var kids=g.querySelectorAll(sel);
-      for(var k=0;k<kids.length;k++)load(kids[k]);
-      load(g);
-    }
     // The creatives rail arms itself two viewports out, on its own reasoning
     // (CreativesRail.tsx); this is the handle it pulls.
     window.__mushiLoadGroup=loadGroup;
@@ -234,16 +234,51 @@ export const PAINT_GATE_SCRIPT = `
         if(!imgs[i].getClientRects().length)continue;
         waits.push(painted(imgs[i]));
       }
-      var els=d.querySelectorAll('[data-await-bg]');
-      for(var j=0;j<els.length;j++){
-        if(!els[j].getClientRects().length)continue;
-        var layers=getComputedStyle(els[j]).backgroundImage,m,re=/url\\((['"]?)(.*?)\\1\\)/g;
+      function awaitBg(el){
+        var layers=getComputedStyle(el).backgroundImage,m,re=/url\\((['"]?)(.*?)\\1\\)/g;
         while((m=re.exec(layers))){
           var u=m[2];
           if(!u||u.indexOf('data:')===0)continue;
           var probe=new Image();probe.src=u;waits.push(painted(probe));
         }
       }
+      var els=d.querySelectorAll('[data-await-bg]');
+      for(var j=0;j<els.length;j++){
+        if(!els[j].getClientRects().length)continue;
+        awaitBg(els[j]);
+      }
+      // THE FIRST SCREEN IS WHEREVER THE BROWSER PUT US, not always the top
+      // (Žilvinas 2026-09-19, "it really sucks when you refresh to see empty
+      // places"). A refresh restores the scroll position, and the deferred
+      // artwork that lands in that viewport used to arrive a second after
+      // the reveal, because the observer below only arms after load and the
+      // fade. So anything deferred that is in view NOW is loaded here and
+      // waited for like the hero's own pictures — and only that: the rule
+      // against gating on below-fold bytes still holds for everything
+      // outside the viewport. A marquee group in view loads whole, as it
+      // would from the observer.
+      try{
+        var vh=window.innerHeight,inView=function(el){
+          var r=el.getBoundingClientRect();
+          return (r.width||r.height)&&r.bottom>0&&r.top<vh;
+        };
+        var gs=d.querySelectorAll('[data-defer-group]'),seen=[];
+        for(var g=0;g<gs.length;g++){
+          if(!inView(gs[g]))continue;
+          var kids=gs[g].querySelectorAll('img[data-src]');
+          loadGroup(gs[g]);
+          for(var k=0;k<kids.length;k++)if(inView(kids[k]))waits.push(painted(kids[k]));
+        }
+        var dfs=d.querySelectorAll(sel);
+        for(var x=0;x<dfs.length;x++){
+          var el=dfs[x];
+          if(el.closest('[data-defer-group]')||!inView(el))continue;
+          var wasImg=el.tagName==='IMG',hadBg=el.hasAttribute('data-bg');
+          load(el);
+          if(wasImg)waits.push(painted(el));
+          if(hadBg)awaitBg(el);
+        }
+      }catch(e2){}
       Promise.all(waits).then(open,open);
     }
     // The document has to exist before it can be measured. On the first paint
