@@ -749,11 +749,16 @@ export function TemplatesTeam() {
                   />
                 ) : null}
                 <div className="relative min-w-0 pr-4">
-                  <p className="truncate text-[20px] font-semibold leading-tight text-white md:text-[28px]">
+                  {/* md: the inspector's SemiBold 34 over Regular 26 with 13
+                      between (Žilvinas 2026-09-19), at the page's 0.9 — 31 /
+                      23, and the 13 → 12 is ink to ink, which on two
+                      leading-none boxes (4.7 of box under the name's
+                      baseline, 3.5 above the role's caps) is a 4 margin. */}
+                  <p className="truncate text-[20px] font-semibold leading-tight text-white md:text-[31px] md:leading-none">
                     {p.name}
                   </p>
                   <p
-                    className="role-gradient mt-0.5 text-[16px] font-normal leading-tight md:text-[15px] md:font-medium"
+                    className="role-gradient mt-0.5 text-[16px] font-normal leading-tight md:mt-1 md:text-[23px] md:font-normal md:leading-none"
                     style={
                       {
                         "--role-color": p.color,
