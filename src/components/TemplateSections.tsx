@@ -483,7 +483,14 @@ export function TemplatesProcess() {
                 {/* NO SHADOW under the chip (2026-09-18, the client's boss:
                     Figma has none, the web had one). The pill sits flat on
                     the step's artwork. */}
-                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black md:bottom-5 md:left-6 md:px-[14px] md:py-2 md:text-[16px] md:font-medium">
+                {/* DESKTOP IS THE ARTBOARD'S PILL (Žilvinas 2026-09-19, off the
+                    inspector): 117 x 31, radius 50, #F5F5F5, Poppins Medium
+                    15, the text 12 in from the pill's curved side and 9 off
+                    its bottom, and the pill 30 from the card's left and 30
+                    up from its bottom. The 31 is set as a height with the
+                    label centred, which is the same 9 / 9 without depending
+                    on Poppins' line box. */}
+                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black md:bottom-[30px] md:left-[30px] md:inline-flex md:h-[31px] md:items-center md:bg-[#f5f5f5] md:px-3 md:py-0 md:text-[15px]">
                   {s.chip}
                 </span>
               </article>
