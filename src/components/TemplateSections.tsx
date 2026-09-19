@@ -1651,10 +1651,11 @@ export function TemplatesInside() {
   // painted pixels) lifts the numbers off the dark cards.
   const SHINE =
     "bg-[linear-gradient(135deg,#a08add_0%,#7c54b5_40%,#7155b5_100%)] bg-clip-text text-transparent drop-shadow-[0_5px_12px_rgba(0,0,0,0.45)]";
-  // md: Poppins Medium 70 on a 75.1 leading for EVERY card's number — 24/7,
-  // 5, 50+ NEW (Žilvinas 2026-09-19, off the inspector); the labels under
-  // them are 40 (33 on the monthly card), set per use below.
-  const BIG = `${SHINE} text-[36px] font-medium leading-none md:text-[70px] md:leading-[75px]`;
+  // md: the inspector's Poppins Medium 70 on 75.1 for EVERY card's number
+  // — 24/7, 5, 50+ NEW (Žilvinas 2026-09-19) — at the 0.9 the cards are
+  // drawn at (see the grid below): 63 on 67.6. The labels under them are
+  // its 40 → 36 (33 → 30 on the monthly card), set per use.
+  const BIG = `${SHINE} text-[36px] font-medium leading-none md:text-[63px] md:leading-[67.6px]`;
   const SMALL = `${SHINE} text-[24px] font-medium leading-none`;
   return (
     // 60 from the last step card to the eyebrow (artboard 2026-09-06).
@@ -1674,7 +1675,15 @@ export function TemplatesInside() {
         {/* PHONE: the two counters side by side at 165 x 119, then Trustpilot
             and the monthly card full width, 15 apart. Desktop keeps its own
             three-column bento. */}
-        <div className="mx-auto mt-[37px] grid max-w-[1080px] grid-cols-2 gap-[15px] md:mt-12 md:grid-cols-[1fr_1fr_1.074fr] md:grid-rows-[243px_241px] md:gap-[15px]">
+        {/* THE BENTO'S EDGES ARE THE PROCESS CARDS' EDGES (Žilvinas
+            2026-09-19): the shell's full 1160, not a 1080 cap, so the
+            monthly card's right side lines up with the orange step card
+            above it and the support card's left with the first. Rows scale
+            with it, 243 / 241 → 261 / 259, which keeps the monthly card at
+            the artboard's 438 x 593 aspect. At 1160 the cards are 0.9 of
+            the artboard's, so the type in them is 0.9 of the inspector's
+            too: 63 / 36 / 30 for 70 / 40 / 33. */}
+        <div className="mx-auto mt-[37px] grid max-w-[1160px] grid-cols-2 gap-[15px] md:mt-12 md:grid-cols-[1fr_1fr_1.074fr] md:grid-rows-[261px_259px] md:gap-[15px]">
           {/* 24/7 support — the baked art carries the memoji cluster and the
               "Need help?" bubble, so only the headline renders as text.
               PHONE has its own art (Žilvinas 2026-09-11): 660 x 476, exactly
@@ -1694,7 +1703,7 @@ export function TemplatesInside() {
           >
             <p className="relative">
               <span className={BIG}>{s.support.big}</span>
-              <span className={`${SMALL} block md:mt-1 md:text-[40px]`}>{s.support.small}</span>
+              <span className={`${SMALL} block md:mt-1 md:text-[36px]`}>{s.support.small}</span>
             </p>
           </article>
 
@@ -1707,7 +1716,7 @@ export function TemplatesInside() {
           >
             <p className="relative">
               <span className={BIG}>{s.industries.big}</span>
-              <span className={`${SMALL} block md:mt-1 md:text-[40px]`}>{s.industries.small}</span>
+              <span className={`${SMALL} block md:mt-1 md:text-[36px]`}>{s.industries.small}</span>
             </p>
           </article>
 
@@ -1782,7 +1791,7 @@ export function TemplatesInside() {
               width={126}
               className="relative mt-2 h-auto w-[126px] md:mt-3 md:h-[33px] md:w-auto"
             />
-            <p className={`${SMALL} relative mt-1 md:mt-2 md:text-[40px]`}>{s.reviews.caption}</p>
+            <p className={`${SMALL} relative mt-1 md:mt-2 md:text-[36px]`}>{s.reviews.caption}</p>
           </article>
 
           {/* 50+ new templates monthly — the dimmed collage is the baked
@@ -1798,7 +1807,7 @@ export function TemplatesInside() {
             // CENTRED on desktop too, 45 down from the card's top (Žilvinas
             // 2026-09-19, off the artboard's inspector); it was left-set
             // under a 24.
-            className={`${CARD} col-span-2 flex h-[222px] flex-col items-center bg-[image:var(--bg,none)] pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:bg-[image:var(--bg-md,none)] md:pt-[45px]`}
+            className={`${CARD} col-span-2 flex h-[222px] flex-col items-center bg-[image:var(--bg,none)] pt-7 text-center md:col-span-1 md:col-start-3 md:row-span-2 md:row-start-1 md:h-auto md:min-h-[360px] md:bg-[image:var(--bg-md,none)] md:pt-[40px]`}
             data-bg="url(/images/templates/inside-monthly-phone.webp)"
             data-bg-md="url(/images/templates/inside-monthly.webp)"
             style={{ backgroundPosition: "center bottom" }}
@@ -1812,7 +1821,7 @@ export function TemplatesInside() {
                   leaves ~17 under it and a leading-none 33 with ~2 above its
                   ascenders it is a -4 margin. */}
               <span className={`${BIG} text-[48px]`}>{s.monthly.big}</span>
-              <span className={`${SMALL} block md:-mt-[4px] md:text-[33px]`}>{s.monthly.small}</span>
+              <span className={`${SMALL} block md:-mt-[4px] md:text-[30px]`}>{s.monthly.small}</span>
             </p>
           </article>
         </div>
