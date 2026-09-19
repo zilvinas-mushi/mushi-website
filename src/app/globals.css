@@ -1829,3 +1829,10 @@ img[data-src] {
     scroll-behavior: auto !important;
   }
 }
+
+/* The desktop showcase wall: a container so the image's -12.33cqw pull-up
+   (TemplateSections) is measured off this box's own width — the export's
+   black band above its first ad, which is what the pull-up hides. */
+.showcase-wall {
+  container-type: inline-size;
+}

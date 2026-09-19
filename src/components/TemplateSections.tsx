@@ -1647,12 +1647,22 @@ export function TemplatesShowcase() {
           starts at the export's own top edge, so the title-to-first-picture
           gap is the section's 48 like everywhere else — the -104 had the
           72px title sitting between the topmost tiles. */}
-      <div aria-hidden="true" className="mt-[32px] md:mt-12 md:-mb-16">
+      {/* md: the gap is counted TO THE HUEL AD, not to the export's edge
+          (Žilvinas 2026-09-19): that ad's top sits 12.33% of the wall's
+          width down inside the file, and the artboard's 72 (65 at 0.9)
+          from the title's baseline is what should be there. So the margin
+          is 65 minus the title's 10.8 of box under its baseline, minus the
+          file's own black band: 54px - 12.33vw of the shell. */}
+      <div aria-hidden="true" className="showcase-wall mt-[32px] md:mt-[54px] md:-mb-16 md:overflow-hidden">
         <ShowcaseRows />
+        {/* The pull-up is on the image, measured against the wrapper's own
+            width (.showcase-wall is a size container in globals.css), so
+            the black band above the Huel ad is exactly what is hidden at
+            any width. */}
         <Img
           src="templates/showcase-wall.webp"
           alt=""
-          className="hidden w-full md:block"
+          className="hidden w-full md:block md:-mt-[12.33cqw]"
         />
       </div>
     </section>
