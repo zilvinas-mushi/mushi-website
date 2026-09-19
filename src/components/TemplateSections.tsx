@@ -1495,13 +1495,30 @@ export function TemplatesAccess() {
                 viewBox="0 0 13 13"
                 fill="none"
                 strokeWidth="2"
-                className="size-[13px] stroke-current md:size-[10px]"
+                className="size-[13px] stroke-current md:hidden"
                 aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M6.277 1l5.278 5.278-5.278 5.277M11.555 6.278H1"
+                />
+              </svg>
+              {/* DESKTOP: the supplied "arrow icon.svg" (Žilvinas 2026-09-19)
+                  verbatim — a 17-box path at weight 2 — drawn in the
+                  artboard's 10 x 10, with the stroke on currentColor so it
+                  inverts with the disc. */}
+              <svg
+                viewBox="0 0 17 17"
+                fill="none"
+                strokeWidth="2"
+                className="hidden size-[10px] stroke-current md:block"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.0708 1L15.1419 8.07107L8.0708 15.1421M15.1419 8.07107L0.999865 8.07094"
                 />
               </svg>
             </span>
