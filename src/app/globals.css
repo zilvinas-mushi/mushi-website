@@ -1375,7 +1375,16 @@ img[data-src] {
    of it, which is what read as too big. So: the artboard's ratio, capped
    at its 100 — 72 on a 1512, 91 on a 1920, 100 from the width the tile
    reaches 230 at. */
+/* CENTRED IN THE TILE, both axes (Žilvinas 2026-09-19, "always centre"):
+   the emoji is pulled out of the label's flow and laid on the tile's own
+   middle, so it sits at the same spot whatever the label above it does. */
+.hero-tile {
+  position: relative;
+}
 .hero-tile-art {
+  position: absolute;
+  inset: 0;
+  margin: auto;
   width: min(100px, calc(var(--tile) * 0.4348));
   height: auto;
   aspect-ratio: 1;
