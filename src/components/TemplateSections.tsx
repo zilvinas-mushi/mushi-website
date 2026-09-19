@@ -1170,7 +1170,7 @@ const ACCESS_ICONS: Record<string, { viewBox: string; d: string[] }> = {
 function AccessIcon({ name }: { name: string }) {
   const icon = ACCESS_ICONS[name];
   if (!icon) {
-    return <Img src={`templates/${name}.webp`} alt="" width={22} className="shrink-0" />;
+    return <Img src={`templates/${name}.webp`} alt="" width={25} className="shrink-0" />;
   }
   // PHONE: a 16 slot, the glyph at its file's own width inside it (the
   // files are 16 wide or 14, and 13 to 16 tall — a 16-tall viewBox height
@@ -1181,7 +1181,10 @@ function AccessIcon({ name }: { name: string }) {
   // target keeps the old 2 / 1.5 pair, which is ~1.3px at either size.
   const grid16 = !icon.viewBox.endsWith(" 24 24");
   return (
-    <span className="grid size-[16px] shrink-0 place-items-center md:size-[22px]">
+    // md: 25 (Žilvinas 2026-09-19, the artboard's 25 x 25), up from 22.
+    // Stroke scaled with it so it stays ~1.5px on screen: 16/25 x 1.5 on the
+    // 16 grid, the 24 grid's 1.5 is ~1.56 there.
+    <span className="grid size-[16px] shrink-0 place-items-center md:size-[25px]">
       <svg
         aria-hidden="true"
         viewBox={icon.viewBox}
@@ -1192,8 +1195,8 @@ function AccessIcon({ name }: { name: string }) {
         strokeLinejoin="round"
         className={
           grid16
-            ? "h-auto w-[16px] max-h-[16px] stroke-[1.5] md:w-[22px] md:max-h-[22px] md:stroke-[1.1]"
-            : "size-[16px] stroke-2 md:size-[22px] md:stroke-[1.5]"
+            ? "h-auto w-[16px] max-h-[16px] stroke-[1.5] md:w-[25px] md:max-h-[25px] md:stroke-[0.96]"
+            : "size-[16px] stroke-2 md:size-[25px] md:stroke-[1.5]"
         }
       >
         {icon.d.map((d) => (
@@ -1314,7 +1317,9 @@ export function TemplatesAccess() {
                       22 slot: the same slot as the plan card's icons, so
                       both lists share one row pitch (32) and one text
                       start (Žilvinas 2026-09-11). */}
-                  <span className="grid size-[16px] shrink-0 place-items-center md:size-[22px]">
+                  {/* md slot 25, matching the plan card's icons (2026-09-19)
+                      so both lists keep one text start; the cross stays 18. */}
+                  <span className="grid size-[16px] shrink-0 place-items-center md:size-[25px]">
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 23 23"
