@@ -395,6 +395,10 @@
     "w": 200,
     "h": 200
   },
+  "templates/chip-creativeos.webp": {
+    "w": 584,
+    "h": 96
+  },
   "templates/chip-kandy.webp": {
     "w": 174,
     "h": 89
@@ -490,14 +494,6 @@
   "templates/diff-trashcan-v2.webp": {
     "w": 2000,
     "h": 2234
-  },
-  "templates/eyebrow-rule-left.webp": {
-    "w": 322,
-    "h": 42
-  },
-  "templates/eyebrow-rule-right.webp": {
-    "w": 320,
-    "h": 42
   },
   "templates/hero-burst-phone.webp": {
     "w": 750,

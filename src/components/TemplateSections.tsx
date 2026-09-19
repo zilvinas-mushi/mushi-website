@@ -174,16 +174,14 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
           logo does; the one-pixel width asymmetry is the exports' own. */}
       <EyebrowRule src="eyebrow-left.svg" width={126} />
 
-      {/* The DESKTOP's own exported rules too (2026-09-10): black fading
-          into the ramp's end colour with a chunky star on the inner tip —
-          purple star left, rose star right — replacing the CSS hairline
-          and ✦ glyph pair. */}
-      <Img
-        src="templates/eyebrow-rule-left.webp"
-        alt=""
-        width={161}
-        className="hidden md:block"
-      />
+      {/* THE DESKTOP'S RULES ARE VECTORS TOO NOW (Žilvinas 2026-09-19,
+          "the best quality they can be"): "left side star:arrow.svg" 161 x
+          21 and "right side of difference .svg" 160 x 21 — a gradient <line>
+          into a star <path>, #6E54B5 on the left and #D07678 on the right —
+          replacing the 2026-09-10 WebP exports, which were rasters of the
+          same drawing and went soft at 2x. One component draws both
+          breakpoints' rules; only the class differs. */}
+      <EyebrowRule src="eyebrow-rule-left.svg" width={161} className="hidden shrink-0 md:block" />
       {/* Poppins Regular 18 on the phone (artboard 2026-09-06), 30 at the
           desktop reference. */}
       {/* Figma panel 2026-09-07: Poppins Regular 30 over an 80 line height
@@ -194,12 +192,7 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
       >
         {children}
       </p>
-      <Img
-        src="templates/eyebrow-rule-right.webp"
-        alt=""
-        width={160}
-        className="hidden md:block"
-      />
+      <EyebrowRule src="eyebrow-rule-right.svg" width={160} className="hidden shrink-0 md:block" />
 
       <EyebrowRule src="eyebrow-right.svg" width={127} />
     </div>
@@ -218,15 +211,24 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
  * shrink, so the row overhangs the padding by a couple of px each side,
  * centred; body clips sideways overflow, so nothing can scroll to it.
  */
-function EyebrowRule({ src, width }: { src: string; width: number }) {
+function EyebrowRule({
+  src,
+  width,
+  className = "shrink-0 md:hidden",
+}: {
+  src: string;
+  width: number;
+  /** Which breakpoint draws it; the phone's rules by default. */
+  className?: string;
+}) {
   const url = `/images/templates/${src}`;
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img data-src={url} alt="" width={width} height={21} loading="lazy" decoding="async" className="shrink-0 md:hidden" />
+      <img data-src={url} alt="" width={width} height={21} loading="lazy" decoding="async" className={className} />
       <noscript>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt="" width={width} height={21} loading="lazy" decoding="async" className="shrink-0 md:hidden" />
+        <img src={url} alt="" width={width} height={21} loading="lazy" decoding="async" className={className} />
       </noscript>
     </>
   );
@@ -2351,16 +2353,17 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                 <Img src="templates/chip-kandy.webp" alt="Kandy" width={58} />
               </span>
             ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={`/images/templates/chip-${brand.toLowerCase()}.svg`}
-                alt={brand}
-                width={172}
-                height={40}
-                loading="lazy"
-                decoding="async"
-                className="h-10 w-auto"
-              />
+              /* CREATIVEOS, THE SAME WAY (Žilvinas 2026-09-19, "creativeOS
+                 logo.svg"): the export is a Figma frame with one 1916 x 316
+                 PNG of the whole logo used twice through pattern crops and a
+                 white rect drifted off its artboard — so the PNG is lifted
+                 out, cropped to its ink and shipped at 4x of the 24 it draws
+                 at (584 x 96, 11 KB), on a live pill: the artboard's 172 x
+                 40, which puts 13.5 either side of the 145-wide mark. The old
+                 chip-creativeos.svg wrapped a smaller raster the same way. */
+              <span className="flex h-10 items-center rounded-[10px] bg-white px-[13.5px]">
+                <Img src="templates/chip-creativeos.webp" alt={brand} width={145} />
+              </span>
             )}
           </li>
         ))}
