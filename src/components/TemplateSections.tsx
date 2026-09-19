@@ -1468,7 +1468,11 @@ export function TemplatesAccess() {
             // against the banner (Žilvinas 2026-09-11; Figma fill 000000).
             // 305 x 50 on the phone, i.e. the banner's full content width.
             // The gradient layer stays so the hover still cross-fades.
-            className="discovery-ring group inline-flex h-[50px] w-full items-center gap-2.5 rounded-[100px] bg-[linear-gradient(147deg,#000_0%,#000_100%)] pl-[17px] pr-5 md:pl-2 text-[15px] font-semibold uppercase tracking-[0.05em] text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black sm:ml-auto sm:w-auto md:h-[46px] md:border md:border-white/70"
+            // NO md:border (Žilvinas 2026-09-19): the desktop had a solid
+            // 70% white ring on top of .discovery-ring's corner-lit one —
+            // white at the top-left and bottom-right, nothing between —
+            // which is the phone's and the design's. One ring, both sizes.
+            className="discovery-ring group inline-flex h-[50px] w-full items-center gap-2.5 rounded-[100px] bg-[linear-gradient(147deg,#000_0%,#000_100%)] pl-[17px] pr-5 md:pl-2 text-[15px] font-semibold uppercase tracking-[0.05em] text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-black sm:ml-auto sm:w-auto md:h-[46px]"
           >
             <span className="flex size-[25px] items-center justify-center rounded-full bg-white text-black md:size-[32px]">
               {/* The design's own arrow (Icon.svg, re-supplied 2026-09-06):
