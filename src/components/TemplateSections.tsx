@@ -26,9 +26,18 @@ const SECTION_TITLE =
   // md: the inspector's Poppins SemiBold 80/80 at the page's 0.9 (Žilvinas
   // 2026-09-19, "title 80 semibold") — 72 on a 72 leading, no tracking. It
   // was 48 with tracking-tight, read off a scaled screenshot.
-  // md:mt 43: the artboard's 48 from the eyebrow to the title (Žilvinas
-  // 2026-09-19, measured 31 x 48), at the page's 0.9. Every section.
-  "mt-[17px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-[43px] md:text-wrap md:text-[72px] md:leading-[72px] md:tracking-normal";
+  // md:mt 28: the artboard's 48 from the eyebrow to the title (Žilvinas
+  // 2026-09-19, measured 31 x 48) at the page's 0.9 is 43 INK TO INK —
+  // Figma's boxes (210 x 23 for the 30px eyebrow, 1038 x 57 for the 80px
+  // title) are cap-height boxes. Ours are not: the 30 leading-none eyebrow
+  // keeps ~4.5 of empty box under its caps and the 72/72 title ~11 above
+  // them, so a 43 margin drew 58 of air ("really not 43"). 43 - 4.5 - 11.
+  //
+  // text-balance on the desktop too (same day, "this should break as
+  // text"): "Not just another Template Library" is 1225 wide at 72 and
+  // must wrap in the 1160 shell; balanced it breaks "Not just another /
+  // Template Library" (587 / 621) instead of stranding "Library".
+  "mt-[17px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-[28px] md:text-[72px] md:leading-[72px] md:tracking-normal";
 
 const SHELL = "mx-auto w-full max-w-[1200px] px-[15px] md:px-5";
 
