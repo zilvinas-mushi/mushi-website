@@ -45,12 +45,15 @@ const BADGE_GRADIENT =
  */
 export function TemplatesHero() {
   return (
-    <section aria-labelledby="templates-heading" className="relative">
+    // From md up the section is a flex column inside the 100svh .tpl-bg, so
+    // the text block takes its natural height and AppWindow's row takes the
+    // rest — see the note on that wrapper.
+    <section aria-labelledby="templates-heading" className="relative md:flex md:min-h-0 md:flex-1 md:flex-col">
 
       {/* 38, not 40: the phone artboard puts 46 between the header bar's
           bottom edge and the badge, and the bar's own 12px bottom inset (the
           shell's pb-2 plus its rounding) is part of that measurement. */}
-      <div className={`${SHELL} relative z-[1] pt-[2.375rem] text-center md:pt-[44px]`}>
+      <div className={`${SHELL} relative z-[1] shrink-0 pt-[2.375rem] text-center md:pt-[44px]`}>
         {/* Gradient-ringed chip, not the home hero's frosted white pill. Ring
             and text share ONE purple-to-salmon gradient, sampled from the
             zoomed badge reference (2026-09-03) — the ring via the
@@ -2019,9 +2022,27 @@ function AppWindow() {
     // header + badge + title + CTA (~330px) times the artwork's 1.6 aspect —
     // so the hero always ends above the fold, on any screen. The 1010px cap
     // still rules on tall monitors.
-    <div
-      className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-6 md:[width:min(100%,calc((100svh-444px)*1.6))]"
-    >
+    // ONE SCREEN, MEASURED NOT GUESSED (Žilvinas 2026-09-19): the 444 that
+    // used to stand in for "header + badge + title + CTA" had drifted ~50px
+    // from the real text block, and every desktop showed that drift as a
+    // black band under the device before the next section. Now .tpl-bg is
+    // exactly 100svh and a flex column, this wrapper is the flex-1 row that
+    // takes whatever height the text block leaves, and the device box inside
+    // sizes itself to that height through its aspect ratio — max-h-full with
+    // a max-w-full, so on a wide-and-short window the height binds and on a
+    // tall one the width does. No constant to drift.
+    //
+    // The width cap is 1440 from md up, not the shell's 1200: on a 2560 x
+    // 1300 monitor the height alone would put the device at ~1440, and a
+    // 1200 cap left 170px of bare burst under it — the same "the hero does
+    // not reach the fold" the change is for. Laptops never get near the cap
+    // (706 at 1440 x 800, 955 at 1920 x 995); it only rules on tall monitors,
+    // where the 2400px master is still above 1x.
+    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-6 md:min-h-0 md:flex-1 md:max-w-[1440px]">
+      {/* The device box. The tile field is inset-y-0 INSIDE it, so 100cqh is
+          the device's own height whichever axis bound above — not the row's,
+          which is taller than the device whenever the width wins. */}
+      <div className="md:relative md:mx-auto md:aspect-[2400/1503] md:max-h-full md:max-w-full">
       <PhoneTiles />
       <CategoryTiles />
 
@@ -2105,9 +2126,10 @@ function AppWindow() {
         alt="The Mushi template library: ad templates with industry and sort filters"
         width={269}
         alternate={{ src: "templates/hero-macbook.webp", media: "(min-width: 768px)" }}
-        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full md:mb-0 md:w-full md:max-w-none md:drop-shadow-[0_50px_140px_rgba(0,0,0,0.95)]"
+        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full md:mb-0 md:h-full md:w-full md:max-w-none md:drop-shadow-[0_50px_140px_rgba(0,0,0,0.95)]"
         priority
       />
+      </div>
     </div>
   );
 }

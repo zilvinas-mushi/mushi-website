@@ -167,15 +167,23 @@ export default function Templates() {
           see TemplatesBgFallbacks. Nothing renders with JavaScript on. */}
       <TemplatesBgFallbacks />
       <main className="flex-1">
-        {/* No bottom padding: the burst artwork (see .tpl-bg) must end
-            exactly where the MacBook image does — nothing colour-washed
-            below it. */}
+        {/* EXACTLY ONE SCREEN from md up (Žilvinas 2026-09-19): h-[100svh]
+            and a flex column, so the hero ends on the fold on every desktop
+            — Air, Pro, an external display, Arc with its sidebar — and the
+            next section's black never shows above it. The device inside
+            sizes itself to the height left under the text (AppWindow). The
+            720 floor is for windows too short to hold the hero at all; there
+            it scrolls rather than shrinking the device to a stamp. */}
         {/* data-await-bg: the burst is a CSS background and it IS this page's
             first screen, so the paint gate holds until it has decoded. Same
             reasoning as .hero-light on the home page. */}
         <div
           data-await-bg=""
-          className="tpl-bg relative -mt-[82px] overflow-hidden pt-[82px]"
+          // The pull-up under the header is --header-h from md up, as on the
+          // home page: the desktop bar is 63 in flow at 1512, not the phone
+          // header's 82, and the 19px difference had the hero's box starting
+          // above the page — which came out of its bottom edge.
+          className="tpl-bg relative -mt-[82px] overflow-hidden pt-[82px] md:-mt-[var(--header-h)] md:flex md:h-[100svh] md:min-h-[720px] md:flex-col md:pt-[var(--header-h)]"
         >
           <TemplatesHero />
         </div>
