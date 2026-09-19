@@ -1505,14 +1505,18 @@ export function TemplatesAccess() {
                 />
               </svg>
               {/* DESKTOP: the supplied "arrow icon.svg" (Žilvinas 2026-09-19)
-                  verbatim — a 17-box path at weight 2 — drawn in the
-                  artboard's 10 x 10, with the stroke on currentColor so it
+                  verbatim — a 17-box path at weight 2 — at its OWN 17, which
+                  is what the design shows in the 35 disc ("make it bigger so
+                  it would match the design"; the inspector's 10 was the
+                  frame, not the glyph). The viewBox is trimmed to the path's
+                  bounds (1 → 15.14 both ways) so the glyph, not the frame,
+                  is what the disc centres. Stroke on currentColor so it
                   inverts with the disc. */}
               <svg
-                viewBox="0 0 17 17"
+                viewBox="0.07 0.07 16 16"
                 fill="none"
                 strokeWidth="2"
-                className="hidden size-[10px] stroke-current md:block"
+                className="hidden size-[17px] stroke-current md:block"
                 aria-hidden="true"
               >
                 <path
