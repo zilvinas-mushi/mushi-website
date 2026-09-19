@@ -857,7 +857,9 @@ function CompetitorMark({ name }: { name: string }) {
         // 36: taller than the wordmark beside it (21 at 98 wide), as the
         // artboard draws the mark (Žilvinas 2026-09-19).
         width={36}
-        className="hidden rounded-[9px] md:block"
+        // mr 6 on top of the cell's 6: 12 to the wordmark (Žilvinas
+        // 2026-09-19, "a bit wider").
+        className="hidden rounded-[9px] md:mr-1.5 md:block"
       />
       <Img src="templates/cmp-konvert.webp" alt={name} width={98} className="hidden md:block" />
     </>
