@@ -1343,6 +1343,16 @@ img[data-src] {
   --tile-gap: calc((100cqh - var(--tile) * 2) / 3);
   --tile-top: var(--tile-gap);
 }
+/* THE SMALLER GAP, BOTH WAYS (Žilvinas 2026-09-20, "should have been
+   picked smaller — the one between the cards"): the artboard's 30 on 230
+   between tiles is the gap everywhere, and the pair is centred so the
+   device-edge gaps are whatever is left — equal to each other, not to
+   the gutter. The third-split above is left in as the pair's upper bound
+   on a short device. */
+.hero-tile-row {
+  --tile-gap: min(calc(var(--tile) * 0.1304), calc((100cqh - var(--tile) * 2) / 3));
+  --tile-top: calc((100cqh - var(--tile) * 2 - var(--tile-gap)) / 2);
+}
 .hero-tile-row--top {
   top: var(--tile-top);
 }
