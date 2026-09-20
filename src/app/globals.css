@@ -1360,9 +1360,11 @@ img[data-src] {
      so the corner stays the same shape as the tile scales: 21.5 at 165, 27
      at 210, 30 at 230. It was 26/160. */
   border-radius: calc(var(--tile) * 0.1304);
-  /* 33 on 230: the artboard's 29 to the label's text box, plus the 4 that
-     box (33 tall at Inter's auto leading) has above a leading-none em. */
-  padding-top: calc(var(--tile) * 0.1435);
+  /* 28 on 230 from the tile's top to the label's CAP top (Žilvinas
+     2026-09-20, measured 7 x 28). Inter's cap height is 0.727em and its
+     leading-none box puts ~0.16em above the caps, so the pad is 28 less
+     0.16 x 25 = 24 on 230. */
+  padding-top: calc(var(--tile) * 0.1043);
   gap: calc(var(--tile) * 0.05);
 }
 /* Inter Bold 25 on the 230 artboard tile, 0% tracking, its text box 29 down
@@ -1380,16 +1382,20 @@ img[data-src] {
    of it, which is what read as too big. So: the artboard's ratio, capped
    at its 100 — 72 on a 1512, 91 on a 1920, 100 from the width the tile
    reaches 230 at. */
-/* CENTRED IN THE TILE, both axes (Žilvinas 2026-09-19, "always centre"):
-   the emoji is pulled out of the label's flow and laid on the tile's own
-   middle, so it sits at the same spot whatever the label above it does. */
+/* THE ARTBOARD'S OWN PLACES (Žilvinas 2026-09-20, correcting the 09-19
+   "centre"): on the 230 tile the emoji's bottom is 53 up from the tile's
+   bottom, and the label's cap top is 28 down from its top — both as ratios
+   so they scale with the tile. Centred horizontally, out of the label's
+   flow. */
 .hero-tile {
   position: relative;
 }
 .hero-tile-art {
   position: absolute;
-  inset: 0;
-  margin: auto;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--tile) * 0.2304);
+  margin: 0 auto;
   width: min(100px, calc(var(--tile) * 0.4348));
   height: auto;
   aspect-ratio: 1;
