@@ -1333,10 +1333,15 @@ img[data-src] {
 
 .hero-tile-row {
   --tile: min(10.9vw, 35cqh);
-  --tile-gap: calc(var(--tile) * 0.1875);
-  --tile-block: calc(var(--tile) * 2 + var(--tile-gap));
-  /* Centred on the device: the pair sits on its middle line at every size. */
-  --tile-top: calc((100cqh - var(--tile-block)) / 2);
+  /* ONE GAP EVERYWHERE (Žilvinas 2026-09-20): device top edge to the upper
+     row, between the two rows, lower row to the device's bottom edge, and
+     between the tiles along a row — all the same. The device's height less
+     two tiles, split three ways, is that gap; the horizontal gutter
+     (.hero-tile-set) takes the same variable. It was a fixed 0.1875 of the
+     tile with the pair merely centred, so the middle gap and the outer two
+     never matched. */
+  --tile-gap: calc((100cqh - var(--tile) * 2) / 3);
+  --tile-top: var(--tile-gap);
 }
 .hero-tile-row--top {
   top: var(--tile-top);
