@@ -176,7 +176,13 @@ const EYEBROW_GRADIENT =
 function SectionEyebrow({ children }: { children: React.ReactNode }) {
   return (
     // gap-3: 12px between the rules and the word (client 2026-09-10).
-    <div className="flex items-center justify-center gap-3">
+    // PHONE 10 FROM THE STAR'S TIP (Žilvinas 2026-09-25, off the artboard's
+    // 10 x 11 spacer between the star and the word) — every section, since
+    // they all take this one recipe. The tip is not the file's edge: both
+    // phone rules carry 3.33 of empty frame past the star (the left star
+    // ends at 122.67 of 126, the right starts at 3.33), so the CSS gap is
+    // 10 - 3.33. The desktop keeps its 12.
+    <div className="flex items-center justify-center gap-[6.67px] md:gap-3">
       {/* PHONES GET THE ARTBOARD'S OWN RULES (Žilvinas 2026-09-06): a line
           that fades from black into the star's colour, with a four-pointed
           star ON its inner end. Since 2026-09-18 ("both of these to improve
