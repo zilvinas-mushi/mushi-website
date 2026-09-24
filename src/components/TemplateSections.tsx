@@ -1817,7 +1817,11 @@ export function TemplatesInside() {
               "Need help?" bubble, so only the headline renders as text.
               PHONE has its own art (Žilvinas 2026-09-11): 660 x 476, exactly
               4x the 165 x 119 card, supplied already dimmed — so the 45%
-              black this card used to lay over the desktop art is gone. */}
+              black this card used to lay over the desktop art is gone.
+              RE-CUT 2026-09-25 (Žilvinas, "it was pixelated") from the
+              client's "24:7.png", a 2091 x 1508 master at the card's own
+              aspect, Lanczos down to the same 660 x 476 and LOSSLESS — the
+              14 KB lossy cut it replaces blocked on the dark faces. 112 KB. */}
           <article
             // THE DESKTOP ART IS THE SUPPLIED "24:7 background.png" (Žilvinas
             // 2026-09-19), a 3924 x 2780 master shipped as an 800-wide webp
