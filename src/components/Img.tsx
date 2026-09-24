@@ -213,18 +213,8 @@ export function Img({
  * Drop it beside (or inside) the element. It renders nothing at all when
  * JavaScript is on.
  */
-export function BgFallback({
-  bg,
-  md,
-  mask,
-}: {
-  bg: string;
-  md?: string;
-  /** The artwork is a mask rather than a fill (the laurel on /templates). */
-  mask?: boolean;
-}) {
-  const prop = mask ? "-webkit-mask-image:VAL;mask-image:VAL" : "background-image:VAL";
-  const rule = (v: string) => prop.replaceAll("VAL", v);
+export function BgFallback({ bg, md }: { bg: string; md?: string }) {
+  const rule = (v: string) => `background-image:${v}`;
   const rules =
     (bg ? `[data-bg="${bg}"]{${rule(bg)}}` : "") +
     (md ? `@media (min-width:768px){[data-bg-md="${md}"]{${rule(md)}}}` : "");

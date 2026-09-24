@@ -1758,8 +1758,7 @@ function ShowcaseRows() {
  * reviews, monthly drops. Card visuals are the design's own baked exports
  * (2026-09-04): memoji cluster + "Need help?" bubble, faded industry-chip
  * rows, and the dimmed template collage ship as card backgrounds; the
- * laurel artwork is a CSS mask painted in the design's faint grey so it
- * reads correctly on the dark card.
+ * laurel leaves are the design's own SVG on both sizes.
  */
 export function TemplatesInside() {
   const s = TEMPLATES_PAGE.inside;
@@ -1873,29 +1872,25 @@ export function TemplatesInside() {
             // 0.9: 64 → 58 from the top to the stars, 30 → 27 stars to
             // wordmark, 35 → 31.5 wordmark to caption, and the 72 under
             // the caption is what the row leaves.
-            className={`${CARD} col-span-2 flex flex-col items-center justify-center text-center md:h-auto md:justify-start md:bg-[#111111] md:bg-[image:var(--bg,none)] md:p-0 md:pt-[58px]`}
+            // PHONE: 20 from the card's top to the stars and 20 from the
+            // caption to its bottom (Žilvinas 2026-09-25, off the artboard) —
+            // py-5 over CARD's p-6, which had both at 24.
+            className={`${CARD} col-span-2 flex flex-col items-center justify-center py-5 text-center md:h-auto md:justify-start md:bg-[#111111] md:bg-[image:var(--bg,none)] md:p-0 md:pt-[58px]`}
             data-bg="url(/images/templates/reviews-card.svg)"
           >
-            {/* The laurel export as a mask painted with the design grey —
-                the artwork itself is black, invisible on this card. Phone
-                only now; the desktop's leaves are in the card's own SVG. */}
+            {/* PHONE: the client's "trustpilot background.svg" (Žilvinas
+                2026-09-25) — the eight #222222 leaves as vectors on a 315 x
+                119 frame, the phone twin of the desktop's reviews-card.svg.
+                Drawn at COVER, centred: the leaves touch the frame's own
+                edges, so at the card's 345 they touch the card's ("closer
+                to the edges"). It replaces the laurel-mask.webp that was
+                painted at contain and left a margin either side. Deferred
+                like every other background: the URL sits in data-bg until
+                the script sets --bg. */}
             <span
               aria-hidden="true"
-              className="absolute inset-0 bg-[#221f26] md:hidden"
-              // Deferred like the backgrounds: a mask-image is fetched as
-              // eagerly as any other CSS url(), and this card is six screens
-              // down. var(--bg, none) is the same handle the script sets.
-              data-bg="url(/images/templates/laurel-mask.webp)"
-              style={{
-                WebkitMaskImage: "var(--bg, none)",
-                maskImage: "var(--bg, none)",
-                WebkitMaskSize: "contain",
-                maskSize: "contain",
-                WebkitMaskRepeat: "no-repeat",
-                maskRepeat: "no-repeat",
-                WebkitMaskPosition: "center",
-                maskPosition: "center",
-              }}
+              className="absolute inset-0 bg-[image:var(--bg,none)] bg-cover bg-center md:hidden"
+              data-bg="url(/images/templates/reviews-laurel-phone.svg)"
             />
             {/* gap 5 between the tiles on the phone (Žilvinas 2026-09-18,
                 off the artboard); the desktop keeps its 6. */}
@@ -2710,8 +2705,7 @@ export function TemplatesBgFallbacks() {
       {wide.map((f) => (
         <BgFallback key={f} bg="" md={`url(/images/templates/${f})`} />
       ))}
-      {/* The laurel behind the Trustpilot card is a MASK, not a fill. */}
-      <BgFallback bg="url(/images/templates/laurel-mask.webp)" mask />
+      <BgFallback bg="url(/images/templates/reviews-laurel-phone.svg)" />
     </>
   );
 }
