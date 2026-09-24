@@ -1060,10 +1060,10 @@ img[data-src] {
    lives on the portrait CELL (overflow-hidden + radius), not here — a radius
    on the img floated a rounded notch wherever the photo was narrower than
    its cell. */
-.team-photo {
-  -webkit-mask-image: linear-gradient(90deg, #000 72%, transparent 98%);
-  mask-image: linear-gradient(90deg, #000 72%, transparent 98%);
-}
+/* NO FADE ON THE PHONE (Žilvinas 2026-09-25, "the right side of Urte and
+   Noah shouldn't have any shadow — it should be full"): below sm the photo
+   and its plate both run to their own right edges at full strength. The
+   72%–98% ramp this had is gone; the sm+ rule below is the only mask. */
 
 @media (min-width: 640px) {
   /* From sm up the photo FILLS its plate rather than sitting narrow inside
@@ -1094,10 +1094,10 @@ img[data-src] {
      panel. The desktop keeps the 135deg version in content.ts. */
   .team-portrait-fade {
     background-image: linear-gradient(180deg, var(--plate-top), var(--plate-bottom));
-    /* The phone artboard's own ramp — the desktop's tighter face-stop above
-       is a desktop-only decision (client 2026-09-07). */
-    -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
-    mask-image: linear-gradient(90deg, #000 70%, transparent 100%);
+    /* FULL to its right edge (Žilvinas 2026-09-25) — the 70%–100% ramp
+       the phone had is gone, with the photo's; see .team-photo. */
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }
 
