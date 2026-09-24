@@ -2469,6 +2469,10 @@ const BRAND_LOGOS: Record<string, { src: string; w: number; svg?: boolean }> = {
   // scripts/svg-pattern-composite.py at 4x and LOSSLESS, since the 3x lossy
   // cut rang round the letters at 3x DPR.
   Konvert: { src: "logo-konvert.svg", w: 67, svg: true },
+  // Kandy is the client's own "kandi logo.png" (2026-09-25, "best quality
+  // as you can do"): cropped to its ink and kept at the file's native 248 x
+  // 127 — 5.5x of the 45 it draws at — LOSSLESS, the way CreativeOS's is.
+  // The 3x lossy cut before it read as pixelated on a phone.
   Kandy: { src: "logo-kandy.webp", w: 45 },
   CreativeOS: { src: "logo-creativeos.webp", w: 100 },
 };
