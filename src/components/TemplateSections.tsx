@@ -2087,7 +2087,19 @@ export function TemplatesDifference() {
                 face, tighter than even leading-none. */}
             <p className="relative z-10 mt-auto text-[16px] font-medium leading-4 text-white md:text-[30px] md:leading-[30px]">
               {d.bad.lead}{" "}
-              <span className="font-normal text-white/50">{d.bad.rest}</span>
+              <span className="font-normal text-white/50">
+                {d.bad.rest.split("\n").map((line, i) => (
+                  <Fragment key={line}>
+                    {i > 0 && (
+                      <>
+                        <br className="md:hidden" />
+                        <span className="hidden md:inline"> </span>
+                      </>
+                    )}
+                    {line}
+                  </Fragment>
+                ))}
+              </span>
             </p>
           </article>
 
@@ -2457,7 +2469,7 @@ const TILE_SET = 755;
  * down. `min-w-0` on nothing here: the pills are fixed-width by their
  * contents and must not shrink, hence shrink-0.
  */
-const BRAND_LOGOS: Record<string, { src: string; w: number; svg?: boolean }> = {
+const BRAND_LOGOS: Record<string, { src: string; w: number; h?: number; svg?: boolean }> = {
   // Konvert's file is a real vector path, so it stays an SVG. The other two
   // are Figma raster-in-<pattern> exports — a single PNG sliced by two <use>
   // transforms in CreativeOS's case — which Chrome rasterises at the pattern
@@ -2468,12 +2480,15 @@ const BRAND_LOGOS: Record<string, { src: string; w: number; svg?: boolean }> = {
   // can be" — and PHONE ONLY, the desktop chip stays its SVG export):
   // scripts/svg-pattern-composite.py at 4x and LOSSLESS, since the 3x lossy
   // cut rang round the letters at 3x DPR.
-  Konvert: { src: "logo-konvert.svg", w: 67, svg: true },
-  // Kandy is the client's own "kandi logo.png" (2026-09-25, "best quality
-  // as you can do"): cropped to its ink and kept at the file's native 248 x
-  // 127 — 5.5x of the 45 it draws at — LOSSLESS, the way CreativeOS's is.
-  // The 3x lossy cut before it read as pixelated on a phone.
-  Kandy: { src: "logo-kandy.webp", w: 45 },
+  Konvert: { src: "logo-konvert.svg", w: 67, h: 13, svg: true },
+  // Kandy is a VECTOR now (Žilvinas 2026-09-25, "best quality as you can
+  // do" — the native-res WebP of the client's "kandi logo.png" was still
+  // soft, because the PNG itself is: ~2px of blur on every edge). The PNG's
+  // alpha was upsampled 8x, thresholded at 50% and traced with potrace
+  // (`-t 20 -a 1 -O 0.2 -u 1`), cropped to the ink, filled with the PNG's
+  // own #f35052. 38 wide, not the artboard's 45 — at 45 the ink filled the
+  // pill ("too big"). The 1984 x 1016 viewBox is 8x the ink's 248 x 127.
+  Kandy: { src: "logo-kandy.svg", w: 38, h: 19.5, svg: true },
   CreativeOS: { src: "logo-creativeos.webp", w: 100 },
 };
 
@@ -2497,8 +2512,8 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                   // 16 KB was landing before the first screen had painted.
                   data-src={`/images/templates/${logo.src}`}
                   alt={brand}
-                  width={67}
-                  height={13}
+                  width={logo.w}
+                  height={logo.h}
                   loading="lazy"
                   decoding="async"
                 />

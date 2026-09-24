@@ -964,7 +964,9 @@ export const TEMPLATES_PAGE = {
       brands: ["Konvert", "Kandy", "CreativeOS"],
       alt: "Competitors' half-finished ad templates dumped in a trash can",
       lead: "Poorly Made Templates.",
-      rest: "Sold as a 5x faster way to make ads, ends up unusable once bought.",
+      // \n is a PHONE-ONLY break (Žilvinas 2026-09-25): "5x faster" opens
+      // the second line there. From md up it is one run of text.
+      rest: "Sold as a\n5x faster way to make ads, ends up unusable once bought.",
     },
     good: {
       alt: "The same ad as a finished, fully editable Mushi template for fungies cordyceps gummies",
