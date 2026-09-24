@@ -1276,6 +1276,9 @@ export const TEMPLATES_PAGE = {
         // stacked on the screenshot; rebuilding them in CSS was close but
         // never the same picture, so the artboard's own render is the
         // background and nothing but the type sits on top of it.
+        // RE-CUT from the client's "Third section.png" (Žilvinas 2026-09-25,
+        // "MAX quality"): the supplied 1376 square, quality 95 — 4x the 345
+        // it draws at, where the 900 was 2.6x and read soft on a 3x phone.
         phoneCard: "templates/process-phone-3.webp",
         card: "process-card-3.webp",
         alt: "Meta Ads Manager campaign list running A/B tests of the finished ad",
