@@ -1864,10 +1864,10 @@ export function TemplatesInside() {
           {/* 5 industries — chip rows baked into the background art. Same
               phone treatment as the support card: its own 4x, pre-dimmed.
               LOSSLESS since 2026-09-25 (Žilvinas, "do not diminish the
-              quality"): the client's "5 industries background.png", a 2008
-              x 1448 master (the first export that day was a 660 and still
-              read soft), Lanczos down to 1320 x 952 — 8x the card, and
-              well past 3x of the widest phone's 191. */}
+              quality"): the client's "5 industries background.png" as
+              supplied — the third export that day (00:52), 660 x 476, which
+              is 4x the 165 card, chosen over the 2008-wide one ("replace
+              with this last one"). Lossless, 62 KB. */}
           <article
             className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[image:var(--bg-md,none)] md:p-6 md:pb-[43px] md:pl-[40px] md:text-left`}
             data-bg="url(/images/templates/inside-industries-phone.webp)"
