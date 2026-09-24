@@ -965,6 +965,50 @@ img[data-src] {
   }
 }
 
+/* THE DIFFERENCE TITLE IS ONE LINE, FLUSH WITH THE CARDS (Žilvinas
+   2026-09-25, "one line ... same alignment as the rectangles, not too big
+   that would go over the edges"). Poppins SemiBold sets this exact string
+   ("Not just another Template Library") at 17.014x its font-size of ink —
+   1225 at the section recipe's 72, which is why SECTION_TITLE had to wrap
+   it in the 1160 shell. Dividing the shell's own content width (1160
+   capped, 100vw less the two 20 gutters below that) by 17.1 puts the ink a
+   hair inside the cards' edges at every viewport — the same min() the
+   shell itself applies, so the title tracks the rectangles exactly and
+   zoom (which narrows the CSS viewport) shrinks it in step. Phone keeps
+   the balanced two-line 36 from the section recipe. */
+@media (min-width: 768px) {
+  .diff-title {
+    white-space: nowrap;
+    font-size: calc(min(1160px, 100vw - 40px) / 17.1);
+    line-height: 1;
+  }
+}
+
+/* THE CHIPS SCALE WITH THEIR CARDS (Žilvinas 2026-09-25, "when i zoom in
+   and out ... the logos in both squares will change accordingly and not
+   become too large"). The brand pills and the Mushi pill were fixed CSS px,
+   so page zoom — which narrows the CSS viewport and the cards with it —
+   left the logos their full size on a shrinking card.
+
+   The cards' GRID is an inline-size container (the grid, not the cards, so
+   the maths never couples to the cards' own padding), and .diff-chip-em
+   turns 1em into "1px at the design width" — the grid is 345 on the phone
+   artboard and 1160 at the full shell — falling in step as zoom or a narrow
+   viewport squeezes the grid, and capped by min() at 1px so a wide grid
+   never inflates the chips past the artboard. Every measurement inside a
+   chip is written in em, so each stays one number away from its design px. */
+.diff-cards {
+  container-type: inline-size;
+}
+.diff-chip-em {
+  font-size: min(1px, calc(100cqw / 345));
+}
+@media (min-width: 768px) {
+  .diff-chip-em {
+    font-size: min(1px, calc(100cqw / 1160));
+  }
+}
+
 /* The templates card's stroke (Žilvinas 2026-09-06): 2 weight, INSIDE at
    weight 4, running from #6E54B5 at the BOTTOM edge to #111111 at 0% opacity
    at the top — so the card is lit along the edge nearest the button and
@@ -1331,26 +1375,18 @@ img[data-src] {
   container-type: size;
 }
 
+/* THE PAIR KEEPS THE ARTBOARD'S GAP AND SITS DEAD-CENTRE (Žilvinas
+   2026-09-25, "keep it the same 30 but move both lines ... perfectly in the
+   middle"): the gap BETWEEN the two rows is the artboard's own 30-on-230 —
+   the same gutter the tiles keep along a row — and the pair as a whole is
+   centred in the field, whose box is device-top-to-FOLD (see CategoryTiles):
+   mac's top edge to the upper row equals lower row to the screen's bottom.
+   It was three equal gaps ((100cqh - 2 tiles) / 3), which pushed the rows
+   further apart than the artboard whenever the device was tall. */
 .hero-tile-row {
   --tile: min(10.9vw, 35cqh);
-  /* ONE GAP EVERYWHERE (Žilvinas 2026-09-20): device top edge to the upper
-     row, between the two rows, lower row to the device's bottom edge, and
-     between the tiles along a row — all the same. The device's height less
-     two tiles, split three ways, is that gap; the horizontal gutter
-     (.hero-tile-set) takes the same variable. It was a fixed 0.1875 of the
-     tile with the pair merely centred, so the middle gap and the outer two
-     never matched. */
-  --tile-gap: calc((100cqh - var(--tile) * 2) / 3);
-  --tile-top: var(--tile-gap);
-}
-/* THE SMALLER GAP, BOTH WAYS (Žilvinas 2026-09-20, "should have been
-   picked smaller — the one between the cards"): the artboard's 30 on 230
-   between tiles is the gap everywhere, and the pair is centred so the
-   device-edge gaps are whatever is left — equal to each other, not to
-   the gutter. The third-split above is left in as the pair's upper bound
-   on a short device. */
-.hero-tile-row {
-  --tile-gap: min(calc(var(--tile) * 0.1304), calc((100cqh - var(--tile) * 2) / 3));
+  --tile-gutter: calc(var(--tile) * 0.1304);
+  --tile-gap: var(--tile-gutter);
   --tile-top: calc((100cqh - var(--tile) * 2 - var(--tile-gap)) / 2);
 }
 .hero-tile-row--top {
@@ -1360,8 +1396,8 @@ img[data-src] {
   top: calc(var(--tile-top) + var(--tile) + var(--tile-gap));
 }
 .hero-tile-set {
-  gap: var(--tile-gap);
-  padding-right: var(--tile-gap);
+  gap: var(--tile-gutter);
+  padding-right: var(--tile-gutter);
 }
 .hero-tile {
   width: var(--tile);

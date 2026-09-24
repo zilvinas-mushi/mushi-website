@@ -130,10 +130,13 @@ export default function Templates() {
       />
       <SiteHeader
         cta={{ label: TEMPLATES_PAGE.login, href: APP_URL, variant: "light" }}
-        // The header CTA turns into the purple Buy Now as the visitor scrolls
-        // into the sales pitch (client 2026-09-12): the swap ramps in from
-        // the top of the Difference section, completes at Process, holds to
-        // the end of the page, and reverses on the way back up.
+        // The header CTA turns into the purple Buy Now the moment the
+        // visitor reaches the Difference section (Žilvinas 2026-09-25 —
+        // previously it ramped from Difference to Process, so it was still
+        // half Login through the whole comparison). start and end name the
+        // SAME section: HeaderCtaSwap treats that as a toggle at the
+        // viewport's midline and slides between the faces, in both
+        // directions.
         ctaSwap={{
           to: {
             label: TEMPLATES_PAGE.access.templates.cta,
@@ -141,7 +144,7 @@ export default function Templates() {
             variant: "purple",
           },
           startId: "difference-heading",
-          endId: "process-heading",
+          endId: "difference-heading",
         }}
         // The phone bar's sliding offer. It rides out as the hero's own CTA
         // goes under the bar, and back up as the "Ad creation from scratch"

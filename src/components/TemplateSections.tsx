@@ -175,14 +175,16 @@ const EYEBROW_GRADIENT =
 
 function SectionEyebrow({ children }: { children: React.ReactNode }) {
   return (
-    // gap-3: 12px between the rules and the word (client 2026-09-10).
     // PHONE 10 FROM THE STAR'S TIP (Žilvinas 2026-09-25, off the artboard's
     // 10 x 11 spacer between the star and the word) — every section, since
     // they all take this one recipe. The tip is not the file's edge: both
     // phone rules carry 3.33 of empty frame past the star (the left star
     // ends at 122.67 of 126, the right starts at 3.33), so the CSS gap is
-    // 10 - 3.33. The desktop keeps its 12.
-    <div className="flex items-center justify-center gap-[6.67px] md:gap-3">
+    // 10 - 3.33.
+    // DESKTOP 6, halved from the 2026-09-10 12 (Žilvinas 2026-09-25, "no
+    // need for such a big spaces after the header"); its rules keep ~3.5
+    // of frame past the star, so the visual gap reads ~9.5.
+    <div className="flex items-center justify-center gap-[6.67px] md:gap-1.5">
       {/* PHONES GET THE ARTBOARD'S OWN RULES (Žilvinas 2026-09-06): a line
           that fades from black into the star's colour, with a four-pointed
           star ON its inner end. Since 2026-09-18 ("both of these to improve
@@ -2045,8 +2047,17 @@ export function TemplatesDifference() {
         <SectionEyebrow>{d.eyebrow}</SectionEyebrow>
 
         {/* 37 under this one, where the rest of the page uses its section's
-            own spacing; see SECTION_TITLE for the type. */}
-        <h2 id="difference-heading" className={SECTION_TITLE}>
+            own spacing. NOT SECTION_TITLE from md up (Žilvinas 2026-09-25,
+            "one line ... same alignment as the rectangles"): at the shared
+            72 this title's ink is 1225 and had to wrap in the 1160 shell.
+            .diff-title (globals.css) keeps it on ONE line instead, sized off
+            the shell's own width so the ink runs edge to edge with the two
+            cards below and can never overflow them. The phone keeps the
+            section recipe. */}
+        <h2
+          id="difference-heading"
+          className="diff-title mt-[17px] text-balance text-center text-[36px] font-semibold leading-9 md:mt-[28px] md:tracking-normal"
+        >
           {d.heading}
         </h2>
 
@@ -2061,7 +2072,7 @@ export function TemplatesDifference() {
             at 30px; at 1080 each card was 528 and both captions broke to
             four. At 1160 they are 568 — 514 inside the 27s — and measured
             in the browser both sit on three lines again. */}
-        <div className="mx-auto mt-[37px] grid max-w-[1160px] gap-[27px] md:mt-12 md:grid-cols-2 md:gap-6">
+        <div className="diff-cards mx-auto mt-[37px] grid max-w-[1160px] gap-[27px] md:mt-12 md:grid-cols-2 md:gap-6">
           {/* Competitors. Card panel, trash composition and the Kandy /
               CreativeOS chips are the design's own exports (2026-09-03);
               only Konvert's chip remains drawn — no asset was supplied.
@@ -2171,15 +2182,17 @@ export function TemplatesDifference() {
                 trimmed to the ink — the untrimmed export is ~45% transparent
                 margin, which is why the desktop's old 36-tall pill with 16
                 gutters never measured as anything on the artboard. */}
-            <div className="flex justify-center">
-              <span className="flex h-[26px] items-center rounded-[6px] bg-white px-[7px] md:h-10 md:rounded-[10px] md:px-[10px]">
+            {/* diff-chip-em: every size below is in em — 1px at the design
+                width, shrinking with the card under zoom (globals.css). */}
+            <div className="diff-chip-em flex justify-center">
+              <span className="flex h-[26em] items-center rounded-[6em] bg-white px-[7em] md:h-[40em] md:rounded-[10em] md:px-[10em]">
                 {/* The phone keeps the copy trimmed to the ink, 14 tall in
                     its 26 pill (with the 7 gutters, the artboard's 62 x 26). */}
                 <Img
                   src="templates/diff-mushi-mark-phone.webp"
                   alt="Mushi"
                   width={47}
-                  className="h-[14px] w-auto md:hidden"
+                  className="h-[14em] w-auto md:hidden"
                 />
                 {/* THE DESKTOP DRAWS THE WORDMARK AS TYPE (Žilvinas
                     2026-09-19): Dutch801 is already loaded for the header,
@@ -2187,9 +2200,11 @@ export function TemplatesDifference() {
                     artboard's 22.15 — Logo measures Dutch801's "Mushi" at
                     0.735em of ink, top of the h to the bottom of the round
                     letters' overshoot — and Logo's own em nudge centres that
-                    ink in the 40-tall pill. */}
+                    ink in the 40-tall pill. text-[30em]: Logo's internal ems
+                    compound off this, so the whole wordmark rides the card's
+                    scale. */}
                 <span className="hidden md:flex">
-                  <Logo tone="black" className="text-[30px]" />
+                  <Logo tone="black" className="text-[30em]" />
                 </span>
               </span>
             </div>
@@ -2298,11 +2313,14 @@ function CategoryTiles() {
       // window a few CSS px UNDER 1280 (the client's sits at ~1272), where
       // xl made the rows vanish entirely (client 2026-09-12).
       //
-      // THE FIELD IS THE DEVICE'S OWN BOX, not the section's. It renders
-      // inside AppWindow's wrapper — inset-y-0 so it is exactly as tall as
-      // the MacBook, and w-screen off the centre line so the rows still run
+      // THE FIELD RUNS FROM THE DEVICE'S TOP EDGE TO THE FOLD. It renders on
+      // AppWindow's flex-1 wrapper — inset-y-0 there is device top (the
+      // aspect box is the wrapper's first block child) down to the 100svh
+      // section's bottom — and w-screen off the centre line so the rows run
       // clear across the viewport. hero-tile-field makes it a SIZE container,
-      // so 100cqh below IS the device's height.
+      // so 100cqh below is that top-of-mac-to-fold height, NOT the device's:
+      // the two differ whenever the 1440px cap (tall monitors) leaves a band
+      // under the device, and the rows centre on the screen, not the mac.
       className="hero-tile-field pointer-events-none absolute inset-y-0 left-1/2 z-0 hidden w-screen -translate-x-1/2 overflow-hidden lg:block"
     >
       {/* CENTRED ON THE PICTURE OF THE COMPUTER (client 2026-09-13), and
@@ -2356,12 +2374,18 @@ function AppWindow() {
     // md:mt-[45px]: the artboard's 64 from button to device, at the same 0.7
     // the button itself is drawn at (see the CTA in TemplatesHero).
     <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[45px] md:min-h-0 md:flex-1 md:max-w-[1440px]">
-      {/* The device box. The tile field is inset-y-0 INSIDE it, so 100cqh is
-          the device's own height whichever axis bound above — not the row's,
-          which is taller than the device whenever the width wins. */}
+      {/* The tile field lives on THIS wrapper, not the device box (Žilvinas
+          2026-09-25, "distance from first row's square ... same as from
+          second row's"): its top is the device's top edge, but its bottom is
+          the wrapper's — the fold — so the pair centres between the mac's
+          top and the bottom of the SCREEN. Inside the device box the two
+          were the same thing whenever the height bound; on tall monitors the
+          1440px width cap leaves a band under the device, and rows centred
+          on the device alone sat visibly high of the screen's own middle. */}
+      <CategoryTiles />
+      {/* The device box. */}
       <div className="md:relative md:mx-auto md:aspect-[2400/1503] md:max-h-full md:max-w-full">
       <PhoneTiles />
-      <CategoryTiles />
 
       {/* THE PHONE IS THE MOBILE HERO, not a shrunken MacBook (Žilvinas
           2026-09-06). The laptop's 2400px master reduces to a 358-wide strip
@@ -2516,7 +2540,10 @@ const TILE_SET = 755;
  * down. `min-w-0` on nothing here: the pills are fixed-width by their
  * contents and must not shrink, hence shrink-0.
  */
-const BRAND_LOGOS: Record<string, { src: string; w: number; h?: number; svg?: boolean }> = {
+const BRAND_LOGOS: Record<
+  string,
+  { src: string; w: number; h?: number; svg?: boolean; emW: string }
+> = {
   // Konvert's file is a real vector path, so it stays an SVG. The other two
   // are Figma raster-in-<pattern> exports — a single PNG sliced by two <use>
   // transforms in CreativeOS's case — which Chrome rasterises at the pattern
@@ -2527,7 +2554,10 @@ const BRAND_LOGOS: Record<string, { src: string; w: number; h?: number; svg?: bo
   // can be" — and PHONE ONLY, the desktop chip stays its SVG export):
   // scripts/svg-pattern-composite.py at 4x and LOSSLESS, since the 3x lossy
   // cut rang round the letters at 3x DPR.
-  Konvert: { src: "logo-konvert.svg", w: 67, h: 13, svg: true },
+  // emW: the same width in the chips' em scale (.diff-chip-em, globals.css)
+  // — a LITERAL class per brand, because Tailwind cannot see a class built
+  // from `${logo.w}` at build time.
+  Konvert: { src: "logo-konvert.svg", w: 67, h: 13, svg: true, emW: "w-[67em]" },
   // Kandy is a VECTOR now (Žilvinas 2026-09-25, "best quality as you can
   // do" — the native-res WebP of the client's "kandi logo.png" was still
   // soft, because the PNG itself is: ~2px of blur on every edge). The PNG's
@@ -2535,20 +2565,22 @@ const BRAND_LOGOS: Record<string, { src: string; w: number; h?: number; svg?: bo
   // (`-t 20 -a 1 -O 0.2 -u 1`), cropped to the ink, filled with the PNG's
   // own #f35052. 38 wide, not the artboard's 45 — at 45 the ink filled the
   // pill ("too big"). The 1984 x 1016 viewBox is 8x the ink's 248 x 127.
-  Kandy: { src: "logo-kandy.svg", w: 38, h: 19.5, svg: true },
-  CreativeOS: { src: "logo-creativeos.webp", w: 100 },
+  Kandy: { src: "logo-kandy.svg", w: 38, h: 19.5, svg: true, emW: "w-[38em]" },
+  CreativeOS: { src: "logo-creativeos.webp", w: 100, emW: "w-[100em]" },
 };
 
 function BrandChips({ brands }: { brands: readonly string[] }) {
   return (
     <>
-      <ul className="relative z-10 flex flex-nowrap items-center justify-center gap-[15px] md:hidden">
+      {/* diff-chip-em: pill and logo sizes in em — 1px at the artboard's
+          345 card, falling with the card under zoom (globals.css). */}
+      <ul className="diff-chip-em relative z-10 flex flex-nowrap items-center justify-center gap-[15em] md:hidden">
         {brands.map((brand) => {
           const logo = BRAND_LOGOS[brand];
           return (
             <li
               key={brand}
-              className="flex h-[26px] shrink-0 items-center rounded-[6px] bg-white px-1.5"
+              className="flex h-[26em] shrink-0 items-center rounded-[6em] bg-white px-[6em]"
             >
               {logo.svg ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -2563,9 +2595,15 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                   height={logo.h}
                   loading="lazy"
                   decoding="async"
+                  className={`${logo.emW} h-auto`}
                 />
               ) : (
-                <Img src={`templates/${logo.src}`} alt={brand} width={logo.w} />
+                <Img
+                  src={`templates/${logo.src}`}
+                  alt={brand}
+                  width={logo.w}
+                  className={`${logo.emW} h-auto`}
+                />
               )}
             </li>
           );
@@ -2578,11 +2616,13 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
           20 there — beside its 22-square mark, 10 in from either end with 6
           between mark and word. The other two stay the chip-*.svg exports,
           scaled to the same 40. */}
-      <ul className="relative z-10 hidden flex-wrap items-center justify-center gap-2.5 md:flex">
+      {/* diff-chip-em: every size in the row is em — 1px at the full 1160
+          shell, falling with the cards under zoom (globals.css). */}
+      <ul className="diff-chip-em relative z-10 hidden flex-wrap items-center justify-center gap-[10em] md:flex">
         {brands.map((brand) => (
           <li key={brand} className="flex items-center">
             {brand === "Konvert" ? (
-              <span className="flex h-10 items-center gap-[6px] rounded-[10px] bg-white px-[10px] font-satoshi text-[24.78px] font-bold leading-none text-black">
+              <span className="flex h-[40em] items-center gap-[6em] rounded-[10em] bg-white px-[10em] font-satoshi font-bold leading-none text-black">
                 {/* The mark: a 22 rounded square in the artboard's violet
                     (#6831ef, lifting to #8e6bf3 at the lower right, sampled
                     off the inspector) with the supplied sparkle inside it at
@@ -2590,7 +2630,7 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                     50% white, exported at 4x with its alpha intact. */}
                 <span
                   aria-hidden="true"
-                  className="flex size-[22px] shrink-0 items-center justify-center rounded-[6px] bg-[linear-gradient(135deg,#6831ef_0%,#6831ef_40%,#8e6bf3_100%)]"
+                  className="flex size-[22em] shrink-0 items-center justify-center rounded-[6em] bg-[linear-gradient(135deg,#6831ef_0%,#6831ef_40%,#8e6bf3_100%)]"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -2600,6 +2640,7 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                     height={14}
                     loading="lazy"
                     decoding="async"
+                    className="w-[14em] h-auto"
                   />
                   <noscript>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -2610,10 +2651,14 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                       height={14}
                       loading="lazy"
                       decoding="async"
+                      className="w-[14em] h-auto"
                     />
                   </noscript>
                 </span>
-                {brand}
+                {/* The panel's 24.78, as an em of the scale — on the CHILD,
+                    not the pill, so the mark's 22em beside it stays off the
+                    type size. */}
+                <span className="text-[24.78em]">{brand}</span>
               </span>
             ) : brand === "Kandy" ? (
               /* KANDY IS THE SUPPLIED LOGO ON A LIVE PILL (Žilvinas 2026-09-19,
@@ -2623,8 +2668,13 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                  logo-red.webp with its flat #f3f3f3 ground keyed out to
                  alpha and cropped to the ink, at 3x of the 58 it draws at —
                  the artboard's 91 x 40 chip, 16 either side. */
-              <span className="flex h-10 items-center rounded-[10px] bg-white px-4">
-                <Img src="templates/chip-kandy.webp" alt="Kandy" width={58} />
+              <span className="flex h-[40em] items-center rounded-[10em] bg-white px-[16em]">
+                <Img
+                  src="templates/chip-kandy.webp"
+                  alt="Kandy"
+                  width={58}
+                  className="w-[58em] h-auto"
+                />
               </span>
             ) : (
               /* CREATIVEOS, THE SAME WAY (Žilvinas 2026-09-19, "creativeOS
@@ -2635,8 +2685,13 @@ function BrandChips({ brands }: { brands: readonly string[] }) {
                  at (584 x 96, 11 KB), on a live pill: the artboard's 172 x
                  40, which puts 13.5 either side of the 145-wide mark. The old
                  chip-creativeos.svg wrapped a smaller raster the same way. */
-              <span className="flex h-10 items-center rounded-[10px] bg-white px-[13.5px]">
-                <Img src="templates/chip-creativeos.webp" alt={brand} width={145} />
+              <span className="flex h-[40em] items-center rounded-[10em] bg-white px-[13.5em]">
+                <Img
+                  src="templates/chip-creativeos.webp"
+                  alt={brand}
+                  width={145}
+                  className="w-[145em] h-auto"
+                />
               </span>
             )}
           </li>

@@ -9,12 +9,16 @@ import { CTA_FILL, type HeaderCta } from "./headerCta";
  * the visitor is reading the sales sections — driven by scroll position, in
  * both directions (client 2026-09-12).
  *
- * The swap is scroll-LINKED, not a toggle: progress runs from 0 to 1 as the
- * viewport's midline travels from the top of the section named by `startId`
- * (Difference) to the top of the one named by `endId` (Process). Buy Now
- * slides IN FROM THE TOP over that stretch, pushing Login out below; past
- * Process it is fully Buy Now until the end of the page, and scrolling back
- * up runs the same ramp in reverse until Login is back at the hero.
+ * Progress runs from 0 to 1 as the viewport's midline travels from the top
+ * of the section named by `startId` to the top of the one named by `endId`.
+ * Buy Now slides IN FROM THE TOP, pushing Login out below, and the same run
+ * reverses on the way back up. When `startId` and `endId` name the SAME
+ * section — /templates passes Difference twice (Žilvinas 2026-09-25, "buy
+ * now when I move to difference") — progress is a clean 0-or-1 toggle at
+ * the midline, and the transition on the column is what turns that flip
+ * into a slide instead of a snap: 700ms ease-in-out (Žilvinas 2026-09-25,
+ * "smoother, not so fast" — it was 300ms ease-out), still completing while
+ * the visitor is at the Difference section.
  *
  * Construction: a clipped box the size of the header CTA holding a 200%-tall
  * column — Buy Now in the top half, Login in the bottom — translated between
@@ -85,7 +89,7 @@ export function HeaderCtaSwap({
       style={style}
     >
       <span
-        className="absolute left-0 top-0 block h-[200%] w-full"
+        className="absolute left-0 top-0 block h-[200%] w-full transition-transform duration-700 ease-in-out"
         style={{ transform: `translateY(${-(1 - p) * 50}%)` }}
       >
         <a
