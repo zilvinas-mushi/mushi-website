@@ -932,6 +932,9 @@ export const TEMPLATES_PAGE = {
   // than the home bar's "Schedule a Call" — /templates sells the library,
   // it does not book a call.
   mobileCta: "Redeem 50% Off",
+  // The phone drawer's full-width bottom row on this page only (2026-09-25).
+  // Its two half-width siblings are `login` and `access.templates.cta`.
+  agencyCall: "Book an Agency Call",
     /**
    * Category tiles beside the window — decorative (aria-hidden). The five
    * industries, one tile each; CategoryTiles repeats the set into two

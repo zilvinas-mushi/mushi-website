@@ -19,7 +19,8 @@ paraphrase it.
 
 The phone drawer carries the three nav rows and SCHEDULE A CALL, nothing else.
 It used to also offer "Buy now" and "Login" into the webapp; the 2026-08-26
-redesign drops both.
+redesign drops both. **On `/templates` only** (2026-09-25) the drawer instead
+ends with BUY NOW / LOGIN side by side and BOOK AN AGENCY CALL full width.
 
 ## Hero
 

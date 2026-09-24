@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Logo } from "./Logo";
-import { MobileHeader, type MobileCtaConfig } from "./MobileHeader";
+import { MobileHeader, type MobileCtaConfig, type MobileDrawerActions } from "./MobileHeader";
 import { HeaderCtaSwap } from "./HeaderCtaSwap";
 import { CTA_FILL, type HeaderCta } from "./headerCta";
 import { NAV, navHref } from "@/lib/content";
@@ -55,6 +55,7 @@ export function SiteHeader({
   cta,
   ctaSwap,
   mobileCta,
+  mobileDrawer,
   active,
 }: {
   cta?: HeaderCta;
@@ -73,6 +74,12 @@ export function SiteHeader({
    */
   mobileCta?: MobileCtaConfig;
   /**
+   * What the phone drawer offers under its nav rows. Unset, it is the one
+   * Schedule a Call button; /templates passes Buy Now / Login / Book an
+   * Agency Call. See MobileDrawerActions.
+   */
+  mobileDrawer?: MobileDrawerActions;
+  /**
    * href of the NAV item for the page being viewed ("/" or "/templates") —
    * that link renders at full white and its siblings drop to 70% so the
    * visitor can see where they are. EVERY page passes it: left unset the bar
@@ -84,7 +91,7 @@ export function SiteHeader({
   return (
     <>
       {/* Phone header with mushi-app's drawer motion; hidden from md up. */}
-      <MobileHeader cta={mobileCta} activePath={active} />
+      <MobileHeader cta={mobileCta} drawer={mobileDrawer} activePath={active} />
 
       <header
         className="sticky top-[1.375rem] z-50 hidden px-4 md:block"

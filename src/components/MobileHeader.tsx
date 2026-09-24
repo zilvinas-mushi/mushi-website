@@ -79,6 +79,30 @@ const HOME_CTA: MobileCtaConfig = {
 const VIOLET_CTA =
   "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] active:text-[#6e54b5]";
 
+/**
+ * The drawer's OUTLINED button: black plate, 1px white ring, white label,
+ * which inverts to a white plate and black label on hover (CLAUDE.md). The
+ * gradient is a flat one so both states have a layer to cross-fade between.
+ */
+const OUTLINE_CTA =
+  "border border-white bg-[linear-gradient(#000,#000)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(#fff,#fff)] hover:text-black active:bg-[linear-gradient(#fff,#fff)] active:text-black";
+
+/**
+ * What the drawer offers under the nav rows when a page wants more than the
+ * one Schedule a Call button. /templates (Žilvinas 2026-09-25, from the phone
+ * artboard): a half-and-half row of the violet Buy Now and an outlined Login,
+ * then a full-width outlined Book an Agency Call. Home passes nothing and
+ * keeps its single button — this is per page, never universal.
+ */
+export type MobileDrawerActions = {
+  /** Left half of the row, violet. */
+  primary: { label: string; href: string };
+  /** Right half of the row, outlined. */
+  secondary: { label: string; href: string };
+  /** The full-width outlined row beneath. */
+  wide: { label: string; href: string };
+};
+
 /** 52 tall, radius 7, 17px semibold caps — the drawer's row box. */
 const CTA_BOX =
   "flex h-[3.25rem] items-center justify-center rounded-[0.4375rem] text-[1.0625rem] font-semibold uppercase";
@@ -385,9 +409,11 @@ function useCtaTravel(
 export function MobileHeader({
   cta = HOME_CTA,
   activePath,
+  drawer,
 }: {
   cta?: MobileCtaConfig;
   activePath?: string;
+  drawer?: MobileDrawerActions;
 }) {
   const [open, setOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -579,9 +605,25 @@ export function MobileHeader({
             {/* Same box and same fill as the bar's button above, so the CTA
                 does not change shape depending on which one you are looking
                 at. It inverts on hover per CLAUDE.md. */}
-            <a href={BOOKING_URL} onClick={() => setOpen(false)} className={`${CTA_BOX} ${VIOLET_CTA}`}>
-              {PHONE_CTA}
-            </a>
+            {drawer ? (
+              <>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <a href={drawer.primary.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${VIOLET_CTA}`}>
+                    {drawer.primary.label}
+                  </a>
+                  <a href={drawer.secondary.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${OUTLINE_CTA}`}>
+                    {drawer.secondary.label}
+                  </a>
+                </div>
+                <a href={drawer.wide.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${OUTLINE_CTA}`}>
+                  {drawer.wide.label}
+                </a>
+              </>
+            ) : (
+              <a href={BOOKING_URL} onClick={() => setOpen(false)} className={`${CTA_BOX} ${VIOLET_CTA}`}>
+                {PHONE_CTA}
+              </a>
+            )}
           </nav>
         )}
       </div>

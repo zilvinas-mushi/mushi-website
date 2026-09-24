@@ -14,7 +14,7 @@ import {
   TemplatesTeam,
 } from "@/components/TemplateSections";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { APP_URL, SITE_NAME, SITE_TAGLINE, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, abs } from "@/lib/site";
+import { APP_URL, BOOKING_URL, SITE_NAME, SITE_TAGLINE, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, abs } from "@/lib/site";
 
 const DESCRIPTION =
   "Plug-and-play ad templates from the team behind 110+ brands' creatives. Your 8-minute shortcut to high-ROAS ads — fashion, beauty, food, health and drink niches covered.";
@@ -160,6 +160,15 @@ export default function Templates() {
           againId: "team-heading",
           labelPx: 20,
           radiusPx: 5,
+        }}
+        // The phone DRAWER, /templates only (Žilvinas 2026-09-25): under the
+        // nav rows a half-and-half Buy Now / Login into the webapp, then a
+        // full-width Book an Agency Call. Home keeps its single Schedule a
+        // Call and the desktop bar is untouched.
+        mobileDrawer={{
+          primary: { label: TEMPLATES_PAGE.access.templates.cta, href: APP_URL },
+          secondary: { label: TEMPLATES_PAGE.login, href: APP_URL },
+          wide: { label: TEMPLATES_PAGE.agencyCall, href: BOOKING_URL },
         }}
         active="/templates"
       />
