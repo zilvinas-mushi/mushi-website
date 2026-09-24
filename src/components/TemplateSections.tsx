@@ -1958,7 +1958,12 @@ export function TemplatesInside() {
               PHONE has its own art (Žilvinas 2026-09-11), cropped off its
               drop shadow to the 345 x 222 card at 4x. Its fade to black is
               in the art, so the gradient that used to be laid over it here
-              is gone. */}
+              is gone.
+              RE-CUT 2026-09-25 (Žilvinas, "should be replaced") from the
+              client's "50+ new templates monthly.png", a 4396 x 2840
+              master at the card's own aspect, Lanczos down to 1380 x 892
+              and LOSSLESS — the 97 KB lossy cut it replaces smeared the
+              collage's small type. 745 KB, lazy, below the fold. */}
           <article
             // CENTRED on desktop too, 45 down from the card's top (Žilvinas
             // 2026-09-19, off the artboard's inspector); it was left-set
