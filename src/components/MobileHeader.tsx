@@ -80,12 +80,23 @@ const VIOLET_CTA =
   "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] active:text-[#6e54b5]";
 
 /**
- * The drawer's OUTLINED button: black plate, 1px white ring, white label,
- * which inverts to a white plate and black label on hover (CLAUDE.md). The
- * gradient is a flat one so both states have a layer to cross-fade between.
+ * The drawer's two dark buttons (Žilvinas 2026-09-25, off the phone artboard):
+ *
+ *   - LOGIN sits on the DRAWER'S OWN #181818, not black, with a 1px white
+ *     stroke, radius 7. It inverts to white on #181818 on hover.
+ *   - BOOK AN AGENCY CALL is black with the corner-lit ring the "Book Your
+ *     Discovery Call" banner button wears — `.discovery-ring` in
+ *     globals.css, white at the top-left and bottom-right, nothing between.
+ *     One class, so the two can never drift apart. It inverts to white on
+ *     black on hover.
+ *
+ * Both keep a flat gradient layer on both states so the fill cross-fades
+ * (CLAUDE.md).
  */
-const OUTLINE_CTA =
-  "border border-white bg-[linear-gradient(#000,#000)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(#fff,#fff)] hover:text-black active:bg-[linear-gradient(#fff,#fff)] active:text-black";
+const LOGIN_CTA =
+  "border border-white bg-[linear-gradient(#181818,#181818)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(#fff,#fff)] hover:text-[#181818] active:bg-[linear-gradient(#fff,#fff)] active:text-[#181818]";
+const CALL_CTA =
+  "discovery-ring bg-[linear-gradient(#000,#000)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(#fff,#fff)] hover:text-black active:bg-[linear-gradient(#fff,#fff)] active:text-black";
 
 /**
  * What the drawer offers under the nav rows when a page wants more than the
@@ -97,9 +108,9 @@ const OUTLINE_CTA =
 export type MobileDrawerActions = {
   /** Left half of the row, violet. */
   primary: { label: string; href: string };
-  /** Right half of the row, outlined. */
+  /** Right half of the row, on the drawer's grey with a white stroke. */
   secondary: { label: string; href: string };
-  /** The full-width outlined row beneath. */
+  /** The full-width black row beneath, with the banner's corner-lit ring. */
   wide: { label: string; href: string };
 };
 
@@ -611,11 +622,11 @@ export function MobileHeader({
                   <a href={drawer.primary.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${VIOLET_CTA}`}>
                     {drawer.primary.label}
                   </a>
-                  <a href={drawer.secondary.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${OUTLINE_CTA}`}>
+                  <a href={drawer.secondary.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${LOGIN_CTA}`}>
                     {drawer.secondary.label}
                   </a>
                 </div>
-                <a href={drawer.wide.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${OUTLINE_CTA}`}>
+                <a href={drawer.wide.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${CALL_CTA}`}>
                   {drawer.wide.label}
                 </a>
               </>
