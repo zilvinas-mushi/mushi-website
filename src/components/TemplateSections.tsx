@@ -823,7 +823,23 @@ function CompetitorMark({ name }: { name: string }) {
   if (name === "Kandy") {
     return (
       <>
-        <Img src="templates/cmp-kandy-phone.webp" alt={name} width={44} className="md:hidden" />
+        {/* THE PHONE MARK IS THE VECTOR (Žilvinas 2026-09-25, "improved
+            quality"): the same potrace trace as the chip's logo-kandy.svg,
+            filled white — one drawing, two colours. 44 wide of INK, the
+            artboard's 44 x 25.52 frame; the 176 x 103 WebP it replaces was
+            44 of file with clear margin inside it, so the ink drew smaller
+            and soft. A raw <img> with data-src, like the chip's, since Img
+            sizes from the WebP table. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          data-src="/images/templates/cmp-kandy-phone.svg"
+          alt={name}
+          width={44}
+          height={22.5}
+          loading="lazy"
+          decoding="async"
+          className="md:hidden"
+        />
         {/* 79 box → 68 of ink (the file has ~14% of clear margin either
             side): the artboard draws Kandy at half the CreativeOS lockup's
             width, which is 134 here (Žilvinas 2026-09-19, "why so small").
