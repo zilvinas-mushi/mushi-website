@@ -1253,6 +1253,10 @@ export const TEMPLATES_PAGE = {
         // Same flattened phone card as step three; see the note there.
         // PHONE ONLY since 2026-09-12 (desktopShot below): on desktop the
         // full-bleed render made this card's picture bigger than step one's.
+        // RE-CUT from the desktop card's own master, "rozinis pic.png"
+        // (Žilvinas 2026-09-25, "improve majorly"): the 3312 square down to
+        // 1380 with Lanczos, LOSSLESS — the 900 it replaces was 2.6x the
+        // card and read soft on a 3x phone. ~870 KB, lazy and below the fold.
         phoneCard: "templates/process-phone-2.webp",
         // THE DESKTOP CARD IS ONE SUPPLIED PICTURE NOW (Žilvinas 2026-09-19,
         // "rozinis pic.png", 3312 square, "full background"): the magenta
@@ -1277,8 +1281,11 @@ export const TEMPLATES_PAGE = {
         // never the same picture, so the artboard's own render is the
         // background and nothing but the type sits on top of it.
         // RE-CUT from the client's "Third section.png" (Žilvinas 2026-09-25,
-        // "MAX quality"): the supplied 1376 square, quality 95 — 4x the 345
+        // "MAX quality"): the supplied 1376 square, LOSSLESS — 4x the 345
         // it draws at, where the 900 was 2.6x and read soft on a 3x phone.
+        // Lossless rather than q95 by instruction ("stop using webp if it's
+        // decreasing the quality"): lossy WebP subsamples chroma, which is
+        // visible on the shot's coloured type. ~870 KB, lazy, below the fold.
         phoneCard: "templates/process-phone-3.webp",
         card: "process-card-3.webp",
         alt: "Meta Ads Manager campaign list running A/B tests of the finished ad",
