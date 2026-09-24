@@ -851,7 +851,23 @@ function CompetitorMark({ name }: { name: string }) {
   if (name === "CreativeOS") {
     return (
       <>
-        <Img src="templates/cmp-creativeos-icon-phone.webp" alt={name} width={27} className="md:hidden" />
+        {/* THE PHONE MARK IS DRAWN (Žilvinas 2026-09-25, "recreate it with
+            components"): two half-discs, measured off the client's
+            "creative os logo white.png" (664 x 593) — the left half of a
+            256-radius circle and the right half of a 257-radius one, its
+            flat edge 37 to the right and its centre 66 lower. Two arcs on a
+            550 x 580 box, white, at the artboard's 27 wide. The 108 x 96
+            WebP it replaces was a raster of the same shape and went soft. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          data-src="/images/templates/cmp-creativeos-phone.svg"
+          alt={name}
+          width={27}
+          height={28.5}
+          loading="lazy"
+          decoding="async"
+          className="md:hidden"
+        />
         <Img
           src="templates/cmp-creativeos-icon.webp"
           alt=""
