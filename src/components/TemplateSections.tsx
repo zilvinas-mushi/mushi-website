@@ -1837,7 +1837,11 @@ export function TemplatesInside() {
           </article>
 
           {/* 5 industries — chip rows baked into the background art. Same
-              phone treatment as the support card: its own 4x, pre-dimmed. */}
+              phone treatment as the support card: its own 4x, pre-dimmed.
+              LOSSLESS since 2026-09-25 (Žilvinas, "do not diminish the
+              quality"): the client's "5 industries background.png" as
+              supplied, 660 x 476. The q-lossy cut before it was 62/255 off
+              the master at its worst, on the chips' fine emoji. 55 KB. */}
           <article
             className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[image:var(--bg-md,none)] md:p-6 md:pb-[43px] md:pl-[40px] md:text-left`}
             data-bg="url(/images/templates/inside-industries-phone.webp)"
