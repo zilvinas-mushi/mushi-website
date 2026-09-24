@@ -1253,10 +1253,10 @@ export const TEMPLATES_PAGE = {
         // Same flattened phone card as step three; see the note there.
         // PHONE ONLY since 2026-09-12 (desktopShot below): on desktop the
         // full-bleed render made this card's picture bigger than step one's.
-        // RE-CUT from the desktop card's own master, "rozinis pic.png"
-        // (Žilvinas 2026-09-25, "improve majorly"): the 3312 square down to
-        // 1380 with Lanczos, LOSSLESS — the 900 it replaces was 2.6x the
-        // card and read soft on a 3x phone. ~870 KB, lazy and below the fold.
+        // RE-CUT from the client's "second section purple.png" (Žilvinas
+        // 2026-09-25): 2544 x 2541, Lanczos down to 1380, LOSSLESS — the
+        // 900 it replaced was 2.6x the card and read soft on a 3x phone.
+        // ~870 KB, lazy and below the fold.
         phoneCard: "templates/process-phone-2.webp",
         // THE DESKTOP CARD IS ONE SUPPLIED PICTURE NOW (Žilvinas 2026-09-19,
         // "rozinis pic.png", 3312 square, "full background"): the magenta
