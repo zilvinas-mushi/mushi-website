@@ -369,11 +369,14 @@ export function PlanSheet() {
                 as vectors — Verified by Visa and PCI DSS are the frame's
                 paths; Mastercard ID Check is the vector from SVG Repo
                 (svgrepo.com/svg/508702), laid out at the frame's geometry
-                with the wordmark in white; McAfee SECURE stays the frame's
-                own construction, its 771-wide raster with SECURE painted
-                white through the frame's mask (no vector of that lockup
-                exists to take). A raw <img> since Img sizes from the WebP
-                table; the sheet mounts on demand, so a plain src is fine. */}
+                with the wordmark in white; McAfee SECURE is the frame's
+                771-wide raster (12x the 62 it draws at) with SECURE painted
+                white in the pixels — NOT through the frame's pattern-fill
+                and alpha mask, which WebKit tiled with a cut right edge
+                (Žilvinas 2026-09-25, "the right part is janky"). No vector
+                of that lockup exists to take. A raw <img> since Img sizes
+                from the WebP table; the sheet mounts on demand, so a plain
+                src is fine. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/templates/pay-badges.svg"
