@@ -22,8 +22,8 @@ import { APP_URL } from "@/lib/site";
  * sections are server components and would each have to become client
  * components to hold a handler. The attribute is the contract.
  *
- * IT RISES FROM THE BOTTOM, 400ms on an ease-out, the backdrop fading with
- * it; it is mounted only while open (and for the 400ms it takes to leave),
+ * IT RISES FROM THE BOTTOM, see OPEN_MS, the backdrop fading with it; it
+ * is mounted only while open (and for the time it takes to leave),
  * so a closed sheet is nothing in the DOM. Escape and the backdrop dismiss
  * it, and the page behind it does not scroll.
  *
@@ -34,7 +34,13 @@ import { APP_URL } from "@/lib/site";
  * the webapp with the plan in the query string. A field that took card
  * numbers into nothing would be worse than none.
  */
-const OPEN_MS = 400;
+/**
+ * The rise: 560ms on a sheet curve — fast off the bottom, then a long,
+ * decelerating settle (cubic-bezier(0.32, 0.72, 0, 1), the curve iOS
+ * sheets use). A flat ease-out over 400 read as a pop (Žilvinas
+ * 2026-09-25, "smoother"). The backdrop fades on the same clock.
+ */
+const OPEN_MS = 560;
 
 /** The struck-through old price, in the frame's red ramp. */
 const WAS =
@@ -99,7 +105,8 @@ export function PlanSheet() {
 
   const plan = c.options.find((o) => o.id === planId) ?? c.options[0];
   const checkout = `${APP_URL}/?plan=${plan.id}`;
-  const motion = "transition-[transform,opacity] duration-[400ms] ease-out motion-reduce:transition-none";
+  const motion =
+    "transition-[transform,opacity] duration-[560ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform motion-reduce:transition-none";
 
   return (
     <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true" aria-labelledby="plan-sheet-title">
