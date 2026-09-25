@@ -157,13 +157,16 @@ export function PlanSheet() {
                         {o.save}
                       </span>
                     )}
-                    {/* The radio: a 24 disc, #464646 at rest; when on, white
-                        with the row's dark ring and a 14 white dot. */}
+                    {/* The radio, off the inspector (Žilvinas 2026-09-25):
+                        a 23.67 disc, #464646 at rest; when on, a 2px white
+                        ring on the row's #2A2431 with a 14.2 white dot. */}
                     <span
                       aria-hidden="true"
-                      className={`grid size-6 shrink-0 place-items-center rounded-full ${on ? "bg-white" : "bg-[#464646]"}`}
+                      className={`grid size-[23.67px] shrink-0 place-items-center rounded-full ${
+                        on ? "border-2 border-white bg-[#2a2431]" : "bg-[#464646]"
+                      }`}
                     >
-                      {on && <span className="size-[14px] rounded-full border-[3.5px] border-[#2a2431] bg-white" />}
+                      {on && <span className="size-[14.2px] rounded-full bg-white" />}
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
                       <span className="text-[18px] font-semibold leading-none text-white">{o.name}</span>
@@ -174,7 +177,7 @@ export function PlanSheet() {
                         {o.was && <span className={`text-[20px] font-semibold leading-none ${WAS}`}>{o.was}</span>}
                         <span className="text-[26px] font-semibold leading-none text-white">{o.price}</span>
                       </span>
-                      <span className="text-[12px] leading-none text-white/45">{c.perMonth}</span>
+                      <span className="text-[12px] font-semibold leading-none text-white/45">{c.perMonth}</span>
                     </span>
                   </button>
                 );
@@ -187,7 +190,7 @@ export function PlanSheet() {
               className={`mt-5 flex h-[47px] w-full items-center justify-center rounded-[10px] text-[18px] font-semibold ${VIOLET}`}
             >
               {c.ctaPrefix} {plan.price}
-              <span className="text-[13px] font-normal opacity-70">{c.perMonth}</span>
+              <span className="text-[13px] font-semibold opacity-70">{c.perMonth}</span>
             </button>
 
             <p className="mt-4 flex items-center justify-center gap-1.5 text-[13px] leading-none text-white/45">
