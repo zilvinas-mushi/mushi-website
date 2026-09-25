@@ -1185,6 +1185,19 @@ img[data-src] {
   mask-repeat: no-repeat;
 }
 
+/* The desktop 5-industries chip rows: the artboard's alpha mask on the rows
+   layer (Žilvinas 2026-09-25) — opaque at the top-right, 10% halfway, gone
+   at the bottom-left, the line from (300.5, -35.5) to (112, 291) on the
+   408 x 289 card. Stretched with the card, so the angle follows its box. */
+.industry-chips {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22408%22%20height=%22289%22%20viewBox=%220%200%20408%20289%22%20preserveAspectRatio=%22none%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20gradientUnits=%22userSpaceOnUse%22%20x1=%22300.5%22%20y1=%22-35.5%22%20x2=%22112%22%20y2=%22291%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%23fff%22%20stop-opacity=%221%22/%3E%3Cstop%20offset=%220.5%22%20stop-color=%22%23fff%22%20stop-opacity=%220.1%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23fff%22%20stop-opacity=%220%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%22408%22%20height=%22289%22%20fill=%22url(%23g)%22/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22408%22%20height=%22289%22%20viewBox=%220%200%20408%20289%22%20preserveAspectRatio=%22none%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20gradientUnits=%22userSpaceOnUse%22%20x1=%22300.5%22%20y1=%22-35.5%22%20x2=%22112%22%20y2=%22291%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%23fff%22%20stop-opacity=%221%22/%3E%3Cstop%20offset=%220.5%22%20stop-color=%22%23fff%22%20stop-opacity=%220.1%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23fff%22%20stop-opacity=%220%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%22408%22%20height=%22289%22%20fill=%22url(%23g)%22/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 /* The /templates hero badge's ring is 2 on the phone (artboard 2026-09-06)
    and the utility's own 1px above md, where the desktop reference was signed
    off. Set here rather than inline so the breakpoint can reach it. */

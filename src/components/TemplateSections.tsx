@@ -1902,7 +1902,7 @@ const INDUSTRY_CHIP_ROWS = [
 function IndustryChips() {
   return (
     <div aria-hidden="true" className="absolute inset-0 hidden md:block">
-      <div className="absolute -top-[18px] left-0 flex flex-col gap-[20px]">
+      <div className="industry-chips absolute -top-[18px] left-0 flex flex-col gap-[20px]">
         {INDUSTRY_CHIP_ROWS.map((row, i) => (
           <div key={i} className="flex gap-[20px]" style={{ marginLeft: row.offset }}>
             {row.labels.map((label, j) => {
@@ -1920,22 +1920,15 @@ function IndustryChips() {
           </div>
         ))}
       </div>
-      {/* THE SHADOW, matched to the client's 408 x 289 target render
-          (Žilvinas 2026-09-25, "DO THE EXACT SAME SHADOW"): ONE
-          alpha-gradient veil — #111111 at 100% into #8F8F8F at 10% into
-          #FFFFFF at 0% — with the DARK end at the lower left, where the
-          "5 industries" number sits (the Beauty chip behind the 5 all but
-          vanishes in the reference), clearing up the gradient line to a
-          fully lit top-right (Food/Drink/Fashion read white up there).
-          The line leans ~32° off vertical, which keeps the top-LEFT chips
-          brighter than the bottom-right ones, exactly as the render has
-          them. The shadows.svg export of this fill ships its dark end as
-          an opaque plate (a Figma flattening) — the render is the truth
-          this reproduces. */}
-      {/* Stops shifted 18% in: the Figma line's dark handle sits INSIDE
-          the card (not at its corner), so everything below-left of it is
-          solid #111 — the reference's near-black lower-left quarter. */}
-      <div className="absolute inset-0 bg-[linear-gradient(32deg,#111111_0%,#111111_22%,rgba(17,17,17,0.35)_55%,rgba(143,143,143,0.08)_75%,rgba(255,255,255,0)_100%)]" />
+      {/* NO VEIL OVER THE ROWS ANY MORE (Žilvinas 2026-09-25, "make the
+          shadow align with Figma"): the artboard dims the chips with an
+          ALPHA MASK on the rows layer — #111111 at 100% top-right, #8F8F8F
+          at 10% halfway, white at 0% bottom-left, the line from (300.5,
+          -35.5) to (112, 291) on the 408 x 289 card — so the bottom-left
+          chips fade out rather than sink under a grey plate. That mask is
+          .industry-chips in globals.css. The card's own shading is the
+          layer UNDER the rows: inside-industries-shadow-desktop.svg, the
+          artboard's "shadows" export, laid in the article. */}
     </div>
   );
 }
@@ -2065,6 +2058,17 @@ export function TemplatesInside() {
               aria-hidden="true"
               className="absolute inset-0 bg-[image:var(--bg,none)] bg-cover bg-center md:hidden"
               data-bg="url(/images/templates/inside-industries-shadow.svg)"
+            />
+            {/* DESKTOP: the artboard's first shadow layer (Žilvinas
+                2026-09-25, "shadows.svg — this is svg for first layer"):
+                the #111111 plate with its masked grey ramp, stretched to
+                the card (it is the 408 x 289 card's own export), under the
+                chip rows. The rows' own dimming is the alpha mask on them,
+                see IndustryChips. Deferred like every background. */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 hidden bg-[image:var(--bg,none)] bg-[length:100%_100%] md:block"
+              data-bg="url(/images/templates/inside-industries-shadow-desktop.svg)"
             />
             <IndustryChips />
             <p className="relative">
@@ -2991,6 +2995,7 @@ export function TemplatesBgFallbacks() {
   // fall back to.
   const wide = [
     "access-rays.webp",
+    "inside-industries-shadow-desktop.svg",
     "inside-support-hd.webp",
     "inside-monthly-v2.webp",
   ];
