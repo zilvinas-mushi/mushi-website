@@ -192,10 +192,14 @@ export function PlanSheet() {
             <button
               type="button"
               onClick={() => setStep("pay")}
-              className={`mt-5 flex h-[47px] w-full items-center justify-center rounded-[10px] text-[18px] font-semibold ${VIOLET}`}
+              // Poppins Medium, 18 for the label and 14 for "/month" at 50%
+              // white, off the inspector (Žilvinas 2026-09-25). The 50% is
+              // an opacity rather than a colour so it still inverts with the
+              // button on hover.
+              className={`mt-5 flex h-[47px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium ${VIOLET}`}
             >
               {c.ctaPrefix} {plan.price}
-              <span className="text-[13px] font-semibold opacity-70">{c.perMonth}</span>
+              <span className="text-[14px] font-medium opacity-50">{c.perMonth}</span>
             </button>
 
             {/* Poppins Regular 14, white at 50%, the whole line — label,
