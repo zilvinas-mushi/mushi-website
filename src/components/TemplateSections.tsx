@@ -185,10 +185,13 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
     // phone rules carry 3.33 of empty frame past the star (the left star
     // ends at 122.67 of 126, the right starts at 3.33), so the CSS gap is
     // 10 - 3.33.
-    // DESKTOP 6, halved from the 2026-09-10 12 (Žilvinas 2026-09-25, "no
-    // need for such a big spaces after the header"); its rules keep ~3.5
-    // of frame past the star, so the visual gap reads ~9.5.
-    <div className="flex items-center justify-center gap-[6.67px] md:gap-1.5">
+    // DESKTOP 4: the whole desktop eyebrow — word, rules AND this gap — is
+    // the signed-off drawing at 1/1.5 (Žilvinas 2026-09-25, "headers 1.5x
+    // smaller" then "animations also proportionally smaller"). The artboard
+    // puts 11 from the letter's ink to the star's tip; at this scale that
+    // is 7.3, and 4 of CSS gap + the rules' ~2.2 of scaled empty frame +
+    // the word's ~1.1 side bearing lands there.
+    <div className="flex items-center justify-center gap-[6.67px] md:gap-[4px]">
       {/* PHONES GET THE ARTBOARD'S OWN RULES (Žilvinas 2026-09-06): a line
           that fades from black into the star's colour, with a four-pointed
           star ON its inner end. Since 2026-09-18 ("both of these to improve
@@ -206,22 +209,26 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
           into a star <path>, #6E54B5 on the left and #D07678 on the right —
           replacing the 2026-09-10 WebP exports, which were rasters of the
           same drawing and went soft at 2x. One component draws both
-          breakpoints' rules; only the class differs. */}
-      <EyebrowRule src="eyebrow-rule-left.svg" width={161} className="hidden shrink-0 md:block" />
-      {/* Poppins Regular 18 on the phone (artboard 2026-09-06), 30 at the
-          desktop reference. */}
-      {/* Figma panel 2026-09-07: Poppins Regular 30 over an 80 line height
-          at the desktop reference; the phone keeps its artboard's 18. */}
+          breakpoints' rules; only the class differs.
+
+          DRAWN AT 1/1.5 SINCE 2026-09-25 (Žilvinas, "animations also
+          proportionally smaller as the headers"): the exports' 161/160 x 21
+          render at 107 x 14, the same ratio the word came down by — they
+          are vectors, so nothing softens. The phone rules keep their
+          artboard size, as the phone word did. */}
+      <EyebrowRule src="eyebrow-rule-left.svg" width={107} height={14} className="hidden shrink-0 md:block" />
+      {/* Poppins Regular 18 at EVERY width now (Žilvinas 2026-09-25, "make
+          headers 1.5x times smaller"): the desktop word was the panel's 30
+          at the page's 0.9 — 27 — and 27 / 1.5 lands on the same 18 the
+          phone artboard has always used, so the two breakpoints share one
+          size. The rules either side keep their own scale. */}
       <p
-        // md 27: the panel's Regular 30 at the page's 0.9, like every other
-        // size on it (Žilvinas 2026-09-19, "why does it seem bigger") — the
-        // literal 30 was the one thing drawn at 1:1.
-        className="bg-clip-text text-[18px] font-normal uppercase leading-none text-transparent md:text-[27px]"
+        className="bg-clip-text text-[18px] font-normal uppercase leading-none text-transparent"
         style={{ backgroundImage: EYEBROW_GRADIENT }}
       >
         {children}
       </p>
-      <EyebrowRule src="eyebrow-rule-right.svg" width={160} className="hidden shrink-0 md:block" />
+      <EyebrowRule src="eyebrow-rule-right.svg" width={107} height={14} className="hidden shrink-0 md:block" />
 
       <EyebrowRule src="eyebrow-right.svg" width={127} />
     </div>
@@ -243,10 +250,13 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
 function EyebrowRule({
   src,
   width,
+  height = 21,
   className = "shrink-0 md:hidden",
 }: {
   src: string;
   width: number;
+  /** The exports are all 21 tall; the desktop pair renders at 14 (1/1.5). */
+  height?: number;
   /** Which breakpoint draws it; the phone's rules by default. */
   className?: string;
 }) {
@@ -263,7 +273,7 @@ function EyebrowRule({
       src={`/images/templates/${src}`}
       alt=""
       width={width}
-      height={21}
+      height={height}
       loading="lazy"
       decoding="async"
       className={className}
@@ -541,14 +551,18 @@ export function TemplatesProcess() {
                 {/* NO SHADOW under the chip (2026-09-18, the client's boss:
                     Figma has none, the web had one). The pill sits flat on
                     the step's artwork. */}
-                {/* DESKTOP IS THE ARTBOARD'S PILL (Žilvinas 2026-09-19, off the
-                    inspector): 117 x 31, radius 50, #F5F5F5, Poppins Medium
-                    15, the text 12 in from the pill's curved side and 9 off
-                    its bottom, and the pill 30 from the card's left and 30
-                    up from its bottom. The 31 is set as a height with the
-                    label centred, which is the same 9 / 9 without depending
-                    on Poppins' line box. */}
-                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[15px] py-1.5 text-[14px] font-medium leading-none text-black md:bottom-[30px] md:left-[30px] md:inline-flex md:h-[31px] md:items-center md:bg-[#f5f5f5] md:px-3 md:py-0 md:text-[15px]">
+                {/* THE PILL FITS ITS LABEL LIKE THE SUPPLIED CROP (Žilvinas
+                    2026-09-25, "make spaces from text and rectangle so it
+                    would be as in example" — an "Easy Peasy!" close-up):
+                    scaled by the label's own glyph run (141px there, 74
+                    here), the example puts 10.5 either side of the text and
+                    a 28 pill height on this 15px face — tighter than the
+                    117 x 31 / 12-inset pill read off the inspector on
+                    2026-09-19, which left the label swimming. The phone
+                    takes the same 10 sides on its 14px face; its py-1.5
+                    already lands the example's 26. Position on the card
+                    (30 / 30, phone 20 / 20) is unchanged. */}
+                <span className="absolute bottom-5 left-5 rounded-[50px] bg-white px-[10px] py-1.5 text-[14px] font-medium leading-none text-black md:bottom-[30px] md:left-[30px] md:inline-flex md:h-[28px] md:items-center md:bg-[#f5f5f5] md:px-[10.5px] md:py-0 md:text-[15px]">
                   {s.chip}
                 </span>
               </article>
@@ -1548,11 +1562,13 @@ export function TemplatesAccess() {
           // hairs and rounded corners are baked in, so the box carries no
           // radius of its own there). The desktop keeps the rays layer over
           // its gradient.
-          // md:pr-[18px]: measured off the built page, the purple card's
-          // BUY NOW fill ends ~18px in from the container edge (its p-7 is
-          // offset by the card ring's inner geometry), and the CTA's right
-          // edge aligns to THAT, not to a theoretical 28 (client 2026-09-12).
-          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1160px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[image:var(--bg,none)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:var(--bg-md,none),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:pl-6 md:pr-[18px]"
+          // md: 38 FROM TOP, BOTTOM AND THE CTA'S SIDE (Žilvinas 2026-09-25,
+          // off the artboard's 4 x 38 spacer above the pill): py-[38px]
+          // stands the 65-tall pill in a ~141 banner, and pr-[38px] holds
+          // the same 38 off its right edge — replacing the 18 that had been
+          // matched to the purple card's BUY NOW fill (client 2026-09-12);
+          // the artboard's own number wins. The left keeps its pl-6.
+          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1160px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[image:var(--bg,none)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:var(--bg-md,none),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:py-[38px] md:pl-6 md:pr-[38px]"
           data-bg="url(/images/templates/access-banner-phone.webp)"
           data-bg-md="url(/images/templates/access-rays.webp)"
         >
@@ -1864,6 +1880,66 @@ function IndustryPills() {
  * rows, and the dimmed template collage ship as card backgrounds; the
  * laurel leaves are the design's own SVG on both sizes.
  */
+/**
+ * The 5-industries card's chip field, LIVE instead of baked (Žilvinas
+ * 2026-09-25, "make HD quality / like this pattern"): the desktop art
+ * (inside-industries.webp, an 800-wide raster) drew its chips soft at the
+ * card's size and softer on retina. These are the artboard's own chips —
+ * 120 x 40 pills, 20 between them along BOTH axes ("diff is 20"), emoji at
+ * 24 from the 200px category masters, Poppins 17 white label — as markup,
+ * so they are sharp at every DPR and zoom. Rows stagger like the
+ * reference's crop and bleed past the card's edges; the card's
+ * overflow-hidden (CARD) crops them.
+ */
+const INDUSTRY_CHIP_ROWS = [
+  { offset: -46, labels: ["Food", "Drink", "Fashion", "Health"] },
+  { offset: 24, labels: ["Health", "Beauty", "Food", "Drink"] },
+  { offset: -84, labels: ["Fashion", "Drink", "Health", "Fashion"] },
+  { offset: -8, labels: ["Beauty", "Health", "Food", "Drink"] },
+  { offset: -60, labels: ["Drink", "Food", "Beauty", "Fashion"] },
+] as const;
+
+function IndustryChips() {
+  return (
+    <div aria-hidden="true" className="absolute inset-0 hidden md:block">
+      <div className="absolute -top-[18px] left-0 flex flex-col gap-[20px]">
+        {INDUSTRY_CHIP_ROWS.map((row, i) => (
+          <div key={i} className="flex gap-[20px]" style={{ marginLeft: row.offset }}>
+            {row.labels.map((label, j) => {
+              const cat = TEMPLATES_PAGE.categories.find((c) => c.label === label)!;
+              return (
+                <span
+                  key={`${label}-${j}`}
+                  className="flex h-[40px] w-[120px] shrink-0 items-center justify-center gap-[8px] rounded-full bg-[#232323]"
+                >
+                  <Img src={cat.image} alt="" width={24} className="size-[24px] object-contain" />
+                  <span className="text-[17px] font-normal leading-none text-white">{label}</span>
+                </span>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      {/* THE SHADOW, matched to the client's 408 x 289 target render
+          (Žilvinas 2026-09-25, "DO THE EXACT SAME SHADOW"): ONE
+          alpha-gradient veil — #111111 at 100% into #8F8F8F at 10% into
+          #FFFFFF at 0% — with the DARK end at the lower left, where the
+          "5 industries" number sits (the Beauty chip behind the 5 all but
+          vanishes in the reference), clearing up the gradient line to a
+          fully lit top-right (Food/Drink/Fashion read white up there).
+          The line leans ~32° off vertical, which keeps the top-LEFT chips
+          brighter than the bottom-right ones, exactly as the render has
+          them. The shadows.svg export of this fill ships its dark end as
+          an opaque plate (a Figma flattening) — the render is the truth
+          this reproduces. */}
+      {/* Stops shifted 18% in: the Figma line's dark handle sits INSIDE
+          the card (not at its corner), so everything below-left of it is
+          solid #111 — the reference's near-black lower-left quarter. */}
+      <div className="absolute inset-0 bg-[linear-gradient(32deg,#111111_0%,#111111_22%,rgba(17,17,17,0.35)_55%,rgba(143,143,143,0.08)_75%,rgba(255,255,255,0)_100%)]" />
+    </div>
+  );
+}
+
 export function TemplatesInside() {
   const s = TEMPLATES_PAGE.inside;
   const CARD = "relative overflow-hidden rounded-[18px] bg-[#121114] bg-cover bg-center p-6";
@@ -1933,14 +2009,32 @@ export function TemplatesInside() {
             // already sits on the headline's 24px line, so the 108.6%
             // right-pinned oversizing that dragged the OLD art into place
             // would now cut the pill's left edge off.
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-[image:var(--bg-md,none)] md:p-6 md:pl-[40px] md:pt-[43px] md:text-left`}
+            // THE DESKTOP ART IS "Group 167.svg" RASTERISED AT 4x (Žilvinas
+            // 2026-09-25, "under 24/7 support make this shadow"): the
+            // client's full-card vector — the 21 memoji circles, the layered
+            // shadow washes, AND the "Need help?" bubble with its label as
+            // paths — rendered at 1632 x 1156 (4x the 408 x 289 artboard)
+            // to inside-support-hd.webp, 39 KB. At that density the bubble's
+            // text finally draws sharp, so the live HTML bubble this card
+            // carried is gone: the supplied art IS the composition.
+            // md:bg-left: the art shares the card's aspect at the full
+            // shell, and when a narrower window makes cover crop it, the
+            // left edge — where the bubble lives — must be the side that
+            // stays.
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-start md:justify-start md:bg-left md:bg-[image:var(--bg-md,none)] md:p-6 md:pl-[40px] md:pt-[43px] md:text-left`}
             data-bg="url(/images/templates/inside-support-phone.webp)"
-            data-bg-md="url(/images/templates/inside-support-v2.webp)"
+            data-bg-md="url(/images/templates/inside-support-hd.webp)"
           >
             <p className="relative">
               <span className={BIG}>{s.support.big}</span>
               <span className={`${SMALL} block md:mt-1 md:text-[36px]`}>{s.support.small}</span>
             </p>
+            {/* No live "Need help?" bubble any more: it spent 2026-09-25
+                being rebuilt as an overlay (the baked one drew at ~10px of
+                mush), and then the client supplied "Group 167.svg" — the
+                whole composition, bubble and label included, as vectors.
+                Rasterised at 4x the bubble text is finally sharp in the
+                background itself, so the overlay came back out. */}
           </article>
 
           {/* 5 industries — chip rows. DESKTOP keeps its baked art; the
@@ -1950,8 +2044,12 @@ export function TemplatesInside() {
               browser draws sharper than any raster). See IndustryPills.
               The shadow over them is still to come. */}
           <article
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[image:var(--bg-md,none)] md:p-6 md:pb-[43px] md:pl-[40px] md:text-left`}
-            data-bg-md="url(/images/templates/inside-industries.webp)"
+            // NO BAKED ART AT EITHER SIZE NOW: the phone's rows are
+            // IndustryPills and the desktop's are IndustryChips, both live
+            // (Žilvinas 2026-09-25, "make HD quality"). The two were built
+            // in parallel — phone first, then desktop — and each is scoped
+            // to its own breakpoint, so they sit side by side here.
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:p-6 md:pb-[43px] md:pl-[40px] md:text-left`}
           >
             <IndustryPills />
             {/* THE SHADOW OVER THE ROWS (Žilvinas 2026-09-25, "background
@@ -1960,12 +2058,15 @@ export function TemplatesInside() {
                 the top-left — laid over the pills and under the headline.
                 The dimming of the rows is not here: it is the artboard's
                 alpha mask on the rows themselves (.industry-rows in
-                globals.css). Deferred like every background. */}
+                globals.css). Deferred like every background.
+                PHONE ONLY: the desktop field carries its own veil, drawn
+                from the same fill panel inside IndustryChips. */}
             <span
               aria-hidden="true"
               className="absolute inset-0 bg-[image:var(--bg,none)] bg-cover bg-center md:hidden"
               data-bg="url(/images/templates/inside-industries-shadow.svg)"
             />
+            <IndustryChips />
             <p className="relative">
               <span className={BIG}>{s.industries.big}</span>
               <span className={`${SMALL} block md:mt-1 md:text-[36px]`}>{s.industries.small}</span>
@@ -2395,14 +2496,15 @@ function CategoryTiles() {
       // window a few CSS px UNDER 1280 (the client's sits at ~1272), where
       // xl made the rows vanish entirely (client 2026-09-12).
       //
-      // THE FIELD RUNS FROM THE DEVICE'S TOP EDGE TO THE FOLD. It renders on
-      // AppWindow's flex-1 wrapper — inset-y-0 there is device top (the
-      // aspect box is the wrapper's first block child) down to the 100svh
-      // section's bottom — and w-screen off the centre line so the rows run
-      // clear across the viewport. hero-tile-field makes it a SIZE container,
-      // so 100cqh below is that top-of-mac-to-fold height, NOT the device's:
-      // the two differ whenever the 1440px cap (tall monitors) leaves a band
-      // under the device, and the rows centre on the screen, not the mac.
+      // THE FIELD IS THE DEVICE'S OWN BOX (again — Žilvinas 2026-09-25,
+      // "86 and 81, make the same": gaps measured to the MAC's edges, so
+      // the mac's edges are what the pair must centre between). inset-y-0
+      // inside the aspect box is exactly the device's height, and w-screen
+      // off the centre line so the rows still run clear across the
+      // viewport. hero-tile-field makes it a SIZE container, so 100cqh
+      // below IS the device's height — top gap and bottom gap to the mac
+      // come out equal on every screen, including where the 1440px width
+      // cap ends the device above the fold.
       className="hero-tile-field pointer-events-none absolute inset-y-0 left-1/2 z-0 hidden w-screen -translate-x-1/2 overflow-hidden lg:block"
     >
       {/* CENTRED ON THE PICTURE OF THE COMPUTER (client 2026-09-13), and
@@ -2456,17 +2558,18 @@ function AppWindow() {
     // md:mt-[45px]: the artboard's 64 from button to device, at the same 0.7
     // the button itself is drawn at (see the CTA in TemplatesHero).
     <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[45px] md:min-h-0 md:flex-1 md:max-w-[1440px]">
-      {/* The tile field lives on THIS wrapper, not the device box (Žilvinas
-          2026-09-25, "distance from first row's square ... same as from
-          second row's"): its top is the device's top edge, but its bottom is
-          the wrapper's — the fold — so the pair centres between the mac's
-          top and the bottom of the SCREEN. Inside the device box the two
-          were the same thing whenever the height bound; on tall monitors the
-          1440px width cap leaves a band under the device, and rows centred
-          on the device alone sat visibly high of the screen's own middle. */}
-      <CategoryTiles />
-      {/* The device box. */}
+      {/* The device box. The tile field is inset-y-0 INSIDE it (Žilvinas
+          2026-09-25, closing the day: "now it is 86 and 81, make the same"
+          — measured against the MAC's edges, which is what the eye
+          measures against): the pair centres between the device's top and
+          bottom edges, so the two gaps read equal on every screen. It
+          spent part of the day centring to the FOLD instead, which is the
+          same thing whenever the height bound — but wherever the 1440px
+          width cap left a band under the device, the fold-centred pair
+          hung a few px low of the mac's own middle, and that offset is
+          exactly the 86-vs-81 the client measured. */}
       <div className="md:relative md:mx-auto md:aspect-[2400/1503] md:max-h-full md:max-w-full">
+      <CategoryTiles />
       <PhoneTiles />
 
       {/* THE PHONE IS THE MOBILE HERO, not a shrunken MacBook (Žilvinas
@@ -2883,10 +2986,12 @@ export function TemplatesBgFallbacks() {
     "inside-monthly-phone.webp",
   ];
   // The desktop twins, which the class only uses above md.
+  // inside-industries.webp left this list 2026-09-25: the desktop chips
+  // are live markup now (IndustryChips), so there is no md background to
+  // fall back to.
   const wide = [
     "access-rays.webp",
-    "inside-support-v2.webp",
-    "inside-industries.webp",
+    "inside-support-hd.webp",
     "inside-monthly-v2.webp",
   ];
   return (

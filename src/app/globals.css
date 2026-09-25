@@ -1415,14 +1415,16 @@ img[data-src] {
   container-type: size;
 }
 
-/* THE PAIR KEEPS THE ARTBOARD'S GAP AND SITS DEAD-CENTRE (Žilvinas
-   2026-09-25, "keep it the same 30 but move both lines ... perfectly in the
-   middle"): the gap BETWEEN the two rows is the artboard's own 30-on-230 —
-   the same gutter the tiles keep along a row — and the pair as a whole is
-   centred in the field, whose box is device-top-to-FOLD (see CategoryTiles):
-   mac's top edge to the upper row equals lower row to the screen's bottom.
-   It was three equal gaps ((100cqh - 2 tiles) / 3), which pushed the rows
-   further apart than the artboard whenever the device was tall. */
+/* THE PAIR KEEPS THE ARTBOARD'S GAP AND SITS DEAD-CENTRE ON THE DEVICE
+   (Žilvinas 2026-09-25, twice: "perfectly in the middle of the mac", and
+   closing the day "86 and 81, make the same"): the gap BETWEEN the two
+   rows is the artboard's own 30-on-230 — the same gutter the tiles keep
+   along a row — and the pair as a whole is centred in the field, whose
+   box is the DEVICE's (see CategoryTiles): mac top edge to the upper row
+   equals lower row to the mac's bottom edge, which is where the client
+   puts the ruler. It was three equal gaps ((100cqh - 2 tiles) / 3), which
+   pushed the rows further apart than the artboard whenever the device was
+   tall. */
 .hero-tile-row {
   --tile: min(10.9vw, 35cqh);
   --tile-gutter: calc(var(--tile) * 0.1304);
