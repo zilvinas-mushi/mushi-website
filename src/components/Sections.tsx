@@ -125,8 +125,16 @@ function Pill({
   // words plus 20 and nothing more. It was 20 a side, which on a 375 screen
   // spent a tenth of the width on air. Desktop keeps its measured
   // 0.32u padding.
+  //
+  // FLAT 44 / 14 ON THE PHONE (Žilvinas 2026-09-25, "why did it become so
+  // small — it should be 44 in height, 14 semibold"). Both were quoted
+  // through --pu, which shrinks the first screen to fit short viewports, and
+  // on an iPhone with Safari's bars showing (~700svh) that made the button
+  // 38 tall with a 12px label. Outside --pu now, like the headline, the sub
+  // and the gap above — the button is the design's own size on every phone
+  // and only the spacing gives.
   const base =
-    "inline-flex h-[calc(var(--pu)*44)] items-center justify-center rounded-[0.625rem] px-[0.625rem] text-[length:calc(var(--pu)*14)] font-semibold uppercase leading-none transition-all duration-300 ease-out hover:-translate-y-[1px] md:h-[3rem] md:px-6 md:text-[1.125rem] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
+    "inline-flex h-[44px] items-center justify-center rounded-[0.625rem] px-[0.625rem] text-[14px] font-semibold uppercase leading-none transition-all duration-300 ease-out hover:-translate-y-[1px] md:h-[3rem] md:px-6 md:text-[1.125rem] md:h-[calc(var(--hero-u)*0.67)] md:rounded-[calc(var(--hero-u)*0.15)] md:px-[calc(var(--hero-u)*0.32)] md:text-[length:calc(var(--hero-u)*0.24)]";
   // Each CTA inverts its own two colours on hover — foreground and background
   // trade places. Purple-on-white becomes white-on-purple; white-on-black
   // becomes black-on-white. Both keep a gradient background layer throughout
