@@ -265,8 +265,9 @@ export function PlanSheet() {
                 {c.pay.totalLabel}
               </h2>
               <span className="flex items-baseline gap-[10px]">
-                {plan.was && <span className={`text-[22px] font-semibold leading-none ${WAS}`}>{plan.was}</span>}
-                <span className="text-[34px] font-semibold leading-none text-white">{plan.price}</span>
+                {/* SemiBold 32 and 24, off the inspector (Žilvinas 2026-09-25). */}
+                {plan.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}>{plan.was}</span>}
+                <span className="text-[32px] font-semibold leading-none text-white">{plan.price}</span>
               </span>
             </div>
 
@@ -274,10 +275,11 @@ export function PlanSheet() {
                 goes to the webapp like Submit does. */}
             <a
               href={checkout}
-              className="mt-[17px] flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[16px] font-semibold leading-none text-black transition-opacity duration-150 hover:opacity-90"
+              className="mt-[17px] flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90"
             >
+              {/* Medium 18 and the client's 61 x 21 mark (Žilvinas 2026-09-25). */}
               {c.pay.payWith}
-              <LinkMark className="h-[22px] w-auto" />
+              <LinkMark className="h-[21px] w-[61px]" />
             </a>
 
             {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
@@ -288,7 +290,9 @@ export function PlanSheet() {
               <span className="h-[2px] flex-1 bg-white/25" />
             </div>
 
-            <p className="mt-[16px] text-[17px] font-semibold leading-none text-white">{c.pay.cardInfo}</p>
+            {/* Medium 20, 25 under the rule — the inspector's 14 x 25 spacer
+                (Žilvinas 2026-09-25; the message said 28, the spacer 25). */}
+            <p className="mt-[25px] text-[20px] font-medium leading-none text-white">{c.pay.cardInfo}</p>
 
             {/* The field group: one #222222 block with a 3px #181818 seam
                 between the card number and the MM/YY | CVV pair. Disabled
@@ -299,17 +303,18 @@ export function PlanSheet() {
                 inputMode="numeric"
                 autoComplete="cc-number"
                 placeholder={c.pay.cardNumber}
-                className="h-[45px] w-full rounded-t-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40"
+                // Regular 18, placeholders at 50% white (Žilvinas 2026-09-25).
+                className="h-[45px] w-full rounded-t-[10px] bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50"
               />
               <div className="grid grid-cols-2 gap-[2px]">
-                <input type="text" inputMode="numeric" autoComplete="cc-exp" placeholder={c.pay.expiry} className="h-[45px] rounded-bl-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40" />
-                <input type="text" inputMode="numeric" autoComplete="cc-csc" placeholder={c.pay.cvv} className="h-[45px] rounded-br-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40" />
+                <input type="text" inputMode="numeric" autoComplete="cc-exp" placeholder={c.pay.expiry} className="h-[45px] rounded-bl-[10px] bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50" />
+                <input type="text" inputMode="numeric" autoComplete="cc-csc" placeholder={c.pay.cvv} className="h-[45px] rounded-br-[10px] bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50" />
               </div>
               <input
                 type="email"
                 autoComplete="email"
                 placeholder={c.pay.email}
-                className="mt-[20px] h-[45px] w-full rounded-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40"
+                className="mt-[20px] h-[45px] w-full rounded-[10px] bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50"
               />
             </fieldset>
             <span id="plan-sheet-note" className="sr-only">
@@ -326,11 +331,11 @@ export function PlanSheet() {
 
             <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[12px] leading-none text-white/60">
               <span className="flex items-center gap-[6px]">
-                <BoltGlyph className="h-[15px] w-auto text-[#8b8b8b]" />
+                <BoltGlyph className="size-[18.4px] text-[#8b8b8b]" />
                 {c.pay.cancel}
               </span>
               <span className="flex items-center gap-[6px]">
-                <ShieldGlyph className="h-[15px] w-auto text-[#8b8b8b]" />
+                <ShieldGlyph className="size-[18.4px] text-[#8b8b8b]" />
                 {c.pay.moneyBack}
               </span>
             </p>
@@ -340,9 +345,8 @@ export function PlanSheet() {
                 where the frame has it: 5 under the line, the legal 5 under it. */}
             <Img src="templates/pay-badges.webp" alt={c.pay.badgesAlt} width={328} className="mt-[5px] h-auto w-full" />
 
-            {/* 262 wide, centred: the frame's block, which breaks after
-                "Terms and". */}
-            <p className="mx-auto mt-[5px] max-w-[262px] text-center text-[11px] leading-[15px] text-white/45">
+            {/* Regular 12 on a 16 line, the full 326 (Žilvinas 2026-09-25). */}
+            <p className="mt-[5px] text-center text-[12px] leading-[16px] text-white/45">
               {c.pay.legalPrefix}{" "}
               <a href={`${APP_URL}/terms`} className="text-white/70 underline underline-offset-2">
                 {c.pay.terms}
