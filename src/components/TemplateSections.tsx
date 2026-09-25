@@ -1944,6 +1944,21 @@ export function TemplatesInside() {
             data-bg-md="url(/images/templates/inside-industries.webp)"
           >
             <IndustryPills />
+            {/* THE SHADOW OVER THE ROWS (Žilvinas 2026-09-25, "background
+                shadow.svg"): the artboard's own — a 662 x 477 vector, 4x the
+                card, a masked grey ramp with a blurred white streak across
+                the top-left — laid over the pills and under the headline.
+                Its fills are nearly transparent, so on its own it left the
+                rows at full strength where the export has them at about
+                half; the ramp beneath it here is the dimming the export
+                shows, read off it: lightest at the top-right, darkest at
+                the bottom-left. Deferred like every background — the
+                gradient paints while the streak is still on the wire. */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 bg-[image:var(--bg,none),linear-gradient(to_bottom_left,rgba(18,17,20,0.45)_0%,rgba(18,17,20,0.72)_50%,rgba(18,17,20,0.96)_100%)] bg-cover bg-center md:hidden"
+              data-bg="url(/images/templates/inside-industries-shadow.svg)"
+            />
             <p className="relative">
               <span className={BIG}>{s.industries.big}</span>
               <span className={`${SMALL} block md:mt-1 md:text-[36px]`}>{s.industries.small}</span>
@@ -2833,6 +2848,7 @@ export function TemplatesBgFallbacks() {
     "diff-card-dark-v2.webp",
     "reviews-card.svg",
     "inside-support-phone.webp",
+    "inside-industries-shadow.svg",
     "inside-monthly-phone.webp",
   ];
   // The desktop twins, which the class only uses above md.
