@@ -282,9 +282,10 @@ export function PlanSheet() {
 
             {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
             <div className="mt-[20px] flex items-center gap-4 text-[20px] leading-none text-[#909090]">
-              <span className="h-px flex-1 bg-white/25" />
+              {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
+              <span className="h-[2px] flex-1 bg-white/25" />
               {c.pay.or}
-              <span className="h-px flex-1 bg-white/25" />
+              <span className="h-[2px] flex-1 bg-white/25" />
             </div>
 
             <p className="mt-[16px] text-[17px] font-semibold leading-none text-white">{c.pay.cardInfo}</p>
