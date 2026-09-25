@@ -280,7 +280,9 @@ export function PlanSheet() {
                 the middle of the $5, and "Total due today" on that same
                 middle. The row's top is 11 under the -50% pill, and 11
                 between the struck price and the price. */}
-            <div className="relative mt-[11px] flex items-center justify-between">
+            {/* 6 from the pill to the $5's cap (Žilvinas 2026-09-25, the 4 x 6
+                spacer): the 32px box's cap starts ~2 under its top, so 4. */}
+            <div className="relative mt-[4px] flex items-center justify-between">
               <span className="absolute bottom-[calc(100%-2px)] left-0 text-[13px] leading-none text-white/45">{plan.billing}</span>
               {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
               <h2 id="plan-sheet-title" className="text-[20px] font-semibold leading-none text-white">
