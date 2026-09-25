@@ -366,9 +366,25 @@ export function PlanSheet() {
             </p>
 
             {/* The four badges as the frame's own band, cut lossless at 4x. */}
-            {/* The band is the frame's own 24..352 x 507..553, so it sits
-                where the frame has it: 5 under the line, the legal 5 under it. */}
-            <Img src="templates/pay-badges.webp" alt={c.pay.badgesAlt} width={328} className="mt-[5px] h-auto w-full" />
+            {/* THE BADGES ARE ONE SVG (Žilvinas 2026-09-25, "improve these to
+                the maximum"): the frame's own 24..352 x 507..553 band, kept
+                as vectors — Verified by Visa and PCI DSS are the frame's
+                paths; Mastercard ID Check is the vector from SVG Repo
+                (svgrepo.com/svg/508702), laid out at the frame's geometry
+                with the wordmark in white; McAfee SECURE stays the frame's
+                own construction, its 771-wide raster with SECURE painted
+                white through the frame's mask (no vector of that lockup
+                exists to take). A raw <img> since Img sizes from the WebP
+                table; the sheet mounts on demand, so a plain src is fine. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/templates/pay-badges.svg"
+              alt={c.pay.badgesAlt}
+              width={328}
+              height={46}
+              decoding="async"
+              className="mt-[5px] h-auto w-full"
+            />
 
             {/* Regular 12 on a 16 line, the full 326 (Žilvinas 2026-09-25). */}
             <p className="mt-[5px] text-center text-[12px] leading-[16px] text-white/45">
