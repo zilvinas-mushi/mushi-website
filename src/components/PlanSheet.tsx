@@ -6,13 +6,17 @@ import { TEMPLATES_PAGE } from "@/lib/content";
 import { APP_URL } from "@/lib/site";
 
 /**
- * The PHONE's purchase sheet (Žilvinas 2026-09-25, from the two supplied
- * frames; PRD: "PRD: /templates purchase sheet (phone)"). Any link on
- * /templates that carries `data-plan` — the hero CTA, the bar's Redeem
- * button, the drawer's Buy Now, the table's and the Access card's Buy Now —
- * opens it instead of leaving, below md only; from md up, and with
- * JavaScript off, those links still go straight to the webapp as before,
- * since the href is untouched.
+ * The purchase sheet (Žilvinas 2026-09-25, from the two supplied frames;
+ * PRD: "PRD: /templates purchase sheet (phone)"). Any link on /templates
+ * that carries `data-plan` — the hero CTA, the bar's Redeem button, the
+ * drawer's Buy Now, the table's and the Access card's Buy Now — opens it
+ * instead of leaving. With JavaScript off those links still go straight to
+ * the webapp as before, since the href is untouched.
+ *
+ * IT IS NOT PHONE-ONLY ANY MORE (same day, "where is the popup"): it was
+ * gated to below md, so every desktop Buy Now simply left for the webapp
+ * and no popup ever appeared. Now it opens at every width — a bottom sheet
+ * on phones, a centred dialog from md up.
  *
  * TWO STEPS: pick a plan, then pay. Step one is the 547-wide frame scaled to
  * the phone's 375 (0.6856); step two is its frame at 1:1.
@@ -85,9 +89,7 @@ export function PlanSheet() {
   };
 
   useEffect(() => {
-    const phone = window.matchMedia("(max-width: 767px)");
     function onClick(e: MouseEvent) {
-      if (!phone.matches) return;
       const a = (e.target as Element).closest?.("a[data-plan]");
       if (!a) return;
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
@@ -120,16 +122,35 @@ export function PlanSheet() {
     "transition-[transform,opacity] duration-[560ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform motion-reduce:transition-none";
 
   return (
-    <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true" aria-labelledby="plan-sheet-title">
+    // DESKTOP GETS IT TOO (Žilvinas 2026-09-25, "where is the popup" —
+    // pressing Buy Now on a desktop just left for the webapp): the same
+    // two steps, as a CENTRED dialog from md up instead of a bottom sheet,
+    // on the artboard's own widths — 394 for the plan step, 776 for the
+    // payment frame. Below md nothing changes: it still rises from the
+    // bottom edge, full width.
+    <div
+      className="fixed inset-0 z-[100] md:flex md:items-center md:justify-center md:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="plan-sheet-title"
+    >
       <button
         type="button"
         aria-label="Close"
         onClick={close}
-        className={`absolute inset-0 bg-black/60 ${motion} ${shown ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 bg-black/60 md:backdrop-blur-[9px] ${motion} ${shown ? "opacity-100" : "opacity-0"}`}
       />
       <div
-        className={`absolute inset-x-0 bottom-0 max-h-[calc(100dvh-24px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[max(27px,env(safe-area-inset-bottom))] ${motion} ${
-          shown ? "translate-y-0" : "translate-y-full"
+        // The md: half overrides the sheet geometry wholesale — static in
+        // the centring flex row, its own width, all four corners round,
+        // and the rise-from-the-bottom transform traded for a fade and a
+        // small scale, which is what a centred dialog wants.
+        className={`absolute inset-x-0 bottom-0 max-h-[calc(100dvh-24px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[max(27px,env(safe-area-inset-bottom))] md:static md:max-h-[calc(100dvh-48px)] md:rounded-[20px] md:pb-6 md:shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${
+          step === "plan" ? "md:w-[394px]" : "md:w-[776px]"
+        } ${motion} ${
+          shown
+            ? "translate-y-0 md:translate-y-0 md:scale-100 md:opacity-100"
+            : "translate-y-full md:translate-y-0 md:scale-[0.97] md:opacity-0"
         }`}
       >
         {step === "plan" ? (
