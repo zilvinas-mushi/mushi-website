@@ -50,9 +50,17 @@ const OPEN_MS = 560;
 const WAS =
   "bg-[linear-gradient(120deg,#de8a8b_0%,#b55456_40%,#b55456_100%)] bg-clip-text text-transparent line-through decoration-[#c9666a]";
 
-/** The violet button, inverting to white on hover like every button. */
+/**
+ * The violet button, inverting to white on hover like every button — and on
+ * TAP (Žilvinas 2026-09-25, "inversion on click"): a phone has no hover, so
+ * the same swap rides on :active, the way the bar's CTA already does.
+ */
 const VIOLET =
-  "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5]";
+  "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] active:text-[#6e54b5]";
+
+/** A payment field: 45 tall, #222222, Regular 18, placeholder at 50% white. */
+const FIELD =
+  "h-[45px] w-full bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b6ad6]";
 
 export function PlanSheet() {
   const c = TEMPLATES_PAGE.plans;
@@ -254,7 +262,8 @@ export function PlanSheet() {
             // Nothing submits here yet — see the note at the top.
             onSubmit={(e) => {
               e.preventDefault();
-              window.location.href = checkout;
+              const email = (e.currentTarget.elements.namedItem("email") as HTMLInputElement | null)?.value.trim();
+              window.location.href = email ? `${checkout}&email=${encodeURIComponent(email)}` : checkout;
             }}
           >
             {/* Summary: the billing line with the discount pill, then the
@@ -320,28 +329,57 @@ export function PlanSheet() {
             {/* The field group: one #222222 block with a 3px #181818 seam
                 between the card number and the MM/YY | CVV pair. Disabled
                 until Stripe's own iframes take their place. */}
-            <fieldset disabled className="mt-[13px] flex flex-col gap-[2px]" aria-describedby="plan-sheet-note">
+            {/* THE FIELDS TAKE INPUT (Žilvinas 2026-09-25, "why can't you
+                type") and format as you go — digits in fours, MM/YY, a 3–4
+                digit CVV. NOTHING IS SENT: with Stripe not wired there is
+                nowhere safe to send a card number, so Submit carries only the
+                plan and the email to the webapp and the card fields are left
+                behind on this page. When the Payment Element lands these
+                inputs become Stripe's iframes; see the PRD. */}
+            <fieldset className="mt-[13px] flex flex-col gap-[2px]" aria-describedby="plan-sheet-note">
               <input
                 type="text"
                 inputMode="numeric"
                 autoComplete="cc-number"
+                maxLength={19}
                 placeholder={c.pay.cardNumber}
-                // Regular 18, placeholders at 50% white (Žilvinas 2026-09-25).
-                className="h-[45px] w-full rounded-t-[10px] bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50"
+                onInput={(e) => {
+                  const el = e.currentTarget;
+                  el.value = el.value.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
+                }}
+                className={`${FIELD} rounded-t-[10px]`}
               />
               <div className="grid grid-cols-2 gap-[2px]">
-                <input type="text" inputMode="numeric" autoComplete="cc-exp" placeholder={c.pay.expiry} className="h-[45px] rounded-bl-[10px] bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50" />
-                <input type="text" inputMode="numeric" autoComplete="cc-csc" placeholder={c.pay.cvv} className="h-[45px] rounded-br-[10px] bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50" />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="cc-exp"
+                  maxLength={5}
+                  placeholder={c.pay.expiry}
+                  onInput={(e) => {
+                    const el = e.currentTarget;
+                    const d = el.value.replace(/\D/g, "").slice(0, 4);
+                    el.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+                  }}
+                  className={`${FIELD} rounded-bl-[10px]`}
+                />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="cc-csc"
+                  maxLength={4}
+                  placeholder={c.pay.cvv}
+                  onInput={(e) => {
+                    const el = e.currentTarget;
+                    el.value = el.value.replace(/\D/g, "").slice(0, 4);
+                  }}
+                  className={`${FIELD} rounded-br-[10px]`}
+                />
               </div>
-              <input
-                type="email"
-                autoComplete="email"
-                placeholder={c.pay.email}
-                className="mt-[20px] h-[45px] w-full rounded-[10px] bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50"
-              />
+              <input type="email" name="email" autoComplete="email" placeholder={c.pay.email} className={`${FIELD} mt-[20px] rounded-[10px]`} />
             </fieldset>
             <span id="plan-sheet-note" className="sr-only">
-              Card payment opens on app.mushi.agency.
+              Card payment is completed on app.mushi.agency.
             </span>
 
             <button
