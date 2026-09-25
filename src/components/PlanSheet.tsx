@@ -256,7 +256,11 @@ export function PlanSheet() {
                 </span>
               )}
             </div>
-            <div className="mt-[3px] flex items-center justify-between">
+            {/* 10 from "Billed yearly" to the total, not the frame's 14
+                (Žilvinas 2026-09-25, "close a bit, max 10"): the row is
+                centred on the 34px price, whose box starts 8 above the
+                18px label's, so the margin is 2. */}
+            <div className="mt-[2px] flex items-center justify-between">
               <h2 id="plan-sheet-title" className="text-[18px] font-semibold leading-none text-white">
                 {c.pay.totalLabel}
               </h2>
