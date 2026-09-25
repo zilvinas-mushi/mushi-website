@@ -169,8 +169,9 @@ export function PlanSheet() {
                       {on && <span className="size-[14.2px] rounded-full bg-white" />}
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
-                      <span className="text-[18px] font-semibold leading-none text-white">{o.name}</span>
-                      <span className="text-[12.5px] leading-none text-white/45">{o.total}</span>
+                      {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
+                      <span className="text-[20px] font-semibold leading-none text-white">{o.name}</span>
+                      <span className="text-[14px] leading-none text-white/45">{o.total}</span>
                     </span>
                     <span className="flex shrink-0 flex-col items-end gap-[3px]">
                       <span className="flex items-baseline gap-2">
@@ -179,7 +180,8 @@ export function PlanSheet() {
                         {o.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}>{o.was}</span>}
                         <span className="text-[32px] font-semibold leading-none text-white">{o.price}</span>
                       </span>
-                      <span className="text-[12px] font-semibold leading-none text-white/45">{c.perMonth}</span>
+                      {/* SemiBold 14 off the inspector (Žilvinas 2026-09-25). */}
+                      <span className="text-[14px] font-semibold leading-none text-white/45">{c.perMonth}</span>
                     </span>
                   </button>
                 );
