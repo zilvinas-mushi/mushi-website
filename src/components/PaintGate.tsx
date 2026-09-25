@@ -15,12 +15,13 @@ import { useEffect, useRef } from "react";
  *
  * ## How it holds
  *
- * The shell is `opacity: 0` in CSS until `<html>` carries `data-ready`
- * (globals.css). That is a CSS rule in the render-blocking stylesheet, so it
- * applies at the FIRST paint — there is no frame in which content is visible
- * and then hidden. What stays on screen meanwhile is layout.tsx's opaque
- * `bg-bg` wrapper: the page's own black, which is where the hero fades up
- * from anyway, so the gate has no colour of its own and reads as nothing.
+ * A fixed `.paint-veil` in the page's own black covers the page until
+ * `<html>` carries `data-ready` (globals.css). That is a CSS rule in the
+ * render-blocking stylesheet, so it is up at the FIRST paint — there is no
+ * frame in which content shows through. The content underneath paints at
+ * full opacity from the start (which is what the browser's paint timing
+ * records); the veil then fades out over it, which is where the hero fades
+ * up from anyway, so the gate has no colour of its own and reads as nothing.
  *
  * No spinner, no logo, no progress bar. A hold this short (it is the tail of
  * the load the visitor was already waiting through) is invisible; a spinner

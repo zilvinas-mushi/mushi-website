@@ -395,33 +395,52 @@ body {
   render-blocking stylesheet, so it is in force at the very FIRST paint rather
   than after hydration.
 
-  It hides the SHELL'S CONTENTS, not the shell. layout.tsx's `bg-bg` wrapper
-  stays painted throughout, so what is on screen during the hold is the page's
-  own black — the same ground the hero fades up out of — and the gate itself
-  is invisible. Hiding the wrapper instead would show `body`'s canvas colour,
-  which is a different black and would flash.
-
-  `opacity`, not `visibility` or `display`: the page must still lay out and
-  the browser must still fetch and decode everything in it, because that is
-  precisely what we are waiting for. It is inert while hidden, so a stray
-  click during the hold cannot land on a button nobody can see.
+  It COVERS the page rather than hiding it (see the veil below): the page
+  lays out and paints underneath, the browser fetches and decodes everything
+  in it — precisely what we are waiting for — and what is on screen during
+  the hold is the page's own black, the same ground the hero fades up out
+  of, so the gate itself is invisible.
 
   PaintGate sets `data-ready` on <html>. If it never runs — JavaScript off,
   a hydration failure, an old browser — the <noscript> override in layout.tsx
   and PaintGate's own timeout both end with the page visible. The failure mode
   is "shows early", never "never shows".
 */
-.page-shell > * {
-  opacity: 1;
+/*
+  THE VEIL, 2026-09-25. The gate used to hold the shell's CHILDREN at
+  opacity 0 and fade them up. Chrome does not record First or Largest
+  Contentful Paint for content that is fading in from opacity 0 until the
+  fade has FINISHED — measured on production: the gate opened at 226ms and
+  the browser logged FCP and LCP at 632ms, the whole 400ms later — and
+  PageSpeed's 4x CPU slowdown stretched that into most of a 4.2s LCP.
+
+  So the content paints at full opacity from the first frame and what the
+  visitor sees is a fixed veil in the page's own black over the top of it,
+  which fades OUT over the same 400ms once <html> carries `data-ready`.
+  Nothing visible changes: black, then the finished screen arriving through
+  the same cross-fade. The paint the browser records is the real one, at
+  the reveal, not 400ms after it.
+
+  The veil is `position: fixed` and above everything (the drawer's 50, the
+  purchase sheet's 100), catches pointer events while it is up so a stray
+  tap cannot land on a button nobody can see, and is inert once gone. Going
+  back UP (a route change re-arms the gate) has no duration, because nothing
+  is ever meant to see it go.
+*/
+.paint-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 400ms ease-out;
 }
 
-:root:not([data-ready]) .page-shell > * {
-  opacity: 0;
-  /* The 400ms fade is an arrival, not a dismissal: going out has no duration
-     because nothing is ever meant to see it go. */
+:root:not([data-ready]) .paint-veil {
+  opacity: 1;
+  pointer-events: auto;
   transition: none;
-  pointer-events: none;
 }
 
 /*
@@ -446,7 +465,7 @@ img[data-src] {
   is only how the finished one arrives, and that part is negotiable.
 */
 @media (prefers-reduced-motion: reduce) {
-  .page-shell > * {
+  .paint-veil {
     transition: none;
   }
 }

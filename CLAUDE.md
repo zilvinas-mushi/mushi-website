@@ -19,11 +19,14 @@ to Poppins, no artwork appearing a layer at a time. Until the first screen is
 finished, what is on screen is the page's own black and nothing else.
 
 The mechanism is the **paint gate**: `src/lib/paint-gate-script.ts`, an inline
-`<head>` script, plus the gate block in `globals.css`. `.page-shell`'s children
-are `opacity: 0` until `<html>` carries `data-ready`, and the gate sets it once
-fonts, every eager `<img>` (decoded, not merely loaded) and every
-`[data-await-bg]` CSS artwork are ready — then the page cross-fades in over
-400ms. It is INLINE and not a component for a reason: inside React it could not
+`<head>` script, plus the gate block in `globals.css`. A fixed `.paint-veil`
+in the page's own black covers the page until `<html>` carries `data-ready`,
+and the gate sets it once fonts, every eager `<img>` (decoded, not merely
+loaded) and every `[data-await-bg]` CSS artwork are ready — then the veil
+fades out over 400ms. It is a cover over painted content, NOT content fading
+in from `opacity: 0`: Chrome only records First/Largest Contentful Paint for
+a fade-in once the fade has finished, which billed the whole 400ms to LCP.
+It is INLINE and not a component for a reason: inside React it could not
 start until the bundle had hydrated, which put the reveal — and Largest
 Contentful Paint with it — seconds behind the artwork it was waiting for.
 `PaintGate.tsx` is now only the thing that re-arms it on a route change.

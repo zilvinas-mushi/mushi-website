@@ -217,9 +217,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {/*
-          NOTHING PAINTS HALF-BUILT. `page-shell` is the paint gate's handle:
-          its CHILDREN are hidden until <html> carries `data-ready`, while the
-          wrapper itself keeps painting the page's black. So the first thing a
+          NOTHING PAINTS HALF-BUILT. The paint gate's veil (below the shell)
+          covers the page in its own black until <html> carries `data-ready`,
+          then fades out over the finished first screen. So the first thing a
           visitor sees is either the finished first screen or an empty black
           page — never the site mid-assembly. See PaintGate.tsx and the gate
           block in globals.css.
@@ -233,12 +233,20 @@ export default function RootLayout({
         <noscript>
           <style
             dangerouslySetInnerHTML={{
-              __html: ":root:not([data-ready]) .page-shell > *{opacity:1!important;pointer-events:auto!important}",
+              __html: ".paint-veil{display:none!important}",
             }}
           />
         </noscript>
         {/* flex-1 and the same column as body, so `main`'s own flex-1 still
             pushes the footer to the bottom on a short page. */}
+        {/* The gate's veil: the page's black over the finished-or-not first
+            screen, fading out once <html> carries data-ready. See the gate
+            block in globals.css for why it is a cover and not a fade-in.
+            FIRST IN THE BODY, before the shell: on a slow connection the
+            parser paints what it has as it goes, and a veil that came after
+            the content would arrive after the content had shown. It is
+            position: fixed, so its place in the DOM costs nothing. */}
+        <div className="paint-veil" aria-hidden="true" />
         <div className="page-shell flex min-h-full flex-1 flex-col bg-bg">
           {children}
         </div>
