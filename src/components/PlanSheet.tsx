@@ -146,51 +146,65 @@ export function PlanSheet() {
                     role="radio"
                     aria-checked={on}
                     onClick={() => setPlanId(o.id)}
-                    // The selected row's 2px ring ramps #A08ADD to #7054B4
-                    // left to right: two backgrounds, the fill on the
-                    // padding box and the ramp on the border box, with a
-                    // transparent border between them.
-                    className={`relative flex h-[78px] w-full items-center gap-3 rounded-[14px] px-4 text-left transition-colors duration-200 ${
-                      on ? "border-2 border-transparent" : "bg-[#222222]"
+                    // THE SELECTED ROW IS A RING AROUND A BOX (Žilvinas
+                    // 2026-09-25, off the inspector): a 2px ring ramping
+                    // #A08ADD to #7054B4 left to right, then 2.5 of the
+                    // sheet's own #181818, then the #2A2431 box at radius
+                    // 15. The ring's box is 2.5 inside the row's slot on
+                    // every side (321.97 x 72.91 in a 327 x 78 slot), so the
+                    // slot — and the 15 between rows — does not move.
+                    className={`relative text-left transition-colors duration-200 ${
+                      on
+                        ? "m-[2.5px] h-[73px] w-[calc(100%-5px)] rounded-[19.5px] border-2 border-transparent p-[2.5px]"
+                        : "h-[78px] w-full rounded-[14px] bg-[#222222]"
                     }`}
                     // Inline, not an arbitrary class: a two-layer background
                     // with box keywords does not survive Tailwind's parser.
                     style={
                       on
-                        ? { background: "linear-gradient(#2a2431,#2a2431) padding-box, linear-gradient(90deg,#a08add,#7054b4) border-box" }
+                        ? { background: "linear-gradient(#181818,#181818) padding-box, linear-gradient(90deg,#a08add,#7054b4) border-box" }
                         : undefined
                     }
                   >
                     {o.save && (
-                      <span className="absolute -top-[9px] left-[41px] flex h-[18px] items-center rounded-[3.4px] bg-white px-2 text-[11px] font-semibold leading-none text-black">
+                      <span className="absolute -top-[11.5px] left-[38.5px] flex h-[18px] items-center rounded-[3.4px] bg-white px-2 text-[11px] font-semibold leading-none text-black">
                         {o.save}
                       </span>
                     )}
-                    {/* The radio, off the inspector (Žilvinas 2026-09-25):
-                        a 23.67 disc, #464646 at rest; when on, a 2px white
-                        ring on the row's #2A2431 with a 14.2 white dot. */}
+                    {/* The box. Its padding is the row's 16 less the ring,
+                        gap and border (7) when on, so the radio and the
+                        price stay on the same lines as the other rows'. */}
                     <span
-                      aria-hidden="true"
-                      className={`grid size-[23.67px] shrink-0 place-items-center rounded-full ${
-                        on ? "border-2 border-white bg-[#2a2431]" : "bg-[#464646]"
+                      className={`flex h-full w-full items-center gap-3 ${
+                        on ? "rounded-[15px] bg-[#2a2431] px-[9px]" : "px-4"
                       }`}
                     >
-                      {on && <span className="size-[14.2px] rounded-full bg-white" />}
-                    </span>
-                    <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
-                      {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
-                      <span className="text-[20px] font-semibold leading-none text-white">{o.name}</span>
-                      <span className="text-[14px] leading-none text-white/45">{o.total}</span>
-                    </span>
-                    <span className="flex shrink-0 flex-col items-end gap-[3px]">
-                      <span className="flex items-baseline gap-2">
-                        {/* SemiBold 32 off the inspector (Žilvinas 2026-09-25); the
-                            struck price at 24, its proportion in the frame. */}
-                        {o.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}>{o.was}</span>}
-                        <span className="text-[32px] font-semibold leading-none text-white">{o.price}</span>
+                      {/* The radio, off the inspector (Žilvinas 2026-09-25):
+                          a 23.67 disc, #464646 at rest; when on, a 2px white
+                          ring on the row's #2A2431 with a 14.2 white dot. */}
+                      <span
+                        aria-hidden="true"
+                        className={`grid size-[23.67px] shrink-0 place-items-center rounded-full ${
+                          on ? "border-2 border-white bg-[#2a2431]" : "bg-[#464646]"
+                        }`}
+                      >
+                        {on && <span className="size-[14.2px] rounded-full bg-white" />}
                       </span>
-                      {/* SemiBold 14 off the inspector (Žilvinas 2026-09-25). */}
-                      <span className="text-[14px] font-semibold leading-none text-white/45">{c.perMonth}</span>
+                      <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
+                        {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
+                        <span className="text-[20px] font-semibold leading-none text-white">{o.name}</span>
+                        <span className="text-[14px] leading-none text-white/45">{o.total}</span>
+                      </span>
+                      <span className="flex shrink-0 flex-col items-end gap-[3px]">
+                        <span className="flex items-baseline gap-2">
+                          {/* SemiBold 32 off the inspector (Žilvinas 2026-09-25); the
+                              struck price at 24, its proportion in the frame. */}
+                          {o.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}>{o.was}</span>}
+                          <span className="text-[32px] font-semibold leading-none text-white">{o.price}</span>
+                        </span>
+                        {/* SemiBold 14 off the inspector (Žilvinas 2026-09-25). */}
+                        <span className="text-[14px] font-semibold leading-none text-white/45">{c.perMonth}</span>
+                      </span>
                     </span>
                   </button>
                 );
