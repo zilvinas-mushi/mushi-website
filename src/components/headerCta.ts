@@ -11,6 +11,8 @@ export type HeaderCta = {
   label: string;
   href: string;
   variant?: "purple" | "light";
+  /** Opens the Pick-your-plan sheet (PlanSheet) instead of leaving. */
+  sheet?: boolean;
 };
 
 export const CTA_FILL = {

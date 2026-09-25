@@ -94,6 +94,7 @@ export function HeaderCtaSwap({
       >
         <a
           href={to.href}
+          data-plan={to.sheet ? "" : undefined}
           aria-hidden={!showingTo}
           tabIndex={showingTo ? 0 : -1}
           className={`${face} ${CTA_FILL[to.variant ?? "purple"]}`}
@@ -102,6 +103,7 @@ export function HeaderCtaSwap({
         </a>
         <a
           href={from.href}
+          data-plan={from.sheet ? "" : undefined}
           aria-hidden={showingTo}
           tabIndex={showingTo ? -1 : 0}
           className={`${face} ${CTA_FILL[from.variant ?? "light"]}`}

@@ -64,7 +64,7 @@ const VIOLET =
 
 /** A payment field: 45 tall, #222222, Regular 18, placeholder at 50% white. */
 const FIELD =
-  "h-[45px] w-full bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b6ad6]";
+  "h-[45px] w-full bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b6ad6] md:h-[56px] md:px-[22px] md:text-[22px]";
 
 export function PlanSheet() {
   const c = TEMPLATES_PAGE.plans;
@@ -73,6 +73,13 @@ export function PlanSheet() {
   const [step, setStep] = useState<"plan" | "pay">("plan");
   const [planId, setPlanId] = useState<string>(c.defaultId);
   const closeTimer = useRef(0);
+  const panelRef = useRef<HTMLDivElement>(null);
+  /**
+   * Desktop only: the step's frame (650 for the plan, 763 for payment)
+   * zoomed down just enough to clear the viewport, 1 whenever it fits.
+   * Zoom rather than transform so the layout box shrinks with it.
+   */
+  const [fit, setFit] = useState(1);
 
   const open = () => {
     window.clearTimeout(closeTimer.current);
@@ -102,15 +109,47 @@ export function PlanSheet() {
 
   useEffect(() => {
     if (!mounted) return;
+    const size = () => {
+      const desktop = window.matchMedia("(min-width: 768px)").matches;
+      const frame = step === "plan" ? 650 : 763;
+      setFit(desktop ? Math.min(1, (window.innerHeight - 24) / frame) : 1);
+    };
+    size();
+    window.addEventListener("resize", size);
+    return () => window.removeEventListener("resize", size);
+  }, [mounted, step]);
+
+  // THE PAGE BEHIND DOES NOT SCROLL — by swallowing the wheel, touch and
+  // key scrolling, NOT overflow:hidden on the body (Žilvinas 2026-09-25,
+  // "the menu shows up instantly when you leave"): <html> clips overflow-x,
+  // so a hidden overflow on <body> made the BODY the scroll container and
+  // the sticky header lost the viewport — it sat at its flow position,
+  // off screen, the whole time the sheet was open and snapped back the
+  // instant the lock came off. Scrolling inside the sheet's own panel is
+  // still allowed when it has somewhere to go (the phone).
+  useEffect(() => {
+    if (!mounted) return;
+    const panel = panelRef.current;
+    const inPanel = (t: EventTarget | null) =>
+      !!panel && t instanceof Node && panel.contains(t) && panel.scrollHeight > panel.clientHeight;
+    const block = (e: Event) => {
+      if (!inPanel(e.target)) e.preventDefault();
+    };
+    const scrollKeys = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") close();
+      const t = e.target as HTMLElement | null;
+      const typing = t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement;
+      const pressing = t instanceof HTMLButtonElement || t instanceof HTMLAnchorElement;
+      if (scrollKeys.has(e.key) && !typing && !pressing && !inPanel(t)) e.preventDefault();
     }
+    document.addEventListener("wheel", block, { passive: false });
+    document.addEventListener("touchmove", block, { passive: false });
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     return () => {
+      document.removeEventListener("wheel", block);
+      document.removeEventListener("touchmove", block);
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
     };
   }, [mounted]);
 
@@ -129,7 +168,10 @@ export function PlanSheet() {
     // payment frame. Below md nothing changes: it still rises from the
     // bottom edge, full width.
     <div
-      className="fixed inset-0 z-[100] md:flex md:items-center md:justify-center md:p-6"
+      // A BOTTOM SHEET ON THE DESKTOP AS WELL (Žilvinas 2026-09-25, "it's
+      // not a popup, even for desktop it comes from the bottom"): anchored
+      // to the bottom edge, centred across, top corners round.
+      className="fixed inset-0 z-[100] md:flex md:items-end md:justify-center md:px-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="plan-sheet-title"
@@ -145,19 +187,31 @@ export function PlanSheet() {
         // the centring flex row, its own width, all four corners round,
         // and the rise-from-the-bottom transform traded for a fade and a
         // small scale, which is what a centred dialog wants.
-        className={`absolute inset-x-0 bottom-0 max-h-[calc(100dvh-24px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[max(27px,env(safe-area-inset-bottom))] md:static md:max-h-[calc(100dvh-48px)] md:rounded-[20px] md:pb-6 md:shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${
-          step === "plan" ? "md:w-[394px]" : "md:w-[776px]"
-        } ${motion} ${
-          shown
-            ? "translate-y-0 md:translate-y-0 md:scale-100 md:opacity-100"
-            : "translate-y-full md:translate-y-0 md:scale-[0.97] md:opacity-0"
-        }`}
+        // IT RISES FROM BELOW ON THE DESKTOP TOO (Žilvinas 2026-09-25,
+        // "instead of popup it should come from below"): the same 560ms
+        // sheet curve carries it up from under the viewport to the centre.
+        // It was a fade with a small scale.
+        //
+        // THE PLAN STEP IS THE 546.5 x 650 FRAME AT 1:1 (Žilvinas
+        // 2026-09-25, "it's larger in size"): the phone step is that frame
+        // at 0.6856, so from md the step is simply zoomed back by 1/0.6856
+        // — every row, price and the Regular 20 "Every plan includes" line
+        // land on the artboard's numbers without a second set of them.
+        // FOCUSING A FIELD MADE SUBMIT JUMP (Žilvinas 2026-09-25): the 763
+        // frame was taller than the viewport minus its margins, so the panel
+        // scrolled and every focus scrolled it. Now the step is ZOOMED to
+        // fit the height (see fit), so the panel never scrolls on a desktop.
+        className={`absolute inset-x-0 bottom-0 max-h-[calc(100dvh-24px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[max(27px,env(safe-area-inset-bottom))] overscroll-contain md:static md:overflow-visible md:rounded-t-[20px] md:shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${
+          step === "plan" ? "md:w-[547px] md:pb-0" : "md:w-[776px] md:pb-6"
+        } ${motion} ${shown ? "translate-y-0" : "translate-y-full"}`}
+        style={{ zoom: fit }}
+        ref={panelRef}
       >
         {step === "plan" ? (
           // 24 from the sheet's top to the title and 24 from the title to
           // the first row; 15 between rows (Žilvinas 2026-09-25, off the
           // artboard's spacers).
-          <div className="px-6 pt-6">
+          <div className="px-6 pt-6 md:pb-[16px] md:[zoom:1.4586]">
             {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
             <h2 id="plan-sheet-title" className="text-center text-[20px] font-semibold leading-none text-white">
               {c.title}
@@ -213,7 +267,10 @@ export function PlanSheet() {
                         // stroke line: 10 above it and 10 below, which is 7.5
                         // above the plate (Žilvinas 2026-09-25, off the
                         // inspector, "much down").
-                        className="absolute -top-[7.5px] left-[41px] z-[1] flex h-[20px] w-[74px] items-center justify-center rounded-[5px] bg-white text-[12px] font-semibold leading-none text-black"
+                        // pl/pb 1: optical centring (Žilvinas 2026-09-25, "should be centred
+                        // both horizontally and vertically") — the box is centred to the
+                        // sub-pixel, but Poppins' $ and 0 lean the word left and low.
+                        className="absolute -top-[7.5px] left-[41px] z-[1] flex h-[20px] w-[74px] items-center justify-center rounded-[5px] bg-white pb-[1px] pl-[1px] text-center text-[12px] font-semibold leading-none text-black"
                       >
                         {o.save}
                       </span>
@@ -279,7 +336,7 @@ export function PlanSheet() {
           </div>
         ) : (
           <form
-            className="px-[25px] pt-[22px]"
+            className="px-[25px] pt-[22px] md:px-[31px] md:pt-[35px]"
             // Nothing submits here yet — see the note at the top.
             onSubmit={(e) => {
               e.preventDefault();
@@ -298,7 +355,7 @@ export function PlanSheet() {
                 An empty span keeps the pill on the right. */}
             <div className="flex justify-end">
               {plan.off && (
-                <span className="flex h-5 items-center rounded-[5px] bg-white px-3 text-[12px] font-semibold leading-none text-black">
+                <span className="flex h-5 items-center rounded-[5px] bg-white px-3 text-[12px] font-semibold leading-none text-black md:h-[26px] md:w-[101px] md:justify-center md:px-0 md:text-[16px]">
                   {plan.off}
                 </span>
               )}
@@ -310,16 +367,16 @@ export function PlanSheet() {
                 between the struck price and the price. */}
             {/* 6 from the pill to the $5's cap (Žilvinas 2026-09-25, the 4 x 6
                 spacer): the 32px box's cap starts ~2 under its top, so 4. */}
-            <div className="relative mt-[4px] flex items-center justify-between">
-              <span className="absolute bottom-[calc(100%-2px)] left-0 text-[13px] leading-none text-white/45">{plan.billing}</span>
+            <div className="relative mt-[4px] flex items-center justify-between md:mt-[5px]">
+              <span className="absolute bottom-[calc(100%-2px)] left-0 text-[13px] leading-none text-white/45 md:bottom-[calc(100%+2px)] md:text-[18px]">{plan.billing}</span>
               {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
-              <h2 id="plan-sheet-title" className="text-[20px] font-semibold leading-none text-white">
+              <h2 id="plan-sheet-title" className="text-[20px] font-semibold leading-none text-white md:text-[29px]">
                 {c.pay.totalLabel}
               </h2>
               <span className="flex items-center gap-[11px]">
                 {/* SemiBold 32 and 24, off the inspector (Žilvinas 2026-09-25). */}
-                {plan.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}>{plan.was}</span>}
-                <span className="text-[32px] font-semibold leading-none text-white">{plan.price}</span>
+                {plan.was && <span className={`text-[24px] font-semibold leading-none md:text-[32px] ${WAS}`}>{plan.was}</span>}
+                <span className="text-[32px] font-semibold leading-none text-white md:text-[44px]">{plan.price}</span>
               </span>
             </div>
 
@@ -327,16 +384,16 @@ export function PlanSheet() {
                 goes to the webapp like Submit does. */}
             <a
               href={checkout}
-              className="mt-[17px] flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90"
+              className="mt-[17px] flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90 md:mt-[19px] md:h-[62px] md:gap-[8px] md:rounded-[15px] md:text-[25px]"
             >
               {/* Medium 18 and the client's 61 x 21 mark (Žilvinas 2026-09-25). */}
               {c.pay.payWith}
-              <LinkMark className="h-[21px] w-[61px]" />
+              <LinkMark className="h-[21px] w-[61px] md:h-[29px] md:w-[84px]" />
             </a>
 
             {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
             {/* 11 between the rules and the word (Žilvinas 2026-09-25, the 11 x 9 spacer; it was 13). */}
-            <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090]">
+            <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090] md:mt-[24px] md:h-[32px] md:gap-[16px] md:text-[24px]">
               {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
               <span className="h-[2px] flex-1 bg-white/25" />
               {c.pay.or}
@@ -345,7 +402,7 @@ export function PlanSheet() {
 
             {/* Medium 20, 25 under the rule — the inspector's 14 x 25 spacer
                 (Žilvinas 2026-09-25; the message said 28, the spacer 25). */}
-            <p className="mt-[25px] text-[20px] font-medium leading-none text-white">{c.pay.cardInfo}</p>
+            <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
 
             {/* The field group: one #222222 block with a 3px #181818 seam
                 between the card number and the MM/YY | CVV pair. Disabled
@@ -357,7 +414,14 @@ export function PlanSheet() {
                 plan and the email to the webapp and the card fields are left
                 behind on this page. When the Payment Element lands these
                 inputs become Stripe's iframes; see the PRD. */}
-            <fieldset className="mt-[13px] flex flex-col gap-[2px]" aria-describedby="plan-sheet-note">
+            {/* NO gap ON THESE BOXES (Žilvinas 2026-09-25, "the submit
+                button keeps jumping"): password managers (NordPass here)
+                inject their icon element INTO the focused field's parent,
+                and a stray child in a flex column or a two-column grid is
+                one more gap — 3px — so everything under it dropped on
+                focus and rose on blur. The seams are margins on the fields
+                instead, which an extra child cannot add to. */}
+            <div role="group" className="mt-[13px] flex flex-col" aria-describedby="plan-sheet-note">
               <input
                 type="text"
                 inputMode="numeric"
@@ -368,9 +432,9 @@ export function PlanSheet() {
                   const el = e.currentTarget;
                   el.value = el.value.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
                 }}
-                className={`${FIELD} rounded-t-[10px]`}
+                className={`${FIELD} rounded-t-[10px] md:rounded-t-[15px]`}
               />
-              <div className="grid grid-cols-2 gap-[2px]">
+              <div className="mt-[2px] grid grid-cols-2 gap-x-[2px] md:mt-[3px] md:gap-x-[3px]">
                 <input
                   type="text"
                   inputMode="numeric"
@@ -382,7 +446,7 @@ export function PlanSheet() {
                     const d = el.value.replace(/\D/g, "").slice(0, 4);
                     el.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
                   }}
-                  className={`${FIELD} rounded-bl-[10px]`}
+                  className={`${FIELD} rounded-bl-[10px] md:rounded-bl-[15px]`}
                 />
                 <input
                   type="text"
@@ -394,30 +458,30 @@ export function PlanSheet() {
                     const el = e.currentTarget;
                     el.value = el.value.replace(/\D/g, "").slice(0, 4);
                   }}
-                  className={`${FIELD} rounded-br-[10px]`}
+                  className={`${FIELD} rounded-br-[10px] md:rounded-br-[15px]`}
                 />
               </div>
-              <input type="email" name="email" autoComplete="email" placeholder={c.pay.email} className={`${FIELD} mt-[20px] rounded-[10px]`} />
-            </fieldset>
+              <input type="email" name="email" autoComplete="email" placeholder={c.pay.email} className={`${FIELD} mt-[22px] rounded-[10px] md:mt-[28px] md:rounded-[15px]`} />
+            </div>
             <span id="plan-sheet-note" className="sr-only">
               Card payment is completed on app.mushi.agency.
             </span>
 
             <button
               type="submit"
-              className={`mt-[27px] flex h-[50px] w-full items-center justify-center gap-[10px] rounded-[10px] text-[16px] font-semibold ${VIOLET}`}
+              className={`mt-[27px] flex h-[50px] w-full items-center justify-center gap-[10px] rounded-[10px] text-[16px] font-semibold md:mt-[34px] md:h-[62px] md:gap-[14px] md:rounded-[15px] md:text-[24px] md:font-medium ${VIOLET}`}
             >
-              <LockGlyph className="h-[19px] w-auto" />
+              <LockGlyph className="h-[19px] w-auto md:h-[33px] md:[stroke-width:2.2]" />
               {c.pay.submit}
             </button>
 
-            <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[12px] leading-none text-white/60">
+            <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[12px] leading-none text-white/60 md:mt-[16px] md:gap-[40px] md:text-[17px]">
               <span className="flex items-center gap-[6px]">
-                <BoltGlyph className="size-[18.4px] text-[#8b8b8b]" />
+                <BoltGlyph className="size-[18.4px] text-[#8b8b8b] md:size-[24px]" />
                 {c.pay.cancel}
               </span>
               <span className="flex items-center gap-[6px]">
-                <ShieldGlyph className="size-[18.4px] text-[#8b8b8b]" />
+                <ShieldGlyph className="size-[18.4px] text-[#8b8b8b] md:size-[24px]" />
                 {c.pay.moneyBack}
               </span>
             </p>
@@ -443,11 +507,15 @@ export function PlanSheet() {
               width={328}
               height={46}
               decoding="async"
-              className="mt-[5px] h-auto w-full"
+              // THE DESKTOP BAND IS 477 WIDE, centred (Žilvinas 2026-09-25, "the
+              // logos are smaller in here", off the supplied 776 frame: Visa
+              // starts at 150 and McAfee ends at 627). Full width at 776 blew
+              // them up to a row of billboards.
+              className="mt-[5px] h-auto w-full md:mt-[10px] md:w-[477px] md:mx-auto"
             />
 
             {/* Regular 12 on a 16 line, the full 326 (Žilvinas 2026-09-25). */}
-            <p className="mt-[5px] text-center text-[12px] leading-[16px] text-white/45">
+            <p className="mt-[5px] text-center text-[12px] leading-[16px] text-white/45 md:mt-[14px] md:text-[17px] md:leading-[24px]">
               {c.pay.legalPrefix}{" "}
               <a href={`${APP_URL}/terms`} className="text-white/70 underline underline-offset-2">
                 {c.pay.terms}

@@ -166,6 +166,9 @@ export default function Templates() {
             label: TEMPLATES_PAGE.access.templates.cta,
             href: APP_URL,
             variant: "purple",
+            // Opens the plan sheet, like every other Buy Now (Žilvinas
+            // 2026-09-25 — it used to leave for the webapp on desktop).
+            sheet: true,
           },
           startId: "difference-heading",
           endId: "difference-heading",
@@ -203,7 +206,7 @@ export default function Templates() {
       {/* The <noscript> rules for this page's deferred background artwork —
           see TemplatesBgFallbacks. Nothing renders with JavaScript on. */}
       <TemplatesBgFallbacks />
-      {/* The phone's Pick-your-plan sheet; every data-plan link opens it. */}
+      {/* The Pick-your-plan sheet, every width; every data-plan link opens it. */}
       <PlanSheet />
       <main className="flex-1">
         {/* EXACTLY ONE SCREEN from md up (Žilvinas 2026-09-19): h-[100svh]
