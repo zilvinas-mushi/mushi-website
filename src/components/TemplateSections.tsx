@@ -1821,8 +1821,11 @@ function IndustryPills() {
       aria-hidden="true"
       // 6 rows at 16.47 with 8 between is 138.8; centred on the 119 card the
       // first and last rows are cut, as in the artboard.
-      className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 flex-col gap-[8px] md:hidden"
+      // The mask is on the CARD-SIZED wrapper, not the rows, so its handles
+      // land where the artboard puts them against the card.
+      className="industry-rows absolute inset-0 md:hidden"
     >
+      <span className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 flex-col gap-[8px]">
       {INDUSTRY_ROWS.map((row, r) => (
         <span
           key={r}
@@ -1843,6 +1846,7 @@ function IndustryPills() {
           })}
         </span>
       ))}
+      </span>
     </span>
   );
 }
@@ -1948,15 +1952,12 @@ export function TemplatesInside() {
                 shadow.svg"): the artboard's own — a 662 x 477 vector, 4x the
                 card, a masked grey ramp with a blurred white streak across
                 the top-left — laid over the pills and under the headline.
-                Its fills are nearly transparent, so on its own it left the
-                rows at full strength where the export has them at about
-                half; the ramp beneath it here is the dimming the export
-                shows, read off it: lightest at the top-right, darkest at
-                the bottom-left. Deferred like every background — the
-                gradient paints while the streak is still on the wire. */}
+                The dimming of the rows is not here: it is the artboard's
+                alpha mask on the rows themselves (.industry-rows in
+                globals.css). Deferred like every background. */}
             <span
               aria-hidden="true"
-              className="absolute inset-0 bg-[image:var(--bg,none),linear-gradient(to_bottom_left,rgba(18,17,20,0.45)_0%,rgba(18,17,20,0.72)_50%,rgba(18,17,20,0.96)_100%)] bg-cover bg-center md:hidden"
+              className="absolute inset-0 bg-[image:var(--bg,none)] bg-cover bg-center md:hidden"
               data-bg="url(/images/templates/inside-industries-shadow.svg)"
             />
             <p className="relative">
