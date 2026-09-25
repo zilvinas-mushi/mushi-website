@@ -197,14 +197,16 @@ export function PlanSheet() {
               <span className="text-[13px] font-semibold opacity-70">{c.perMonth}</span>
             </button>
 
-            <p className="mt-4 flex items-center justify-center gap-1.5 text-[13px] leading-none text-white/45">
+            {/* Poppins Regular 14, white at 50%, the whole line — label,
+                glyph and "500+ static templates" alike (Žilvinas 2026-09-25). */}
+            <p className="mt-4 flex items-center justify-center gap-1.5 text-[14px] leading-none text-white/50">
               {c.includesLabel}
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="size-[14px] text-white" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="size-[14px]" aria-hidden="true">
                 <path d="M8 2 2 5.2 8 8.4l6-3.2L8 2Z" />
                 <path d="m2 8.2 6 3.2 6-3.2" />
                 <path d="m2 11.2 6 3.2 6-3.2" />
               </svg>
-              <span className="text-white">{c.includes}</span>
+              {c.includes}
             </p>
           </div>
         ) : (
