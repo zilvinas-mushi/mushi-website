@@ -15,7 +15,18 @@ import {
   TemplatesTeam,
 } from "@/components/TemplateSections";
 import { TEMPLATES_PAGE } from "@/lib/content";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { APP_URL, BOOKING_URL, SITE_NAME, SITE_TAGLINE, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, abs } from "@/lib/site";
+
+/**
+ * hero-burst-phone.webp, read at BUILD time — this is a server component in
+ * a static export, so this runs once on the build machine and the base64
+ * lands in the HTML. See the <style> in the head below.
+ */
+const HERO_BURST_PHONE_B64 = readFileSync(
+  join(process.cwd(), "public/images/templates/hero-burst-phone.webp"),
+).toString("base64");
 
 const DESCRIPTION =
   "Plug-and-play ad templates from the team behind 110+ brands' creatives. Your 8-minute shortcut to high-ROAS ads — fashion, beauty, food, health and drink niches covered.";
@@ -101,12 +112,21 @@ export default function Templates() {
           Keep these four in step with .tpl-bg (globals.css) and with the
           hero <picture> (TemplateSections). A preload for a file nothing
           then uses is a warning in the console and pure waste on the wire. */}
-      <link
-        rel="preload"
-        as="image"
-        href="/images/templates/hero-burst-phone.webp"
-        media="(max-width: 767px)"
-        fetchPriority="high"
+      {/* THE PHONE BURST IS INLINE (2026-09-25). It is the phone's Largest
+          Contentful Paint element — the angular field behind the hero — and
+          as a 15 KB file it was landing after everything else in flight, so
+          PageSpeed simulated its paint at 3.6–3.9s on a page whose first
+          screen was otherwise ready at 1.2. As a data URI in this <style> it
+          arrives with the document: no request, nothing to wait for, and the
+          gate skips data: URLs. 20 KB of base64 on this page's HTML only —
+          not on the home page, which is why it is here and not in
+          globals.css. The rule sets background-image alone, so the position
+          and size stay the ones globals.css measured off the artboard; the
+          desktop keeps its own file and preload below. */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `@media (max-width:767px){.tpl-bg{background-image:url("data:image/webp;base64,${HERO_BURST_PHONE_B64}")}}`,
+        }}
       />
       <link
         rel="preload"
