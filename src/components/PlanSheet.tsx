@@ -110,7 +110,7 @@ export function PlanSheet() {
         className={`absolute inset-0 bg-black/60 ${motion} ${shown ? "opacity-100" : "opacity-0"}`}
       />
       <div
-        className={`absolute inset-x-0 bottom-0 max-h-[calc(100dvh-24px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[max(24px,env(safe-area-inset-bottom))] ${motion} ${
+        className={`absolute inset-x-0 bottom-0 max-h-[calc(100dvh-24px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[max(27px,env(safe-area-inset-bottom))] ${motion} ${
           shown ? "translate-y-0" : "translate-y-full"
         }`}
       >
@@ -205,20 +205,20 @@ export function PlanSheet() {
             {/* Summary: the billing line with the discount pill, then the
                 total with the struck old price. */}
             <div className="flex items-center justify-between">
-              <span className="text-[12px] leading-none text-white/45">{plan.billing}</span>
+              <span className="text-[13px] leading-none text-white/45">{plan.billing}</span>
               {plan.off && (
-                <span className="flex h-5 items-center rounded-[5px] bg-white px-[9px] text-[11px] font-semibold leading-none text-black">
+                <span className="flex h-5 items-center rounded-[5px] bg-white px-3 text-[12px] font-semibold leading-none text-black">
                   {plan.off}
                 </span>
               )}
             </div>
-            <div className="mt-[11px] flex items-baseline justify-between">
-              <h2 id="plan-sheet-title" className="text-[16px] font-semibold leading-none text-white">
+            <div className="mt-[3px] flex items-center justify-between">
+              <h2 id="plan-sheet-title" className="text-[18px] font-semibold leading-none text-white">
                 {c.pay.totalLabel}
               </h2>
-              <span className="flex items-baseline gap-2">
-                {plan.was && <span className={`text-[18px] font-semibold leading-none ${WAS}`}>{plan.was}</span>}
-                <span className="text-[26px] font-semibold leading-none text-white">{plan.price}</span>
+              <span className="flex items-baseline gap-[10px]">
+                {plan.was && <span className={`text-[22px] font-semibold leading-none ${WAS}`}>{plan.was}</span>}
+                <span className="text-[34px] font-semibold leading-none text-white">{plan.price}</span>
               </span>
             </div>
 
@@ -226,24 +226,25 @@ export function PlanSheet() {
                 goes to the webapp like Submit does. */}
             <a
               href={checkout}
-              className="mt-[26px] flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[15px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90"
+              className="mt-[17px] flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[16px] font-semibold leading-none text-black transition-opacity duration-150 hover:opacity-90"
             >
               {c.pay.payWith}
-              <LinkMark className="h-[20px] w-auto" />
+              <LinkMark className="h-[22px] w-auto" />
             </a>
 
-            <div className="mt-[28px] flex items-center gap-4 text-[13px] leading-none text-[#909090]">
+            {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
+            <div className="mt-[20px] flex items-center gap-4 text-[20px] leading-none text-[#909090]">
               <span className="h-px flex-1 bg-white/25" />
               {c.pay.or}
               <span className="h-px flex-1 bg-white/25" />
             </div>
 
-            <p className="mt-[24px] text-[16px] font-semibold leading-none text-white">{c.pay.cardInfo}</p>
+            <p className="mt-[16px] text-[17px] font-semibold leading-none text-white">{c.pay.cardInfo}</p>
 
             {/* The field group: one #222222 block with a 3px #181818 seam
                 between the card number and the MM/YY | CVV pair. Disabled
                 until Stripe's own iframes take their place. */}
-            <fieldset disabled className="mt-[16px] flex flex-col gap-[3px]" aria-describedby="plan-sheet-note">
+            <fieldset disabled className="mt-[13px] flex flex-col gap-[2px]" aria-describedby="plan-sheet-note">
               <input
                 type="text"
                 inputMode="numeric"
@@ -251,7 +252,7 @@ export function PlanSheet() {
                 placeholder={c.pay.cardNumber}
                 className="h-[45px] w-full rounded-t-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40"
               />
-              <div className="grid grid-cols-2 gap-[3px]">
+              <div className="grid grid-cols-2 gap-[2px]">
                 <input type="text" inputMode="numeric" autoComplete="cc-exp" placeholder={c.pay.expiry} className="h-[45px] rounded-bl-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40" />
                 <input type="text" inputMode="numeric" autoComplete="cc-csc" placeholder={c.pay.cvv} className="h-[45px] rounded-br-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40" />
               </div>
@@ -259,7 +260,7 @@ export function PlanSheet() {
                 type="email"
                 autoComplete="email"
                 placeholder={c.pay.email}
-                className="mt-[17px] h-[45px] w-full rounded-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40"
+                className="mt-[20px] h-[45px] w-full rounded-[10px] bg-[#222222] px-4 text-[15px] text-white placeholder:text-white/40"
               />
             </fieldset>
             <span id="plan-sheet-note" className="sr-only">
@@ -268,13 +269,13 @@ export function PlanSheet() {
 
             <button
               type="submit"
-              className={`mt-[27px] flex h-[50px] w-full items-center justify-center gap-[10px] rounded-[10px] text-[15px] font-semibold ${VIOLET}`}
+              className={`mt-[27px] flex h-[50px] w-full items-center justify-center gap-[10px] rounded-[10px] text-[16px] font-semibold ${VIOLET}`}
             >
               <LockGlyph className="h-[19px] w-auto" />
               {c.pay.submit}
             </button>
 
-            <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[11px] leading-none text-white/60">
+            <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[12px] leading-none text-white/60">
               <span className="flex items-center gap-[6px]">
                 <BoltGlyph className="h-[15px] w-auto text-[#8b8b8b]" />
                 {c.pay.cancel}
@@ -286,9 +287,13 @@ export function PlanSheet() {
             </p>
 
             {/* The four badges as the frame's own band, cut lossless at 4x. */}
-            <Img src="templates/pay-badges.webp" alt={c.pay.badgesAlt} width={328} className="mt-[14px] h-auto w-full" />
+            {/* The band is the frame's own 24..352 x 507..553, so it sits
+                where the frame has it: 5 under the line, the legal 5 under it. */}
+            <Img src="templates/pay-badges.webp" alt={c.pay.badgesAlt} width={328} className="mt-[5px] h-auto w-full" />
 
-            <p className="mt-[19px] text-center text-[10.5px] leading-[1.5] text-white/45">
+            {/* 262 wide, centred: the frame's block, which breaks after
+                "Terms and". */}
+            <p className="mx-auto mt-[5px] max-w-[262px] text-center text-[11px] leading-[15px] text-white/45">
               {c.pay.legalPrefix}{" "}
               <a href={`${APP_URL}/terms`} className="text-white/70 underline underline-offset-2">
                 {c.pay.terms}
