@@ -115,10 +115,13 @@ export default function Templates() {
         media="(min-width: 768px)"
         fetchPriority="high"
       />
+      {/* The same srcset the <img> carries, or the browser would preload one
+          file and then fetch the other. */}
       <link
         rel="preload"
         as="image"
-        href="/images/templates/hero-phone.webp"
+        imageSrcSet="/images/templates/hero-phone-sm.webp 538w, /images/templates/hero-phone.webp 807w"
+        imageSizes="269px"
         media="(max-width: 767px)"
         fetchPriority="high"
       />

@@ -14,19 +14,59 @@ import { CARD_SIZES, srcSet } from "./creative-media";
  * export and this avoids shipping a dependency for six glyphs.
  */
 
+/**
+ * A DEFERRED <img> for this card: the URL rides in data-src (and data-srcset)
+ * and the inline paint-gate script moves it across as the card comes within
+ * range, with a <noscript> twin for visitors and crawlers without JavaScript
+ * — the same contract Img keeps (CLAUDE.md, "below the fold, nothing is
+ * fetched until it is nearly in view").
+ *
+ * WHY NOT `loading="lazy"` ALONE (2026-09-25): Chrome starts a lazy image
+ * 1250px ahead of the viewport, 3000 on a slow link, and the rail sits inside
+ * that window on every phone — so the stills, avatars and the five action
+ * icons (some 90 KB together) were on the wire before the first screen had
+ * painted, sharing the pipe with the fonts and the hero the paint gate was
+ * waiting on. PageSpeed counted every byte of it against the hero's Largest
+ * Contentful Paint. The rail's own arming (CreativesRail) already calls the
+ * group loader, so nothing about the marquee changes: the cards are still
+ * fully painted two viewports before anyone reaches them.
+ */
+export function LazyImg({
+  src,
+  srcSet,
+  sizes,
+  alt,
+  width,
+  height,
+  className,
+  ariaHidden,
+}: {
+  src: string;
+  srcSet?: string;
+  sizes?: string;
+  alt: string;
+  width: number;
+  height: number;
+  className: string;
+  ariaHidden?: boolean;
+}) {
+  const shared = { width, height, className, decoding: "async" as const, ...(ariaHidden ? { "aria-hidden": true as const } : {}) };
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img data-src={src} data-srcset={srcSet} sizes={srcSet ? sizes : undefined} alt={alt} loading="lazy" {...shared} />
+      <noscript>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} srcSet={srcSet} sizes={srcSet ? sizes : undefined} alt={alt} loading="lazy" {...shared} />
+      </noscript>
+    </>
+  );
+}
+
 function Verified() {
   return (
     // The design's own badge artwork, not a redrawn tick.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/creatives/icons/verified.svg"
-      alt="Verified account"
-      width={21}
-      height={21}
-      loading="lazy"
-      decoding="async"
-      className="size-[0.9375rem] shrink-0"
-    />
+    <LazyImg src="/creatives/icons/verified.svg" alt="Verified account" width={21} height={21} className="size-[0.9375rem] shrink-0" />
   );
 }
 
@@ -40,17 +80,7 @@ function Verified() {
  */
 function ActionIcon({ name, w, h }: { name: string; w: number; h: number }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={`/creatives/icons/${name}.svg`}
-      alt=""
-      width={w}
-      height={h}
-      loading="lazy"
-      decoding="async"
-      className="h-[2rem] w-auto"
-      aria-hidden="true"
-    />
+    <LazyImg src={`/creatives/icons/${name}.svg`} alt="" width={w} height={h} className="h-[2rem] w-auto" ariaHidden />
   );
 }
 
@@ -68,16 +98,7 @@ export function CreativeCard({ item }: { item: Creative }) {
     <article className="w-[17.5rem] shrink-0 snap-start overflow-hidden rounded-[0.9375rem] bg-white sm:w-[18.75rem]">
       <header className="flex items-center gap-2.5 px-3 py-2.5">
         {item.avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={`/creatives/${item.avatar}`}
-            alt=""
-            width={32}
-            height={32}
-            loading="lazy"
-            decoding="async"
-            className="size-8 shrink-0 rounded-full object-cover"
-          />
+          <LazyImg src={`/creatives/${item.avatar}`} alt="" width={32} height={32} className="size-8 shrink-0 rounded-full object-cover" />
         ) : (
           // Placeholder until account avatars are supplied — a neutral disc
           // with the handle's initial, never a stand-in photo.
@@ -115,12 +136,13 @@ export function CreativeCard({ item }: { item: Creative }) {
         set — sat above the stylesheet, and the stylesheet is what the hero's
         headline (the LCP element) is blocked on.
 
-        Lazy costs the rail nothing here because the rail is never in the first
-        viewport at any width — the hero field is min-h-svh — and Chrome starts
-        a lazy image 1250px before it arrives, 3000px on a slow connection.
-        The rail sits inside that window, so the stills are already on the wire
-        by the time anyone reaches them; they are simply no longer ahead of the
-        CSS in the head.
+        Lazy alone was still too early, though: Chrome starts a lazy image
+        1250px before it arrives, 3000px on a slow connection, and the rail
+        sits inside that window — so the stills were on the wire before the
+        first screen had painted. They are DEFERRED now (LazyImg): the URL
+        sits in data-src until the paint gate has opened and the rail is
+        within range, which the rail's own arming guarantees is still two
+        viewports early.
 
         Film cards carry the same still as their poster and layer the video
         over it, so this holds for every card in the rail regardless of which
@@ -136,18 +158,16 @@ export function CreativeCard({ item }: { item: Creative }) {
           h={item.h}
         />
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        // Creatives are portrait ads; a 4:5 crop cut the tops and bottoms off.
+        // 9:16 matches the source material, so the whole ad stays visible.
+        // Deferred, not merely lazy — see LazyImg.
+        <LazyImg
           src={`/images/${item.image}`}
           srcSet={srcSet(item.image)}
           sizes={CARD_SIZES}
           alt={media}
           width={item.w}
           height={item.h}
-          loading="lazy"
-          decoding="async"
-          // Creatives are portrait ads; a 4:5 crop cut the tops and bottoms off.
-          // 9:16 matches the source material, so the whole ad stays visible.
           className="aspect-[9/16] w-full bg-zinc-100 object-cover"
         />
       )}

@@ -2558,6 +2558,13 @@ function AppWindow() {
         src="templates/hero-phone.webp"
         alt="The Mushi template library: ad templates with industry and sort filters"
         width={269}
+        // TWO CUTS OF THE PHONE (2026-09-25): hero-phone-sm.webp is the same
+        // render at 2x (538), hero-phone.webp at 3x (807). With `sizes` at
+        // the drawn 269, a 3x iPhone takes the 807 and a 2x phone — or
+        // PageSpeed's 1.75x Moto — takes the 538 and 52 fewer KB on the one
+        // request the first screen waits for. Img emits the srcset from the
+        // -sm name; the preload in page.tsx carries the same pair.
+        sizes="269px"
         alternate={{ src: "templates/hero-macbook.webp", media: "(min-width: 768px)" }}
         // No drop-shadow on the MacBook (Žilvinas 2026-09-19, via the
         // client): the 140px blur reached up over the CTA and read as a

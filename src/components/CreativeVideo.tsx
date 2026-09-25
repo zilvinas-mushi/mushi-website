@@ -333,21 +333,37 @@ export function CreativeVideo({
         poster under preload="none". The video fades over it once it is
         genuinely painting frames, so there is no flash of empty black.
       */}
+      {/* DEFERRED, not merely lazy (2026-09-25): the URL rides in data-src
+          until the paint gate has opened and the rail is within range, with a
+          <noscript> twin. Chrome's lazy lookahead had the first poster on the
+          wire before the first screen painted, sharing the pipe with the
+          fonts and the hero — see LazyImg in CreativeCard. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`/images/${image}`}
-        srcSet={srcSet(image)}
+        data-src={`/images/${image}`}
+        data-srcset={srcSet(image)}
         sizes={CARD_SIZES}
         alt={alt}
         width={w}
         height={h}
-        // Lazy for the same reason as the still cards: eager put a preload
-        // for every poster in the document head, ahead of the stylesheet.
-        // See the note in CreativeCard.
         loading="lazy"
         decoding="async"
         className="absolute inset-0 size-full object-cover"
       />
+      <noscript>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/images/${image}`}
+          srcSet={srcSet(image)}
+          sizes={CARD_SIZES}
+          alt={alt}
+          width={w}
+          height={h}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 size-full object-cover"
+        />
+      </noscript>
 
       <video
         ref={ref}

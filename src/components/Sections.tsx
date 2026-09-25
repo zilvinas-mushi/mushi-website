@@ -10,6 +10,7 @@ import {
   FINAL_CTA,
 } from "@/lib/content";
 import { BOOKING_ANCHOR, BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID } from "@/lib/site";
+import { LazyImg } from "./CreativeCard";
 import { SHELL } from "@/lib/layout";
 
 /**
@@ -530,14 +531,16 @@ export function SocialProof() {
               {SOCIAL_PROOF.brands.slice(from, to).map((brand) => (
                 <li key={brand.name} className="flex items-center">
                   {brand.logo ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    // DEFERRED (2026-09-25): the strip is under the min-h-svh
+                    // hero, so it is never on the first screen, yet Chrome's
+                    // lazy lookahead had all twelve marks on the wire before
+                    // the hero painted. data-src until the gate opens, with
+                    // a <noscript> twin — see LazyImg.
+                    <LazyImg
                       src={`/logos/${brand.logo}`}
                       alt={brand.name}
                       width={brand.w}
                       height={brand.h}
-                      loading="lazy"
-                      decoding="async"
                       className={`w-auto opacity-95 ${
                         "tall" in brand && brand.tall
                           ? "h-[calc(var(--pu)*24)] md:h-[calc(var(--hero-u)*0.325)]"
@@ -757,14 +760,12 @@ export function CaseStudies() {
                   {/* Every case study now carries its real logotype, so the old
                       text fallback became dead code the type checker rightly
                       rejected. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  {/* Deferred like the strip's marks — see LazyImg. */}
+                  <LazyImg
                       src={`/logos/${item.logo}`}
                       alt={item.brand}
                       width={item.logoW}
                       height={25}
-                      loading="lazy"
-                      decoding="async"
                       // Desktop carries the artboard's logo, which is a good
                       // deal bigger than the phone's and sits further off the
                       // corner: 3.25rem is ~39px at 1440 against the 18 this
