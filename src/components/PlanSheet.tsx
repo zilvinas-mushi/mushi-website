@@ -181,7 +181,13 @@ export function PlanSheet() {
                       />
                     )}
                     {o.save && (
-                      <span className="absolute -top-[9px] left-[41px] z-[1] flex h-[18px] items-center rounded-[3.4px] bg-white px-2 text-[11px] font-semibold leading-none text-black">
+                      <span
+                        // 74 x 20, radius 5, SemiBold 12, centred on the box's
+                        // stroke line: 10 above it and 10 below, which is 7.5
+                        // above the plate (Žilvinas 2026-09-25, off the
+                        // inspector, "much down").
+                        className="absolute -top-[7.5px] left-[41px] z-[1] flex h-[20px] w-[74px] items-center justify-center rounded-[5px] bg-white text-[12px] font-semibold leading-none text-black"
+                      >
                         {o.save}
                       </span>
                     )}
