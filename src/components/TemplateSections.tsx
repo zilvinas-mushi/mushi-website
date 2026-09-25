@@ -1794,6 +1794,60 @@ function ShowcaseRows() {
 }
 
 /**
+ * The 5-industries card's chip rows on the PHONE, drawn live (Žilvinas
+ * 2026-09-25, off the artboard's inspector): each pill is 16.47 tall with
+ * an 8-square emoji and a Poppins Regular 7 label — "Food" measures 42.06
+ * wide, the rest fall out of the same padding — 9 between pills and 8
+ * between rows. Six rows, staggered as the artboard staggers them, with the
+ * first and last cut by the card's own overflow-hidden, as in the export.
+ * The emoji are the hero's own category glyphs (cat-*.webp, 200 square)
+ * drawn at 8. Decorative: aria-hidden, and the headline sits over it.
+ *
+ * The rows' left offsets are the artboard's, read against its 165 card.
+ * Phone only — the desktop's card keeps its baked inside-industries.webp.
+ */
+const INDUSTRY_ROWS: { x: number; labels: string[] }[] = [
+  { x: 2, labels: ["Food", "Drink", "Fashion", "Health"] },
+  { x: 24, labels: ["Health", "Beauty", "Food"] },
+  { x: -12, labels: ["Fashion", "Drink", "Health", "Fashion"] },
+  { x: 8, labels: ["Beauty", "Health", "Food", "Drink"] },
+  { x: -8, labels: ["Drink", "Food", "Beauty", "Fashion"] },
+  { x: -24, labels: ["Food", "Drink", "Fashion", "Health"] },
+];
+
+function IndustryPills() {
+  return (
+    <span
+      aria-hidden="true"
+      // 6 rows at 16.47 with 8 between is 138.8; centred on the 119 card the
+      // first and last rows are cut, as in the artboard.
+      className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 flex-col gap-[8px] md:hidden"
+    >
+      {INDUSTRY_ROWS.map((row, r) => (
+        <span
+          key={r}
+          className="flex shrink-0 gap-[9px] whitespace-nowrap"
+          style={{ marginLeft: `${row.x}px` }}
+        >
+          {row.labels.map((label, i) => {
+            const cat = TEMPLATES_PAGE.categories.find((c) => c.label === label)!;
+            return (
+              <span
+                key={i}
+                className="inline-flex h-[16.47px] shrink-0 items-center gap-[3px] rounded-full bg-[#262626] px-[7px] text-[7px] font-normal leading-none text-white/80"
+              >
+                <Img src={cat.image} alt="" width={8} className="size-[8px]" />
+                {label}
+              </span>
+            );
+          })}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/**
  * "Inside" bento — what comes with the library: support, industry coverage,
  * reviews, monthly drops. Card visuals are the design's own baked exports
  * (2026-09-04): memoji cluster + "Need help?" bubble, faded industry-chip
@@ -1879,18 +1933,17 @@ export function TemplatesInside() {
             </p>
           </article>
 
-          {/* 5 industries — chip rows baked into the background art. Same
-              phone treatment as the support card: its own 4x, pre-dimmed.
-              LOSSLESS since 2026-09-25 (Žilvinas, "do not diminish the
-              quality"): the client's "5 industries background.png" as
-              supplied — the third export that day (00:52), 660 x 476, which
-              is 4x the 165 card, chosen over the 2008-wide one ("replace
-              with this last one"). Lossless, 62 KB. */}
+          {/* 5 industries — chip rows. DESKTOP keeps its baked art; the
+              PHONE draws the rows LIVE (Žilvinas 2026-09-25, "recreate this
+              5 industries background": the export's shadow was softening
+              the whole picture, and pills are type and emoji, which the
+              browser draws sharper than any raster). See IndustryPills.
+              The shadow over them is still to come. */}
           <article
-            className={`${CARD} flex h-[119px] flex-col items-center justify-center bg-[image:var(--bg,none)] p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[image:var(--bg-md,none)] md:p-6 md:pb-[43px] md:pl-[40px] md:text-left`}
-            data-bg="url(/images/templates/inside-industries-phone.webp)"
+            className={`${CARD} flex h-[119px] flex-col items-center justify-center p-4 text-center md:h-auto md:min-h-[210px] md:items-stretch md:justify-end md:bg-[image:var(--bg-md,none)] md:p-6 md:pb-[43px] md:pl-[40px] md:text-left`}
             data-bg-md="url(/images/templates/inside-industries.webp)"
           >
+            <IndustryPills />
             <p className="relative">
               <span className={BIG}>{s.industries.big}</span>
               <span className={`${SMALL} block md:mt-1 md:text-[36px]`}>{s.industries.small}</span>
@@ -2780,7 +2833,6 @@ export function TemplatesBgFallbacks() {
     "diff-card-dark-v2.webp",
     "reviews-card.svg",
     "inside-support-phone.webp",
-    "inside-industries-phone.webp",
     "inside-monthly-phone.webp",
   ];
   // The desktop twins, which the class only uses above md.
