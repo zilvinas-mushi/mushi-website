@@ -42,9 +42,14 @@ import { APP_URL } from "@/lib/site";
  */
 const OPEN_MS = 560;
 
-/** The struck-through old price, in the frame's red ramp. */
+/**
+ * The struck-through old price, in the frame's red ramp: #DE8A8B at 0%,
+ * #B55456 from 40%, running top-left to bottom-right (the inspector's
+ * handles, Žilvinas 2026-09-25 — about 30° below horizontal, which is
+ * 120deg in CSS).
+ */
 const WAS =
-  "bg-[linear-gradient(112deg,#de8a8b_0%,#b55456_40%,#b55456_100%)] bg-clip-text text-transparent line-through decoration-[#c9666a]";
+  "bg-[linear-gradient(120deg,#de8a8b_0%,#b55456_40%,#b55456_100%)] bg-clip-text text-transparent line-through decoration-[#c9666a]";
 
 /** The violet button, inverting to white on hover like every button. */
 const VIOLET =
@@ -122,13 +127,16 @@ export function PlanSheet() {
         }`}
       >
         {step === "plan" ? (
-          <div className="px-6 pt-7">
+          // 24 from the sheet's top to the title and 24 from the title to
+          // the first row; 15 between rows (Žilvinas 2026-09-25, off the
+          // artboard's spacers).
+          <div className="px-6 pt-6">
             {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
             <h2 id="plan-sheet-title" className="text-center text-[20px] font-semibold leading-none text-white">
               {c.title}
             </h2>
 
-            <div className="mt-[22px] flex flex-col gap-[14px]" role="radiogroup" aria-label={c.title}>
+            <div className="mt-6 flex flex-col gap-[15px]" role="radiogroup" aria-label={c.title}>
               {c.options.map((o) => {
                 const on = o.id === planId;
                 return (
