@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Img } from "./Img";
 import { BoltGlyph, LinkMark, LockGlyph, ShieldGlyph } from "./plan-sheet-glyphs";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { APP_URL } from "@/lib/site";
@@ -103,7 +102,6 @@ export function PlanSheet() {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
   if (!mounted) return null;
