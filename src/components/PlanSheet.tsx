@@ -206,10 +206,12 @@ export function PlanSheet() {
                 glyph and "500+ static templates" alike (Žilvinas 2026-09-25). */}
             <p className="mt-4 flex items-center justify-center gap-1.5 text-[14px] leading-none text-white/50">
               {c.includesLabel}
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="size-[14px]" aria-hidden="true">
-                <path d="M8 2 2 5.2 8 8.4l6-3.2L8 2Z" />
-                <path d="m2 8.2 6 3.2 6-3.2" />
-                <path d="m2 11.2 6 3.2 6-3.2" />
+              {/* The layers glyph at the inspector's 11.36 square (Žilvinas
+                  2026-09-25) — the glyph fills its box, no padding inside. */}
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" className="size-[11.36px]" aria-hidden="true">
+                <path d="M6 .8.8 3.6 6 6.4l5.2-2.8L6 .8Z" />
+                <path d="m.8 6.2 5.2 2.8 5.2-2.8" />
+                <path d="m.8 8.6 5.2 2.8 5.2-2.8" />
               </svg>
               {c.includes}
             </p>
