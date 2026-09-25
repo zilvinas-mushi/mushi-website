@@ -1981,24 +1981,26 @@ export function TemplatesInside() {
             // 0.9: 64 → 58 from the top to the stars, 30 → 27 stars to
             // wordmark, 35 → 31.5 wordmark to caption, and the 72 under
             // the caption is what the row leaves.
-            // PHONE: 20 from the card's top to the stars and 20 from the
-            // caption to its bottom (Žilvinas 2026-09-25, off the artboard) —
-            // py-5 over CARD's p-6, which had both at 24.
-            className={`${CARD} col-span-2 flex flex-col items-center justify-center py-5 text-center md:h-auto md:justify-start md:bg-[#111111] md:bg-[image:var(--bg,none)] md:p-0 md:pt-[58px]`}
+            // PHONE: 120 tall (Žilvinas 2026-09-25, the artboard's 345 x 119
+            // "firstly is 120"), 20 from the card's top to the stars and 20
+            // from the caption to its bottom — py-5 over CARD's 24, and
+            // justify-between so both hold at once with the lockup between.
+            className={`${CARD} col-span-2 flex h-[120px] flex-col items-center justify-between py-5 text-center md:h-auto md:justify-start md:bg-[#111111] md:bg-[image:var(--bg,none)] md:p-0 md:pt-[58px]`}
             data-bg="url(/images/templates/reviews-card.svg)"
           >
             {/* PHONE: the client's "trustpilot background.svg" (Žilvinas
                 2026-09-25) — the eight #222222 leaves as vectors on a 315 x
                 119 frame, the phone twin of the desktop's reviews-card.svg.
-                Drawn at COVER, centred: the leaves touch the frame's own
-                edges, so at the card's 345 they touch the card's ("closer
-                to the edges"). It replaces the laurel-mask.webp that was
-                painted at contain and left a margin either side. Deferred
-                like every other background: the URL sits in data-bg until
-                the script sets --bg. */}
+                Drawn at the card's HEIGHT and its own width, centred — 315
+                on a 345 card, so the leaves sit 15 in from either edge, the
+                artboard's own inset ("the background image is just a little
+                bit narrower", Žilvinas 2026-09-25; cover had them touching
+                the edges). It replaces the laurel-mask.webp that was painted
+                at contain. Deferred like every other background: the URL
+                sits in data-bg until the script sets --bg. */}
             <span
               aria-hidden="true"
-              className="absolute inset-0 bg-[image:var(--bg,none)] bg-cover bg-center md:hidden"
+              className="absolute inset-0 bg-[image:var(--bg,none)] bg-[length:auto_100%] bg-center bg-no-repeat md:hidden"
               data-bg="url(/images/templates/reviews-laurel-phone.svg)"
             />
             {/* gap 5 between the tiles on the phone (Žilvinas 2026-09-18,
@@ -2050,9 +2052,9 @@ export function TemplatesInside() {
               // md: the artboard's wordmark plus star measures ~213 x 59;
               // at the bento's 0.9 that is 53 tall ("bigger, like 60%",
               // Žilvinas 2026-09-19 — it was 33).
-              className="relative mt-2 h-auto w-[126px] md:mt-[27px] md:h-[42px] md:w-auto"
+              className="relative h-auto w-[126px] md:mt-[27px] md:h-[42px] md:w-auto"
             />
-            <p className={`${SMALL} relative mt-1 md:mt-[31.5px] md:text-[36px]`}>{s.reviews.caption}</p>
+            <p className={`${SMALL} relative md:mt-[31.5px] md:text-[36px]`}>{s.reviews.caption}</p>
           </article>
 
           {/* 50+ new templates monthly — the dimmed collage is the baked
