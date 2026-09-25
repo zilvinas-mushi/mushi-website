@@ -231,7 +231,7 @@ export function PlanSheet() {
               // white, off the inspector (Žilvinas 2026-09-25). The 50% is
               // an opacity rather than a colour so it still inverts with the
               // button on hover.
-              className={`mt-5 flex h-[47px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium ${VIOLET}`}
+              className={`mt-5 flex h-[47.35px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium ${VIOLET}`}
             >
               {c.ctaPrefix} {plan.price}
               <span className="text-[14px] font-medium opacity-50">{c.perMonth}</span>
