@@ -2501,6 +2501,16 @@ function AppWindow() {
           The file is a Lanczos downsample of the 3x master, not a re-export
           of anything softer.
 
+          RE-CUT 2026-09-25 (Žilvinas, "why is this phone such a bad
+          quality — do it maximum"): the client's "Whole iphone with
+          border.png", a 4x render (the device is 1076 wide in it), cropped
+          to the device's own opaque box — no glow, per the rule below —
+          and to the same top 434.5 CSS the layout shows, then Lanczos to
+          EXACTLY 3x (807 x 1304), an iPhone's own pixel grid, so nothing
+          is resampled on the device. Quality 95, 121 KB; the 538-wide 2x it
+          replaces was 64 KB and soft at 3x. Lossless would be 361 KB on the
+          one image the first screen waits for, for no visible gain at q95.
+
           -mb-px: the section's height lands on a fractional pixel (the type
           above it does), and when the browser rounds the two apart a single
           row of the burst shows UNDER the device before the black of the next
