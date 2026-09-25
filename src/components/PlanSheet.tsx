@@ -155,7 +155,13 @@ export function PlanSheet() {
                     // right. So the plate shows as a 3 band around the
                     // stroke, and the slot — and the 15 between rows — does
                     // not move. Content padding is the same in both states.
-                    className="relative h-[78px] w-full rounded-[14px] bg-[#222222] text-left"
+                    // When on, the plate is the inspector's 327.65 x 78.59 at
+                    // radius 17 with a 4px inside stroke of #252525 over a
+                    // #303030 fill; the stroked box 3 inside covers everything
+                    // but that stroke, so the band around it is #252525.
+                    className={`relative h-[78px] w-full text-left ${
+                      on ? "rounded-[17px] bg-[#252525]" : "rounded-[14px] bg-[#222222]"
+                    }`}
                   >
                     {on && (
                       <span
