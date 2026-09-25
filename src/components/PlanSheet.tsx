@@ -146,23 +146,26 @@ export function PlanSheet() {
                     role="radio"
                     aria-checked={on}
                     onClick={() => setPlanId(o.id)}
-                    // THE SELECTED ROW IS A RING AROUND A BOX (Žilvinas
-                    // 2026-09-25, off the inspector): a 2px ring ramping
-                    // #A08ADD to #7054B4 left to right, then 2.5 of the
-                    // sheet's own #181818, then the #2A2431 box at radius
-                    // 15. The ring's box is 2.5 inside the row's slot on
-                    // every side (321.97 x 72.91 in a 327 x 78 slot), so the
-                    // slot — and the 15 between rows — does not move.
+                    // THE SELECTED ROW, off the inspector (Žilvinas 2026-09-25):
+                    // a 321.97 x 72.91 box at radius 15, its fill #2A2431 under
+                    // 50% black (#15121A), with a 2px INSIDE stroke ramping
+                    // #A08ADD to #7054B4 left to right; inside that, 2.5 in,
+                    // the #2A2431 plate the content sits on. The box is 2.5
+                    // inside the row's slot on every side, so the slot — and
+                    // the 15 between rows — does not move. The stroke is
+                    // inside because the border is part of the 73, and the
+                    // outer radius is the box's 15, not 15 plus the border:
+                    // that larger radius is what read as a ring drawn outside.
                     className={`relative text-left transition-colors duration-200 ${
                       on
-                        ? "m-[2.5px] h-[73px] w-[calc(100%-5px)] rounded-[19.5px] border-2 border-transparent p-[2.5px]"
+                        ? "m-[2.5px] h-[73px] w-[calc(100%-5px)] rounded-[15px] border-2 border-transparent p-[2.5px]"
                         : "h-[78px] w-full rounded-[14px] bg-[#222222]"
                     }`}
                     // Inline, not an arbitrary class: a two-layer background
                     // with box keywords does not survive Tailwind's parser.
                     style={
                       on
-                        ? { background: "linear-gradient(#181818,#181818) padding-box, linear-gradient(90deg,#a08add,#7054b4) border-box" }
+                        ? { background: "linear-gradient(#15121a,#15121a) padding-box, linear-gradient(90deg,#a08add,#7054b4) border-box" }
                         : undefined
                     }
                   >
@@ -176,7 +179,7 @@ export function PlanSheet() {
                         price stay on the same lines as the other rows'. */}
                     <span
                       className={`flex h-full w-full items-center gap-3 ${
-                        on ? "rounded-[15px] bg-[#2a2431] px-[9px]" : "px-4"
+                        on ? "rounded-[10.5px] bg-[#2a2431] px-[9px]" : "px-4"
                       }`}
                     >
                       {/* The radio, off the inspector (Žilvinas 2026-09-25):
