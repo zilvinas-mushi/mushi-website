@@ -307,8 +307,8 @@ export function PlanSheet() {
             </a>
 
             {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
-            {/* 13 between the rules and the word (Žilvinas 2026-09-25). */}
-            <div className="mt-[20px] flex items-center gap-[13px] text-[20px] leading-none text-[#909090]">
+            {/* 11 between the rules and the word (Žilvinas 2026-09-25, the 11 x 9 spacer; it was 13). */}
+            <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090]">
               {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
               <span className="h-[2px] flex-1 bg-white/25" />
               {c.pay.or}
