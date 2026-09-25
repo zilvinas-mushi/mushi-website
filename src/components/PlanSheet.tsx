@@ -123,7 +123,8 @@ export function PlanSheet() {
       >
         {step === "plan" ? (
           <div className="px-6 pt-7">
-            <h2 id="plan-sheet-title" className="text-center text-[19px] font-semibold leading-none text-white">
+            {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
+            <h2 id="plan-sheet-title" className="text-center text-[20px] font-semibold leading-none text-white">
               {c.title}
             </h2>
 
