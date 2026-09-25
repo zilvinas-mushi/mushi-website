@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { PlanSheet } from "@/components/PlanSheet";
 import {
   TemplatesAccess,
   TemplatesBgFallbacks,
@@ -163,13 +164,14 @@ export default function Templates() {
           againId: "team-heading",
           labelPx: 20,
           radiusPx: 5,
+          sheet: true,
         }}
         // The phone DRAWER, /templates only (Žilvinas 2026-09-25): under the
         // nav rows a half-and-half Buy Now / Login into the webapp, then a
         // full-width Book an Agency Call. Home keeps its single Schedule a
         // Call and the desktop bar is untouched.
         mobileDrawer={{
-          primary: { label: TEMPLATES_PAGE.access.templates.cta, href: APP_URL },
+          primary: { label: TEMPLATES_PAGE.access.templates.cta, href: APP_URL, sheet: true },
           secondary: { label: TEMPLATES_PAGE.login, href: APP_URL },
           wide: { label: TEMPLATES_PAGE.agencyCall, href: BOOKING_URL },
         }}
@@ -178,6 +180,8 @@ export default function Templates() {
       {/* The <noscript> rules for this page's deferred background artwork —
           see TemplatesBgFallbacks. Nothing renders with JavaScript on. */}
       <TemplatesBgFallbacks />
+      {/* The phone's Pick-your-plan sheet; every data-plan link opens it. */}
+      <PlanSheet />
       <main className="flex-1">
         {/* EXACTLY ONE SCREEN from md up (Žilvinas 2026-09-19): h-[100svh]
             and a flex column, so the hero ends on the fold on every desktop

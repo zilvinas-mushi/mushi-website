@@ -55,6 +55,8 @@ export type MobileCtaConfig = {
   radiusPx?: number;
   /** Optional 1px INSIDE stroke. Nothing sets one since /templates dropped its #7C54B5 ring. */
   strokeColor?: string;
+  /** Opens /templates' Pick-your-plan sheet instead of leaving (PlanSheet). */
+  sheet?: boolean;
 };
 
 const HOME_CTA: MobileCtaConfig = {
@@ -106,8 +108,8 @@ const CALL_CTA =
  * keeps its single button — this is per page, never universal.
  */
 export type MobileDrawerActions = {
-  /** Left half of the row, violet. */
-  primary: { label: string; href: string };
+  /** Left half of the row, violet. `sheet` opens the plan sheet (PlanSheet). */
+  primary: { label: string; href: string; sheet?: boolean };
   /** Right half of the row, on the drawer's grey with a white stroke. */
   secondary: { label: string; href: string };
   /** The full-width black row beneath, with the banner's corner-lit ring. */
@@ -556,6 +558,7 @@ export function MobileHeader({
         >
           <a
             href={cta.href}
+            data-plan={cta.sheet ? "" : undefined}
             tabIndex={ctaOffered ? undefined : -1}
             style={{
               fontSize: `${cta.labelPx ?? 17}px`,
@@ -619,7 +622,12 @@ export function MobileHeader({
             {drawer ? (
               <>
                 <div className="grid grid-cols-2 gap-2.5">
-                  <a href={drawer.primary.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${VIOLET_CTA}`}>
+                  <a
+                    href={drawer.primary.href}
+                    data-plan={drawer.primary.sheet ? "" : undefined}
+                    onClick={() => setOpen(false)}
+                    className={`${CTA_BOX} ${VIOLET_CTA}`}
+                  >
                     {drawer.primary.label}
                   </a>
                   <a href={drawer.secondary.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${LOGIN_CTA}`}>

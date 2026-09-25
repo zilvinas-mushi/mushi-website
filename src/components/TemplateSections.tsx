@@ -107,6 +107,10 @@ export function TemplatesHero() {
         <a
           id={TEMPLATES_HERO_CTA_ID}
           href={APP_URL}
+          // data-plan: on the phone this opens the Pick-your-plan sheet
+          // instead of leaving (PlanSheet); the href stays for md up and
+          // for no JavaScript.
+          data-plan
           // Per "Rectangle 83" (2026-09-09): the light spreads across the
           // WHOLE diagonal — a18ade top-left flowing to 6e54b5 bottom-right,
           // lifted a step brighter as asked. Sharper 8px corners stay.
@@ -1186,6 +1190,7 @@ export function TemplatesComparison() {
             three stops repeated in white so the fill cross-fades. */}
         <a
           href={APP_URL}
+          data-plan
           className="mt-[45px] flex h-[57px] w-full items-center justify-center rounded-[15px] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-[20px] font-semibold text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:hidden"
         >
           {/* Set type here, not the masked label artwork the desktop pill
@@ -1526,6 +1531,7 @@ export function TemplatesAccess() {
             </ul>
             <a
               href={APP_URL}
+              data-plan
               className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] md:h-[93px] bg-[image:var(--bg,none)] bg-cover text-[20px] font-semibold uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:rounded-[12px] md:text-[35px] md:tracking-normal"
               data-bg="url(/images/templates/access-btn-purple.webp)"
             >

@@ -1187,6 +1187,46 @@ export const TEMPLATES_PAGE = {
    * composition (templates/showcase-wall.webp, supplied 2026-09-04) — no
    * per-tile data needed anymore.
    */
+  /**
+   * The PHONE's "Pick your plan" sheet (Žilvinas 2026-09-25, from the
+   * supplied frame): it rises from the bottom on any Buy Now, and the
+   * plan chosen goes to the webapp as a query — see PlanSheet.
+   */
+  plans: {
+    title: "Pick your plan",
+    // `was` is the struck-through monthly price; only the discounted plans
+    // carry one. `save` is the badge on the recommended plan.
+    // `billing` and `off` are the payment step's summary line and pill.
+    options: [
+      { id: "1-month", name: "1-month", total: "$10 total", price: "$10", was: null, save: null, billing: "Billed monthly", off: null },
+      { id: "3-months", name: "3-months", total: "$24 total", price: "$8", was: "$10", save: null, billing: "Billed every 3 months", off: "-20% OFF" },
+      { id: "12-months", name: "12-months", total: "$60 total", price: "$5", was: "$10", save: "SAVE $60", billing: "Billed yearly", off: "-50% OFF" },
+    ],
+    defaultId: "12-months",
+    ctaPrefix: "Buy now for",
+    perMonth: "/month",
+    includesLabel: "Every plan includes:",
+    includes: "500+ static templates",
+    // Step two, the payment, from the second supplied frame.
+    pay: {
+      totalLabel: "Total due today",
+      payWith: "Pay with",
+      or: "or",
+      cardInfo: "Card information",
+      cardNumber: "1234 1234 1234 1234",
+      expiry: "MM/YY",
+      cvv: "CVV",
+      email: "Email",
+      submit: "Submit payment",
+      cancel: "Cancel anytime",
+      moneyBack: "14-day money-back",
+      badgesAlt: "Verified by Visa, Mastercard ID Check, PCI DSS compliant, McAfee Secure",
+      legalPrefix: "By purchasing, you agree to our",
+      terms: "Terms and Conditions",
+      and: "and",
+      privacy: "Privacy policy",
+    },
+  },
   showcase: {
     eyebrow: "Showcase",
     heading: "1 cent = 1 design",
