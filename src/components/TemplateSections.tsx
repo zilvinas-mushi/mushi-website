@@ -2068,9 +2068,14 @@ export function TemplatesInside() {
               is gone.
               RE-CUT 2026-09-25 (Žilvinas, "should be replaced") from the
               client's "50+ new templates monthly.png", a 4396 x 2840
-              master at the card's own aspect, Lanczos down to 1380 x 892
+              master at the card's own aspect, Lanczos down to 1380 x 888
               and LOSSLESS — the 97 KB lossy cut it replaces smeared the
-              collage's small type. 745 KB, lazy, below the fold. */}
+              collage's small type. 745 KB, lazy, below the fold.
+              CROPPED TO ITS INK (Žilvinas 2026-09-25, "does not fully fit"):
+              the export carries 16 of clear margin either side and 33 of
+              drop shadow under its bottom edge, which cover was drawing
+              inside the card as a hairline of black and a notch at each
+              bottom corner. The cut starts at the opaque edge now. */}
           <article
             // CENTRED on desktop too, 45 down from the card's top (Žilvinas
             // 2026-09-19, off the artboard's inspector); it was left-set
