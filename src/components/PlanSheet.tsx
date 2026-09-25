@@ -174,8 +174,10 @@ export function PlanSheet() {
                     </span>
                     <span className="flex shrink-0 flex-col items-end gap-[3px]">
                       <span className="flex items-baseline gap-2">
-                        {o.was && <span className={`text-[20px] font-semibold leading-none ${WAS}`}>{o.was}</span>}
-                        <span className="text-[26px] font-semibold leading-none text-white">{o.price}</span>
+                        {/* SemiBold 32 off the inspector (Žilvinas 2026-09-25); the
+                            struck price at 24, its proportion in the frame. */}
+                        {o.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}>{o.was}</span>}
+                        <span className="text-[32px] font-semibold leading-none text-white">{o.price}</span>
                       </span>
                       <span className="text-[12px] font-semibold leading-none text-white/45">{c.perMonth}</span>
                     </span>
