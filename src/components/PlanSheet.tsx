@@ -269,18 +269,17 @@ export function PlanSheet() {
                 </span>
               )}
             </div>
-            {/* Two things pinned separately (Žilvinas 2026-09-25): the label
-                sits tight under "Billed yearly" ("it must be smaller"), and
-                the price sits 11 under the -50% pill. They are not on one
-                line box: the label's top is 4 under the billing line and
-                the price's 5 lower again, which lands its cap 11 under the
-                pill. 11 between the struck price and the price too. */}
-            <div className="mt-[4px] flex items-start justify-between">
+            {/* ONE LINE (Žilvinas 2026-09-25): the label, the struck price
+                and the price are centred on each other — the struck $10 on
+                the middle of the $5, and "Total due today" on that same
+                middle. The row's top is 11 under the -50% pill, and 11
+                between the struck price and the price. */}
+            <div className="mt-[11px] flex items-center justify-between">
               {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
               <h2 id="plan-sheet-title" className="text-[20px] font-semibold leading-none text-white">
                 {c.pay.totalLabel}
               </h2>
-              <span className="mt-[7px] flex items-baseline gap-[11px]">
+              <span className="flex items-center gap-[11px]">
                 {/* SemiBold 32 and 24, off the inspector (Žilvinas 2026-09-25). */}
                 {plan.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}>{plan.was}</span>}
                 <span className="text-[32px] font-semibold leading-none text-white">{plan.price}</span>
