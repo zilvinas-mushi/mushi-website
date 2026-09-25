@@ -214,12 +214,11 @@ export function PlanSheet() {
                 glyph and "500+ static templates" alike (Žilvinas 2026-09-25). */}
             <p className="mt-4 flex items-center justify-center gap-1.5 text-[14px] leading-none text-white/50">
               {c.includesLabel}
-              {/* The layers glyph at the inspector's 11.36 square (Žilvinas
-                  2026-09-25) — the glyph fills its box, no padding inside. */}
-              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" className="size-[11.36px]" aria-hidden="true">
-                <path d="M6 .8.8 3.6 6 6.4l5.2-2.8L6 .8Z" />
-                <path d="m.8 6.2 5.2 2.8 5.2-2.8" />
-                <path d="m.8 8.6 5.2 2.8 5.2-2.8" />
+              {/* The client's "stacked icon.svg" (Žilvinas 2026-09-25), its
+                  path verbatim, at the inspector's 11.36 → 11.5 square. Its
+                  #8B8B8B stroke is the line's own 50% white here. */}
+              <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="size-[11.5px]" aria-hidden="true">
+                <path d="M0.75 6.43153L6.22854 9.18692C6.30307 9.22441 6.34034 9.24315 6.37943 9.25053C6.41405 9.25706 6.44958 9.25706 6.4842 9.25053C6.52329 9.24315 6.56056 9.22441 6.6351 9.18692L12.1136 6.43153M0.75 9.28916L6.22854 12.0445C6.30307 12.082 6.34034 12.1008 6.37943 12.1082C6.41405 12.1147 6.44958 12.1147 6.4842 12.1082C6.52329 12.1008 6.56056 12.082 6.6351 12.0445L12.1136 9.28916M0.75 3.5739L6.22854 0.818508C6.30307 0.781021 6.34034 0.762277 6.37943 0.7549C6.41405 0.748367 6.44958 0.748367 6.4842 0.7549C6.52329 0.762277 6.56056 0.781021 6.6351 0.818508L12.1136 3.5739L6.6351 6.32929C6.56056 6.36678 6.52329 6.38552 6.4842 6.3929C6.44958 6.39943 6.41405 6.39943 6.37943 6.3929C6.34034 6.38552 6.30307 6.36678 6.22854 6.32929L0.75 3.5739Z" />
               </svg>
               {c.includes}
             </p>
