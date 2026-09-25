@@ -261,8 +261,14 @@ export function PlanSheet() {
           >
             {/* Summary: the billing line with the discount pill, then the
                 total with the struck old price. */}
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] leading-none text-white/45">{plan.billing}</span>
+            {/* "Billed yearly" is pinned to the TOTAL, not the pill: 7 above
+                the label's cap (Žilvinas 2026-09-25, the 7 x 7 spacer). The
+                pill keeps its own 22 from the top; the billing line is
+                positioned off the row below. Its box bottom is 2 under the
+                row's top: the label's cap starts 9 under the row's top (6 of
+                centring in the 32 row, 3 of Poppins' ascent), and 9 - 7 = 2.
+                An empty span keeps the pill on the right. */}
+            <div className="flex justify-end">
               {plan.off && (
                 <span className="flex h-5 items-center rounded-[5px] bg-white px-3 text-[12px] font-semibold leading-none text-black">
                   {plan.off}
@@ -274,7 +280,8 @@ export function PlanSheet() {
                 the middle of the $5, and "Total due today" on that same
                 middle. The row's top is 11 under the -50% pill, and 11
                 between the struck price and the price. */}
-            <div className="mt-[11px] flex items-center justify-between">
+            <div className="relative mt-[11px] flex items-center justify-between">
+              <span className="absolute bottom-[calc(100%-2px)] left-0 text-[13px] leading-none text-white/45">{plan.billing}</span>
               {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
               <h2 id="plan-sheet-title" className="text-[20px] font-semibold leading-none text-white">
                 {c.pay.totalLabel}
@@ -298,7 +305,8 @@ export function PlanSheet() {
             </a>
 
             {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
-            <div className="mt-[20px] flex items-center gap-4 text-[20px] leading-none text-[#909090]">
+            {/* 13 between the rules and the word (Žilvinas 2026-09-25). */}
+            <div className="mt-[20px] flex items-center gap-[13px] text-[20px] leading-none text-[#909090]">
               {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
               <span className="h-[2px] flex-1 bg-white/25" />
               {c.pay.or}
