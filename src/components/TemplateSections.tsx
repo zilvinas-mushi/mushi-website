@@ -191,7 +191,7 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
     // puts 11 from the letter's ink to the star's tip; at this scale that
     // is 7.3, and 4 of CSS gap + the rules' ~2.2 of scaled empty frame +
     // the word's ~1.1 side bearing lands there.
-    <div className="flex items-center justify-center gap-[6.67px] md:gap-[4px]">
+    <div className="flex items-center justify-center gap-[6.67px] md:gap-[5px]">
       {/* PHONES GET THE ARTBOARD'S OWN RULES (Žilvinas 2026-09-06): a line
           that fades from black into the star's colour, with a four-pointed
           star ON its inner end. Since 2026-09-18 ("both of these to improve
@@ -216,19 +216,22 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
           render at 107 x 14, the same ratio the word came down by — they
           are vectors, so nothing softens. The phone rules keep their
           artboard size, as the phone word did. */}
-      <EyebrowRule src="eyebrow-rule-left.svg" width={107} height={14} className="hidden shrink-0 md:block" />
-      {/* Poppins Regular 18 at EVERY width now (Žilvinas 2026-09-25, "make
-          headers 1.5x times smaller"): the desktop word was the panel's 30
-          at the page's 0.9 — 27 — and 27 / 1.5 lands on the same 18 the
-          phone artboard has always used, so the two breakpoints share one
-          size. The rules either side keep their own scale. */}
+      <EyebrowRule src="eyebrow-rule-left.svg" width={131} height={17} className="hidden shrink-0 md:block" />
+      {/* Poppins Regular 18 on the phone (its artboard's size) and 22 from
+          md (Žilvinas 2026-09-26, "Difference — a bit bigger, it is too
+          small now; the same size for the other labels"): the 2026-09-25
+          "1.5x smaller" pass had taken the desktop word from 27 to 18,
+          and 22 is the step back up. The desktop rules come up by the
+          same 22/18 — 107 x 14 to 131 x 17 — and the gap 4 to 5, so the
+          eyebrow stays one drawing. Every section takes this recipe, so
+          they all move together. */}
       <p
-        className="bg-clip-text text-[18px] font-normal uppercase leading-none text-transparent"
+        className="bg-clip-text text-[18px] font-normal uppercase leading-none text-transparent md:text-[22px]"
         style={{ backgroundImage: EYEBROW_GRADIENT }}
       >
         {children}
       </p>
-      <EyebrowRule src="eyebrow-rule-right.svg" width={107} height={14} className="hidden shrink-0 md:block" />
+      <EyebrowRule src="eyebrow-rule-right.svg" width={131} height={17} className="hidden shrink-0 md:block" />
 
       <EyebrowRule src="eyebrow-right.svg" width={127} />
     </div>
