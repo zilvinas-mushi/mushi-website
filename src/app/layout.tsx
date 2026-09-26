@@ -129,15 +129,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     // Absolute URL: required by CLAUDE.md, and relative OG images are ignored
     // by most crawlers. Dimensions are each file's real size — declaring a
-    // 1200x630 that does not exist makes crawlers drop the card.
+    // size that does not exist makes crawlers drop the card.
     //
     // JPEG, not the WebP the rest of the site uses: LinkedIn and iMessage
     // still refuse WebP share cards and fall back to no image at all.
     images: [
       {
         url: abs(OG_IMAGE),
-        width: 1200,
-        height: 630,
+        width: 2400,
+        height: 1260,
         alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
       },
       {

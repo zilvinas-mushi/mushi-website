@@ -248,8 +248,8 @@
     "h": 674
   },
   "og-mushi-wide.jpg": {
-    "w": 1200,
-    "h": 630
+    "w": 2400,
+    "h": 1260
   },
   "og-mushi.jpg": {
     "w": 1200,
@@ -546,6 +546,10 @@
   "templates/inside-monthly-v2.webp": {
     "w": 2000,
     "h": 2700
+  },
+  "templates/inside-support-hd.webp": {
+    "w": 1632,
+    "h": 1156
   },
   "templates/inside-support-phone.webp": {
     "w": 660,
