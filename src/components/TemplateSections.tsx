@@ -1059,10 +1059,14 @@ export function TemplatesComparison() {
           style={
             {
               "--cmp-rows": `44px repeat(${c.rows.length}, 48px)`,
-              // The foot row is 96, not 76 (Žilvinas 2026-09-26, "Get Mushi —
-              // a touch more space above and below"): the ~49-tall pill sits
-              // centred in it, so each side went from ~13 to ~23.
-              "--cmp-rows-md": `80px repeat(${c.rows.length}, 65px) 96px`,
+              // OFF THE ARTBOARD (Žilvinas 2026-09-26, "it was 34 from the
+              // bottom and 44 from the top for Mushi", at the page's 0.9):
+              // the header row is 108 so the centred 29-tall wordmark starts
+              // 39.6 under the card's top (44 x 0.9); the foot row is 105
+              // for the 54.5-tall pill (60.6 x 0.9) sat 31 off the bottom
+              // (34 x 0.9), see the pill's self-end and mb. They were 80
+              // and 96.
+              "--cmp-rows-md": `108px repeat(${c.rows.length}, 65px) 105px`,
             } as CSSProperties
           }
         >
@@ -1195,7 +1199,9 @@ export function TemplatesComparison() {
             // Opens the plan sheet (Žilvinas 2026-09-26, "Get Mushi leads
             // to the login page, it should be the popup").
             data-plan
-            className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-5 py-3 text-[25px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5"
+            // 148 x 54.5: the artboard's 164.13 x 60.6 at the page's 0.9
+            // (Žilvinas 2026-09-26), sat 31 off the card's bottom.
+            className="z-10 col-start-2 hidden h-[54.5px] w-[148px] items-center justify-center self-end justify-self-center whitespace-nowrap rounded-full mb-[31px] md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] text-[25px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white"
             style={{ gridRowStart: lastRow }}
           >
             {/* LIVE TYPE (Žilvinas 2026-09-19, "looks distorted"): the label
