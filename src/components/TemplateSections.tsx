@@ -1058,7 +1058,10 @@ export function TemplatesComparison() {
           style={
             {
               "--cmp-rows": `44px repeat(${c.rows.length}, 48px)`,
-              "--cmp-rows-md": `80px repeat(${c.rows.length}, 65px) 76px`,
+              // The foot row is 96, not 76 (Žilvinas 2026-09-26, "Get Mushi —
+              // a touch more space above and below"): the ~49-tall pill sits
+              // centred in it, so each side went from ~13 to ~23.
+              "--cmp-rows-md": `80px repeat(${c.rows.length}, 65px) 96px`,
             } as CSSProperties
           }
         >
@@ -1574,13 +1577,15 @@ export function TemplatesAccess() {
           // hairs and rounded corners are baked in, so the box carries no
           // radius of its own there). The desktop keeps the rays layer over
           // its gradient.
-          // md: 38 FROM TOP, BOTTOM AND THE CTA'S SIDE (Žilvinas 2026-09-25,
-          // off the artboard's 4 x 38 spacer above the pill): py-[38px]
-          // stands the 65-tall pill in a ~141 banner, and pr-[38px] holds
-          // the same 38 off its right edge — replacing the 18 that had been
-          // matched to the purple card's BUY NOW fill (client 2026-09-12);
-          // the artboard's own number wins. The left keeps its pl-6.
-          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1160px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[image:var(--bg,none)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-auto md:justify-start md:overflow-hidden md:bg-[image:var(--bg-md,none),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:py-[38px] md:pl-6 md:pr-[38px]"
+          // md: 130 TALL (Žilvinas 2026-09-26, "the shape is spread too far
+          // top and bottom, in Figma it is sleeker — height is 40", off the
+          // 22 x 40 spacer between the banner's top edge and the emoji
+          // tile): 40 + the 64.33 tile + 40 is 144 on the artboard, 130 at
+          // the page's 0.9. The pill and the emoji row centre in it, which
+          // puts ~32 either side of the 65-tall pill; it was py-[38px] and
+          // ~141 tall. pr-[38px] still holds the pill 38 off the right
+          // edge (the artboard's 4 x 38 spacer); the left keeps its pl-6.
+          className="relative mx-auto mt-5 flex h-[150px] max-w-[980px] md:max-w-[1160px] flex-col items-start justify-center gap-4 rounded-[18px] bg-[image:var(--bg,none)] bg-cover bg-center p-5 sm:flex-row sm:items-center md:mt-6 md:h-[130px] md:justify-start md:overflow-hidden md:bg-[image:var(--bg-md,none),linear-gradient(100deg,#1c1426_0%,#150f1e_45%,#0d0a12_100%)] md:py-0 md:pl-6 md:pr-[38px]"
           data-bg="url(/images/templates/access-banner-phone.webp)"
           data-bg-md="url(/images/templates/access-rays.webp)"
         >
