@@ -48,6 +48,14 @@ export function HeaderCtaSwap({
 }) {
   const [p, setP] = useState(0);
   const raf = useRef(0);
+  /**
+   * NO SLIDE ON ARRIVAL (Žilvinas 2026-09-26, "when you refresh the page
+   * the animation runs again from Login to Buy Now"): a reload halfway down
+   * the page lands in the Buy Now state, and the column must be drawn
+   * there, not slide there. The transition is only put on the column once
+   * the first measurement has painted.
+   */
+  const [live, setLive] = useState(false);
 
   useEffect(() => {
     const start = document.getElementById(startId)?.closest("section");
@@ -70,12 +78,16 @@ export function HeaderCtaSwap({
     };
 
     update();
+    // Two frames: the first paints the measured state, the second turns
+    // the transition on for everything after it.
+    const arm = requestAnimationFrame(() => requestAnimationFrame(() => setLive(true)));
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       if (raf.current) cancelAnimationFrame(raf.current);
+      cancelAnimationFrame(arm);
     };
   }, [startId, endId]);
 
@@ -89,7 +101,7 @@ export function HeaderCtaSwap({
       style={style}
     >
       <span
-        className="absolute left-0 top-0 block h-[200%] w-full transition-transform duration-700 ease-in-out"
+        className={`absolute left-0 top-0 block h-[200%] w-full ${live ? "transition-transform duration-700 ease-in-out" : ""}`}
         style={{ transform: `translateY(${-(1 - p) * 50}%)` }}
       >
         <a

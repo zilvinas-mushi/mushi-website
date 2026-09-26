@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, LockGlyph, ShieldGlyph } from "./plan-sheet-glyphs";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { APP_URL } from "@/lib/site";
@@ -83,12 +84,20 @@ export function PlanSheet() {
 
   const open = () => {
     window.clearTimeout(closeTimer.current);
-    setStep("plan");
-    setMounted(true);
-    // Two frames so the panel's first paint is at translateY(100%) and the
-    // transition has somewhere to go from — one frame is not always enough
-    // for the browser to have laid it out.
-    requestAnimationFrame(() => requestAnimationFrame(() => setShown(true)));
+    // THE RISE STARTS FROM A FORCED LAYOUT, not from a frame or two of
+    // waiting (Žilvinas 2026-09-26, "there should be animation for that
+    // popup, both desktop and mobile"): flushSync commits the panel at
+    // 100% down right here, reading its box makes the browser compute that
+    // before-change style, and only then is it flipped to 0, so the
+    // transition has a start to run from. Two requestAnimationFrames did
+    // this before, and on iOS they were not always two frames apart, which
+    // left the sheet snapping into place.
+    flushSync(() => {
+      setStep("plan");
+      setMounted(true);
+    });
+    void panelRef.current?.getBoundingClientRect();
+    setShown(true);
   };
   const close = () => {
     setShown(false);
@@ -158,7 +167,12 @@ export function PlanSheet() {
   const plan = c.options.find((o) => o.id === planId) ?? c.options[0];
   const checkout = `${APP_URL}/?plan=${plan.id}`;
   const motion =
-    "transition-[transform,opacity] duration-[560ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform motion-reduce:transition-none";
+    // `translate`, not `transform`: Tailwind's translate-y-* utilities set
+    // the CSS translate property, so a transition on transform never ran
+    // and the sheet SNAPPED into place at both widths (Žilvinas
+    // 2026-09-26, "there should be animation for that popup"). Only the
+    // backdrop's opacity had been fading.
+    "transition-[translate,opacity] duration-[560ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-[translate] motion-reduce:transition-none";
 
   return (
     // DESKTOP GETS IT TOO (Žilvinas 2026-09-25, "where is the popup" —
@@ -201,7 +215,14 @@ export function PlanSheet() {
         // frame was taller than the viewport minus its margins, so the panel
         // scrolled and every focus scrolled it. Now the step is ZOOMED to
         // fit the height (see fit), so the panel never scrolls on a desktop.
-        className={`absolute inset-x-0 bottom-0 max-h-[calc(100dvh-24px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[max(27px,env(safe-area-inset-bottom))] overscroll-contain md:static md:overflow-visible md:rounded-t-[20px] md:shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${
+        // 40 PAST THE BOTTOM EDGE on the phone (Žilvinas 2026-09-26, "there
+        // shouldn't be any gap between Safari's bottom bar and the popup"):
+        // the panel hangs 40 below the viewport, its bottom padding grown
+        // by the same 40, so whatever iOS does with the toolbar and the
+        // fixed box's bottom edge, the sheet's own black is what meets it.
+        // The viewport clips the overhang. From md the panel is static in
+        // the centring flex, so bottom and the padding are reset there.
+        className={`absolute inset-x-0 -bottom-[40px] max-h-[calc(100dvh+16px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[calc(max(27px,env(safe-area-inset-bottom))+40px)] overscroll-contain md:static md:overflow-visible md:rounded-t-[20px] md:shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${
           step === "plan" ? "md:w-[547px] md:pb-0" : "md:w-[776px] md:pb-6"
         } ${motion} ${shown ? "translate-y-0" : "translate-y-full"}`}
         style={{ zoom: fit }}

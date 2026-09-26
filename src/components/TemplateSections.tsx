@@ -1185,6 +1185,9 @@ export function TemplatesComparison() {
               DESKTOP ONLY — see the phone's own button below the grid. */}
           <a
             href={APP_URL}
+            // Opens the plan sheet (Žilvinas 2026-09-26, "Get Mushi leads
+            // to the login page, it should be the popup").
+            data-plan
             className="z-10 col-start-2 hidden self-center justify-self-center whitespace-nowrap rounded-full md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] px-5 py-3 text-[25px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white md:px-5"
             style={{ gridRowStart: lastRow }}
           >
@@ -1468,7 +1471,13 @@ export function TemplatesAccess() {
                 other button (transparent/white -> white/black), with gradient
                 layers in both states so the fill cross-fades. */}
             <a
-              href={BOOKING_URL}
+              // THE PLAN SHEET, not the agency booking (Žilvinas 2026-09-26,
+              // "Try an Alternative should open the popup, now it drops you
+              // at the agency offer"): the alternative to ad creation from
+              // scratch is the template library, so this sells that. The
+              // href is the webapp for no-JavaScript.
+              href={APP_URL}
+              data-plan
               // Phone: Regular 20 with no tracking, a 2 INSIDE stroke and a
               // 15 radius, 24 below the list (artboard 2026-09-06). The
               // desktop reference keeps its 24/1px/12.
