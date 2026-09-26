@@ -17,7 +17,7 @@ import {
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { APP_URL, BOOKING_URL, SITE_NAME, SITE_TAGLINE, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, abs } from "@/lib/site";
+import { APP_URL, BOOKING_URL, OG_IMAGE, SITE_NAME, SITE_TAGLINE, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, abs } from "@/lib/site";
 
 /**
  * hero-burst-phone.webp, read at BUILD time — this is a server component in
@@ -42,13 +42,13 @@ export const metadata: Metadata = {
     title: `Templates — ${SITE_NAME}`,
     description: DESCRIPTION,
     locale: "en_US",
-    // Same interim share image as the home page — see the TODO(og) in
-    // layout.tsx. Swap both together when the designed 1200x630 lands.
+    // The same share card as the home page. JPEG, not WebP: Slack, LinkedIn
+    // and iMessage refuse WebP cards and show nothing at all.
     images: [
       {
-        url: abs("/images/logo-without-bg-white102.webp"),
-        width: 672,
-        height: 199,
+        url: abs(OG_IMAGE),
+        width: 2400,
+        height: 1260,
         alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
       },
     ],
