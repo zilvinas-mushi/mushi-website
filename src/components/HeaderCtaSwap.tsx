@@ -53,9 +53,18 @@ export function HeaderCtaSwap({
    * the animation runs again from Login to Buy Now"): a reload halfway down
    * the page lands in the Buy Now state, and the column must be drawn
    * there, not slide there. The transition is only put on the column once
-   * the first measurement has painted.
+   * the first measurement has painted — and it is TAKEN OFF AGAIN for any
+   * JUMP (same day, "sometimes it still happens"): Chrome restores a
+   * reload's scroll position late, once the deferred artwork below has
+   * laid out, and that restore is a scroll event like any other. So a
+   * change of more than half a screen between two measurements — a
+   * restore, a hash, a Home/End key — is drawn where it lands, and only
+   * scrolling of a human's pace slides the column. lastY is the
+   * position the previous measurement was made at.
    */
   const [live, setLive] = useState(false);
+  const lastY = useRef(0);
+  const arm = useRef(0);
 
   useEffect(() => {
     const start = document.getElementById(startId)?.closest("section");
@@ -71,23 +80,38 @@ export function HeaderCtaSwap({
       const a = start.getBoundingClientRect().top;
       const b = end.getBoundingClientRect().top;
       const prog = b === a ? (a <= line ? 1 : 0) : (line - a) / (b - a);
+      const y = window.scrollY;
+      const jump = Math.abs(y - lastY.current) > window.innerHeight / 2;
+      lastY.current = y;
+      if (jump) {
+        // Both states land in one render: the new position, drawn without
+        // the transition. Two frames later the transition is back on.
+        setLive(false);
+        cancelAnimationFrame(arm.current);
+        arm.current = requestAnimationFrame(() => {
+          arm.current = requestAnimationFrame(() => setLive(true));
+        });
+      }
       setP(Math.min(1, Math.max(0, prog)));
     };
     const schedule = () => {
       if (!raf.current) raf.current = requestAnimationFrame(update);
     };
 
+    lastY.current = window.scrollY;
     update();
     // Two frames: the first paints the measured state, the second turns
     // the transition on for everything after it.
-    const arm = requestAnimationFrame(() => requestAnimationFrame(() => setLive(true)));
+    arm.current = requestAnimationFrame(() => {
+      arm.current = requestAnimationFrame(() => setLive(true));
+    });
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       if (raf.current) cancelAnimationFrame(raf.current);
-      cancelAnimationFrame(arm);
+      cancelAnimationFrame(arm.current);
     };
   }, [startId, endId]);
 
