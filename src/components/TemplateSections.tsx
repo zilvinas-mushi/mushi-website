@@ -1199,9 +1199,11 @@ export function TemplatesComparison() {
             // Opens the plan sheet (Žilvinas 2026-09-26, "Get Mushi leads
             // to the login page, it should be the popup").
             data-plan
-            // 148 x 54.5: the artboard's 164.13 x 60.6 at the page's 0.9
-            // (Žilvinas 2026-09-26), sat 31 off the card's bottom.
-            className="z-10 col-start-2 hidden h-[54.5px] w-[148px] items-center justify-center self-end justify-self-center whitespace-nowrap rounded-full mb-[31px] md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] text-[25px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white"
+            // 164 x 54.5 (Žilvinas 2026-09-26): the height is the artboard's
+            // 60.6 at the page's 0.9, the width its 164.13 as is — at 148
+            // the 25px label left the sides looking pinched ("a bit larger,
+            // it seems narrow from the sides"). Sat 31 off the card's bottom.
+            className="z-10 col-start-2 hidden h-[54.5px] w-[164px] items-center justify-center self-end justify-self-center whitespace-nowrap rounded-full mb-[31px] md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] text-[25px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white"
             style={{ gridRowStart: lastRow }}
           >
             {/* LIVE TYPE (Žilvinas 2026-09-19, "looks distorted"): the label
