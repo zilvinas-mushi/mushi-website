@@ -135,14 +135,14 @@ export function PlanSheet() {
       const h1 = panel.offsetHeight;
       panel.style.height = `${h0}px`;
       void panel.offsetHeight;
-      panel.style.transition = "height 420ms cubic-bezier(0.32, 0.72, 0, 1)";
+      panel.style.transition = "height 480ms cubic-bezier(0.32, 0.72, 0, 1)";
       panel.style.height = `${h1}px`;
       setStepIn(true);
       stepTimer.current = window.setTimeout(() => {
         panel.style.height = "";
         panel.style.transition = "";
-      }, 440);
-    }, 200);
+      }, 500);
+    }, 170);
   };
   const close = () => {
     window.clearTimeout(stepTimer.current);
@@ -275,8 +275,15 @@ export function PlanSheet() {
         ref={panelRef}
       >
         <div
-          className={`transition-[opacity,translate] duration-[260ms] ease-out motion-reduce:transition-none ${
-            stepIn ? "translate-x-0 opacity-100" : step === "plan" ? "-translate-x-3 opacity-0" : "translate-x-3 opacity-0"
+          // Out is quick and small — 170ms, 6px, easing in — and in is
+          // calm and a little longer — 380ms, 14px, on the sheet curve
+          // (Žilvinas 2026-09-26, "premium and subtle, a little more").
+          className={`motion-reduce:transition-none ${
+            stepIn
+              ? "translate-x-0 opacity-100 transition-[opacity,translate] duration-[380ms] ease-[cubic-bezier(0.32,0.72,0,1)]"
+              : step === "plan"
+                ? "-translate-x-[6px] opacity-0 transition-[opacity,translate] duration-[170ms] ease-in"
+                : "translate-x-[14px] opacity-0"
           }`}
         >
         {step === "plan" ? (
