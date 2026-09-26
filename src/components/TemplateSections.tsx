@@ -1,5 +1,6 @@
 import { Fragment, type CSSProperties } from "react";
 import { BgFallback, Img } from "./Img";
+import { CountUp } from "./CountUp";
 import { Logo } from "./Logo";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { APP_URL, BOOKING_URL, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID } from "@/lib/site";
@@ -1420,7 +1421,7 @@ export function TemplatesAccess() {
                 (Žilvinas 2026-09-19, "add like 3 pixels" to the 2). */}
             <p className="mt-[22px] flex items-baseline gap-[5px] md:mt-7 md:gap-1.5">
               <span className="bg-[linear-gradient(180deg,#dd898b_0%,#c5696a_55%,#b65556_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[69px]">
-                {a.scratch.figure}
+                <CountUp value={a.scratch.figure} />
               </span>
               {/* SemiBold 20, no tracking, and tight to the figure — the
                   slash is part of the price, not a separate label. */}
@@ -1535,7 +1536,7 @@ export function TemplatesAccess() {
                   halfway up the 40 and left the chip riding high. */}
               <span className="flex shrink-0 items-baseline gap-[5px] whitespace-nowrap md:gap-1.5">
                 <span className="bg-[linear-gradient(180deg,#a08ade_0%,#9275ce_50%,#7f56b6_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[69px]">
-                  {a.templates.figure}
+                  <CountUp value={a.templates.figure} />
                 </span>
                 {/* 1.5 below the figure's baseline on the phone (Figma). */}
                 <span className="translate-y-[1.5px] text-[20px] font-semibold tracking-normal text-[#9b79e2] md:translate-y-0 md:text-[29px] md:font-semibold">
@@ -2036,7 +2037,8 @@ export function TemplatesInside() {
             data-bg-md="url(/images/templates/inside-support-hd.webp)"
           >
             <p className="relative">
-              <span className={BIG}>{s.support.big}</span>
+              {/* The numbers count up once, on arrival — see CountUp. */}
+              <span className={BIG}><CountUp value={s.support.big} /></span>
               <span className={`${SMALL} block md:mt-1 md:text-[36px]`}>{s.support.small}</span>
             </p>
             {/* No live "Need help?" bubble any more: it spent 2026-09-25
@@ -2089,7 +2091,7 @@ export function TemplatesInside() {
             />
             <IndustryChips />
             <p className="relative">
-              <span className={BIG}>{s.industries.big}</span>
+              <span className={BIG}><CountUp value={s.industries.big} /></span>
               <span className={`${SMALL} block md:mt-1 md:text-[36px]`}>{s.industries.small}</span>
             </p>
           </article>
@@ -2221,7 +2223,7 @@ export function TemplatesInside() {
                   the "0+" and the "mpla"), so on a 75px box whose baseline
                   leaves ~17 under it and a leading-none 33 with ~2 above its
                   ascenders it is a -4 margin. */}
-              <span className={`${BIG} text-[48px]`}>{s.monthly.big}</span>
+              <span className={`${BIG} text-[48px]`}><CountUp value={s.monthly.big} /></span>
               <span className={`${SMALL} block md:-mt-[4px] md:text-[30px]`}>{s.monthly.small}</span>
             </p>
           </article>

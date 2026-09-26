@@ -76,6 +76,16 @@ export function PlanSheet() {
   const closeTimer = useRef(0);
   const panelRef = useRef<HTMLDivElement>(null);
   /**
+   * STEP ONE TO STEP TWO IS A HAND-OFF, NOT A CUT (Žilvinas 2026-09-26,
+   * "after the first step, going to buy should properly do a transition"):
+   * the plan step slides out to the left as it fades (260ms), the panel's
+   * height glides to the payment step's on the sheet curve, and the
+   * payment step slides in from the right. stepIn is false while a step
+   * is off stage; the direction comes from which step is current.
+   */
+  const [stepIn, setStepIn] = useState(true);
+  const stepTimer = useRef(0);
+  /**
    * Desktop only: the step's frame (650 for the plan, 763 for payment)
    * zoomed down just enough to clear the viewport, 1 whenever it fits.
    * Zoom rather than transform so the layout box shrinks with it.
@@ -92,14 +102,50 @@ export function PlanSheet() {
     // transition has a start to run from. Two requestAnimationFrames did
     // this before, and on iOS they were not always two frames apart, which
     // left the sheet snapping into place.
+    window.clearTimeout(stepTimer.current);
     flushSync(() => {
       setStep("plan");
+      setStepIn(true);
       setMounted(true);
     });
+    if (panelRef.current) {
+      panelRef.current.style.height = "";
+      panelRef.current.style.transition = "";
+    }
     void panelRef.current?.getBoundingClientRect();
     setShown(true);
   };
+  const goPay = () => {
+    const panel = panelRef.current;
+    if (!panel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStep("pay");
+      return;
+    }
+    setStepIn(false);
+    window.clearTimeout(stepTimer.current);
+    stepTimer.current = window.setTimeout(() => {
+      // The plan step is off stage. Pin the panel at its height, swap the
+      // step in (still off stage, to the right), measure where the height
+      // wants to be, then let both run: the height on the sheet curve, the
+      // step's own fade and slide on the step's transition.
+      const h0 = panel.offsetHeight;
+      panel.style.height = `${h0}px`;
+      flushSync(() => setStep("pay"));
+      panel.style.height = "";
+      const h1 = panel.offsetHeight;
+      panel.style.height = `${h0}px`;
+      void panel.offsetHeight;
+      panel.style.transition = "height 420ms cubic-bezier(0.32, 0.72, 0, 1)";
+      panel.style.height = `${h1}px`;
+      setStepIn(true);
+      stepTimer.current = window.setTimeout(() => {
+        panel.style.height = "";
+        panel.style.transition = "";
+      }, 440);
+    }, 200);
+  };
   const close = () => {
+    window.clearTimeout(stepTimer.current);
     setShown(false);
     closeTimer.current = window.setTimeout(() => setMounted(false), OPEN_MS);
   };
@@ -228,6 +274,11 @@ export function PlanSheet() {
         style={{ zoom: fit }}
         ref={panelRef}
       >
+        <div
+          className={`transition-[opacity,translate] duration-[260ms] ease-out motion-reduce:transition-none ${
+            stepIn ? "translate-x-0 opacity-100" : step === "plan" ? "-translate-x-3 opacity-0" : "translate-x-3 opacity-0"
+          }`}
+        >
         {step === "plan" ? (
           // 24 from the sheet's top to the title and 24 from the title to
           // the first row; 15 between rows (Žilvinas 2026-09-25, off the
@@ -331,7 +382,7 @@ export function PlanSheet() {
 
             <button
               type="button"
-              onClick={() => setStep("pay")}
+              onClick={goPay}
               // Poppins Medium, 18 for the label and 14 for "/month" at 50%
               // white, off the inspector (Žilvinas 2026-09-25). The 50% is
               // an opacity rather than a colour so it still inverts with the
@@ -548,6 +599,7 @@ export function PlanSheet() {
             </p>
           </form>
         )}
+        </div>
       </div>
     </div>
   );
