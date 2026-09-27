@@ -2584,7 +2584,7 @@ function AppWindow() {
     // where the 2400px master is still above 1x.
     // md:mt-[45px]: the artboard's 64 from button to device, at the same 0.7
     // the button itself is drawn at (see the CTA in TemplatesHero).
-    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[45px] md:min-h-0 md:flex-1 md:max-w-[1440px]">
+    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[45px] md:min-h-0 md:flex-1 md:max-w-[1440px] md:[container-type:size]">
       {/* The device box. The tile field is inset-y-0 INSIDE it (Žilvinas
           2026-09-25, closing the day: "now it is 86 and 81, make the same"
           — measured against the MAC's edges, which is what the eye
@@ -2594,8 +2594,15 @@ function AppWindow() {
           same thing whenever the height bound — but wherever the 1440px
           width cap left a band under the device, the fold-centred pair
           hung a few px low of the mac's own middle, and that offset is
-          exactly the 86-vs-81 the client measured. */}
-      <div className="md:relative md:mx-auto md:aspect-[2400/1503] md:max-h-full md:max-w-full">
+          exactly the 86-vs-81 the client measured.
+          THE WIDTH IS WORKED OUT, NOT LEFT TO aspect-ratio (2026-09-27):
+          max-h-full + max-w-full let Chrome carry the height cap across
+          the ratio into the width, but Safari does not — it gave the box
+          the full width at the capped height and stretched the MacBook
+          edge to edge. The row is a size container now and the box's
+          width is min(its width, its height x 2400/1503), which every
+          engine computes the same. */}
+      <div className="md:relative md:mx-auto md:aspect-[2400/1503] md:w-[min(100cqw,calc(100cqh*2400/1503))]">
       <CategoryTiles />
       <PhoneTiles />
 
