@@ -16,6 +16,10 @@ import { useEffect, useRef, useState } from "react";
  * - SMALL NUMBERS DO NOT COUNT. 0-1-2-3-4-5 in a second is a slot machine;
  *   anything under 20 only gets the fade-up.
  * - Tabular figures hold the width, so nothing around it shifts.
+ * - A GRADIENT FIGURE PASSES ITS CLASSES IN as `className`, never as a
+ *   wrapper: this span is an inline-block, and a parent's
+ *   `bg-clip-text text-transparent` does not paint through an atomic
+ *   inline — every figure rendered as nothing (2026-09-27).
  *
  * `value` is the finished string — "24/7", "-520 hours", "$5", "50+ NEW".
  * The first run of digits is what counts; everything around it (the sign,
