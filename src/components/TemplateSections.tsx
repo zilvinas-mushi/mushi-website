@@ -69,21 +69,29 @@ export function TemplatesHero() {
           shell's pb-2 plus its rounding) is part of that measurement. */}
       {/* tpl-scale: the text block at the page's 0.8 from md up. The device
           row under it is not inside it — see AppWindow. */}
-      {/* DESKTOP: LOWER, AND BOTH A SIZE UP (Žilvinas 2026-10-04: the badge
-          looked "punished", shoved up under the header where nobody reads
-          it, and the headline wanted to be a touch bigger and further down).
-          The block starts 64 down instead of 44, the badge's type is 17 in a
-          roomier pill instead of 14, and the headline is 62/66 instead of
-          56/60 — all before the 0.8 zoom. It costs the device ~35px of
-          height, since the row under this takes what the text leaves. The
-          phone is its own artboard and is untouched. */}
-      <div className={`${SHELL} tpl-scale relative z-[1] shrink-0 pt-[2.375rem] text-center md:pt-[64px]`}>
+      {/* DESKTOP: THE HOME HERO'S RHYTHM, ON THE HOME HERO'S UNIT (Žilvinas
+          2026-10-04, twice: the badge looked "punished", shoved up under the
+          header where nobody reads it, and the headline wanted to be bigger
+          and further down — and a flat 44 -> 64 / 14 -> 17 / 56 -> 62 was
+          "not good enough"). Those were fixed px, so on any window past
+          1280 the block stayed the size of a small laptop's while the header
+          and the button beside it grew.
+
+          So the block is drawn in --hero-u now, like the button already is
+          (through --tpl-hero-u, which undoes the 0.8 zoom): 0.83 down to the
+          badge, 0.21 of badge type, 0.26 to the headline, a 0.75 headline —
+          the home hero's eyebrow sits 0.8 down in 0.21 type over a 0.84
+          headline. The old px are the floors, so nothing is smaller than it
+          was. --hero-u is height-capped, so a short window tightens the text
+          before it squeezes the device; the row under this still takes what
+          the text leaves. The phone is its own artboard and is untouched. */}
+      <div className={`${SHELL} tpl-scale relative z-[1] shrink-0 pt-[2.375rem] text-center md:pt-[max(64px,calc(var(--tpl-hero-u)*0.83))]`}>
         {/* Gradient-ringed chip, not the home hero's frosted white pill. Ring
             and text share ONE purple-to-salmon gradient, sampled from the
             zoomed badge reference (2026-09-03) — the ring via the
             --agb-gradient override, the text via background-clip. */}
         <span
-          className="tpl-badge animated-gradient-border inline-flex items-center rounded-[50px] bg-[#0d0a14]/80 px-5 py-2 md:px-6 md:py-2.5"
+          className="tpl-badge animated-gradient-border inline-flex items-center rounded-[50px] bg-[#0d0a14]/80 px-5 py-2 md:px-[max(24px,calc(var(--tpl-hero-u)*0.3))] md:py-[max(10px,calc(var(--tpl-hero-u)*0.12))]"
           // Radius 50, and a 2-weight stroke ON THE PHONE (.tpl-badge in
           // globals.css — the desktop reference keeps the ring's 1px). Figma
           // calls the stroke "Outside"; the ring is masked INSIDE the box
@@ -93,8 +101,8 @@ export function TemplatesHero() {
         >
           <span
             // Poppins Medium 15 on the phone (artboard 2026-09-06); desktop
-            // is 17, up from the reference's 14 — see the note on the block.
-            className="tpl-badge-text bg-clip-text text-[15px] font-medium tracking-[0.02em] text-transparent md:text-[17px]"
+            // is 0.21 of the hero unit, floor 17 — see the note on the block.
+            className="tpl-badge-text bg-clip-text text-[15px] font-medium tracking-[0.02em] text-transparent md:text-[length:max(17px,calc(var(--tpl-hero-u)*0.21))]"
             style={{ backgroundImage: BADGE_GRADIENT }}
           >
             {TEMPLATES_PAGE.badge}
@@ -104,11 +112,12 @@ export function TemplatesHero() {
         {/* The only <h1> on the page. Figma typography panel (2026-09-03):
             Poppins SemiBold 80/80 (leading 1.0), 0% letter spacing, centred —
             so no tracking-tight, and 80px at the desktop reference width.
-            62/66 here since 2026-10-04 (was 56/60), with the measure widened
-            from 680 to 780 so it still breaks after "Shortcut". */}
+            0.75 of the hero unit here since 2026-10-04 (floor 62; it was a
+            flat 56/60), and the measure is in em so it still breaks after
+            "Shortcut" at every size. */}
         <h1
           id="templates-heading"
-          className="mx-auto mt-6 max-w-[1000px] text-balance text-[28px] font-semibold leading-none sm:text-[38px] md:mt-5 md:max-w-[780px] lg:text-[62px] lg:leading-[66px]"
+          className="mx-auto mt-6 max-w-[1000px] text-balance text-[28px] font-semibold leading-none sm:text-[38px] md:mt-[max(20px,calc(var(--tpl-hero-u)*0.26))] md:max-w-[12.6em] lg:text-[length:max(62px,calc(var(--tpl-hero-u)*0.75))] lg:leading-[1.065]"
         >
           {TEMPLATES_PAGE.heading}
         </h1>
