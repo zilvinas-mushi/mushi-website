@@ -75,7 +75,7 @@ When you build anything new:
   call to action, and flipping that much area to white flashes the whole block.
   Only its "View More" cluster reacts, and only with a small opacity fade.
 - **A second exception: the two arrow pills** — the creatives "Yes" and the
-  final card's "15 Minute Fit-Check". They do not go white. The violet and the
+  final card's "30 Minute Fit-Check". They do not go white. The violet and the
   arrow disc's #222222 trade places instead: on hover the button takes the
   disc's grey and the disc takes the button's violet, so the same two colours
   are still on screen in the same amounts, just swapped. Label and arrow stay

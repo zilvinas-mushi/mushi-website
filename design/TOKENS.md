@@ -106,7 +106,7 @@ lighten/darken. Two rules follow from it:
 | --- | --- | --- |
 | 15 | 48 | Default for cards, images, panels — **the house radius** |
 | 5 | 30 | Small chips, tags, inline badges |
-| 100 | 11 | Pills — buttons, "15 MINUTE FIT-CHECK" style CTAs |
+| 100 | 11 | Pills — buttons, "30 MINUTE FIT-CHECK" style CTAs |
 | 20 | 8 | Large panels |
 | 16 | 3 | Occasional card |
 | 30 / 50 / 10 | 2 / 2 / 1 | One-offs; prefer the values above |
@@ -538,7 +538,7 @@ Both blocks break where the design breaks them, as `block` spans rather than
 
 - Heading: **"You scrolled so far."** alone, then "You want this. Trust us."
 - Sub: "We have a cap. We don't know if you're the right fit yet." /
-  "But we'd love to find out in 15 minutes."
+  "But we'd love to find out in 30 minutes."
 
 ### Fill
 

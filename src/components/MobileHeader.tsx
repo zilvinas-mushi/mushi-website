@@ -186,7 +186,7 @@ const TAU_MS = 110;
  *     SPAN_PX of further scrolling. The two still swap — the CTA starts
  *     moving on the frame the pill starts disappearing — but the CTA outlasts
  *     it rather than finishing with it.
- *   - It goes back in as the final card's "15 Minute Fit-Check" pill arrives:
+ *   - It goes back in as the final card's "30 Minute Fit-Check" pill arrives:
  *     untouched when that pill's top touches the bottom of the screen, and
  *     then over the same SPAN_PX.
  *     From there down the page is already asking in a pill of its own, and a

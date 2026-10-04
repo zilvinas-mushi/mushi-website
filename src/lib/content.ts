@@ -341,7 +341,7 @@ export const HERO = {
   subLines: HERO_SUB_LINES,
   subParts: HERO_SUB_PARTS,
   sub: HERO_SUB_LINES.join(" "),
-  primaryCta: "15 Minute Fit-Check",
+  primaryCta: "30 Minute Fit-Check",
   secondaryCta: "Steal Our Secrets",
   /**
    * OFF while there is nothing behind it (Noah 2026-08-19). The copy and the
@@ -897,7 +897,7 @@ export const FINAL_CTA = {
   heading: "You scrolled so far. You want this. Trust us.",
   /** The design breaks after the first sentence — "You scrolled so far." alone. */
   headingLines: ["You scrolled so far.", "You want this. Trust us."],
-  sub: "We have a cap. We don't know if you're the right fit yet. But we'd love to find out in 15 minutes.",
+  sub: "We have a cap. We don't know if you're the right fit yet. But we'd love to find out in 30 minutes.",
   /**
    * One sentence per line — the phone card's three breaks. The desktop card is
    * wide enough to carry the first two on one line, which is the break the
@@ -906,9 +906,9 @@ export const FINAL_CTA = {
   subLines: [
     "We have a cap.",
     "We don't know if you're the right fit yet.",
-    "But we'd love to find out in 15 minutes.",
+    "But we'd love to find out in 30 minutes.",
   ],
-  cta: "15 Minute Fit-Check",
+  cta: "30 Minute Fit-Check",
   scarcity: "2/10 client spots left for 2026",
 } as const;
 

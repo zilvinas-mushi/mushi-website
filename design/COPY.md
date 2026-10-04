@@ -35,7 +35,7 @@ banger creatives, landing pages, and strategy - all led by us, under one roof."
 - Sub: Weekly research, scripting, creator sourcing, editing, and angle testing for Meta, TikTok, and YouTube ads.
   - Desktop two lines: `Weekly research, scripting, creator sourcing, editing,` /
     `and angle testing for Meta, TikTok, and YouTube ads.`
-- CTA primary: 15 MINUTE FIT-CHECK
+- CTA primary: 30 MINUTE FIT-CHECK
 - CTA secondary: STEAL OUR SECRETS
 
 Floating proof chips around the hero visual:
@@ -156,8 +156,8 @@ wider than the card, so breaking there wrapped it onto a third line and left
 ## Final CTA
 
 - **You scrolled so far. You want this. Trust us.**
-- We have a cap. We don't know if you're the right fit yet. But we'd love to find out in 15 minutes.
-- CTA: 15 Minute Fit-Check
+- We have a cap. We don't know if you're the right fit yet. But we'd love to find out in 30 minutes.
+- CTA: 30 Minute Fit-Check
 - Scarcity note: 2/10 client spots left for 2026
 
 ## Footer

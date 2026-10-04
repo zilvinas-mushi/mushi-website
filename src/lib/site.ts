@@ -56,12 +56,12 @@ export const abs = (path: string) =>
  * Booking destination for every fit-check CTA.
  *
  * There is no server, so scheduling has to be an external link or embed
- * (CLAUDE.md). This is the real scheduler — iClosed's "Introduction Call", 30
+ * (CLAUDE.md). This is the real scheduler — Calendly's mushiagency/call, 30
  * minutes — and every CTA on the site reads from here: the header's Book a
  * Call, the hero's fit-check, the creatives "Yes", the final card's pill and
  * the footer's Redeem. One line changes all of them.
  */
-export const BOOKING_URL = "https://app.iclosed.io/e/mushi/introduction";
+export const BOOKING_URL = "https://calendly.com/mushiagency/call";
 
 /**
  * Anchor the booking CTAs land on until BOOKING_URL points at a real
@@ -82,7 +82,7 @@ export const BOOKING_ANCHOR = "book-a-call";
 export const CREATIVES_CTA_ID = "creatives-yes";
 
 /**
- * DOM id on the final card's "15 Minute Fit-Check" pill.
+ * DOM id on the final card's "30 Minute Fit-Check" pill.
  *
  * The other end of the same contract as CREATIVES_CTA_ID: the "Yes" pill
  * leaving the top of the screen is what BRINGS the phone header's Schedule a
