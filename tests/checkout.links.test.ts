@@ -59,6 +59,13 @@ describe("the plan sheet", () => {
     expect(sheet).toMatch(/<a\s+href=\{checkout\}/);
   });
 
+  it("opens by itself on /templates#buy, once the page has finished painting", () => {
+    expect(sheet).toContain('export const BUY_HASH = "#buy";');
+    expect(sheet).toContain("if (window.location.hash !== BUY_HASH) return;");
+    // It waits for the paint gate's signal rather than opening over the veil.
+    expect(sheet).toMatch(/attributeFilter: \["data-ready"\]/);
+  });
+
   it("no longer hands the purchase to the webapp", () => {
     expect(sheet).not.toContain("?plan=");
   });

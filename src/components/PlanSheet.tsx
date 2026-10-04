@@ -47,6 +47,9 @@ import { APP_URL } from "@/lib/site";
  */
 const OPEN_MS = 560;
 
+/** The address that opens the sheet on arrival: `/templates#buy`. The webapp links to it. */
+export const BUY_HASH = "#buy";
+
 /**
  * The struck-through old price, in the frame's red ramp: #DE8A8B at 0%,
  * #B55456 from 40%, running top-left to bottom-right (the inspector's
@@ -132,6 +135,32 @@ export function PlanSheet() {
     }
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
+  }, []);
+
+  // ARRIVING AT /templates#buy OPENS THE SHEET (Žilvinas 2026-10-04): it is
+  // where the webapp's "Create an Account" sends someone who has no account —
+  // they came to buy, so they land on the plans rather than on the hero. It
+  // waits for the paint gate, so the sheet rises over a finished page and
+  // never over the veil; the gate's own 4s limit bounds the wait.
+  useEffect(() => {
+    if (window.location.hash !== BUY_HASH) return;
+    const root = document.documentElement;
+    let opened = false;
+    const whenReady = () => {
+      if (opened || !root.hasAttribute("data-ready")) return;
+      opened = true;
+      seen.disconnect();
+      open();
+    };
+    const seen = new MutationObserver(whenReady);
+    seen.observe(root, { attributes: true, attributeFilter: ["data-ready"] });
+    // Already painted (a navigation inside the site): the next frame, not
+    // this effect's own body.
+    const frame = requestAnimationFrame(whenReady);
+    return () => {
+      seen.disconnect();
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   useEffect(() => {
