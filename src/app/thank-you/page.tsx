@@ -43,7 +43,9 @@ export default function ThankYouPage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
       <script dangerouslySetInnerHTML={{ __html: REQUIRE_SESSION }} />
-      <Logo className="h-7 w-auto" />
+      {/* The wordmark is TYPE, so it is sized with a font-size: 38 on the
+          phone, as in the phone header, and 48 from md up. */}
+      <Logo className="text-[2.375rem] md:text-[3rem]" />
       <h1 className="mt-10 text-[32px] font-semibold leading-tight text-white md:text-[44px]">
         Thank you. Your account is ready.
       </h1>
