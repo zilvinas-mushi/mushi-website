@@ -102,8 +102,9 @@ export function PlanSheet() {
   const [fit, setFit] = useState(1);
 
   const open = () => {
-    // The buyer has asked for the sheet: start fetching Stripe.js now, so the
-    // payment step's fields are ready by the time they get to it.
+    // The buyer has asked for the sheet. Stripe.js is usually here already
+    // (see the intent listener below); the payment step itself mounts with
+    // the sheet and loads behind the plan step.
     preloadStripe();
     window.clearTimeout(closeTimer.current);
     // THE RISE STARTS FROM A FORCED LAYOUT, not from a frame or two of
@@ -170,8 +171,23 @@ export function PlanSheet() {
       e.preventDefault();
       open();
     }
+    // STRIPE.JS STARTS ON INTENT, a moment before the click: the pointer
+    // arriving on a Buy button, a finger landing on it, or focus reaching
+    // it. Still never with the page — a visitor who goes nowhere near a
+    // Buy button fetches nothing from Stripe.
+    function onIntent(e: Event) {
+      if ((e.target as Element).closest?.("a[data-plan]")) preloadStripe();
+    }
     document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
+    document.addEventListener("pointerover", onIntent, { passive: true });
+    document.addEventListener("touchstart", onIntent, { passive: true });
+    document.addEventListener("focusin", onIntent);
+    return () => {
+      document.removeEventListener("click", onClick);
+      document.removeEventListener("pointerover", onIntent);
+      document.removeEventListener("touchstart", onIntent);
+      document.removeEventListener("focusin", onIntent);
+    };
   }, []);
 
   // ARRIVING AT /templates#buy OPENS THE SHEET (Žilvinas 2026-10-04): it is
@@ -321,7 +337,7 @@ export function PlanSheet() {
           // Out is quick and small — 170ms, 6px, easing in — and in is
           // calm and a little longer — 380ms, 14px, on the sheet curve
           // (Žilvinas 2026-09-26, "premium and subtle, a little more").
-          className={`motion-reduce:transition-none ${
+          className={`relative motion-reduce:transition-none ${
             stepIn
               ? "translate-x-0 opacity-100 transition-[opacity,translate] duration-[380ms] ease-[cubic-bezier(0.32,0.72,0,1)]"
               : step === "plan"
@@ -329,7 +345,7 @@ export function PlanSheet() {
                 : "translate-x-[14px] opacity-0"
           }`}
         >
-        {step === "plan" ? (
+        {step === "plan" && (
           // 24 from the sheet's top to the title and 24 from the title to
           // the first row; 15 between rows (Žilvinas 2026-09-25, off the
           // artboard's spacers).
@@ -456,8 +472,33 @@ export function PlanSheet() {
               {c.includes}
             </p>
           </div>
-        ) : (
-          <div className="px-[25px] pt-[22px] md:px-[31px] md:pt-[35px]">
+        )}
+        {/* THE PAYMENT STEP IS IN THE SHEET FROM THE MOMENT IT OPENS
+            (Žilvinas 2026-10-04, "this is where sales are lost, because it
+            loads long"). It used to be rendered when Buy was pressed, and
+            only then did the session, Stripe's checkout and its card fields
+            start — 1.5s on a good day, during which the fields were a
+            picture of fields that could not be clicked and Submit was dead.
+
+            Now it is rendered behind the plan step and loads while the
+            buyer is reading the plans, so pressing Buy only has to SHOW it.
+            Behind means: out of flow, see-through, inert, and clipped to the
+            plan step's own box so it adds nothing to the panel's height or
+            scroll — but NOT display:none and not a zero-height box, because
+            Stripe will not draw into a box with no size and a browser does
+            not render an iframe that is clipped away entirely. It is given
+            the width it will have (the panel's on a phone, the 776 frame on
+            a desktop), since Stripe arranges its fields by width.
+
+            A different plan picked on step one remounts StripePay (its key)
+            and starts that plan's session; the webapp's endpoint only
+            creates a Stripe session, which costs nothing and expires. */}
+        <div
+          className={step === "plan" ? "pointer-events-none absolute inset-0 overflow-hidden opacity-0" : undefined}
+          inert={step === "plan"}
+          aria-hidden={step === "plan" ? true : undefined}
+        >
+          <div className={`px-[25px] pt-[22px] md:px-[31px] md:pt-[35px] ${step === "plan" ? "md:w-[776px]" : ""}`}>
             {/* Summary: the billing line with the discount pill, then the
                 total with the struck old price. */}
             {/* "Billed yearly" is pinned to the TOTAL, not the pill: 7 above
@@ -484,7 +525,7 @@ export function PlanSheet() {
             <div className="relative mt-[4px] flex items-center justify-between md:mt-[5px]">
               <span className="absolute bottom-[calc(100%-2px)] left-0 text-[13px] leading-none text-white/45 md:bottom-[calc(100%+2px)] md:text-[18px]">{plan.billing}</span>
               {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
-              <h2 id="plan-sheet-title" className="text-[20px] font-semibold leading-none text-white md:text-[29px]">
+              <h2 id={step === "pay" ? "plan-sheet-title" : undefined} className="text-[20px] font-semibold leading-none text-white md:text-[29px]">
                 {c.pay.totalLabel}
               </h2>
               <span className="flex items-center gap-[11px]">
@@ -498,8 +539,8 @@ export function PlanSheet() {
             </div>
 
             {/* The card fields, the email and Submit: Stripe's own fields in
-                the sheet's clothes — see StripePay. Keyed by plan, so going
-                back and choosing another plan starts a session for THAT plan. */}
+                the sheet's clothes — see StripePay. Keyed by plan, so
+                choosing another plan starts a session for THAT plan. */}
             <StripePay
               key={plan.id}
               planId={plan.id as PlanId}
@@ -603,7 +644,7 @@ export function PlanSheet() {
               </a>
             </p>
           </div>
-        )}
+        </div>
         </div>
       </div>
     </div>

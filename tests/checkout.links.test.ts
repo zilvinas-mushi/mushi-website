@@ -109,8 +109,20 @@ describe("the plan sheet", () => {
     expect(sheet).toContain("const hosted = checkoutUrl(plan.id as PlanId);");
     expect(sheet).toMatch(/<a\s+href=\{hosted\}/);
     expect(sheet).toContain("fallbackHref={(email) => checkoutUrl(plan.id as PlanId, undefined, email || undefined)}");
-    expect(pay).toContain('if (state === "unavailable") {');
+    expect(pay).toContain('if (stateNow.current === "unavailable") {');
     expect(pay).toContain("window.location.href = fallbackHref(email);");
+  });
+
+  it("loads the payment step behind the plan step, and leaves nothing dead while it does", () => {
+    // Rendered with the sheet, not when Buy is pressed: hidden, inert, sized.
+    expect(sheet).toContain('{step === "plan" && (');
+    expect(sheet).toContain('inert={step === "plan"}');
+    // Submit is never disabled for loading — it holds the press instead.
+    expect(pay).toContain("disabled={busy}");
+    expect(pay).not.toContain('disabled={state === "loading"');
+    expect(pay).toContain("await settledOnce.current;");
+    // A press on the stand-in fields is honoured when Stripe's arrive.
+    expect(pay).toContain('if (next === "ready" && wantsFocus.current) element?.focus();');
   });
 
   it("shows three card fields and nothing else: no country selector, mandate line or Link sign-up", () => {

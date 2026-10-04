@@ -19,9 +19,18 @@ import type { PlanId } from "@/lib/pricing";
  * before took digits and sent them nowhere; a card number may only ever be
  * typed into Stripe's own fields.
  *
- * NOTHING LOADS UNTIL THIS MOUNTS. Stripe.js and the session are fetched when
- * the buyer reaches the payment step, never with the page — the first screen
- * owes them nothing (CLAUDE.md, the paint gate).
+ * NOTHING LOADS UNTIL THIS MOUNTS, AND IT MOUNTS WITH THE SHEET — behind the
+ * plan step, so the session, Stripe's checkout and its fields load while the
+ * buyer is choosing a plan and are simply there when Buy is pressed
+ * (PlanSheet.tsx). Never with the page: the first screen owes them nothing
+ * (CLAUDE.md, the paint gate).
+ *
+ * NOTHING HERE IS DEAD WHILE IT LOADS (Žilvinas 2026-10-04, "you cannot
+ * select card parts", "it did not let me press Complete purchase"). If the
+ * buyer does get here first — a fast click, a slow network — a press on the
+ * stand-in fields is remembered and the real field takes focus the moment it
+ * is in, and Submit is never disabled for loading: it holds the press and
+ * carries on once the fields are ready.
  *
  * IT CANNOT STRAND A BUYER. If the webapp or Stripe.js cannot be reached the
  * fields give way to one line saying so, and Submit goes to the plan's
@@ -185,6 +194,13 @@ export function StripePay({
   const linkMount = useRef<HTMLDivElement>(null);
   const actions = useRef<StripeCheckoutLoadActionsSuccess | null>(null);
   const country = useRef<string | null>(null);
+  // What the load has come to, for code that outlives a render (a Submit
+  // that is waiting for it), and the promise such code waits on.
+  const stateNow = useRef<State>("loading");
+  const settledOnce = useRef<Promise<void>>(Promise.resolve());
+  // The buyer pressed the stand-in fields before Stripe's were in.
+  const [wanted, setWanted] = useState(false);
+  const wantsFocus = useRef(false);
 
   useEffect(() => {
     let gone = false;
@@ -192,13 +208,22 @@ export function StripePay({
     let element: StripePaymentElement | null = null;
     let express: StripeCheckoutExpressCheckoutElement | null = null;
 
+    let release = () => {};
+    stateNow.current = "loading";
+    settledOnce.current = new Promise<void>((resolve) => (release = resolve));
+
     // Whichever comes first decides it: the fields are ready, something
     // failed, or the wait ran out.
     const settle = (next: State) => {
       if (gone || settled) return;
       settled = true;
       window.clearTimeout(limit);
+      stateNow.current = next;
       setState(next);
+      release();
+      // The press the stand-in took is honoured now.
+      if (next === "ready" && wantsFocus.current) element?.focus();
+      wantsFocus.current = false;
     };
     const limit = window.setTimeout(() => {
       console.error("[checkout] the in-sheet payment form did not load in time");
@@ -287,6 +312,8 @@ export function StripePay({
     return () => {
       gone = true;
       window.clearTimeout(limit);
+      // Nobody is left waiting on a load that has been abandoned.
+      release();
       actions.current = null;
       element?.destroy();
       express?.destroy();
@@ -308,12 +335,24 @@ export function StripePay({
       return;
     }
 
-    if (state === "unavailable") {
+    if (busy) return;
+    // PRESSED BEFORE THE FIELDS WERE IN: the press is held, not refused. The
+    // button shows it is working, and this carries on when the load settles
+    // one way or the other (LOAD_LIMIT_MS bounds it).
+    if (stateNow.current === "loading") {
+      setBusy(true);
+      setError(null);
+      await settledOnce.current;
+    }
+    if (stateNow.current === "unavailable") {
       window.location.href = fallbackHref(email);
       return;
     }
     const checkout = actions.current;
-    if (state !== "ready" || !checkout || busy) return;
+    if (stateNow.current !== "ready" || !checkout) {
+      setBusy(false);
+      return;
+    }
 
     setBusy(true);
     setError(null);
@@ -373,9 +412,19 @@ export function StripePay({
               while Stripe draws its own, this stand-in holds their exact
               shape and placeholders, and is lifted off when they are ready —
               nothing appears late and nothing below it moves. */}
+          {/* A PRESS ON IT IS KEPT: the number row takes the field's ring at
+              once and Stripe's own field takes focus when it arrives, so a
+              buyer quicker than the load does not meet a dead picture. */}
           {state === "loading" && (
-            <div aria-hidden="true" className="flex flex-col gap-[2px] text-[18px] leading-[23px] text-white/50 md:gap-[3.2px] md:text-[22.4px] md:leading-[27.2px]">
-              <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">1234 1234 1234 1234</div>
+            <div
+              aria-hidden="true"
+              onPointerDown={() => {
+                wantsFocus.current = true;
+                setWanted(true);
+              }}
+              className="flex cursor-text flex-col gap-[2px] text-[18px] leading-[23px] text-white/50 md:gap-[3.2px] md:text-[22.4px] md:leading-[27.2px]"
+            >
+              <div className={`rounded-[10px] bg-[#222222] px-4 py-[11px] md:rounded-[15px] md:px-[22.4px] md:py-[14.4px] ${wanted ? "shadow-[inset_0_0_0_2px_#8b6ad6]" : ""}`}>1234 1234 1234 1234</div>
               <div className="grid grid-cols-2 gap-[2px] md:gap-[3.2px]">
                 <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">MM / YY</div>
                 <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">CVC</div>
@@ -419,7 +468,9 @@ export function StripePay({
 
       <button
         type="submit"
-        disabled={state === "loading" || busy}
+        // Disabled only while a press is being worked on — never for
+        // loading, which would make it a button that does nothing.
+        disabled={busy}
         className={`mt-[27px] flex h-[50px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium disabled:cursor-wait disabled:opacity-60 md:mt-[34px] md:h-[62px] md:rounded-[15px] md:text-[24px] md:font-medium ${submitClass}`}
       >
         {labels.submit}
