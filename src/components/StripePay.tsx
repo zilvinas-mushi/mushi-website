@@ -51,8 +51,9 @@ function appearance(desktop: boolean): Appearance {
       colorDanger: "#de8a8b",
       fontFamily: "Poppins, system-ui, sans-serif",
       fontSizeBase: desktop ? "14px" : "18px",
-      // ONE BLOCK WITH SEAMS: square fields 2px apart, and the block's own
-      // rounded corners come from the box they are mounted in.
+      // ONE BLOCK WITH SEAMS: fields 2px apart inside a rounded box. The
+      // seams are drawn by the sheet (see the mount box); the fields carry
+      // the block's corner radius themselves, for the focus ring below.
       borderRadius: "0px",
       gridRowSpacing: "2px",
       gridColumnSpacing: "2px",
@@ -62,16 +63,30 @@ function appearance(desktop: boolean): Appearance {
         border: "0",
         boxShadow: "none",
         backgroundColor: "#222222",
+        // The block's radius: 10 on a phone, 15 on desktop (÷1.6, see above).
+        borderRadius: desktop ? "9.375px" : "10px",
         padding: desktop ? "9px 14px" : "11px 16px",
         lineHeight: desktop ? "17px" : "23px",
       },
-      // No ring on the field itself: its corners are square and the block's
-      // rounded corners would cut it. The ring is drawn around the WHOLE
-      // block, in the sheet (see `focused`); the field in use just lifts.
-      ".Input:focus": { boxShadow: "none", backgroundColor: "#2b2b2b" },
-      ".Input--invalid": { color: "#de8a8b" },
+      // THE RING IS ON THE FIELD IN USE, NOT ON THE BLOCK (Žilvinas
+      // 2026-10-04, "why the selection is for all combined section"), and it
+      // has all its corners (same day, "you see no corners"). Stripe offers no
+      // way to style one field differently from the next, so every field is
+      // given the BLOCK's corner radius: at the block's outer corners the
+      // ring then runs exactly along the box's own curve instead of being cut
+      // by it. Unfocused, the rounding is invisible — the box behind the
+      // fields is the same grey.
+      ".Input:focus": { boxShadow: `inset 0 0 0 ${desktop ? "1.25px" : "2px"} #8b6ad6` },
+      // A field Stripe has refused wears the same ring in the error colour.
+      // WHAT is wrong is said once, by the sheet's own alert under the email
+      // — Stripe's line under each field is collapsed, like its labels: two
+      // voices saying the same thing in two styles looked broken.
+      ".Input--invalid": { color: "#de8a8b", boxShadow: `inset 0 0 0 ${desktop ? "1.25px" : "2px"} rgba(222,138,139,0.6)` },
       ".Label": { fontSize: "0px", lineHeight: "0px", margin: "0", padding: "0", opacity: "0" },
-      ".Error": { color: "#de8a8b", fontSize: desktop ? "10px" : "13px" },
+      // The -4px takes back the 4px Stripe still leaves above a collapsed
+      // error line, so a refused field does not push the row under it down
+      // and off the seams.
+      ".Error": { fontSize: "0px", lineHeight: "0px", margin: "0px", marginTop: "-4px", padding: "0px", opacity: "0" },
     },
   };
 }
@@ -166,7 +181,6 @@ export function StripePay({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [link, setLink] = useState(false);
-  const [focused, setFocused] = useState(false);
   const mount = useRef<HTMLDivElement>(null);
   const linkMount = useRef<HTMLDivElement>(null);
   const actions = useRef<StripeCheckoutLoadActionsSuccess | null>(null);
@@ -232,12 +246,6 @@ export function StripePay({
       });
       element.on("ready", () => settle("ready"));
       element.on("loaderror", () => settle("unavailable"));
-      element.on("focus", () => {
-        if (!gone) setFocused(true);
-      });
-      element.on("blur", () => {
-        if (!gone) setFocused(false);
-      });
       element.mount(mount.current);
       actions.current = loaded.actions;
 
@@ -375,17 +383,17 @@ export function StripePay({
             </div>
           )}
           {/* Stripe draws underneath the stand-in, out of flow, until ready. */}
-          <div className={`md:[zoom:1.6] ${state === "loading" ? "pointer-events-none absolute inset-x-0 top-0 opacity-0" : ""}`}>
+          <div className={`relative flow-root bg-[#222222] md:[zoom:1.6] ${state === "loading" ? "pointer-events-none absolute inset-x-0 top-0 opacity-0" : ""}`}>
             <div ref={mount} />
+            {/* THE SEAMS. Stripe's fields are rounded (for the focus ring) and
+                sit on a box of their own grey, so the 2px gaps between them
+                would not show; these two lines, in the sheet's colour, are
+                those gaps. A row is 45 tall on a phone and 35 here on desktop
+                (56 once zoomed). `flow-root` keeps Stripe's -4px iframe
+                margin inside this box, so its top edge is the fields'. */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[45px] h-[2px] bg-[#181818] md:top-[35px]" />
+            <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-[calc(50%-1px)] top-[47px] w-[2px] bg-[#181818] md:top-[37px]" />
           </div>
-          {/* THE FOCUS RING, around the whole card block and with its rounded
-              corners (Žilvinas 2026-10-04, "focus is off, you see no
-              corners"): the same violet ring the email field wears, drawn
-              over Stripe's fields rather than by them. */}
-          <div
-            aria-hidden="true"
-            className={`pointer-events-none absolute inset-0 rounded-[10px] ring-2 ring-inset ring-[#8b6ad6] transition-opacity duration-150 md:rounded-[15px] ${focused ? "opacity-100" : "opacity-0"}`}
-          />
         </div>
       )}
 

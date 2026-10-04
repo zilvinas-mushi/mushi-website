@@ -83,6 +83,21 @@ describe("the plan sheet", () => {
     expect(sheet).toMatch(/const open = \(\) => \{[\s\S]{0,260}preloadStripe\(\);/);
   });
 
+  it("says what is wrong once: Stripe's per-field line is collapsed, the sheet's alert speaks", () => {
+    expect(pay).toContain('".Error": { fontSize: "0px", lineHeight: "0px", margin: "0px", marginTop: "-4px", padding: "0px", opacity: "0" }');
+    expect(pay).toContain('role="alert"');
+  });
+
+  it("rings the field in use, not the whole card block", () => {
+    expect(pay).toMatch(/"\.Input:focus": \{ boxShadow: `inset 0 0 0 \$\{desktop \? "1\.25px" : "2px"\} #8b6ad6` \}/);
+    expect(pay).not.toContain("setFocused");
+  });
+
+  it("keeps the email field dark when the browser autofills it", () => {
+    expect(sheet).toContain("autofill:shadow-[inset_0_0_0_1000px_#222222]");
+    expect(sheet).toContain("autofill:[-webkit-text-fill-color:#ffffff]");
+  });
+
   it("checks the email itself and says so in the sheet, not in the browser's bubble", () => {
     expect(pay).toContain("<form onSubmit={onSubmit} noValidate>");
     expect(pay).toContain('setError("Please enter your email.");');

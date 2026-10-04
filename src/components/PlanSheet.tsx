@@ -67,9 +67,14 @@ const WAS =
 const VIOLET =
   "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] active:text-[#6e54b5]";
 
-/** A payment field: 45 tall, #222222, Regular 18, placeholder at 50% white. */
+/**
+ * A payment field: 45 tall, #222222, Regular 18, placeholder at 50% white.
+ * The `autofill:` pair keeps it that way when the browser fills the email in:
+ * Chrome paints an autofilled field pale blue with dark text, which beside
+ * Stripe's dark card fields looked like a different form (Žilvinas 2026-10-04).
+ */
 const FIELD =
-  "h-[45px] w-full bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b6ad6] md:h-[56px] md:px-[22px] md:text-[22px]";
+  "h-[45px] w-full bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50 outline-none [color-scheme:dark] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b6ad6] autofill:shadow-[inset_0_0_0_1000px_#222222] autofill:[-webkit-text-fill-color:#ffffff] md:h-[56px] md:px-[22px] md:text-[22px]";
 
 export function PlanSheet() {
   const c = TEMPLATES_PAGE.plans;
