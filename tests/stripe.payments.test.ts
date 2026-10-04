@@ -235,7 +235,12 @@ describe.skipIf(connection.skip)("a subscription in Stripe test mode", () => {
         amount_total: plan.amount,
         livemode: false,
       });
-      expect(session.url).toMatch(/^https:\/\/checkout\.stripe\.com\//);
+      // Stripe's own host, or the account's custom checkout domain — since
+      // 2026-10-04 that is pay.mushi.agency (a CNAME to Stripe's hosted
+      // checkout), and Stripe hands sessions out on it in both modes. Either
+      // way it has to be THIS session's page, not just somewhere on the host.
+      expect(session.url).toMatch(/^https:\/\/(checkout\.stripe\.com|pay\.mushi\.agency)\/c\/pay\//);
+      expect(session.url).toContain(session.id);
     });
   });
 
