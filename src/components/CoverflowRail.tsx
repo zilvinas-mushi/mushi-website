@@ -358,6 +358,14 @@ export function CoverflowRail({
   return (
     <section
       ref={root}
+      // THE RAIL'S PICTURES LOAD AS A GROUP (paint-gate-script's
+      // data-defer-group), the moment the rail nears the viewport — not one
+      // by one. Per-image deferral cannot work here: a card waiting off the
+      // edge is clipped by this section's overflow, so it never counts as
+      // "near", and when a press brings it in it arrived as an empty grey
+      // frame and stayed one (live, 2026-10-04: three blank cards on a phone
+      // after three presses).
+      data-defer-group=""
       aria-labelledby={headingId}
       className={`cf cf-${kind} relative overflow-hidden`}
       style={
@@ -415,6 +423,9 @@ export function CoverflowRail({
                 src={item.src}
                 alt={clone ? "" : item.alt}
                 className="cf-img"
+                // Fetched when the rail's group loads, not when Chrome
+                // decides the card is near — see Img's gateOnly.
+                gateOnly
                 // The -sm half of a pair is for a phone's 240px card.
                 sizes="(min-width: 768px) 30vw, 64vw"
                 draggable={false}

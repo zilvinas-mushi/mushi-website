@@ -61,6 +61,16 @@ type Props = {
    * looks broken when a drag peels the photo off its card as a ghost.
    */
   draggable?: boolean;
+  /**
+   * Deferred by the paint gate ONLY — no `loading="lazy"` on top. For a
+   * picture whose turn on screen comes by something other than scrolling
+   * (the /case-studies rails): the gate hands it its URL when the rail is
+   * near, and it must fetch then. Left lazy as well, Chrome waited for the
+   * card to be near the viewport by its own reckoning, which for a card
+   * parked off the rail's clipped edge was never — it slid in as an empty
+   * frame and stayed empty (live, 2026-10-04).
+   */
+  gateOnly?: boolean;
 };
 
 /**
@@ -88,6 +98,7 @@ export function Img({
   sizes: sizesAttr,
   style,
   draggable,
+  gateOnly = false,
   alternate,
 }: Props) {
   const dim = IMAGE_SIZES[src];
@@ -145,7 +156,7 @@ export function Img({
       className={className}
       style={style}
       draggable={draggable}
-      loading={priority ? "eager" : "lazy"}
+      loading={priority || gateOnly ? "eager" : "lazy"}
       decoding={priority === true ? "sync" : "async"}
       {...(priority === true ? { fetchPriority: "high" as const } : {})}
     />
