@@ -82,9 +82,9 @@ Depends on Phase 3 being green. **Outward-facing: one live write.**
 Depends on Phase 4.
 
 - [x] `ci.yml`: `npm test` in the `check` job, the missing-key rule, the daily run.
-- [ ] `STRIPE_TEST_KEY` and `STRIPE_LIVE_READONLY_KEY` set in GitHub (needs the
+- [x] `STRIPE_TEST_KEY` and `STRIPE_LIVE_READONLY_KEY` set in GitHub (needs the
       two restricted keys from the Dashboard — only a person can create them).
-- [ ] First run on main green.
+- [x] First run on main green (52e1499, run 37214339081, 2026-10-04: all 185 tests ran with both keys, none skipped).
 
 ## Traceability
 
