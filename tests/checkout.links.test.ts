@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { CHECKOUT_SESSION_URL, STRIPE_PUBLISHABLE_KEYS, dueToday, usd } from "@/lib/checkout";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { PAYMENT_LINKS, PLANS, THANK_YOU_PATH, checkoutUrl } from "@/lib/pricing";
+import { CHECKOUT_HOST, PAYMENT_LINKS, PLANS, THANK_YOU_PATH, checkoutUrl } from "@/lib/pricing";
 
 const read = (path: string) => readFileSync(path, "utf8");
 
@@ -20,13 +20,17 @@ describe("payment links", () => {
     expect(Object.keys(PAYMENT_LINKS).sort()).toEqual(PLANS.map((p) => p.id).sort());
   });
 
-  it.each(PLANS)("$id has a test-mode link on Stripe's checkout domain", (plan) => {
-    expect(PAYMENT_LINKS[plan.id].test).toMatch(/^https:\/\/buy\.stripe\.com\/test_[A-Za-z0-9]+$/);
+  it.each(PLANS)("$id has a test-mode link on Mushi's checkout domain", (plan) => {
+    const url = new URL(PAYMENT_LINKS[plan.id].test);
+    expect(url.origin).toBe(`https://${CHECKOUT_HOST}`);
+    expect(url.pathname).toMatch(/^\/b\/test_[A-Za-z0-9]+$/);
   });
 
   it.each(PLANS)("$id has a LIVE link, and it is not a test one", (plan) => {
     const { live } = PAYMENT_LINKS[plan.id];
-    expect(live).toMatch(/^https:\/\/buy\.stripe\.com\/[A-Za-z0-9]+$/);
+    const url = new URL(live);
+    expect(url.origin).toBe(`https://${CHECKOUT_HOST}`);
+    expect(url.pathname).toMatch(/^\/b\/[A-Za-z0-9]+$/);
     expect(live).not.toMatch(/\/test_/);
   });
 

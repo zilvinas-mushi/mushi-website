@@ -60,6 +60,19 @@ export function monthsIn(plan: Pick<Plan, "interval" | "intervalCount">): number
 }
 
 /**
+ * THE HOST STRIPE SERVES MUSHI'S CHECKOUT ON — the account's custom domain
+ * (Stripe Dashboard → Settings → Custom domains; a CNAME to Stripe's hosted
+ * checkout, 2026-10-04). Payment Links and Checkout Sessions both live on
+ * it, in test mode and live, so the buyer never sees buy.stripe.com. It is
+ * an account setting: if the domain changes there, this is the one line to
+ * change here, and `npm test` holds Stripe to it.
+ */
+export const CHECKOUT_HOST = "pay.mushi.agency";
+
+/** A Payment Link's address from its id — `test_…` in test mode. */
+const paymentLink = (id: string) => `https://${CHECKOUT_HOST}/b/${id}`;
+
+/**
  * WHERE EACH PLAN IS PAID FOR: a Stripe Payment Link, hosted by Stripe, so
  * the card never touches this site and no server is needed (2026-10-04, the
  * launch). One link per plan and per mode; each sells exactly that plan's
@@ -74,16 +87,16 @@ export function monthsIn(plan: Pick<Plan, "interval" | "intervalCount">): number
  */
 export const PAYMENT_LINKS: Record<PlanId, { test: string; live: string }> = {
   "1-month": {
-    test: "https://buy.stripe.com/test_14A00bdtYcxrdYL4jEafS00",
-    live: "https://buy.stripe.com/14A00bdtYcxrdYL4jEafS00",
+    test: paymentLink("test_14A00bdtYcxrdYL4jEafS00"),
+    live: paymentLink("14A00bdtYcxrdYL4jEafS00"),
   },
   "3-months": {
-    test: "https://buy.stripe.com/test_fZu9AL3TodBvaMzaI2afS01",
-    live: "https://buy.stripe.com/fZu9AL3TodBvaMzaI2afS01",
+    test: paymentLink("test_fZu9AL3TodBvaMzaI2afS01"),
+    live: paymentLink("fZu9AL3TodBvaMzaI2afS01"),
   },
   "12-months": {
-    test: "https://buy.stripe.com/test_6oU28jahM1SNbQD9DYafS02",
-    live: "https://buy.stripe.com/6oU28jahM1SNbQD9DYafS02",
+    test: paymentLink("test_6oU28jahM1SNbQD9DYafS02"),
+    live: paymentLink("6oU28jahM1SNbQD9DYafS02"),
   },
 };
 

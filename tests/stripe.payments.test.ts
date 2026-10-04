@@ -16,7 +16,7 @@
  */
 import type Stripe from "stripe";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { CURRENCY, PLANS, TEMPLATES_PRODUCT, monthsIn, type Plan, type PlanId } from "@/lib/pricing";
+import { CHECKOUT_HOST, CURRENCY, PLANS, TEMPLATES_PRODUCT, monthsIn, type Plan, type PlanId } from "@/lib/pricing";
 import { connect } from "./helpers/stripe.ts";
 
 const connection = connect("test");
@@ -235,12 +235,12 @@ describe.skipIf(connection.skip)("a subscription in Stripe test mode", () => {
         amount_total: plan.amount,
         livemode: false,
       });
-      // Stripe's own host, or the account's custom checkout domain — since
-      // 2026-10-04 that is pay.mushi.agency (a CNAME to Stripe's hosted
-      // checkout), and Stripe hands sessions out on it in both modes. Either
-      // way it has to be THIS session's page, not just somewhere on the host.
-      expect(session.url).toMatch(/^https:\/\/(checkout\.stripe\.com|pay\.mushi\.agency)\/c\/pay\//);
-      expect(session.url).toContain(session.id);
+      // On the account's checkout domain (CHECKOUT_HOST, pricing.ts), and
+      // THIS session's page there, not just somewhere on the host.
+      const url = new URL(session.url ?? "");
+      expect(url.origin).toBe(`https://${CHECKOUT_HOST}`);
+      expect(url.pathname).toMatch(/^\/c\/pay\//);
+      expect(url.pathname).toContain(session.id);
     });
   });
 
