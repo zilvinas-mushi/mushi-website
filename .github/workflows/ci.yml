@@ -43,6 +43,10 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          # Two lockfiles: the site's, and the page-quality gate's own.
+          cache-dependency-path: |
+            package-lock.json
+            tools/page-quality/package-lock.json
 
       # `ci`, not `install`: it installs exactly what package-lock.json pins and
       # fails if the two have drifted, which is the point of running it here.
@@ -111,3 +115,28 @@ jobs:
             echo "::error::grep failed with status $status; nothing was checked"
             exit 1
           fi
+
+      # THE PAGE-QUALITY GATE (tools/page-quality/check.mjs), on the export
+      # that was just built. Two promises, checked together because they pull
+      # against each other:
+      #
+      #   - Lighthouse's mobile performance score — the number PageSpeed
+      #     shows — is above 90 on /, /templates and /case-studies, median of
+      #     three runs;
+      #   - scrolling each page straight down from the instant it appears, on
+      #     a 10 Mbit/s line, at a laptop's width and a phone's, never puts an
+      #     unloaded picture — or a card waiting for one — on screen.
+      #
+      # Its dependencies are its own lockfile's, not the site's: Lighthouse
+      # is 180 MB of tooling that has no business in a Cloudflare build. The
+      # runner's own Chrome is what it drives.
+      #
+      # Like the payment tests, it does not stop a deploy — Cloudflare builds
+      # main regardless. It is a red X on the commit that broke it.
+      - name: Install the page-quality gate
+        run: npm ci --prefix tools/page-quality
+
+      - name: Page quality — PageSpeed above 90, no unloaded picture on screen
+        run: npm run pages:check
+        env:
+          CI: "true"

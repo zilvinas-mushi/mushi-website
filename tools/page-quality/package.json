@@ -1,0 +1,10 @@
+{
+  "name": "mushi-page-quality",
+  "private": true,
+  "type": "module",
+  "description": "The page-quality gate's own dependencies, kept out of the site's package.json — see check.mjs.",
+  "dependencies": {
+    "lighthouse": "12.8.2",
+    "puppeteer-core": "24.43.1"
+  }
+}

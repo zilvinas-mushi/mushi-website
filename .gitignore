@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+# ...and the page-quality gate's own (tools/page-quality/package.json)
+/tools/*/node_modules
 /.pnp
 .pnp.*
 .yarn/*

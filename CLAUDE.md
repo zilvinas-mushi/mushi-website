@@ -79,6 +79,22 @@ When you build anything new:
 - This applies to **every page**, not just the home page — a new route's first
   screen is gated the same way or it is not finished.
 
+## The page-quality gate
+`npm run pages:check` (after `npx next build`; first time,
+`npm ci --prefix tools/page-quality`) holds the built export to two things at
+once, and CI runs it on every push:
+- **Lighthouse mobile performance above 90** on `/`, `/templates` and
+  `/case-studies` — the PageSpeed number, median of three runs.
+- **No unloaded picture on screen, ever**: each page is scrolled top to bottom
+  from the instant it is revealed, on a throttled line, at a laptop's width
+  and a phone's.
+
+They pull against each other — fetch less and the score rises, fetch late and
+pictures pop in — so a change to images, loading or the paint gate is not
+done until both pass. Never buy either by lowering image quality. A new page
+goes into `PAGES` in `tools/page-quality/check.mjs`. `-- --url
+https://mushi.agency` runs it against the live site.
+
 ## Interaction rules
 - **Buttons invert their own colours on hover.** Foreground and background
   trade places — they do NOT swap schemes with a neighbouring button, and they
