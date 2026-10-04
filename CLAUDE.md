@@ -83,6 +83,31 @@ When you build anything new:
   bring a second one in from behind it. All of it lives in one component —
   `ArrowDisc` in `Sections.tsx` — so the two can never drift apart.
 
+## Payments
+**What Mushi charges lives in one file, `src/lib/pricing.ts`.** Stripe is held
+to it in test mode and live, and `content.ts` is held to it too — change a
+price in one place only and `npm test` goes red. PRD and plan:
+`docs/features/0001-stripe-pricing/`.
+
+- **A Stripe price is immutable.** Changing one means a new price in
+  `pricing.ts` taking over the lookup key; the old one is archived by a
+  person. `npm run stripe:apply` only ever creates, and stops at the first
+  thing that differs.
+- **Code names lookup keys, never `price_…` ids** — ids differ between test
+  and live.
+- **Live is written by a person, on purpose:** `npm run stripe:apply -- --live`
+  shows what it would create and does nothing without `--yes`. It goes through
+  the Stripe CLI login for the account pinned in `stripe/access.ts`; there is
+  no key that can write the catalog, and CI holds none that can move money.
+- **Nothing under `src/` may import `stripe`, `stripe/`, `scripts/` or
+  `tests/`.** The SDK needs a secret key and this site has no server. Only a
+  publishable key may ever reach the bundle.
+- **No live money is taken yet.** Buy buttons still hand off to
+  app.mushi.agency. Checkout comes only after the app can grant access, create
+  the account and send its email (PRD, Phases 2 and 3).
+- `npm test` runs everything; without a key it uses the Stripe CLI login. On
+  CI a missing key fails the run — never make that a skip.
+
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.
 - `metadata` export with absolute OG image URLs.

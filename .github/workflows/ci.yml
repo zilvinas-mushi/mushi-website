@@ -15,11 +15,19 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Once a day as well, for the one failure no push causes: a price edited by
+  # hand in the Stripe Dashboard. The payment tests compare Stripe with
+  # src/lib/pricing.ts, so they notice it the next morning.
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
 
 # A second push while the first is still running makes the first irrelevant —
-# cancel it rather than paying for two answers about the same branch.
+# cancel it rather than paying for two answers about the same branch. The daily
+# run has a group of its own: it and a push to main would otherwise cancel each
+# other, and a payment test cancelled half-way leaves its test customers behind.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name == 'schedule' && 'daily' || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -48,6 +56,58 @@ jobs:
 
       - run: npx tsc --noEmit
 
+      # The payment tests, the sync script and their helpers have a config of
+      # their own, so that a type error in a TEST can never fail the Cloudflare
+      # deploy — `next build` type-checks everything tsconfig.json includes.
+      - run: npx tsc --noEmit -p tsconfig.tools.json
+
+      # THE PAYMENT GATE (docs/features/0001-stripe-pricing). Three layers: the
+      # site's copy against the catalog; the catalog against Stripe test mode,
+      # with real test-card subscriptions and their renewals; the catalog
+      # against LIVE Stripe, read-only.
+      #
+      # It cannot be passed by doing nothing: there is no continue-on-error,
+      # and a MISSING KEY FAILS the step instead of skipping it
+      # (stripe/access.ts) — a payment check that passes once its secret is
+      # deleted is not a check. The single exception is a pull request from a
+      # fork, which GitHub never gives secrets to; only for that does
+      # STRIPE_KEYS_REQUIRED become "false", and then the copy-against-catalog
+      # layer still runs. (`tests/stripe.gate.test.ts` holds this step to that.)
+      #
+      # WHAT IT DOES NOT DO is stop a deploy: Cloudflare Pages builds main on
+      # its own, whatever this job says. A failure here is a red X on the
+      # commit. Making it block the deploy is an open decision in the PRD.
+      #
+      # Neither key can move money in live: the test key is test-mode only and
+      # the live one may read Products and Prices and nothing else.
+      - name: Payment tests
+        run: npm test
+        env:
+          # GitHub sets this itself; it is repeated because the missing-key
+          # rule hangs on it, and a runner without it would skip, green.
+          CI: "true"
+          STRIPE_TEST_KEY: ${{ secrets.STRIPE_TEST_KEY }}
+          STRIPE_LIVE_READONLY_KEY: ${{ secrets.STRIPE_LIVE_READONLY_KEY }}
+          STRIPE_KEYS_REQUIRED: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+
       # The real thing, with the same command Cloudflare uses. If this passes,
       # the deploy will too.
       - run: npx next build
+
+      # The site has no server, so nothing that needs a Stripe secret can run
+      # in it. This makes sure nothing tries: no secret-shaped string and no
+      # call to Stripe's API anywhere in what gets deployed.
+      - name: The export carries no Stripe secret
+        run: |
+          # A missing out/ must fail too: grep on a directory that is not there
+          # finds nothing, and "found nothing" is exactly what passes.
+          test -d out || { echo "::error::out/ does not exist; nothing was checked"; exit 1; }
+          status=0
+          grep -rlE '(sk|rk)_(org_)?(test|live)_[A-Za-z0-9]{10,}|whsec_[A-Za-z0-9]{10,}|api\.stripe\.com' out/ || status=$?
+          if [ "$status" -eq 0 ]; then
+            echo "::error::Stripe secret or server-side Stripe code found in the static export"
+            exit 1
+          elif [ "$status" -ne 1 ]; then
+            echo "::error::grep failed with status $status; nothing was checked"
+            exit 1
+          fi
