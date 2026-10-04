@@ -89,7 +89,11 @@ describe("the plan sheet", () => {
   });
 
   it("rings the field in use, not the whole card block", () => {
-    expect(pay).toMatch(/"\.Input:focus": \{ boxShadow: `inset 0 0 0 \$\{desktop \? "1\.25px" : "2px"\} #8b6ad6` \}/);
+    expect(pay).toContain('".Input:focus": { boxShadow: `inset 0 0 0 ${drawn} #8b6ad6` }');
+    // ...in the block's shape: Stripe's ring is square and thick, and the
+    // sheet's three masks leave only the band the ring should be.
+    expect(pay).toContain('const drawn = shaped ? (desktop ? "4px" : "6px") : ring;');
+    expect(pay.match(/border-\[6px\] border-\[#222222\]/g)).toHaveLength(3);
     expect(pay).not.toContain("setFocused");
   });
 
@@ -100,8 +104,8 @@ describe("the plan sheet", () => {
 
   it("checks the email itself and says so in the sheet, not in the browser's bubble", () => {
     expect(pay).toContain("<form onSubmit={onSubmit} noValidate>");
-    expect(pay).toContain('setError("Please enter your email.");');
-    expect(pay).toContain('setError("Enter a valid email address.");');
+    expect(pay).toContain('setError("Please enter your email address.");');
+    expect(pay).toContain('setError("Please enter a valid email address.");');
     expect(pay).not.toMatch(/name="email"\s+required/);
   });
 

@@ -44,7 +44,11 @@ import type { PlanId } from "@/lib/pricing";
  * below), so what is given to Stripe there is the frame's field divided by
  * 1.6: 14px type for the frame's 22, a 35px field for its 56.
  */
-function appearance(desktop: boolean): Appearance {
+function appearance(desktop: boolean, shaped: boolean): Appearance {
+  // The ring as the buyer sees it, and as Stripe is asked to draw it — see
+  // the note on .Input:focus.
+  const ring = desktop ? "1.25px" : "2px";
+  const drawn = shaped ? (desktop ? "4px" : "6px") : ring;
   return {
     theme: "night",
     // THE FRAME'S FIELDS HAVE PLACEHOLDERS AND NO LABELS (Žilvinas 2026-10-04,
@@ -72,25 +76,36 @@ function appearance(desktop: boolean): Appearance {
         border: "0",
         boxShadow: "none",
         backgroundColor: "#222222",
-        // The block's radius: 10 on a phone, 15 on desktop (÷1.6, see above).
-        borderRadius: desktop ? "9.375px" : "10px",
+        // Square when the ring is shaped by the sheet (see .Input:focus);
+        // otherwise the block's radius: 10 on a phone, 15 on desktop (÷1.6).
+        borderRadius: shaped ? "0px" : desktop ? "9.375px" : "10px",
         padding: desktop ? "9px 14px" : "11px 16px",
         lineHeight: desktop ? "17px" : "23px",
       },
       // THE RING IS ON THE FIELD IN USE, NOT ON THE BLOCK (Žilvinas
-      // 2026-10-04, "why the selection is for all combined section"), and it
-      // has all its corners (same day, "you see no corners"). Stripe offers no
-      // way to style one field differently from the next, so every field is
-      // given the BLOCK's corner radius: at the block's outer corners the
-      // ring then runs exactly along the box's own curve instead of being cut
-      // by it. Unfocused, the rounding is invisible — the box behind the
-      // fields is the same grey.
-      ".Input:focus": { boxShadow: `inset 0 0 0 ${desktop ? "1.25px" : "2px"} #8b6ad6` },
+      // 2026-10-04, "why the selection is for all combined section"), AND IT
+      // TAKES THE BLOCK'S SHAPE (same day, off the frame: "selection should
+      // look like this"): round only where the field meets the block's own
+      // corner — the number's two top corners, the expiry's bottom left, the
+      // security code's bottom right — and square everywhere else.
+      //
+      // Stripe offers no way to style one field differently from the next,
+      // and does not say which field has focus. So Stripe draws a ring that
+      // is square and TOO THICK on whichever field is in use, and the sheet
+      // lays a fixed frame of the field's own grey over each field (the
+      // masks beside the seams, below) that covers everything but the 2px
+      // band the ring should be — with the rounding the frame shows. With
+      // no ring under it a mask is grey on grey and cannot be seen.
+      //
+      // `shaped` is off when the country field has to be shown: the masks
+      // only know the three card fields, so that case keeps the plain ring
+      // with the block's radius on every corner.
+      ".Input:focus": { boxShadow: `inset 0 0 0 ${drawn} #8b6ad6` },
       // A field Stripe has refused wears the same ring in the error colour.
-      // WHAT is wrong is said once, by the sheet's own alert under the email
+      // WHAT is wrong is said once, by the sheet's own line under the button
       // — Stripe's line under each field is collapsed, like its labels: two
       // voices saying the same thing in two styles looked broken.
-      ".Input--invalid": { color: "#de8a8b", boxShadow: `inset 0 0 0 ${desktop ? "1.25px" : "2px"} rgba(222,138,139,0.6)` },
+      ".Input--invalid": { color: "#de8a8b", boxShadow: `inset 0 0 0 ${drawn} rgba(222,138,139,0.6)` },
       ".Label": { fontSize: "0px", lineHeight: "0px", margin: "0", padding: "0", opacity: "0" },
       // The -4px takes back the 4px Stripe still leaves above a collapsed
       // error line, so a refused field does not push the row under it down
@@ -200,6 +215,9 @@ export function StripePay({
   const settledOnce = useRef<Promise<void>>(Promise.resolve());
   // The buyer pressed the stand-in fields before Stripe's were in.
   const [wanted, setWanted] = useState(false);
+  // The ring is shaped by the sheet's masks — see appearance().
+  const [shaped, setShaped] = useState(true);
+  const lastMask = useRef<HTMLDivElement>(null);
   const wantsFocus = useRef(false);
 
   useEffect(() => {
@@ -207,6 +225,8 @@ export function StripePay({
     let settled = false;
     let element: StripePaymentElement | null = null;
     let express: StripeCheckoutExpressCheckoutElement | null = null;
+    let shapeWatch: ResizeObserver | null = null;
+    let shapeTimer = 0;
 
     let release = () => {};
     stateNow.current = "loading";
@@ -241,15 +261,17 @@ export function StripePay({
         buyerCountry(),
       ]);
       country.current = where;
+      if (!gone) setShaped(Boolean(where));
       if (!response.ok) throw new Error(`the webapp answered ${response.status}`);
       const { clientSecret } = (await response.json()) as { clientSecret?: string };
       if (!clientSecret) throw new Error("the webapp sent no client secret");
 
       if (!stripe) throw new Error("Stripe.js did not load");
+      const desktop = window.matchMedia("(min-width: 768px)").matches;
       const checkout = stripe.initCheckoutElementsSdk({
         clientSecret,
         elementsOptions: {
-          appearance: appearance(window.matchMedia("(min-width: 768px)").matches),
+          appearance: appearance(desktop, Boolean(where)),
           fonts: FONTS,
         },
       });
@@ -269,6 +291,35 @@ export function StripePay({
         fields: { billingDetails: { address: { country: where ? "never" : "auto" } } },
         wallets: { link: "never" },
       });
+      // THE MASKS ARE ONLY RIGHT IF STRIPE LAID THE FIELDS OUT AS EXPECTED:
+      // the number over the expiry and the security code, in rows of the
+      // height asked for. That is Stripe's decision (it arranges by the
+      // width it measures), and it cannot be read from inside the iframe —
+      // but it shows in the iframe's height. The last mask should end one
+      // ring-width above the fields' bottom edge (plus the 4px the iframe
+      // keeps round itself); if it does not, the ring goes back to the plain
+      // one Stripe draws by itself, which is right in any arrangement.
+      // Stripe glides the iframe to its height, so this is asked once the
+      // height has stopped moving, and again if it ever moves later.
+      const checkShape = () => {
+        const box = mount.current;
+        const mask = lastMask.current;
+        if (gone || !box || !mask) return;
+        const m = mask.getBoundingClientRect();
+        const scale = m.height / (desktop ? 32.5 : 41);
+        const under = (box.getBoundingClientRect().bottom - m.bottom) / scale;
+        if (Math.abs(under - (desktop ? 5.25 : 6)) <= 1.5) return;
+        shapeWatch?.disconnect();
+        setShaped(false);
+        checkout.changeAppearance(appearance(desktop, false));
+      };
+      if (where && "ResizeObserver" in window) {
+        shapeWatch = new ResizeObserver(() => {
+          window.clearTimeout(shapeTimer);
+          shapeTimer = window.setTimeout(checkShape, 250);
+        });
+        shapeWatch.observe(mount.current);
+      }
       element.on("ready", () => settle("ready"));
       element.on("loaderror", () => settle("unavailable"));
       element.mount(mount.current);
@@ -312,6 +363,8 @@ export function StripePay({
     return () => {
       gone = true;
       window.clearTimeout(limit);
+      window.clearTimeout(shapeTimer);
+      shapeWatch?.disconnect();
       // Nobody is left waiting on a load that has been abandoned.
       release();
       actions.current = null;
@@ -324,14 +377,14 @@ export function StripePay({
     e.preventDefault();
     const email = String(new FormData(e.currentTarget).get("email") ?? "").trim();
 
-    // The sheet's own message, in the webapp's words — not the browser's
+    // The sheet's own message — not the browser's
     // "Please fill in this field" bubble (Žilvinas 2026-10-04).
     if (!email) {
-      setError("Please enter your email.");
+      setError("Please enter your email address.");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Enter a valid email address.");
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -424,7 +477,7 @@ export function StripePay({
               }}
               className="flex cursor-text flex-col gap-[2px] text-[18px] leading-[23px] text-white/50 md:gap-[3.2px] md:text-[22.4px] md:leading-[27.2px]"
             >
-              <div className={`rounded-[10px] bg-[#222222] px-4 py-[11px] md:rounded-[15px] md:px-[22.4px] md:py-[14.4px] ${wanted ? "shadow-[inset_0_0_0_2px_#8b6ad6]" : ""}`}>1234 1234 1234 1234</div>
+              <div className={`rounded-t-[10px] bg-[#222222] px-4 py-[11px] md:rounded-t-[15px] md:px-[22.4px] md:py-[14.4px] ${wanted ? "shadow-[inset_0_0_0_2px_#8b6ad6]" : ""}`}>1234 1234 1234 1234</div>
               <div className="grid grid-cols-2 gap-[2px] md:gap-[3.2px]">
                 <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">MM / YY</div>
                 <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">CVC</div>
@@ -442,6 +495,17 @@ export function StripePay({
                 margin inside this box, so its top edge is the fields'. */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[45px] h-[2px] bg-[#181818] md:top-[35px]" />
             <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-[calc(50%-1px)] top-[47px] w-[2px] bg-[#181818] md:top-[37px]" />
+            {/* THE RING'S SHAPE — see .Input:focus in appearance(). One frame
+                per field, in the field's grey, sitting one ring-width inside
+                it: number, expiry, security code. Each is rounded only at
+                the block's own corner, by the block's radius less the ring. */}
+            {shaped && (
+              <>
+                <div aria-hidden="true" className="pointer-events-none absolute inset-x-[2px] top-[2px] h-[41px] rounded-t-[8px] border-[6px] border-[#222222] md:inset-x-[1.25px] md:top-[1.25px] md:h-[32.5px] md:rounded-t-[8.125px] md:border-[6px]" />
+                <div aria-hidden="true" className="pointer-events-none absolute left-[2px] right-[calc(50%+3px)] top-[49px] h-[41px] rounded-bl-[8px] border-[6px] border-[#222222] md:left-[1.25px] md:right-[calc(50%+2.25px)] md:top-[38.25px] md:h-[32.5px] md:rounded-bl-[8.125px] md:border-[6px]" />
+                <div ref={lastMask} aria-hidden="true" className="pointer-events-none absolute left-[calc(50%+3px)] right-[2px] top-[49px] h-[41px] rounded-br-[8px] border-[6px] border-[#222222] md:left-[calc(50%+2.25px)] md:right-[1.25px] md:top-[38.25px] md:h-[32.5px] md:rounded-br-[8.125px] md:border-[6px]" />
+              </>
+            )}
           </div>
         </div>
       )}
@@ -456,16 +520,6 @@ export function StripePay({
         className={`${fieldClass} mt-[22px] rounded-[10px] md:mt-[28px] md:rounded-[15px]`}
       />
 
-      {/* The webapp's alert (its login page): a red-tinted box, red text. */}
-      {error && (
-        <p
-          role="alert"
-          className="mt-3 rounded-[10px] border border-[#de8a8b]/30 bg-[#de8a8b]/10 px-4 py-2.5 text-[14px] leading-snug text-[#f0b4b5] md:rounded-[15px] md:px-[22px] md:py-3 md:text-[17px]"
-        >
-          {error}
-        </p>
-      )}
-
       <button
         type="submit"
         // Disabled only while a press is being worked on — never for
@@ -475,6 +529,16 @@ export function StripePay({
       >
         {labels.submit}
       </button>
+
+      {/* WHAT IS WRONG, UNDER THE BUTTON (Žilvinas 2026-10-04, off the
+          reference: "error message should be below button one to one as in
+          picture"): one centred red line, no box, between Submit and the
+          promises under it. It was a tinted alert box above the button. */}
+      {error && (
+        <p role="alert" className="mb-[-3px] mt-[14px] text-center text-[13px] leading-[18px] text-[#e25555] md:mb-0 md:mt-[18px] md:text-[17px] md:leading-[24px]">
+          {error}
+        </p>
+      )}
     </form>
   );
 }
