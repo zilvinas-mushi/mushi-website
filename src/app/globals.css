@@ -232,6 +232,8 @@
   the hero). A px value here is a value that will be wrong at every width but
   one.
 */
+/* --tpl-rem (the /templates scale, further down) repeats this clamp for a
+   window 1/0.8 as wide. Change one, change both. */
 @media (min-width: 768px) {
   html {
     font-size: clamp(10.5px, 0.83333vw, 16px);
@@ -886,6 +888,94 @@ img[data-src] {
 
 /* ------------------------------------------------------ templates page --- */
 
+/* THE DESKTOP PAGE IS DRAWN AT 80% (Žilvinas 2026-10-04, from his boss:
+   "everything looks a bit bigger than in the main page ... 100% would look
+   the same as how it looks with 80% zoomed in"). The home page scales with
+   the window through the root font-size (12.6px on a 1512, 0.79 of its
+   frame); this page's sections are literal px, so on the same laptop they
+   stood a fifth larger than the page they sit beside.
+
+   `zoom`, on two boxes: the hero's text block and the wrapper round every
+   section under the hero (page.tsx). It is zoom and not a transform because
+   zoom re-lays the page out — the fold, the document's height and every
+   observer see the scaled boxes, where a transform would leave the old
+   layout behind and paint a smaller picture of it. Left OUT of it:
+
+     - the header and footer, the shared components, already on the home
+       page's scale;
+     - the hero's device row. It is a share of the window — what is left of
+       100svh under the text — and is built on container units, which Safari
+       scales TWICE inside a zoomed box. Its px were scaled by hand instead:
+       the 45 above the device, the 720 floor, the emoji's 100.
+
+   WHAT BROWSER ZOOM LEAVES ALONE HAS TO BE HANDED BACK. Ctrl-minus shrinks
+   a px and widens the viewport by the same factor, so a share of the window
+   (vw, and rem — the root font-size is a vw) comes out the size it went in.
+   CSS zoom shrinks those as well. So the two the sections use are worked out
+   up here, OUTSIDE the zoom, as the window 1/0.8 as wide would have them:
+
+     --tpl-rem   the root font-size there; Tailwind's whole spacing scale is
+                 rem, and --spacing is re-declared from it. KEEP IN STEP with
+                 the clamp on `html` at the top of this file.
+     --tpl-vw    100vw there; .diff-title and .diff-chip-em.
+
+   And one that is the opposite case — a length that must come out of the
+   zoom the size it is on the HOME page:
+
+     --tpl-hero-u   --hero-u over the zoom, for the hero button, which is
+                    the home hero's pill and takes its box from that unit.
+
+   They are REGISTERED lengths so that what reaches the zoom is a finished
+   px. Unregistered, the vw travels down as text and is resolved inside the
+   zoomed box, where Safari does not scale a relative unit in `gap` or in a
+   transform — every gap-N came out a quarter wide.
+
+   So, under .tpl-scale: px, %, em and the spacing scale are safe. A NEW vw,
+   svh or rem goes through a registered length like these, and a container
+   unit not at all.
+
+   The phone frame is its own design, measured on its own artboard, and is
+   not scaled.
+
+   Checked box by box against the page at an actual 80% browser zoom, in
+   Chromium and WebKit, 800 to 2560 wide. What differs is meant to: the
+   header keeps the home page's height where a real zoom would shrink it
+   (windows past 1536), the hero button is the home one, the device keeps
+   its 1440 cap, and breakpoints still answer to the real window. */
+@property --tpl-rem {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 16px;
+}
+@property --tpl-vw {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 1500px;
+}
+@property --tpl-hero-u {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 100px;
+}
+:root {
+  --tpl-z: 0.8;
+}
+@media (min-width: 768px) {
+  /* On body, not :root: --hero-u carries a rem, and Safari resolves a rem
+     in a registered property on the root element against the default 16px
+     rather than the root's own font-size — the button came out 6% small
+     wherever the hero unit was height-bound. */
+  body {
+    --tpl-rem: clamp(10.5px, 0.83333vw / var(--tpl-z), 16px);
+    --tpl-vw: calc(100vw / var(--tpl-z));
+    --tpl-hero-u: calc(var(--hero-u) / var(--tpl-z));
+  }
+  .tpl-scale {
+    --spacing: calc(var(--tpl-rem) / 4);
+    zoom: var(--tpl-z);
+  }
+}
+
 /* The /templates hero field: the design's own burst artwork ("Mask group",
    supplied 2026-09-03), shipped verbatim as hero-burst.webp — colours,
    brightness and sharpness are the file's, not a CSS approximation (which is
@@ -998,7 +1088,8 @@ img[data-src] {
 @media (min-width: 768px) {
   .diff-title {
     white-space: nowrap;
-    font-size: calc(min(1160px, 100vw - 40px) / 17.1);
+    /* --tpl-vw, not 100vw: the window as .tpl-scale's content sees it. */
+    font-size: calc(min(1160px, var(--tpl-vw) - 40px) / 17.1);
     line-height: 1;
   }
 }
@@ -1015,7 +1106,15 @@ img[data-src] {
    artboard and 1160 at the full shell — falling in step as zoom or a narrow
    viewport squeezes the grid, and capped by min() at 1px so a wide grid
    never inflates the chips past the artboard. Every measurement inside a
-   chip is written in em, so each stays one number away from its design px. */
+   chip is written in em, so each stays one number away from its design px.
+
+   FROM md UP THE GRID'S WIDTH IS WORKED OUT, NOT ASKED FOR (2026-10-04):
+   the grid sits inside the page's 0.8 zoom (.tpl-scale) and Safari scales a
+   container unit there twice, which drew every chip a fifth small. So the
+   desktop rule is the shell's own arithmetic instead — the window as the
+   zoomed content sees it (--tpl-vw), less the shell's two px-5 gutters —
+   the same sum .diff-title already does. The phone is not zoomed and keeps
+   its cqw. */
 .diff-cards {
   container-type: inline-size;
 }
@@ -1024,7 +1123,7 @@ img[data-src] {
 }
 @media (min-width: 768px) {
   .diff-chip-em {
-    font-size: min(1px, calc(100cqw / 1160));
+    font-size: min(1px, calc((var(--tpl-vw) - var(--spacing) * 10) / 1160));
   }
 }
 
@@ -1426,6 +1525,15 @@ img[data-src] {
    off the wrong box. */
 .hero-tile-field {
   container-type: size;
+  /* THE FIELD STARTS AT THE MAC'S INK, NOT AT ITS FILE'S EDGE (Žilvinas
+     2026-10-04, two equal 95 x 187 bars on the artboard — mac top to the
+     upper row, lower row to the hero's end — "should be the same in size,
+     for some reason it doesn't in live"). hero-macbook.webp keeps 10.7 empty
+     rows of its 1503 above the device's top edge and none under its bottom,
+     so a pair centred in the FILE's box sat that much closer to the edge the
+     eye measures from: 51.5 over 54.8 on a 1512, and more the taller the
+     device. Re-cut the artwork and this fraction moves with it. */
+  top: 0.71%;
 }
 
 /* THE PAIR KEEPS THE ARTBOARD'S GAP AND SITS DEAD-CENTRE ON THE DEVICE
@@ -1497,7 +1605,9 @@ img[data-src] {
   right: 0;
   bottom: calc(var(--tile) * 0.2304);
   margin: 0 auto;
-  width: min(100px, calc(var(--tile) * 0.4348));
+  /* 80, not 100, since 2026-10-04: the cap is a px, and the desktop page is
+     drawn at 0.8 (.tpl-scale). The tile's share is a ratio and is not. */
+  width: min(80px, calc(var(--tile) * 0.4348));
   height: auto;
   aspect-ratio: 1;
   object-fit: contain;
@@ -1940,13 +2050,6 @@ img[data-src] {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* The desktop showcase wall: a container so the image's -12.33cqw pull-up
-   (TemplateSections) is measured off this box's own width — the export's
-   black band above its first ad, which is what the pull-up hides. */
-.showcase-wall {
-  container-type: inline-size;
 }
 
 /* --------------------------------------------------- case studies page --- */

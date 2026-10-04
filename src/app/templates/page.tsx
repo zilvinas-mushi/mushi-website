@@ -225,19 +225,27 @@ export default function Templates() {
           // home page: the desktop bar is 63 in flow at 1512, not the phone
           // header's 82, and the 19px difference had the hero's box starting
           // above the page — which came out of its bottom edge.
-          className="tpl-bg relative -mt-[82px] overflow-hidden pt-[82px] md:-mt-[var(--header-h)] md:flex md:h-[100svh] md:min-h-[720px] md:flex-col md:pt-[var(--header-h)]"
+          // md:min-h 576 is the 720 floor at the page's 0.8 (.tpl-scale in
+          // globals.css). This wrapper is NOT inside the zoom — the hero is
+          // a share of the window, and only its text block is scaled.
+          className="tpl-bg relative -mt-[82px] overflow-hidden pt-[82px] md:-mt-[var(--header-h)] md:flex md:h-[100svh] md:min-h-[576px] md:flex-col md:pt-[var(--header-h)]"
         >
           <TemplatesHero />
         </div>
 
-        <TemplatesDifference />
-        <TemplatesProcess />
-        <TemplatesInside />
-        <TemplatesShowcase />
-        <TemplatesAccess />
-        <TemplatesComparison />
-        <TemplatesTeam />
-        <TemplatesFaq />
+        {/* tpl-scale: every section below the hero at 0.8 from md up — read
+            the note in globals.css before writing a vw, rem or container
+            unit under here. */}
+        <div className="tpl-scale">
+          <TemplatesDifference />
+          <TemplatesProcess />
+          <TemplatesInside />
+          <TemplatesShowcase />
+          <TemplatesAccess />
+          <TemplatesComparison />
+          <TemplatesTeam />
+          <TemplatesFaq />
+        </div>
       </main>
       <SiteFooter />
       <script

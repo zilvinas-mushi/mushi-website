@@ -68,7 +68,9 @@ export function TemplatesHero() {
       {/* 38, not 40: the phone artboard puts 46 between the header bar's
           bottom edge and the badge, and the bar's own 12px bottom inset (the
           shell's pb-2 plus its rounding) is part of that measurement. */}
-      <div className={`${SHELL} relative z-[1] shrink-0 pt-[2.375rem] text-center md:pt-[44px]`}>
+      {/* tpl-scale: the text block at the page's 0.8 from md up. The device
+          row under it is not inside it — see AppWindow. */}
+      <div className={`${SHELL} tpl-scale relative z-[1] shrink-0 pt-[2.375rem] text-center md:pt-[44px]`}>
         {/* Gradient-ringed chip, not the home hero's frosted white pill. Ring
             and text share ONE purple-to-salmon gradient, sampled from the
             zoomed badge reference (2026-09-03) — the ring via the
@@ -102,9 +104,14 @@ export function TemplatesHero() {
           {TEMPLATES_PAGE.heading}
         </h1>
 
-        {/* Header-CTA sizing rather than the home hero's pill — the reference
-            shows a compact rounded-rect button. Hover inverts its own two
-            colours, gradient layer kept in both states (CLAUDE.md). */}
+        {/* THE HOME HERO'S PILL (Žilvinas 2026-10-04, the two buttons side by
+            side: "make templates button look similar to the main page
+            button"). It was a compact rounded rect of its own — 8px corners,
+            a 104deg fill, a title-case label. Now it is Pill from
+            Sections.tsx in everything but its contents: caps, the same
+            147deg violet, the same corner, and from md up the same box on
+            the same screen. Hover inverts its own two colours, gradient
+            layer kept in both states (CLAUDE.md). */}
         <a
           id={TEMPLATES_HERO_CTA_ID}
           href={APP_URL}
@@ -112,24 +119,25 @@ export function TemplatesHero() {
           // instead of leaving (PlanSheet); the href stays for md up and
           // for no JavaScript.
           data-plan
-          // Per "Rectangle 83" (2026-09-09): the light spreads across the
-          // WHOLE diagonal — a18ade top-left flowing to 6e54b5 bottom-right,
-          // lifted a step brighter as asked. Sharper 8px corners stay.
+          // The fill, its white twin and the 1px lift are Pill's, verbatim.
+          // The hover repeats ALL THREE stop positions in white (CLAUDE.md):
+          // a white with different stops cannot interpolate against the
+          // violet, and the fill jumps instead of cross-fading.
           //
-          // The hover repeats ALL FOUR of those stop positions in white
-          // (CLAUDE.md): a 2-stop white against a 4-stop violet cannot
-          // interpolate, so the fill jumped instead of cross-fading — which
-          // read as the invert having been dropped altogether.
+          // FROM md UP THE SIZES ARE PILL'S OWN MULTIPLES OF --hero-u — 0.67
+          // tall, 0.15 of corner, 0.32 either side, a 0.24 label — read
+          // through --tpl-hero-u, because this block is inside the page's
+          // 0.8 zoom and the unit has to arrive undone (globals.css). So it
+          // is label plus padding, like the home one, not the 270 x 67 the
+          // artboard's proportions gave it.
           //
-          // DESKTOP SIZE AND GAPS ARE THE ARTBOARD'S AT 0.7 (Žilvinas
-          // 2026-09-19: "the proportions should stay"). Figma draws the
-          // button 385 x 96 with 64 above it to the headline and 64 below
-          // it to the device, against an 80px headline; the headline is 56
-          // here, so everything takes the same 56/80: 270 x 67, 45 and 45.
-          // min-w rather than a fixed width, so the label can never clip if
-          // the copy grows. The label is the artboard's 30 at the same 0.7:
-          // 21. No shadow: the button does not glow (same note).
-          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[54px] items-center justify-center gap-2.5 rounded-[8px] bg-[linear-gradient(104deg,#ab95e3_0%,#8a64c6_45%,#7a5ec0_100%)] px-7 text-[17px] font-semibold text-white transition-all duration-150 hover:bg-[linear-gradient(104deg,#fff_0%,#fff_45%,#fff_100%)] hover:text-[#6e54b5] md:h-[67px] md:min-w-[270px] md:px-8 md:text-[21px]"
+          // The 45 above it is still the artboard's 64 at 0.7 (Žilvinas
+          // 2026-09-19, "the proportions should stay"), and there is still
+          // no shadow: the button does not glow (same note).
+          //
+          // The phone keeps its own measured 54 box and 17 label and takes
+          // the look only: caps, the fill, and the 10 corner Pill has there.
+          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[54px] items-center justify-center gap-2.5 rounded-[10px] bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-7 text-[17px] font-semibold uppercase leading-none text-white transition-all duration-300 ease-out hover:-translate-y-[1px] hover:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] md:h-[calc(var(--tpl-hero-u)*0.67)] md:rounded-[calc(var(--tpl-hero-u)*0.15)] md:px-[calc(var(--tpl-hero-u)*0.32)] md:text-[length:calc(var(--tpl-hero-u)*0.24)]"
         >
           {TEMPLATES_PAGE.cta}
           {/* The design's own arrow, from the supplied "arrow icon.svg"
@@ -144,7 +152,9 @@ export function TemplatesHero() {
             aria-hidden="true"
             viewBox="0 0 16 15"
             fill="none"
-            className="size-[14px] shrink-0 md:h-[13px] md:w-[15px]"
+            // md: 13 x 15 against the old 21px label, kept as that share of
+            // the type now the label rides --hero-u.
+            className="size-[14px] shrink-0 md:h-[0.62em] md:w-[0.714em]"
           >
             <path
               d="M1.25293 2.08593C1.0626 1.63108 0.967435 1.40366 1.00923 1.2641C1.04547 1.14311 1.13552 1.0483 1.25054 1.01006C1.38322 0.965948 1.59961 1.06575 2.03241 1.26535L14.3147 6.92981C14.7054 7.10999 14.9008 7.20008 14.9606 7.32603C15.0125 7.43541 15.0125 7.5641 14.9606 7.67348C14.9008 7.79943 14.7054 7.88952 14.3147 8.0697L2.03241 13.7342C1.59961 13.9338 1.38321 14.0336 1.25054 13.9894C1.13552 13.9512 1.04547 13.8564 1.00923 13.7354C0.967435 13.5959 1.0626 13.3684 1.25293 12.9136L3.41344 7.7504C3.45208 7.65807 3.4714 7.61191 3.47903 7.56395C3.48579 7.52145 3.48579 7.47806 3.47903 7.43556C3.4714 7.38761 3.45208 7.34144 3.41344 7.24911L1.25293 2.08593Z"
@@ -1737,18 +1747,22 @@ export function TemplatesShowcase() {
           from the title's baseline is what should be there. So the margin
           is 65 minus the title's 10.8 of box under its baseline, minus the
           file's own black band: 54px - 12.33vw of the shell. */}
-      <div aria-hidden="true" className="showcase-wall mt-[32px] md:mt-[calc(54px-8.33cqw)] md:-mb-16 md:overflow-hidden">
+      {/* PERCENTAGES, not the cqw they were (2026-10-04): a vertical margin
+          in % is a share of the containing block's WIDTH, which is the same
+          measure with no container — and a container unit inside the page's
+          zoom is scaled twice in Safari (.tpl-scale in globals.css). */}
+      <div aria-hidden="true" className="mt-[32px] md:mt-[calc(54px-8.33%)] md:-mb-16 md:overflow-hidden">
         <ShowcaseRows />
         {/* Pulled up by the file's own empty top only — the side columns'
             tiles start 4% of the width down, the Huel ad in the middle at
             12.33% (Žilvinas 2026-09-19, "don't cut anything"): the image
             loses the 4 and NOTHING of any tile, and the wrapper's margin
             gives back the other 8.33 so Huel still lands 65 under the
-            title. The wrapper is the size container (.showcase-wall). */}
+            title. */}
         <Img
           src="templates/showcase-wall.webp"
           alt=""
-          className="hidden w-full md:block md:-mt-[4cqw]"
+          className="hidden w-full md:block md:-mt-[4%]"
         />
       </div>
     </section>
@@ -2532,7 +2546,10 @@ function CategoryTiles() {
       // below IS the device's height — top gap and bottom gap to the mac
       // come out equal on every screen, including where the 1440px width
       // cap ends the device above the fold.
-      className="hero-tile-field pointer-events-none absolute inset-y-0 left-1/2 z-0 hidden w-screen -translate-x-1/2 overflow-hidden lg:block"
+      //
+      // bottom-0 and no top: the top is .hero-tile-field's, a hair inside
+      // the box, where the mac's INK starts (2026-10-04, globals.css).
+      className="hero-tile-field pointer-events-none absolute bottom-0 left-1/2 z-0 hidden w-screen -translate-x-1/2 overflow-hidden lg:block"
     >
       {/* CENTRED ON THE PICTURE OF THE COMPUTER (client 2026-09-13), and
           sized between the artboard's own 230 and what the device can hold —
@@ -2584,7 +2601,12 @@ function AppWindow() {
     // where the 2400px master is still above 1x.
     // md:mt-[45px]: the artboard's 64 from button to device, at the same 0.7
     // the button itself is drawn at (see the CTA in TemplatesHero).
-    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[45px] md:min-h-0 md:flex-1 md:max-w-[1440px] md:[container-type:size]">
+    // AT THE PAGE'S 0.8 SINCE 2026-10-04 (.tpl-scale in globals.css): this
+    // row is outside the zoom — its container units would be scaled twice in
+    // Safari — so its px is scaled by hand: the 45 above is 36. The 1440 cap
+    // is NOT scaled. It is there for the reason given above, and at 1152 a
+    // 2560 x 1300 monitor was back to 219px of bare burst under the device.
+    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[36px] md:min-h-0 md:flex-1 md:max-w-[1440px] md:[container-type:size]">
       {/* The device box. The tile field is inset-y-0 INSIDE it (Žilvinas
           2026-09-25, closing the day: "now it is 86 and 81, make the same"
           — measured against the MAC's edges, which is what the eye
