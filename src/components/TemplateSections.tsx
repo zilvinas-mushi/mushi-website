@@ -2606,7 +2606,16 @@ function AppWindow() {
     // Safari — so its px is scaled by hand: the 45 above is 36. The 1440 cap
     // is NOT scaled. It is there for the reason given above, and at 1152 a
     // 2560 x 1300 monitor was back to 219px of bare burst under the device.
-    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[36px] md:min-h-0 md:flex-1 md:max-w-[1440px] md:[container-type:size]">
+    //
+    // THE DEVICE SITS ON THE FOLD, ALWAYS (Žilvinas 2026-10-04, a tall narrow
+    // window with 350px of bare burst under the mac: "laptop should always
+    // be on the bottom screen"). When the row's WIDTH binds — a narrow
+    // window, or the 1440 cap on a tall monitor — the device is shorter than
+    // the row, and it used to hang from the row's top with the spare height
+    // under it. The row is a column that packs to its end now, so the spare
+    // goes between the button and the device, and the mac's cut edge is the
+    // hero's last line on every window.
+    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[36px] md:flex md:min-h-0 md:flex-1 md:max-w-[1440px] md:flex-col md:justify-end md:[container-type:size]">
       {/* The device box. The tile field is inset-y-0 INSIDE it (Žilvinas
           2026-09-25, closing the day: "now it is 86 and 81, make the same"
           — measured against the MAC's edges, which is what the eye
