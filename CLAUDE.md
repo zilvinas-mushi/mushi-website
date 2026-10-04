@@ -102,9 +102,16 @@ price in one place only and `npm test` goes red. PRD and plan:
 - **Nothing under `src/` may import `stripe`, `stripe/`, `scripts/` or
   `tests/`.** The SDK needs a secret key and this site has no server. Only a
   publishable key may ever reach the bundle.
-- **No live money is taken yet.** Buy buttons still hand off to
-  app.mushi.agency. Checkout comes only after the app can grant access, create
-  the account and send its email (PRD, Phases 2 and 3).
+- **Checkout is live since 2026-10-04, through Stripe Payment Links** — one
+  per plan and per mode, in `PAYMENT_LINKS` (`src/lib/pricing.ts`). The plan
+  sheet's Buy goes to the chosen plan's link; Stripe hosts the payment and
+  returns the buyer to `/thank-you`. The webapp's webhook creates the account
+  from Stripe's notice of the payment. A live link is created by a person
+  (`scripts/stripe-live-payment-links.sh`), never by a build or by CI.
+- **`/thank-you` grants nothing.** It is static, unindexed, and bounces
+  anyone without a `session_id`. Never make access depend on it.
+- The sheet's own payment step (card fields) is unreachable until the webapp
+  can hand it a Stripe session (PRD, Phase 3).
 - `npm test` runs everything; without a key it uses the Stripe CLI login. On
   CI a missing key fails the run — never make that a skip.
 

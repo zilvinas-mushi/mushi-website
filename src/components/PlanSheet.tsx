@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, LockGlyph, ShieldGlyph } from "./plan-sheet-glyphs";
 import { TEMPLATES_PAGE } from "@/lib/content";
+import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import { APP_URL } from "@/lib/site";
 
 /**
@@ -115,35 +116,6 @@ export function PlanSheet() {
     void panelRef.current?.getBoundingClientRect();
     setShown(true);
   };
-  const goPay = () => {
-    const panel = panelRef.current;
-    if (!panel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setStep("pay");
-      return;
-    }
-    setStepIn(false);
-    window.clearTimeout(stepTimer.current);
-    stepTimer.current = window.setTimeout(() => {
-      // The plan step is off stage. Pin the panel at its height, swap the
-      // step in (still off stage, to the right), measure where the height
-      // wants to be, then let both run: the height on the sheet curve, the
-      // step's own fade and slide on the step's transition.
-      const h0 = panel.offsetHeight;
-      panel.style.height = `${h0}px`;
-      flushSync(() => setStep("pay"));
-      panel.style.height = "";
-      const h1 = panel.offsetHeight;
-      panel.style.height = `${h0}px`;
-      void panel.offsetHeight;
-      panel.style.transition = "height 480ms cubic-bezier(0.32, 0.72, 0, 1)";
-      panel.style.height = `${h1}px`;
-      setStepIn(true);
-      stepTimer.current = window.setTimeout(() => {
-        panel.style.height = "";
-        panel.style.transition = "";
-      }, 500);
-    }, 170);
-  };
   const close = () => {
     window.clearTimeout(stepTimer.current);
     setShown(false);
@@ -211,7 +183,12 @@ export function PlanSheet() {
   if (!mounted) return null;
 
   const plan = c.options.find((o) => o.id === planId) ?? c.options[0];
-  const checkout = `${APP_URL}/?plan=${plan.id}`;
+  // CHECKOUT IS STRIPE'S OWN PAGE (2026-10-04, the launch): the chosen plan's
+  // Payment Link, which shows the real total and takes the card. The payment
+  // step below is no longer reached — its fields were never wired, and its
+  // "Total due today" showed the per-month figure, not the charge. It stays
+  // in the file for Phase 3, when Stripe's fields replace the inputs.
+  const checkout = checkoutUrl(plan.id as PlanId);
   const motion =
     // `translate`, not `transform`: Tailwind's translate-y-* utilities set
     // the CSS translate property, so a transition on transform never ran
@@ -387,9 +364,11 @@ export function PlanSheet() {
               })}
             </div>
 
-            <button
-              type="button"
-              onClick={goPay}
+            <a
+              href={checkout}
+              // Straight to Stripe's checkout for the chosen plan (2026-10-04).
+              // An anchor, so it works as a link in every sense: middle-click,
+              // long-press, a screen reader's links list.
               // Poppins Medium, 18 for the label and 14 for "/month" at 50%
               // white, off the inspector (Žilvinas 2026-09-25). The 50% is
               // an opacity rather than a colour so it still inverts with the
@@ -398,7 +377,7 @@ export function PlanSheet() {
             >
               {c.ctaPrefix} {plan.price}
               <span className="text-[14px] font-medium opacity-50">{c.perMonth}</span>
-            </button>
+            </a>
 
             {/* Poppins Regular 14, white at 50%, the whole line — label,
                 glyph and "500+ static templates" alike (Žilvinas 2026-09-25). */}
@@ -420,7 +399,7 @@ export function PlanSheet() {
             onSubmit={(e) => {
               e.preventDefault();
               const email = (e.currentTarget.elements.namedItem("email") as HTMLInputElement | null)?.value.trim();
-              window.location.href = email ? `${checkout}&email=${encodeURIComponent(email)}` : checkout;
+              window.location.href = checkoutUrl(plan.id as PlanId, undefined, email || undefined);
             }}
           >
             {/* Summary: the billing line with the discount pill, then the

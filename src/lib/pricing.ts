@@ -58,3 +58,46 @@ export const PLANS: readonly Plan[] = [
 export function monthsIn(plan: Pick<Plan, "interval" | "intervalCount">): number {
   return plan.interval === "year" ? plan.intervalCount * 12 : plan.intervalCount;
 }
+
+/**
+ * WHERE EACH PLAN IS PAID FOR: a Stripe Payment Link, hosted by Stripe, so
+ * the card never touches this site and no server is needed (2026-10-04, the
+ * launch). One link per plan and per mode; each sells exactly that plan's
+ * price and sends the buyer to `THANK_YOU_PATH` afterwards.
+ *
+ * These are URLs, not secrets — anyone who presses Buy sees them. They are
+ * created in Stripe by hand (`scripts/stripe-live-payment-links.sh` for
+ * live), because creating one is the moment real money can be taken.
+ *
+ * The sheet's own card fields return when the webapp can hand it a session
+ * (PRD, Phase 3); until then this is the checkout.
+ */
+export const PAYMENT_LINKS: Record<PlanId, { test: string; live: string }> = {
+  "1-month": {
+    test: "https://buy.stripe.com/test_14A00bdtYcxrdYL4jEafS00",
+    live: "https://buy.stripe.com/14A00bdtYcxrdYL4jEafS00",
+  },
+  "3-months": {
+    test: "https://buy.stripe.com/test_fZu9AL3TodBvaMzaI2afS01",
+    live: "https://buy.stripe.com/fZu9AL3TodBvaMzaI2afS01",
+  },
+  "12-months": {
+    test: "https://buy.stripe.com/test_6oU28jahM1SNbQD9DYafS02",
+    live: "https://buy.stripe.com/6oU28jahM1SNbQD9DYafS02",
+  },
+};
+
+/** Where Stripe sends the buyer after paying; it appends `?session_id=cs_…`. */
+export const THANK_YOU_PATH = "/thank-you";
+
+/**
+ * Live unless the build says otherwise. `NEXT_PUBLIC_STRIPE_MODE=test` is for
+ * a preview deployment or a local run, where a Buy button must not charge.
+ */
+export const STRIPE_MODE: "test" | "live" = process.env.NEXT_PUBLIC_STRIPE_MODE === "test" ? "test" : "live";
+
+/** The checkout address for a plan, with the buyer's email filled in when known. */
+export function checkoutUrl(planId: PlanId, mode: "test" | "live" = STRIPE_MODE, email?: string): string {
+  const link = PAYMENT_LINKS[planId][mode];
+  return email ? `${link}?prefilled_email=${encodeURIComponent(email)}` : link;
+}

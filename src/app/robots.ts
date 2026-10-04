@@ -7,7 +7,8 @@ export const dynamic = "force-static";
 /** Prerendered to /robots.txt at build time. */
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
+    // /thank-you is where a buyer lands after paying; it is not content.
+    rules: [{ userAgent: "*", allow: "/", disallow: "/thank-you" }],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
   };

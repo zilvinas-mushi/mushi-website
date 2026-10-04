@@ -120,6 +120,28 @@ Depends on Phase 4.
 - [deferred] The red gate marks the commit but does not stop Cloudflare Pages
   (PRD risk 3).
 
+## Launch addendum (2026-10-04, evening)
+
+Checkout went live the same day, ahead of the PRD's Phase 3, through Stripe
+Payment Links (`PAYMENT_LINKS` in `src/lib/pricing.ts`): the sheet's Buy goes
+to the plan's link and Stripe returns the buyer to `/thank-you`. The webapp
+shipped a minimal webhook (account + library on a paid checkout) at the same
+time; the full feature is `mushi-app/docs/features/0006-purchase-creates-account`.
+
+Verified by hand against Stripe, both modes: three active links, each selling
+exactly one of the catalog prices (lookup key, amount, interval, quantity 1),
+each redirecting to `https://mushi.agency/thank-you?session_id={CHECKOUT_SESSION_ID}`.
+`tests/checkout.links.test.ts` pins the links, the sheet's hand-off and the
+Thank You page offline.
+
+- [deferred] The same check against Stripe in CI. It needs **Payment Links:
+  Read** added to both CI keys; until then a link edited in the Dashboard (its
+  price, its redirect) is not noticed by the daily run.
+- [deferred] `/thank-you` only checks that a `session_id` is present. Asking
+  the webapp whether that session was paid waits on 0006's status endpoint.
+- [deferred] The account-created email, access ending with the subscription,
+  and VAT — all in 0006 or the PRD's Risks.
+
 ## Review record (2026-10-04)
 
 Two fresh-context reviews, both read-only: a code review with a silent-failure
