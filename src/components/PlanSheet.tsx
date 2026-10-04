@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, LockGlyph, ShieldGlyph } from "./plan-sheet-glyphs";
 import { TEMPLATES_PAGE } from "@/lib/content";
+import { StripePay } from "./StripePay";
+import { dueToday } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import { APP_URL } from "@/lib/site";
 
@@ -32,12 +34,10 @@ import { APP_URL } from "@/lib/site";
  * so a closed sheet is nothing in the DOM. Escape and the backdrop dismiss
  * it, and the page behind it does not scroll.
  *
- * STRIPE IS NOT WIRED YET (2026-09-25). The card fields are Stripe's job —
- * a Payment Element needs a client secret from the webapp, which does not
- * expose one yet (PRD, Architecture). Until it does the fields are
- * disabled, and both Pay with Link and Submit payment send the visitor to
- * the webapp with the plan in the query string. A field that took card
- * numbers into nothing would be worse than none.
+ * STRIPE IS WIRED (2026-10-04). Step two pays in place: the card fields are
+ * Stripe's own, mounted by StripePay from a session the webapp creates
+ * (lib/checkout.ts). "Pay with Link" opens the same plan on Stripe's hosted
+ * page, which is also where Submit falls back to if the fields cannot load.
  */
 /**
  * The rise: 560ms on a sheet curve — fast off the bottom, then a long,
@@ -118,6 +118,35 @@ export function PlanSheet() {
     }
     void panelRef.current?.getBoundingClientRect();
     setShown(true);
+  };
+  const goPay = () => {
+    const panel = panelRef.current;
+    if (!panel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStep("pay");
+      return;
+    }
+    setStepIn(false);
+    window.clearTimeout(stepTimer.current);
+    stepTimer.current = window.setTimeout(() => {
+      // The plan step is off stage. Pin the panel at its height, swap the
+      // step in (still off stage, to the right), measure where the height
+      // wants to be, then let both run: the height on the sheet curve, the
+      // step's own fade and slide on the step's transition.
+      const h0 = panel.offsetHeight;
+      panel.style.height = `${h0}px`;
+      flushSync(() => setStep("pay"));
+      panel.style.height = "";
+      const h1 = panel.offsetHeight;
+      panel.style.height = `${h0}px`;
+      void panel.offsetHeight;
+      panel.style.transition = "height 480ms cubic-bezier(0.32, 0.72, 0, 1)";
+      panel.style.height = `${h1}px`;
+      setStepIn(true);
+      stepTimer.current = window.setTimeout(() => {
+        panel.style.height = "";
+        panel.style.transition = "";
+      }, 500);
+    }, 170);
   };
   const close = () => {
     window.clearTimeout(stepTimer.current);
@@ -212,12 +241,12 @@ export function PlanSheet() {
   if (!mounted) return null;
 
   const plan = c.options.find((o) => o.id === planId) ?? c.options[0];
-  // CHECKOUT IS STRIPE'S OWN PAGE (2026-10-04, the launch): the chosen plan's
-  // Payment Link, which shows the real total and takes the card. The payment
-  // step below is no longer reached — its fields were never wired, and its
-  // "Total due today" showed the per-month figure, not the charge. It stays
-  // in the file for Phase 3, when Stripe's fields replace the inputs.
-  const checkout = checkoutUrl(plan.id as PlanId);
+  // STEP TWO PAYS IN PLACE (2026-10-04): Stripe's own card fields, mounted in
+  // the sheet by StripePay. `hosted` is the same plan on Stripe's own page —
+  // where "Pay with Link" goes, and where Submit falls back to if the fields
+  // cannot load, so there is always a way to pay.
+  const hosted = checkoutUrl(plan.id as PlanId);
+  const due = dueToday(plan.id as PlanId);
   const motion =
     // `translate`, not `transform`: Tailwind's translate-y-* utilities set
     // the CSS translate property, so a transition on transform never ran
@@ -393,11 +422,9 @@ export function PlanSheet() {
               })}
             </div>
 
-            <a
-              href={checkout}
-              // Straight to Stripe's checkout for the chosen plan (2026-10-04).
-              // An anchor, so it works as a link in every sense: middle-click,
-              // long-press, a screen reader's links list.
+            <button
+              type="button"
+              onClick={goPay}
               // Poppins Medium, 18 for the label and 14 for "/month" at 50%
               // white, off the inspector (Žilvinas 2026-09-25). The 50% is
               // an opacity rather than a colour so it still inverts with the
@@ -406,7 +433,7 @@ export function PlanSheet() {
             >
               {c.ctaPrefix} {plan.price}
               <span className="text-[14px] font-medium opacity-50">{c.perMonth}</span>
-            </a>
+            </button>
 
             {/* Poppins Regular 14, white at 50%, the whole line — label,
                 glyph and "500+ static templates" alike (Žilvinas 2026-09-25). */}
@@ -422,15 +449,7 @@ export function PlanSheet() {
             </p>
           </div>
         ) : (
-          <form
-            className="px-[25px] pt-[22px] md:px-[31px] md:pt-[35px]"
-            // Nothing submits here yet — see the note at the top.
-            onSubmit={(e) => {
-              e.preventDefault();
-              const email = (e.currentTarget.elements.namedItem("email") as HTMLInputElement | null)?.value.trim();
-              window.location.href = checkoutUrl(plan.id as PlanId, undefined, email || undefined);
-            }}
-          >
+          <div className="px-[25px] pt-[22px] md:px-[31px] md:pt-[35px]">
             {/* Summary: the billing line with the discount pill, then the
                 total with the struck old price. */}
             {/* "Billed yearly" is pinned to the TOTAL, not the pill: 7 above
@@ -462,105 +481,69 @@ export function PlanSheet() {
               </h2>
               <span className="flex items-center gap-[11px]">
                 {/* SemiBold 32 and 24, off the inspector (Žilvinas 2026-09-25). */}
-                {plan.was && <span className={`text-[24px] font-semibold leading-none md:text-[32px] ${WAS}`}>{plan.was}</span>}
-                <span className="text-[32px] font-semibold leading-none text-white md:text-[44px]">{plan.price}</span>
+                {/* WHAT IS CHARGED TODAY — the whole period, $60 for the year —
+                    not the per-month $5 the plan rows show (2026-10-04). The
+                    struck figure is the same months at the 1-month price. */}
+                {due.was && <span className={`text-[24px] font-semibold leading-none md:text-[32px] ${WAS}`}>{due.was}</span>}
+                <span className="text-[32px] font-semibold leading-none text-white md:text-[44px]">{due.price}</span>
               </span>
             </div>
 
-            {/* Stripe Link, in its own green. Until Stripe is wired this
-                goes to the webapp like Submit does. */}
-            <a
-              href={checkout}
-              className="mt-[17px] flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90 md:mt-[19px] md:h-[62px] md:gap-[8px] md:rounded-[15px] md:text-[25px]"
-            >
-              {/* Medium 18 and the client's 61 x 21 mark (Žilvinas 2026-09-25). */}
-              {c.pay.payWith}
-              <LinkMark className="h-[21px] w-[61px] md:h-[29px] md:w-[84px]" />
-            </a>
-
-            {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
-            {/* 11 between the rules and the word (Žilvinas 2026-09-25, the 11 x 9 spacer; it was 13). */}
-            <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090] md:mt-[24px] md:h-[32px] md:gap-[16px] md:text-[24px]">
-              {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
-              <span className="h-[2px] flex-1 bg-white/25" />
-              {c.pay.or}
-              <span className="h-[2px] flex-1 bg-white/25" />
-            </div>
-
-            {/* Medium 20, 25 under the rule — the inspector's 14 x 25 spacer
-                (Žilvinas 2026-09-25; the message said 28, the spacer 25). */}
-            <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
-
-            {/* The field group: one #222222 block with a 3px #181818 seam
-                between the card number and the MM/YY | CVV pair. Disabled
-                until Stripe's own iframes take their place. */}
-            {/* THE FIELDS TAKE INPUT (Žilvinas 2026-09-25, "why can't you
-                type") and format as you go — digits in fours, MM/YY, a 3–4
-                digit CVV. NOTHING IS SENT: with Stripe not wired there is
-                nowhere safe to send a card number, so Submit carries only the
-                plan and the email to the webapp and the card fields are left
-                behind on this page. When the Payment Element lands these
-                inputs become Stripe's iframes; see the PRD. */}
-            {/* NO gap ON THESE BOXES (Žilvinas 2026-09-25, "the submit
-                button keeps jumping"): password managers (NordPass here)
-                inject their icon element INTO the focused field's parent,
-                and a stray child in a flex column or a two-column grid is
-                one more gap — 3px — so everything under it dropped on
-                focus and rose on blur. The seams are margins on the fields
-                instead, which an extra child cannot add to. */}
-            <div role="group" className="mt-[13px] flex flex-col" aria-describedby="plan-sheet-note">
-              <input
-                type="text"
-                inputMode="numeric"
-                autoComplete="cc-number"
-                maxLength={19}
-                placeholder={c.pay.cardNumber}
-                onInput={(e) => {
-                  const el = e.currentTarget;
-                  el.value = el.value.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
-                }}
-                className={`${FIELD} rounded-t-[10px] md:rounded-t-[15px]`}
-              />
-              <div className="mt-[2px] grid grid-cols-2 gap-x-[2px] md:mt-[3px] md:gap-x-[3px]">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="cc-exp"
-                  maxLength={5}
-                  placeholder={c.pay.expiry}
-                  onInput={(e) => {
-                    const el = e.currentTarget;
-                    const d = el.value.replace(/\D/g, "").slice(0, 4);
-                    el.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+            {/* The card fields, the email and Submit: Stripe's own fields in
+                the sheet's clothes — see StripePay. Keyed by plan, so going
+                back and choosing another plan starts a session for THAT plan. */}
+            <StripePay
+              key={plan.id}
+              planId={plan.id as PlanId}
+              fallbackHref={(email) => checkoutUrl(plan.id as PlanId, undefined, email || undefined)}
+              // Stripe Link, in its own green: this one opens the plan on
+              // Stripe's hosted page, and stands in until Stripe's own Link
+              // button (which opens Link in a small window) is ready.
+              linkFallback={
+                <a
+                  href={hosted}
+                  // IN ITS OWN SMALL WINDOW (Žilvinas 2026-10-04, as on
+                  // Sintra's checkout), not by taking this page away: the
+                  // sheet stays where it is behind it. A blocked popup falls
+                  // through to the plain link. /thank-you hands the result
+                  // back to this tab and closes the window.
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                    const w = 480;
+                    const h = 760;
+                    const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - w) / 2));
+                    const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - h) / 2));
+                    const popup = window.open(hosted, "mushi-checkout", `popup,width=${w},height=${h},left=${left},top=${top}`);
+                    if (popup) e.preventDefault();
                   }}
-                  className={`${FIELD} rounded-bl-[10px] md:rounded-bl-[15px]`}
-                />
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="cc-csc"
-                  maxLength={4}
-                  placeholder={c.pay.cvv}
-                  onInput={(e) => {
-                    const el = e.currentTarget;
-                    el.value = el.value.replace(/\D/g, "").slice(0, 4);
-                  }}
-                  className={`${FIELD} rounded-br-[10px] md:rounded-br-[15px]`}
-                />
-              </div>
-              <input type="email" name="email" autoComplete="email" placeholder={c.pay.email} className={`${FIELD} mt-[22px] rounded-[10px] md:mt-[28px] md:rounded-[15px]`} />
-            </div>
-            <span id="plan-sheet-note" className="sr-only">
-              Card payment is completed on app.mushi.agency.
-            </span>
-
-            <button
-              type="submit"
-              className={`mt-[27px] flex h-[50px] w-full items-center justify-center gap-[10px] rounded-[10px] text-[16px] font-semibold md:mt-[34px] md:h-[62px] md:gap-[14px] md:rounded-[15px] md:text-[24px] md:font-medium ${VIOLET}`}
-            >
-              <LockGlyph className="h-[19px] w-auto md:h-[33px] md:[stroke-width:2.2]" />
-              {c.pay.submit}
-            </button>
+                  className="flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90 md:h-[62px] md:gap-[8px] md:rounded-[15px] md:text-[25px]"
+                >
+                  {/* Medium 18 and the client's 61 x 21 mark (Žilvinas 2026-09-25). */}
+                  {c.pay.payWith}
+                  <LinkMark className="h-[21px] w-[61px] md:h-[29px] md:w-[84px]" />
+                </a>
+              }
+              divider={
+                <>
+                  {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
+                  {/* 11 between the rules and the word (Žilvinas 2026-09-25, the 11 x 9 spacer; it was 13). */}
+                  <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090] md:mt-[24px] md:h-[32px] md:gap-[16px] md:text-[24px]">
+                    {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
+                    <span className="h-[2px] flex-1 bg-white/25" />
+                    {c.pay.or}
+                    <span className="h-[2px] flex-1 bg-white/25" />
+                  </div>
+      
+                  {/* Medium 20, 25 under the rule — the inspector's 14 x 25 spacer
+                      (Žilvinas 2026-09-25; the message said 28, the spacer 25). */}
+                  <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
+                </>
+              }
+              labels={{ email: c.pay.email, submit: c.pay.submit }}
+              fieldClass={FIELD}
+              submitClass={VIOLET}
+              submitIcon={<LockGlyph className="h-[19px] w-auto md:h-[33px] md:[stroke-width:2.2]" />}
+            />
 
             <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[12px] leading-none text-white/60 md:mt-[16px] md:gap-[40px] md:text-[17px]">
               <span className="flex items-center gap-[6px]">
@@ -612,7 +595,7 @@ export function PlanSheet() {
                 {c.pay.privacy}
               </a>
             </p>
-          </form>
+          </div>
         )}
         </div>
       </div>

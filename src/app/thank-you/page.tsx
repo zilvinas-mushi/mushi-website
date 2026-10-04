@@ -28,6 +28,15 @@ export const metadata: Metadata = {
 /** Runs during parsing, ahead of the content below it. */
 const REQUIRE_SESSION = `if(!/[?&]session_id=cs_[A-Za-z0-9_]+/.test(location.search))location.replace("/templates")`;
 
+/**
+ * PAID IN THE SMALL WINDOW (the sheet's "Pay with Link" opens Stripe's page
+ * in a popup): hand this address to the tab that opened it and close, so the
+ * buyer ends up on one Thank You page, in the tab they started in. If the
+ * opener is out of reach — Stripe's page may sever it — the popup simply
+ * shows this page itself.
+ */
+const RETURN_TO_OPENER = `try{if(window.name==="mushi-checkout"&&window.opener&&!window.opener.closed){window.opener.location.href=location.href;window.close()}}catch(e){}`;
+
 // The site's violet button: it inverts to white with violet text on hover and
 // on tap (CLAUDE.md, Interaction rules), cross-fading through the gradient.
 const VIOLET =
@@ -42,7 +51,7 @@ const STEPS = [
 export default function ThankYouPage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-      <script dangerouslySetInnerHTML={{ __html: REQUIRE_SESSION }} />
+      <script dangerouslySetInnerHTML={{ __html: `${REQUIRE_SESSION};${RETURN_TO_OPENER}` }} />
       {/* The wordmark is TYPE, so it is sized with a font-size: 38 on the
           phone, as in the phone header, and 48 from md up. */}
       <Logo className="text-[2.375rem] md:text-[3rem]" />

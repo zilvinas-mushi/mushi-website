@@ -9,6 +9,8 @@
  */
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { CHECKOUT_SESSION_URL, STRIPE_PUBLISHABLE_KEYS, dueToday, usd } from "@/lib/checkout";
+import { TEMPLATES_PAGE } from "@/lib/content";
 import { PAYMENT_LINKS, PLANS, THANK_YOU_PATH, checkoutUrl } from "@/lib/pricing";
 
 const read = (path: string) => readFileSync(path, "utf8");
@@ -53,21 +55,109 @@ describe("checkoutUrl", () => {
 
 describe("the plan sheet", () => {
   const sheet = read("src/components/PlanSheet.tsx");
+  const pay = read("src/components/StripePay.tsx");
 
-  it("sends Buy to Stripe's checkout for the chosen plan", () => {
-    expect(sheet).toContain("const checkout = checkoutUrl(plan.id as PlanId);");
-    expect(sheet).toMatch(/<a\s+href=\{checkout\}/);
+  it("pays in place: step one leads to the payment step, which mounts Stripe's fields", () => {
+    expect(sheet).toMatch(/onClick=\{goPay\}/);
+    expect(sheet).toContain("<StripePay");
+    expect(pay).toContain("initCheckoutElementsSdk");
+    expect(pay).toContain("createPaymentElement");
+  });
+
+  it("has no card input of its own: a card number is only ever typed into Stripe's fields", () => {
+    for (const source of [sheet, pay]) {
+      expect(source).not.toMatch(/autoComplete="cc-(number|exp|csc)"/);
+    }
+  });
+
+  it("asks the webapp for the session of the chosen plan, by lookup key", () => {
+    expect(pay).toContain("fetch(CHECKOUT_SESSION_URL");
+    expect(pay).toContain("JSON.stringify({ plan: planFor(planId).lookupKey })");
+  });
+
+  it("loads Stripe.js only when the payment step is reached, never with the page", () => {
+    expect(pay).toContain('import("@stripe/stripe-js")');
+    expect(pay).not.toMatch(/^import \{[^}]*loadStripe[^}]*\} from "@stripe\/stripe-js"/m);
+    expect(sheet).not.toContain("@stripe/stripe-js");
+  });
+
+  it("can always be paid: Stripe's hosted page is the fallback and the Pay with Link target", () => {
+    expect(sheet).toContain("const hosted = checkoutUrl(plan.id as PlanId);");
+    expect(sheet).toMatch(/<a\s+href=\{hosted\}/);
+    expect(sheet).toContain("fallbackHref={(email) => checkoutUrl(plan.id as PlanId, undefined, email || undefined)}");
+    expect(pay).toContain('if (state === "unavailable") {');
+    expect(pay).toContain("window.location.href = fallbackHref(email);");
+  });
+
+  it("shows three card fields and nothing else: no country selector, mandate line or Link sign-up", () => {
+    expect(pay).toContain('terms: { card: "never" }');
+    expect(pay).toContain('fields: { billingDetails: { address: { country: where ? "never" : "auto" } } }');
+    expect(pay).toContain('wallets: { link: "never" }');
+  });
+
+  it("supplies the billing country itself, from Cloudflare's report of where the visitor is", () => {
+    expect(pay).toContain('fetch("/cdn-cgi/trace"');
+    expect(pay).toContain("{ billingAddress: { address: { country: country.current } } }");
+  });
+
+  it("opens Pay with Link in its own small window, and falls back to the plain link if that is blocked", () => {
+    expect(sheet).toMatch(/window\.open\(hosted, "mushi-checkout", `popup,/);
+    expect(sheet).toContain("if (popup) e.preventDefault();");
+  });
+
+  it("never waits for ever: a stalled load gives way to the hosted page within a limit", () => {
+    expect(pay).toMatch(/const LOAD_LIMIT_MS = 12_000;/);
+    expect(pay).toMatch(/window\.setTimeout\(\(\) => \{[\s\S]{0,160}settle\("unavailable"\);[\s\S]{0,20}\}, LOAD_LIMIT_MS\)/);
+  });
+
+  it("shows what is charged today, not the per-month figure", () => {
+    expect(sheet).toContain("const due = dueToday(plan.id as PlanId);");
+    expect(sheet).toContain("{due.price}");
+    expect(sheet).not.toMatch(/totalLabel[\s\S]{0,900}\{plan\.price\}/);
   });
 
   it("opens by itself on /templates#buy, once the page has finished painting", () => {
     expect(sheet).toContain('export const BUY_HASH = "#buy";');
     expect(sheet).toContain("if (window.location.hash !== BUY_HASH) return;");
-    // It waits for the paint gate's signal rather than opening over the veil.
     expect(sheet).toMatch(/attributeFilter: \["data-ready"\]/);
   });
 
   it("no longer hands the purchase to the webapp", () => {
     expect(sheet).not.toContain("?plan=");
+  });
+});
+
+describe("the in-sheet checkout's configuration", () => {
+  it("has a publishable key for each mode, and nothing but publishable keys", () => {
+    expect(STRIPE_PUBLISHABLE_KEYS.test).toMatch(/^pk_test_[A-Za-z0-9]{90,}$/);
+    expect(STRIPE_PUBLISHABLE_KEYS.live).toMatch(/^pk_live_[A-Za-z0-9]{90,}$/);
+  });
+
+  it("both keys belong to the one Stripe account", () => {
+    // A Stripe key carries its account's id after the mode.
+    expect(STRIPE_PUBLISHABLE_KEYS.test).toContain("_51Q7Da8026uErRlIm");
+    expect(STRIPE_PUBLISHABLE_KEYS.live).toContain("_51Q7Da8026uErRlIm");
+  });
+
+  it("asks the webapp for sessions unless a build points it elsewhere", () => {
+    expect(CHECKOUT_SESSION_URL).toBe("https://app.mushi.agency/api/checkout/session");
+  });
+
+  it.each([
+    ["1-month", "$10", null],
+    ["3-months", "$24", "$30"],
+    ["12-months", "$60", "$120"],
+  ] as const)("%s is due %s today, against %s at the monthly price", (planId, price, was) => {
+    expect(dueToday(planId)).toEqual({ price, was });
+  });
+
+  it.each(PLANS)("$id: what is due today is the catalog's charge, and its discount is the pill's", (plan) => {
+    const due = dueToday(plan.id);
+    expect(due.price).toBe(usd(plan.amount));
+    const shown = TEMPLATES_PAGE.plans.options.find((o) => o.id === plan.id);
+    const was = due.was ? Number(due.was.slice(1)) * 100 : plan.amount;
+    const pct = ((was - plan.amount) * 100) / was;
+    expect(shown?.off ?? null).toBe(pct > 0 ? `-${pct}% OFF` : null);
   });
 });
 
@@ -82,6 +172,11 @@ describe("the Thank You page", () => {
     expect(page).toContain("robots: { index: false, follow: false }");
     expect(read("src/app/sitemap.ts")).not.toContain("thank-you");
     expect(read("src/app/robots.ts")).toContain('disallow: "/thank-you"');
+  });
+
+  it("hands a payment made in the small window back to the tab that opened it", () => {
+    expect(page).toContain('window.name==="mushi-checkout"&&window.opener');
+    expect(page).toContain("window.opener.location.href=location.href;window.close()");
   });
 
   it("sends away anyone who did not arrive from a Stripe checkout", () => {
