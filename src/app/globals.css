@@ -491,13 +491,34 @@ img[data-src] {
 [data-bg-wait] {
   opacity: 0;
 }
-[data-bg-in] {
+[data-bg-in],
+[data-hold-in] {
   transition: opacity 350ms ease-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-bg-in] {
+  [data-bg-in],
+  [data-hold-in] {
     transition: none;
   }
+}
+
+/*
+  THE SAME FOR A CARD WHOSE PICTURES ARE <img>s (same day, after pre-loading
+  alone was live: "once I am in the page I can't see, as a user, an unloaded
+  image"). paint-gate-script puts data-hold on every article, li and figure
+  with a deferred picture in it before the veil lifts, and takes it off when
+  the last of them has decoded. !important because a rail sets its cards'
+  opacity inline. It is the script that sets it, so with JavaScript off, or
+  the script dead, nothing is ever held.
+
+  And a deferred picture on its own — in no card — is not drawn while it is
+  still arriving (data-src-wait), so it cannot be watched filling in.
+*/
+[data-hold] {
+  opacity: 0 !important;
+}
+img[data-src-wait] {
+  visibility: hidden;
 }
 
 /*

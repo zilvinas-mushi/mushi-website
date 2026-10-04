@@ -38,16 +38,24 @@ before anyone scrolls to it.** `loading="lazy"` does not deliver the first part
 cannot ask for it at all, so the URL is kept out of anything the browser will
 fetch from — `data-src` on an image, `data-bg` + `background-image: var(--bg,
 none)` on a background. Once the cross-fade has ended the script walks the
-page top to bottom and loads every one, three at a time, each decoded before
+page top to bottom and loads every one, six at a time, each decoded before
 the next (`warm()`); an IntersectionObserver lets whatever the reader gets
 near jump the queue. Save-Data and 2G visitors keep the observer alone.
 
-**A reader must never scroll onto a half-loaded card** (Žilvinas 2026-10-04:
-"either don't show anything when pictures are not loaded or load everything
-beforehand" — both are done). An element with `data-bg` is invisible, words
-and all, until its artwork and the pictures inside it have arrived and
-decoded, then it fades in whole. So a deferred background belongs on the
-CARD, not on a layer inside it.
+**A reader must never see an unloaded picture, or a card that is waiting for
+one** (Žilvinas 2026-10-04: "either don't show anything when pictures are not
+loaded or load everything beforehand", then "once I am in the page I can't
+see, as a user, an unloaded image" — both halves are done). Pre-loading makes
+the gap short; hiding makes it invisible:
+- an element with `data-bg` is invisible, words and all, until its artwork
+  and the pictures inside it have arrived and decoded, then fades in whole —
+  so a deferred background belongs on the CARD, not on a layer inside it;
+- every `article`, `li` and `figure` with a deferred `<img>` in it is held
+  the same way by the script (`data-hold`), so **a card with pictures must be
+  one of those three elements**;
+- a deferred `<img>` in no card is simply not drawn until it has decoded.
+Do not leave a picture to `loading="lazy"` with a real `src`: nothing holds
+it. The ceiling on every hold is 12s (`HOLD_MS`), for a line that has stalled.
 
 When you build anything new:
 - Artwork that is a **CSS background** above the fold gets `data-await-bg` on

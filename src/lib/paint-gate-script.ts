@@ -51,12 +51,23 @@ export const PAINT_GATE_SCRIPT = `
   // with JavaScript off the <noscript> block in layout.tsx does the same.
   var sel='[data-src],[data-bg]';
   // Calls back once a picture has arrived AND decoded — or failed, or taken
-  // 8s, because nothing here may wait for ever.
+  // HOLD_MS, because nothing here may wait for ever.
+  //
+  // "Arrived" is the load event, or complete WITH pixels. Not complete alone:
+  // an <img> that has just been given its src still answers complete=true
+  // until the browser gets round to the request, and decode() on an SVG can
+  // reject outright — either of which called a picture loaded while it was
+  // still on the wire, and showed its card without it.
+  //
+  // HOLD_MS is long on purpose (Žilvinas 2026-10-04: an unloaded picture is
+  // never to be seen). It is the ceiling for a line that has stalled, not a
+  // budget: a card shows the moment its pictures are in.
+  var HOLD_MS=12000;
   function settle(img,cb){
     var f=0,fin=function(){if(f)return;f=1;cb()};
     var dec=function(){try{img.decode().then(fin,fin)}catch(e){fin()}};
-    setTimeout(fin,8000);
-    if(img.complete&&img.src)dec();
+    setTimeout(fin,HOLD_MS);
+    if(img.complete&&img.naturalWidth>0)dec();
     else{img.addEventListener('load',dec,{once:true});img.addEventListener('error',fin,{once:true})}
   }
   // The file a deferred background will draw at this width, as a probe.
@@ -66,6 +77,39 @@ export const PAINT_GATE_SCRIPT = `
     var m=/url\\((['"]?)(.*?)\\1\\)/.exec(v);
     if(!m||!m[2]||m[2].indexOf('data:')===0)return null;
     var p=new Image();p.src=m[2];return p;
+  }
+  // A CARD IS SHOWN WITH ITS PICTURES OR NOT AT ALL (Žilvinas 2026-10-04,
+  // after the pre-loading below was live: "once I am in the page I can't
+  // see, as a user, an unloaded image"). Loading everything early makes the
+  // gap short; it cannot make it zero for a reader who scrolls the moment
+  // the page appears. So the gap is made invisible instead: before the veil
+  // lifts, every card (article, li, figure) that has a deferred picture in
+  // it is hidden — words, plate and all — and it comes back, finished, when
+  // the last of its pictures has arrived and decoded. What the reader can
+  // meet is a card that is not there yet, never one that is half there.
+  //
+  // A card with a deferred BACKGROUND holds itself the same way through
+  // data-bg (see load), so those are left to it. Cards in a marquee group
+  // just appear; a fade would fight the rail's own transitions. HOLD_MS
+  // after a card's first picture is asked for it is shown regardless.
+  function hold(){
+    var c=d.querySelectorAll('img[data-src]');
+    for(var i=0;i<c.length;i++){
+      var el=c[i];
+      if(el.__card||!el.getClientRects().length)continue;
+      var card=el.closest('article,li,figure');
+      if(!card||card.hasAttribute('data-bg')||card.closest('[data-bg],[data-bg-wait]'))continue;
+      card.__n=(card.__n||0)+1;el.__card=card;
+      card.setAttribute('data-hold','');
+    }
+  }
+  function release(card){
+    if(!card.hasAttribute('data-hold'))return;
+    if(!card.closest('[data-defer-group]')){
+      card.setAttribute('data-hold-in','');
+      setTimeout(function(){card.removeAttribute('data-hold-in')},600);
+    }
+    card.removeAttribute('data-hold');
   }
   function load(el){
       var s=el.getAttribute('data-src');
@@ -79,6 +123,15 @@ export const PAINT_GATE_SCRIPT = `
         var ss=el.getAttribute('data-srcset');
         if(ss){el.setAttribute('srcset',ss);el.removeAttribute('data-srcset')}
         el.setAttribute('src',s);el.removeAttribute('data-src');
+        // NOT SEEN UNTIL IT IS ALL THERE (globals.css hides data-src-wait):
+        // a picture still arriving is one a reader can watch arrive.
+        el.setAttribute('data-src-wait','');
+        var card=el.__card;
+        if(card&&!card.__t)card.__t=setTimeout(function(){release(card)},HOLD_MS);
+        settle(el,function(){
+          el.removeAttribute('data-src-wait');
+          if(card&&!--card.__n)release(card);
+        });
       }
       var b=el.getAttribute('data-bg');
       if(b){
@@ -90,8 +143,7 @@ export const PAINT_GATE_SCRIPT = `
         // and from here it carries data-bg-wait instead until its artwork
         // has arrived and decoded — together with every picture and nested
         // background inside it, which are loaded now for that reason. Then
-        // it fades in, finished. 4s is the ceiling: late artwork must not
-        // keep a card's words off the page.
+        // it fades in, finished. HOLD_MS is the ceiling.
         var n=1,up=0,inner=[];
         var show=function(){
           if(up)return;up=1;
@@ -110,7 +162,7 @@ export const PAINT_GATE_SCRIPT = `
             inner.push(ins[q]);
           }
           el.setAttribute('data-bg-wait','');
-          setTimeout(show,4000);
+          setTimeout(show,HOLD_MS);
         }
         // The property is what the stylesheet already points at: every
         // deferred background is background-image:var(--bg,none), so setting
@@ -139,7 +191,7 @@ export const PAINT_GATE_SCRIPT = `
   //
   // So when defer() arms — and not before: the first screen still owes
   // nothing to what is under it — this walks every deferred picture and
-  // background in document order and loads it, three at a time, waiting for
+  // background in document order and loads it, six at a time, waiting for
   // each to arrive AND decode before taking the next. In order, so the
   // sections fill in the order they are read; a few at a time, so the next
   // section is not sharing the line with the last one. The observer stays:
@@ -154,7 +206,7 @@ export const PAINT_GATE_SCRIPT = `
     var list=d.querySelectorAll(sel+',[data-defer-group]'),i=0,busy=0;
     function done(){busy--;next()}
     function next(){
-      while(busy<3&&i<list.length){
+      while(busy<6&&i<list.length){
         var el=list[i++];
         if(!el.getClientRects().length)continue;
         if(el.hasAttribute('data-defer-group')){
@@ -174,6 +226,11 @@ export const PAINT_GATE_SCRIPT = `
       }
     }
     next();
+    // And the few pictures that were left to the browser's own lazy loading
+    // (small vectors with a real src) are asked for now as well, rather than
+    // when Chrome decides the reader is close enough.
+    var lz=d.querySelectorAll('img[loading="lazy"][src]');
+    for(var z=0;z<lz.length;z++)if(lz[z].getClientRects().length)lz[z].loading='eager';
   }
   function defer(){
     // A MARQUEE LOADS AS A GROUP. The showcase wall and the creatives rail
@@ -199,13 +256,15 @@ export const PAINT_GATE_SCRIPT = `
       for(var i=0;i<entries.length;i++){
         if(entries[i].isIntersecting){io.unobserve(entries[i].target);load(entries[i].target)}
       }
-    // Vertical: two thirds of a screen of warning, enough that the artwork is
-    // decoded before it is scrolled to and little enough that the next
-    // section's 300 KB is not on the wire while the first is still being read.
+    // Vertical: two screens of warning (it was two thirds of one, 600px,
+    // while this observer was the only thing loading the page). warm() now
+    // loads everything in order regardless, so the margin's job is only to
+    // let what the reader is heading for jump that queue — the earlier the
+    // better.
     // Horizontal: much wider, because the creatives rail and the tile strips
     // travel sideways — a card three screens to the right is seconds away, not
     // a scroll away, and 0 here would pop it in mid-marquee.
-    },{rootMargin:'600px 3000px'});
+    },{rootMargin:'1600px 3000px'});
     for(var j=0;j<all.length;j++)io.observe(all[j]);
     var gio=new IntersectionObserver(function(entries){
       for(var i=0;i<entries.length;i++){
@@ -213,7 +272,7 @@ export const PAINT_GATE_SCRIPT = `
       }
     // A group is loaded on the vertical margin alone — its own width is the
     // horizontal reach, and that is the point of grouping it.
-    },{rootMargin:'600px 0px'});
+    },{rootMargin:'1600px 0px'});
     for(var g=0;g<groups.length;g++)gio.observe(groups[g]);
     // ANYTHING ADDED LATER IS WATCHED TOO. The pass above only knows the
     // elements that existed when it ran; a picture React renders afterwards
@@ -302,6 +361,7 @@ export const PAINT_GATE_SCRIPT = `
     }
     function collect(){
       var waits=[];
+      try{hold()}catch(e0){}
       // THE FACES THE FIRST SCREEN ACTUALLY USES, not every face the document
       // asks for anywhere. document.fonts.ready waits for all of them —
       // Poppins in five weights here, of which the hero uses two — and each

@@ -306,9 +306,14 @@ function EyebrowRule({
   // arrows no more"): the rules are ~900-byte vectors, so deferring them
   // saved nothing and cost the one thing that matters — they showed only
   // once the below-fold observer had reached them, and in a tab that had
-  // not been reloaded since the markup changed that was never. loading=lazy
-  // keeps them off the paint gate's list (it skips lazy images), and the
-  // browser fetches them on its own terms.
+  // not been reloaded since the markup changed that was never.
+  //
+  // EAGER SINCE 2026-10-04 (it was loading=lazy): left to Chrome's own lazy
+  // threshold they were asked for as the reader arrived, and on a slow line
+  // each section's heading stood for a moment without its rules — the one
+  // thing the scroll test still caught after everything else was pre-loaded.
+  // Four files of ~900 bytes, fetched with the page and waited for by the
+  // paint gate like any eager picture; that is the whole cost.
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -316,7 +321,7 @@ function EyebrowRule({
       alt=""
       width={width}
       height={height}
-      loading="lazy"
+      loading="eager"
       decoding="async"
       className={className}
     />
