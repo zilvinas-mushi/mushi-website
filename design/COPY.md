@@ -372,3 +372,53 @@ shows them COLLAPSED, so the answers are NOT from any design.
 - Answers supplied verbatim by the client 2026-09-04 (in content.ts) —
   including the Canva-Pro nuance and app.mushi.agency login-code delivery.
   The earlier drafted answers and their caveats are superseded.
+---
+
+# Case Studies page (`/case-studies`)
+
+Read off Figma 2026-10-04 — see [CASE-STUDIES.md](CASE-STUDIES.md) for the
+nodes and every measurement. Implemented in `CASE_STUDIES_PAGE`
+(`src/lib/content.ts`).
+
+## Hero
+
+- **H1: Case Studies** *(the only `<h1>`)*
+
+Four cards, in this order on both breakpoints. Line breaks are the frames':
+
+| Brand | Result — desktop | Result — phone | Tag (desktop only) |
+| --- | --- | --- | --- |
+| Holo | From $0k/month to / $117k/month in 7 months. | From $0k/month / to $117k/month / in 7 months. | AI FOR MARKETING |
+| Breezit | Generated 700 sales calls / & 1500 leads in 8 months. | Generated 700 / sales calls & 1500 / leads in 8 months. | AI FOR SALES |
+| eany | Helped find 3 evergreen / ads for 8 figure company. | Helped find 3 / evergreen ads for / 8 figure company. | B2B MARKETPLACE |
+| we interiors | From $13k/month to / $75k/month in 3 months. | From $13k/month / to $75k/month / in 3 months. | FURNITURE RETAIL |
+
+- Body, **the same line on all four cards in the file** (placeholder): Capturing
+  demand from day 1 and helping scale Holo into the largest AI content tool.
+- Button: Read full story
+
+## Rails
+
+- H2: Video Ads
+- H2: Landing Pages
+- H2: Static Ads
+
+## Ready To Scale?
+
+- H2: Ready To Scale?
+- Card 1 — 500+ High-ROAS / Static Templates · BUY NOW · 50+ new templates
+  monthly · 24/7 customer support · Editable in Canva
+- Card 2 — Premium Static / & Video Ads · BOOK A CALL · Now Booking New Projects
+
+## Case study — Holo (`/case-studies/holo`)
+
+- Eyebrow: HOLO • CASE STUDY
+- **H1: From $0k/month to $117k/month in 7 months.**
+- Sub: Capturing demand from day 1 and helping scale Holo into the largest AI
+  content tool.
+- Call card: BOOK A CALL · 2/10 spots left for 2026 · Prefer Email? ·
+  nojus@mushi.agency
+- Article: THE BRAND, THE CHALLENGE, THE GOAL, THE STRATEGY, THE EXECUTION,
+  THE RESULTS, WHY THIS WORKED. **Placeholder** — the file's copy under these
+  heads is another client's story; it lives verbatim in `CASE_STUDY_DETAILS`
+  and is not repeated here.

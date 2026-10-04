@@ -115,6 +115,20 @@ export const TEMPLATES_HERO_CTA_ID = "templates-hero-cta";
  */
 export const TEMPLATES_SCRATCH_CARD_ID = "templates-scratch-card";
 
+/**
+ * /case-studies' two ends of the phone header's contract (see
+ * CREATIVES_CTA_ID): the rails passing under the bar bring the Schedule a
+ * Call button out, and the Ready To Scale card's own Book a Call pill
+ * arriving puts it away.
+ */
+export const CASE_STUDIES_RAILS_ID = "case-studies-rails";
+export const CASE_STUDIES_CALL_ID = "case-studies-call";
+
+/** The same contract on a case study's own page: its hero Book a Call
+ * leaving brings the header's button out, the call card's puts it away. */
+export const CASE_STUDY_HERO_CTA_ID = "case-study-hero-cta";
+export const CASE_STUDY_CALL_ID = "case-study-call";
+
 export const FOOTER_PLATE_ID = "footer-plate";
 
 /**

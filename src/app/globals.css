@@ -1948,3 +1948,384 @@ img[data-src] {
 .showcase-wall {
   container-type: inline-size;
 }
+
+/* --------------------------------------------------- case studies page --- */
+
+/* The /case-studies hero field: every SOFT layer of the frame's background —
+   the black-to-#161220 ramp, the violet diamond gradient, the blurred light
+   and the two fades — baked into one file (design/CASE-STUDIES.md, "How the
+   artwork was made"). The sharp things, the angular shapes and the floating
+   icons, are their own sprites over it.
+
+   `100% 100%`, like .hero-light and for its reason: it is all blur, the
+   bottom fade has to land on the field's real bottom edge at whatever height
+   the cards give it, and stretching a blur costs nothing.
+
+   The phone file starts 11px down. The phone page is the artboard pushed down
+   by that much (the live bar ends at 84, the frame's at 73) and the field
+   moves with the cards it lights; the strip above it is the field's own
+   black. */
+.cs-field {
+  background:
+    url("/images/case-studies/field-phone.webp") 0 11px / 100% calc(100% - 11px) no-repeat,
+    #000;
+}
+@media (min-width: 768px) {
+  .cs-field {
+    background:
+      url("/images/case-studies/field.webp") center top / 100% 100% no-repeat,
+      #000;
+  }
+}
+
+/* A floating icon. Geometry arrives as custom properties, one set per
+   breakpoint (CaseStudySections), because the phone frame is a different
+   arrangement of the same seven and not a scaled copy of the desktop's. */
+.cs-floater {
+  position: absolute;
+  left: var(--px);
+  right: var(--pr);
+  top: var(--py);
+  width: var(--pw);
+  height: var(--ph);
+  max-width: none;
+}
+@media (min-width: 768px) {
+  .cs-floater {
+    left: var(--dx);
+    right: var(--dr);
+    top: var(--dy);
+    width: var(--dw);
+    height: var(--dh);
+  }
+}
+
+/* A case card's artwork. It breaks OUT of its tile — left and up on desktop,
+   left over the text on the phone, where it is measured from the plate's
+   right edge so the pair stays together on a wider phone. */
+.cs-art {
+  position: absolute;
+  right: var(--pr);
+  top: var(--pt);
+  width: var(--pw);
+  height: var(--ph);
+  max-width: none;
+}
+.cs-logo {
+  position: absolute;
+  left: calc(20px + var(--lpx));
+  /* --csp / --csd: how far a card without its pill moves its copy down. */
+  top: calc(var(--lpt) + var(--csp));
+  width: var(--lpw);
+  height: var(--lph);
+  max-width: none;
+}
+@media (min-width: 768px) {
+  .cs-art {
+    right: auto;
+    left: var(--dl);
+    top: var(--dt);
+    width: var(--dw);
+    height: var(--dh);
+  }
+  .cs-logo {
+    left: calc(1.875rem + var(--ldx));
+    top: calc(var(--ldt) + var(--csd));
+    width: var(--ldw);
+    height: var(--ldh);
+  }
+}
+
+/* The two Ready To Scale cards are 1196 design px side by side — 785 real
+   ones at the page scale's 10.5px floor, which a 768 window (an iPad held
+   upright) is 17 short of. Everything in the cards is rem, so there is no
+   local scale to turn down; `zoom` shrinks the pair as a unit for the 44px
+   band where it does not fit, and nothing else on the page needs it. */
+@media (min-width: 768px) and (max-width: 811px) {
+  .cs-scale-pair {
+    zoom: 0.94;
+  }
+}
+
+/* The cover-flow rails — see CoverflowRail.tsx for the model. Every length
+   is a custom property the component sets per card and per breakpoint; the
+   rules here only say which set applies and that a change of slot is a
+   600ms glide. */
+.cf {
+  height: var(--ph);
+  --cf-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cf-plate {
+  position: absolute;
+  left: calc(50% - 152.5px);
+  top: 13px;
+  width: 305px;
+  height: var(--pplate);
+  border-radius: 15px;
+  background: #181818;
+}
+.cf-title {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 20;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 24px;
+  color: #fff;
+}
+.cf-stage {
+  position: absolute;
+  inset: 0;
+}
+.cf-card {
+  position: absolute;
+  left: calc(50% + var(--px));
+  top: var(--py);
+  width: var(--pw);
+  height: var(--ph);
+  padding: var(--pp);
+  border-radius: 20px;
+  background: #343434;
+  box-shadow: var(--ps);
+  opacity: var(--pv);
+  transition:
+    left 600ms var(--cf-ease),
+    top 600ms var(--cf-ease),
+    width 600ms var(--cf-ease),
+    height 600ms var(--cf-ease),
+    padding 600ms var(--cf-ease),
+    box-shadow 600ms var(--cf-ease),
+    opacity 600ms var(--cf-ease);
+}
+.cf-card[data-side] {
+  cursor: pointer;
+}
+.cf-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 17px;
+  object-fit: cover;
+  opacity: var(--po);
+  transition: opacity 600ms var(--cf-ease);
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* Landing pages are tall screenshots: the card shows the top of the page.
+   The ads are centre-cropped, which is the default. */
+.cf-landing .cf-img {
+  object-position: 50% 0;
+}
+/* A card's film: over its poster, inside the frame's inset (the card's
+   padding is not a containing-block edge, hence the explicit box), and
+   invisible until it is actually playing. */
+.cf-film {
+  position: absolute;
+  left: var(--ppx);
+  top: var(--ppy);
+  width: calc(100% - 2 * var(--ppx));
+  height: calc(100% - 2 * var(--ppy));
+  border-radius: 17px;
+  object-fit: cover;
+  transition: opacity 500ms ease-out;
+  pointer-events: none;
+}
+/* The frame draws the mute badge on desktop only. A phone still needs to see
+   that the film has sound to turn on, so the CENTRE card carries the home
+   rail's badge there (28 x 26, 10 in) and the side cards carry none. */
+.cf-badge {
+  display: none;
+  color: #fff;
+}
+/* The glyph is the home rail's, at the frame's 25-in-40 of its badge. */
+.cf-badge svg {
+  width: 62.5%;
+  height: 62.5%;
+}
+.cf-card:not([data-side]) .cf-badge {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  display: grid;
+  width: 28px;
+  height: 26px;
+  place-items: center;
+  border-radius: 19.5px;
+  background: rgba(79, 79, 79, 0.5);
+}
+.cf-arrow {
+  position: absolute;
+  top: var(--parrows);
+  z-index: 20;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 50%;
+  /* #343434 fill / white chevron -> white fill / #343434 chevron. A flat
+     gradient on both states so the fill cross-fades (CLAUDE.md). */
+  background: linear-gradient(#343434, #343434);
+  color: #fff;
+  transition:
+    background 300ms ease-out,
+    color 300ms ease-out;
+}
+.cf-arrow:hover {
+  background: linear-gradient(#fff, #fff);
+  color: #343434;
+}
+.cf-arrow-prev {
+  left: calc(50% - 57.5px);
+}
+.cf-arrow-next {
+  left: calc(50% + 10.5px);
+}
+.cf-arrow svg {
+  width: 11.08px;
+  height: 19px;
+}
+/* The chevrons sit a pixel towards the way they point — off the frame, and
+   the usual optical correction for an arrowhead in a circle. */
+.cf-arrow-prev svg {
+  translate: -1px 0;
+}
+.cf-arrow-next svg {
+  translate: 1px 0;
+}
+@media (min-width: 768px) {
+  .cf {
+    height: var(--dh);
+  }
+  .cf-plate {
+    left: calc(50% - 19.875rem);
+    top: 1.5rem;
+    width: 40.375rem;
+    height: var(--dplate);
+    border-radius: 1.25rem;
+  }
+  .cf-title {
+    /* 55/80, its line centred 24.5 down — half a pixel past the plate's top
+       edge, which is what makes the title straddle it. */
+    top: -0.96875rem;
+    font-size: 3.4375rem;
+    line-height: 5rem;
+  }
+  .cf-card {
+    left: calc(50% + var(--dx));
+    top: var(--dy);
+    width: var(--dw);
+    height: var(--dh);
+    padding: var(--dp);
+    border-radius: 1.5625rem;
+    box-shadow: var(--ds);
+    opacity: var(--dv);
+  }
+  .cf-img {
+    border-radius: 1.25rem;
+    opacity: var(--do);
+  }
+  .cf-film {
+    left: var(--dpx);
+    top: var(--dpy);
+    width: calc(100% - 2 * var(--dpx));
+    height: calc(100% - 2 * var(--dpy));
+    border-radius: 1.25rem;
+  }
+  .cf-badge,
+  .cf-card:not([data-side]) .cf-badge {
+    position: absolute;
+    right: var(--dbi);
+    bottom: var(--dbi);
+    display: grid;
+    width: var(--dbs);
+    height: var(--dbs);
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(79, 79, 79, 0.5);
+    transition:
+      right 600ms var(--cf-ease),
+      bottom 600ms var(--cf-ease),
+      width 600ms var(--cf-ease),
+      height 600ms var(--cf-ease);
+  }
+  .cf-arrow {
+    top: var(--darrows);
+    width: 4.0625rem;
+    height: 4.0625rem;
+  }
+  .cf-arrow-prev {
+    left: calc(50% - 4.8125rem);
+  }
+  .cf-arrow-next {
+    left: calc(50% + 0.75rem);
+  }
+  /* The Static Ads pair is drawn 1px left of the other two rails' — the
+     frame's own (882 / 971 against 883 / 972). */
+  .cf-static .cf-arrow-prev {
+    left: calc(50% - 4.875rem);
+  }
+  .cf-static .cf-arrow-next {
+    left: calc(50% + 0.6875rem);
+  }
+  .cf-arrow svg {
+    width: 0.875rem;
+    height: 1.5rem;
+  }
+  .cf-arrow-prev svg {
+    translate: -0.09375rem 0;
+  }
+  .cf-arrow-next svg {
+    translate: 0.09375rem 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-card,
+  .cf-img,
+  .cf-film,
+  .cf-badge {
+    transition: none;
+  }
+}
+
+/* ----------------------------------------------- case study detail page --- */
+
+/* /case-studies/<slug>'s hero field: the frame's lit violet image and its dot
+   pattern, baked into one file per breakpoint. The image is at 88% over black
+   in the file (97% on the phone) — measured off Figma's own render, since the
+   exported image does not carry it — and the bake has that applied.
+
+   `100% 100%` and the phone's 11px offset for the reasons given on .cs-field
+   above. */
+.csd-field {
+  background:
+    url("/images/case-studies/detail-field-phone.webp") 0 11px / 100% calc(100% - 11px) no-repeat,
+    #000;
+}
+@media (min-width: 768px) {
+  .csd-field {
+    background:
+      url("/images/case-studies/detail-field.webp") center top / 100% 100% no-repeat,
+      #000;
+  }
+}
+
+/* The phone's gallery strip scrolls sideways with no scrollbar of its own —
+   the 3px line under it is the indicator. */
+.csd-strip {
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 20px;
+  scrollbar-width: none;
+}
+.csd-strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* The page's column is 1380 design px — 905 real ones at the scale's 10.5px
+   floor, which windows from 768 to 945 are narrower than. Same answer as
+   .cs-scale-pair: `zoom` the column as a unit for that band. */
+@media (min-width: 768px) and (max-width: 945px) {
+  .csd-fit {
+    zoom: 0.8;
+  }
+}

@@ -25,16 +25,12 @@ import { BOOKING_ANCHOR } from "@/lib/site";
 
 export const NAV = [
   { label: "Agency", href: "/" },
-  { label: "Case Studies", href: null },
-  // HELD BACK FOR NOW (Žilvinas 2026-09-19, "disable so templates from the
-  // menu wouldn't be reachable for now", then "this one" on /templates
-  // itself): the DESKTOP bar shows it as the half-strength text a not-yet
-  // page gets on every page, /templates included (liveOn: []). The phone
-  // drawer keeps its 2026-09-18 rule — held back on the home page, a link
-  // and the selected row on /templates (phoneLiveOn). Put "/templates" in
-  // liveOn to light the desktop link there, drop liveOn to restore it
-  // everywhere. See navHref.
-  { label: "Templates", href: "/templates", liveOn: [], phoneLiveOn: ["/templates"] },
+  { label: "Case Studies", href: "/case-studies" },
+  // Live everywhere again (Žilvinas 2026-10-04, "enable templates page"). It
+  // was held back from 2026-09-19 with `liveOn: []` (the desktop bar) and
+  // `phoneLiveOn: ["/templates"]` (the phone drawer); navHref still honours
+  // both keys, so holding a page back again is one property on its entry.
+  { label: "Templates", href: "/templates" },
 ] as const;
 
 /**
@@ -1345,6 +1341,263 @@ export const TEMPLATES_PAGE = {
  * until a provider exists; see the enablement note in SiteFooter.
  */
 
+/**
+ * /case-studies page. Mirrors design/CASE-STUDIES.md — change there first.
+ *
+ * Every number here is a FRAME coordinate off the Figma artboards (desktop
+ * 1920, phone 375) and is written the way the frame gives it: px. The
+ * components turn desktop px into rem (/16) so the page scales with the
+ * window like every other desktop surface; phone px stay px.
+ *
+ * `logo.desktop` / `logo.phone` are [width, height, top, x-nudge] of the mark's
+ * BOX, fitted so its INK lands where the frame's does — the supplied files
+ * carry different amounts of padding (we interiors' has 4px of it on the left).
+ *
+ * `art` is each card's artwork box relative to its own plate — the artwork
+ * BREAKS OUT of the plate, so these run negative on desktop and the phone's
+ * are measured from the plate's right edge. They are the baked files' own
+ * bounding boxes; re-bake a file and its box moves with it.
+ */
+export const CASE_STUDIES_PAGE = {
+  heading: "Case Studies",
+  storyCta: "Read full story",
+  /** The same line on all four cards in the design — placeholder copy. */
+  body: "Capturing demand from day 1 and helping scale Holo into the largest AI content tool.",
+  cards: [
+    {
+      brand: "Holo",
+      result: "From $0k/month to $117k/month in 7 months.",
+      // Where the frames break the result: two lines on desktop, three on the
+      // phone. AUTHORED, not left to the box width — Figma and the browser
+      // disagree by about 1% on how wide Poppins Medium sets, and eany's
+      // first line fits one and not the other. `lines` is words per line.
+      lines: { desktop: [3, 4], phone: [2, 2, 3] },
+      tag: "AI FOR MARKETING",
+      tagW: 233,
+      logo: { src: "holo.svg", w: 62, h: 25, desktop: [86, 34.7, 31, 0], phone: [67, 27, 20, 0] },
+      image: "case-studies/art-holo.webp",
+      imagePhone: "case-studies/art-holo-phone.webp",
+      art: { desktop: [-20, -12, 302, 348], phone: [7, 7, 183, 285] },
+      // NO PILL UNTIL THERE IS A PAGE (Žilvinas 2026-10-04: "we don't have
+      // the page cooked for now"). A null href leaves the "Read full story"
+      // pill out altogether and centres the copy in the plate; set it to
+      // "/case-studies/holo" (and publish the page, see `_[slug]/page.tsx`)
+      // and the pill comes back where the frame draws it.
+      href: null as string | null,
+    },
+    {
+      brand: "Breezit",
+      result: "Generated 700 sales calls & 1500 leads in 8 months.",
+      lines: { desktop: [4, 5], phone: [2, 4, 3] },
+      tag: "AI FOR SALES",
+      tagW: 171,
+      logo: { src: "breezit.svg", w: 98, h: 25, desktop: [127, 32.4, 32, 0], phone: [95, 24.2, 23, 0] },
+      image: "case-studies/art-breezit.webp",
+      imagePhone: "case-studies/art-breezit-phone.webp",
+      art: { desktop: [-14, -16, 296, 352], phone: [5, 5, 131, 289] },
+      href: null,
+    },
+    {
+      brand: "eany",
+      result: "Helped find 3 evergreen ads for 8 figure company.",
+      lines: { desktop: [4, 5], phone: [3, 3, 3] },
+      tag: "B2B MARKETPLACE",
+      tagW: 231,
+      logo: { src: "eany.svg", w: 96, h: 25, desktop: [135, 35.2, 33, 0], phone: [99, 26, 21, 0] },
+      image: "case-studies/art-eany.webp",
+      imagePhone: "case-studies/art-eany-phone.webp",
+      art: { desktop: [-28, -16, 310, 352], phone: [5, 5, 120, 289] },
+      href: null,
+    },
+    {
+      brand: "we interiors",
+      result: "From $13k/month to $75k/month in 3 months.",
+      lines: { desktop: [3, 4], phone: [2, 2, 3] },
+      tag: "FURNITURE RETAIL",
+      tagW: 221,
+      logo: { src: "we-interiors.webp", w: 849, h: 153, desktop: [198.3, 35.7, 31, -4.1], phone: [144.2, 26, 22, -2.6] },
+      image: "case-studies/art-we.webp",
+      imagePhone: "case-studies/art-we-phone.webp",
+      art: { desktop: [-28, 5, 310, 331], phone: [7, 7, 183, 285] },
+      href: null,
+    },
+  ],
+  rails: {
+    // Posters are frames of the films themselves, cut from the 1080 masters
+    // at the moment the design's still shows (design/ASSETS.md has the
+    // timestamps). The design's seven sit in the middle of the list in its
+    // order, Holo in the centre; the four it does not draw are at the ends.
+    video: {
+      title: "Video Ads",
+      items: [
+        { src: "case-studies/video-shadow.webp", video: "case-studies/shadow.mp4", alt: "Shadow video ad: a founder's story" },
+        { src: "case-studies/video-skin-signs.webp", video: "case-studies/skin-signs.mp4", alt: "Skincare video ad: 4 warning signs your skin is aging" },
+        { src: "case-studies/video-red-x.webp", video: "case-studies/red-x.mp4", alt: "Video ad opening on a struck-through figure" },
+        { src: "case-studies/video-bride.webp", video: "case-studies/bride.mp4", alt: "Breezit video ad: a bride calls the venue at 10pm" },
+        { src: "case-studies/video-dog.webp", video: "case-studies/dog.mp4", alt: "Pet care video ad showing real customer results" },
+        { src: "case-studies/video-holo.webp", video: "case-studies/holo.mp4", alt: "Holo video ad: meet Holo" },
+        { src: "case-studies/video-office.webp", video: "case-studies/office.mp4", alt: "Video ad: in 15 minutes, a team at work" },
+        { src: "case-studies/video-celemi.webp", video: "case-studies/celemi.mp4", alt: "Celemi skincare video ad" },
+        { src: "case-studies/video-overpaying.webp", video: "case-studies/overpaying.mp4", alt: "Finance video ad: overpaying" },
+        { src: "case-studies/video-postpartum.webp", video: "case-studies/postpartum.mp4", alt: "Post-partum bra video ad, creator to camera" },
+        { src: "case-studies/video-tattoo.webp", video: "case-studies/tattoo.mp4", alt: "Sintra video ad: a tattoo studio owner" },
+      ],
+    },
+    landing: {
+      title: "Landing Pages",
+      items: [
+        {
+          src: "case-studies/landing-sintra-plan.webp",
+          phoneSrc: "case-studies/landing-sintra-plan-phone.webp",
+          alt: "Sintra pricing landing page",
+        },
+        {
+          src: "case-studies/landing-sintra-home.webp",
+          phoneSrc: "case-studies/landing-sintra-home-phone.webp",
+          alt: "Sintra landing page: the solution your business needs, already exists",
+        },
+        {
+          src: "case-studies/landing-axiometa.webp",
+          phoneSrc: "case-studies/landing-axiometa-phone.webp",
+          alt: "Axiometa product landing page",
+        },
+      ],
+    },
+    // The design's five in its order around Hey Bud; the eight further
+    // statics supplied on 2026-10-04 run on either side of them.
+    static: {
+      title: "Static Ads",
+      items: [
+        { src: "case-studies/static-inbox.webp", alt: "Inbox organizer static ad: built for people who live in their inbox" },
+        { src: "case-studies/static-moerie.webp", alt: "Moerie static ad: your hair growth timeline" },
+        { src: "case-studies/static-viktor.webp", alt: "Viktor static ad: stop searching for perfect AI models" },
+        { src: "case-studies/static-beast.webp", alt: "Beast blender static ad" },
+        { src: "case-studies/static-spacegoods.webp", alt: "Spacegoods static ad: goals for 2026" },
+        { src: "case-studies/static-bluechew.webp", alt: "Bluechew static ad" },
+        { src: "case-studies/static-heybud.webp", alt: "Hey Bud static ad: best seller for a reason" },
+        { src: "case-studies/static-luckytime.webp", alt: "Lucky Fours static ad: luxury style without the luxury bill" },
+        { src: "case-studies/static-towels.webp", alt: "Towel brand static ad with a customer review" },
+        { src: "case-studies/static-hismile.webp", alt: "Hismile static ad: buy 3, get 2 free" },
+        { src: "case-studies/static-fieldy.webp", alt: "Fieldy static ad: this isn't a necklace, it's your second brain" },
+        { src: "case-studies/static-sintra-restaurant.webp", alt: "Sintra static ad: same food, different Tuesday" },
+        { src: "case-studies/static-sintra-clothing.webp", alt: "Sintra static ad: you style the pieces, Sintra styles the content" },
+      ],
+    },
+  },
+  scale: {
+    heading: "Ready To Scale?",
+    templates: {
+      titleLines: ["500+ High-ROAS", "Static Templates"],
+      cta: "Buy Now",
+      // `w` is the icon's own width on desktop — the headset is 28 where the
+      // other two are 25, and each label starts 9 (6 for the headset) past it.
+      items: [
+        { icon: "icon-sparkles", label: "50+ new templates monthly", w: 25, gap: 9 },
+        { icon: "icon-headset", label: "24/7 customer support", w: 28, gap: 8 },
+        { icon: "icon-tools", label: "Editable in Canva", w: 25, gap: 8 },
+      ],
+    },
+    agency: {
+      titleLines: ["Premium Static", "& Video Ads"],
+      cta: "Book a Call",
+      status: "Now Booking New Projects",
+    },
+  },
+} as const;
+
+/**
+ * /case-studies/<slug> — one case study. Mirrors design/CASE-STUDIES.md
+ * ("Detail page"); change there first.
+ *
+ * HELD BACK for now — the route's folder is `_[slug]`, which Next does not
+ * build; see the note at the top of its page.tsx.
+ *
+ * Only Holo is drawn in the file, so only Holo exists. The article body is the
+ * file's own copy verbatim — and in the file it is still the PLACEHOLDER from
+ * another client's write-up (an email programme for a supplement brand), not
+ * Holo's story. It ships as drawn; replace it here when the real one arrives.
+ *
+ * `lines` is words per line where the frames break the hero copy — see
+ * Broken in CaseStudySections.
+ */
+export const CASE_STUDY_DETAILS = {
+  holo: {
+    brand: "Holo",
+    eyebrow: "HOLO • CASE STUDY",
+    title: "From $0k/month to $117k/month in 7 months.",
+    titleLines: { desktop: [3, 4], phone: [2, 3, 2] },
+    sub: "Capturing demand from day 1 and helping scale Holo into the largest AI content tool.",
+    subLines: { desktop: [7, 8], phone: [6, 7, 2] },
+    thumb: "case-studies/detail-holo-thumb.webp",
+    thumbAlt: "Holo's site: any niche, from bakeries to B2B SaaS",
+    sections: [
+        { label: "THE BRAND", paragraphs: [
+          "Gains in Bulk is a premium direct-to-consumer supplement brand focused on whole-food-based formulas with zero synthetic vitamins or minerals. Their hero product — Instantized Creatine — is the only 100% soluble creatine monohydrate in the world.",
+          "Their audience consists of disciplined, consistency-driven customers (ages 30–50) who value purity, performance, and long-term health over hype.",
+        ] },
+        { label: "THE CHALLENGE", items: [
+          "Email managed by one person juggling all marketing channels",
+          "No real campaign system — 1 campaign/week, sent same day",
+          "Flows hadn’t been updated in over a year",
+          "Heavy reliance on discount-driven emails to compensate for lack of strategy",
+          "Deliverability issues: 25–30% open rates with 100k+ profiles but only 20–30k engaged",
+          "Email accounted for ~28% of revenue (goal was 40%+)",
+        ] },
+        { label: "THE GOAL", items: [
+          "Turn email into a predictable, scalable revenue channel without relying on discounts",
+          "Improve deliverability and engagement across the list",
+          "Increase list growth via higher-converting popups",
+          "Build long-term infrastructure for scale",
+        ] },
+        { label: "THE STRATEGY", items: [
+          "Infrastructure + consistency + non-discount education-based messaging",
+          "Analyzed customer behavior and built a lifecycle strategy designed to educate, build trust, and convert without margin erosion",
+          "Build a consistent campaign engine (3–5 emails/week)",
+          "Rebuild and modernize core flows",
+          "Fix deliverability and sender reputation",
+          "Use segmentation to increase engagement and inbox placement",
+        ] },
+        { label: "THE EXECUTION", items: [
+          "Full Klaviyo audit and brand analysis",
+          "Built a complete lifecycle strategy with 40–60 emails across 8–12 core flows with segmentation and engagement filters",
+          "Tripled popup opt-in rate in the first two weeks — dramatically increasing list growth and downstream revenue",
+          "Deliverability reset: paused low-engagement flows, sent only to 14–30 day engaged segments, put unengaged profiles to rest, gradually re-warmed the domain",
+          "Scaled campaigns from 1x/week to 3–5x/week built around FAQs, education, product clarity, and objection handling",
+          "Re-angled past winning topics instead of inventing new offers",
+          "Rebuilt 11 core flows, launched 40+ emails, added upsells, cross-sells, and advanced logic over time",
+        ] },
+        { label: "THE RESULTS", items: [
+          "2x monthly email revenue in 60 days",
+          "54.6% of total store revenue from email & SMS",
+          "Open rates climbed from ~25–30% to 60%+",
+          "200% increase in popup opt-in rate and list growth",
+          "Scaled from 7-figures to 8-figures",
+        ] },
+        { label: "WHY THIS WORKED", items: [
+          "Rebuilt the customer lifecycle from the ground up",
+          "Fixed deliverability before scaling volume",
+          "Focused on trust, education, and clarity instead of discounts",
+          "Built systems that compound over time",
+        ] },
+    ],
+    gallery: [
+      { src: "case-studies/video-holo.webp", alt: "Holo video ad: meet Holo" },
+      { src: "case-studies/video-office.webp", alt: "Video ad: in 15 minutes, a team at work" },
+      { src: "case-studies/video-red-x.webp", alt: "Video ad opening on a struck-through figure" },
+    ],
+  },
+} as const;
+
+export type CaseStudySlug = keyof typeof CASE_STUDY_DETAILS;
+
+/** The call card beside (phone: under) every case study. */
+export const CASE_STUDY_CALL = {
+  cta: "Book a Call",
+  spots: ["2/10", "spots left for 2026"],
+  emailLabel: "Prefer Email?",
+  email: "nojus@mushi.agency",
+} as const;
+
 /** The bottom bar's links, declared once and ordered per frame below. */
 /**
  * None of these documents exist yet, so every one carries `href: null` and the
@@ -1401,7 +1654,7 @@ export const FOOTER = {
     {
       title: "Company",
       titleDesktop: "Company",
-      links: [{ label: "Case Studies", href: null }],
+      links: [{ label: "Case Studies", href: "/case-studies" }],
     },
   ],
   contactTitle: "Contact",

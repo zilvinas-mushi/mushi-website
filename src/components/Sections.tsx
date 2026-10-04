@@ -56,16 +56,36 @@ import { SHELL } from "@/lib/layout";
  * side is what keeps the tip round; the rendered size has to carry the same
  * factor or the arrow just draws smaller.
  */
-function ArrowDisc({
+/**
+ * `tone` is the disc's two fills, rest and hover. The default is the pair the
+ * two home pills wear — #222222, trading with the pill's violet. /case-studies
+ * draws the same pill with a BLACK disc ("black"), and a white pill whose
+ * black disc inverts to white with a black arrow ("invert"). Every pair keeps
+ * the three stop positions, so each still cross-fades.
+ */
+const DISC_TONE = {
+  grey: "bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)]",
+  black:
+    "bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)]",
+  invert:
+    "bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] group-hover:text-black",
+  // The case study's mail disc: #363636 with a white arrow, inverting to white
+  // with a #363636 arrow.
+  mail: "bg-[linear-gradient(117.51deg,#363636_10.47%,#363636_45.54%,#363636_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] group-hover:text-[#363636]",
+} as const;
+
+export function ArrowDisc({
   disc,
   arrow,
   viewBox,
   strokeWidth,
+  tone = "grey",
 }: {
   disc: string;
   arrow: string;
   viewBox: string;
   strokeWidth: number;
+  tone?: keyof typeof DISC_TONE;
 }) {
   const glyph = (
     <path d="M0.999888 15.9999L15.9998 1M15.9998 14.1708L15.9998 1L2.82898 1" />
@@ -73,7 +93,7 @@ function ArrowDisc({
   const shared = `${arrow} col-start-1 row-start-1 stroke-current transition-transform duration-300 ease-out`;
   return (
     <span
-      className={`${disc} relative grid shrink-0 place-items-center overflow-hidden rounded-full bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] text-white transition-all duration-300 ease-out group-hover:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)]`}
+      className={`${disc} relative grid shrink-0 place-items-center overflow-hidden rounded-full transition-all duration-300 ease-out ${DISC_TONE[tone]}`}
     >
       <svg
         viewBox={viewBox}

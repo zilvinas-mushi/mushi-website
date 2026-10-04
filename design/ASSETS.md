@@ -372,3 +372,63 @@ Compared against the 3x export at DPR 3 before the swap.
 
 If a higher-resolution master is ever supplied, a fresh 538-wide export from
 it beats this downsample — use it.
+
+## case-studies/ — the /case-studies page, added 2026-10-04
+
+Everything `/case-studies` draws, in `public/images/case-studies/`. None of
+it is a screenshot: Figma's MCP renders are 1x only, so each file is composed
+from the Figma file's own source images at their original resolution and then
+checked against Figma's 1x render of the same node. The method, and which
+files needed what, is in [CASE-STUDIES.md](CASE-STUDIES.md).
+
+| File(s) | What | Drawn at | Stored at |
+| --- | --- | --- | --- |
+| `field.webp` | hero field, every soft layer | 1920 × 1785 | 2x |
+| `field-phone.webp` | the phone's | 375 × 1433 | 3x |
+| `shapes-left.webp`, `shapes-right.webp` | the angular shapes, desktop only | 384 × 954, 320 × 1008 | 2x |
+| `fl-*.webp`, `fl-*-phone.webp` | the seven floating icons | per icon | 3x |
+| `art-<brand>.webp`, `art-<brand>-phone.webp` | case-card artwork: gradient tile + device, breaking out of the tile | ~300 × 350, ~130–183 × 285 | 3x |
+| `video-*.webp` (+ `-sm`) | Video Ads posters (11) — frames of the films, see below | up to 342 × 564 | 900 / 540 wide |
+| `landing-*.webp`, `landing-*-phone.webp` | Landing Pages (3), cropped from the top of the page | 738 × 413, 240 × 398 | source, 1240 / 728 wide |
+| `static-*.webp` (+ `-sm`) | Static Ads (13) — from the 6000px masters supplied 2026-10-04; the two Sintra ones were supplied at 1080, and `towels` is still the Figma file's 1080 | up to 484 | 1452 (3x) / 726 |
+| `scale-templates*.webp`, `scale-agency*.webp` | Ready To Scale card artwork | 585 × 525, 345 × 309 | 2x / 3x |
+| `detail-field.webp`, `detail-field-phone.webp` | the detail page's hero field (image at 88% / 97% + dots) | 1920 × 617, 375 × 598 | 2x / 3x |
+| `detail-call.webp`, `detail-call-phone.webp` | the call card's panel, phone and fade | 327 × 318, 306 × 278 | 3x |
+| `detail-holo-thumb.webp` | Holo's hero still | 680 × 383 | source, 1229 wide |
+| `icon-sparkles.svg`, `icon-headset.svg`, `icon-tools.svg` | card 1's feature icons | 25 | vector |
+
+The card artwork carries a `-phone` twin because the phone frame crops and
+turns each device differently — it is not the desktop file scaled down.
+
+### `public/videos/case-studies/` — the eleven films, added 2026-10-04
+
+Masters supplied by Žilvinas as 1080 × 1920 delivery files at 8–19 Mbps
+(841 MB). Transcoded like the home rail's, one notch gentler because the
+centre card here is 342 wide rather than 300: **720 × 1280, H.264 CRF 25,
+30 fps, AAC 96k, `+faststart`** — 69 MB across the eleven.
+
+Each poster is a frame of its own film, cut from the master at the timestamp
+below. For the seven the design draws, that timestamp was FOUND by matching
+the design's still against every frame of every master — not read off the
+file names, which do not say which ad is which.
+
+| film / poster | master | poster frame |
+| --- | --- | --- |
+| `red-x` | `002_EN_Video_Cortisol_Nojus_Var1` | 6.733 s |
+| `bride` | `061_EN_Video_RealTime_Nojus_Var1` | 1.700 s |
+| `dog` | `001_Video_Care_Aistė&Danielis_Var1` | 15.667 s |
+| `holo` | `031_EN_Video_Introducing_Nojus&Domantas_Var3` | 0.533 s |
+| `office` | `What Makes An Office Great` | 4.833 s |
+| `celemi` | `Celemi Advertisement 001` | 17.448 s |
+| `overpaying` | `001_EN_Video_UGC_MakeMoreMoney_Nojus&Eimantas_Var1` | 6.800 s |
+| `shadow` | `001_EN_Video_Founder_Nojus_Var1` | 1.5 s (not in the design) |
+| `postpartum` | `002_EN_Video_UGC_PostPartum_Dovydas_Var1` | 3.0 s (not in the design) |
+| `skin-signs` | `PUN_26_W13_B14_Video_9x16_NB_Warning_1` | 0.2 s (not in the design) |
+| `tattoo` | `TOF_807_ChatGPT_Mix_Non-UGC_VAR2_…` | 0.2 s (not in the design) |
+
+```sh
+ffmpeg -i IN.mp4 -vf "scale=720:1280:flags=lanczos" -r 30 \
+  -c:v libx264 -profile:v high -crf 25 -preset slow -pix_fmt yuv420p \
+  -c:a aac -b:a 96k -movflags +faststart -y public/videos/case-studies/OUT.mp4
+ffmpeg -ss T -i IN.mp4 -frames:v 1 poster.png   # then 900 and 540 wide, WebP
+```

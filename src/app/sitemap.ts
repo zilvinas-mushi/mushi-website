@@ -23,6 +23,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
+      url: `${SITE_URL}/case-studies`,
+      lastModified: new Date("2026-10-04"),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
       url: `${SITE_URL}/templates`,
       lastModified: new Date("2026-09-02"),
       changeFrequency: "weekly",

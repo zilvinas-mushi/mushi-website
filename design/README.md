@@ -13,6 +13,7 @@ by a future session, or by you.
 | [SECTIONS.md](SECTIONS.md) | Semantic page outline and per-section build spec |
 | [COPY.md](COPY.md) | Authoritative copy deck for the home page |
 | [ASSETS.md](ASSETS.md) | Inventory of all 92 exported assets |
+| [CASE-STUDIES.md](CASE-STUDIES.md) | The `/case-studies` page: nodes, every measurement, how its artwork was made |
 | `assets.json` | Machine-readable map: filename → original Figma layer |
 | `../public/images/` | The assets themselves (2.16 MB, WebP + SVG) |
 
@@ -38,7 +39,10 @@ by a future session, or by you.
 | `4167:280` | Footer desktop | 1920 × 425 | 2026-08-19 |
 | `4167:278` | Footer phone | 375 × 977 | 2026-08-19 |
 
-Both are in this same file. `4167:280`'s children are numbered `4134:6xx` — the
+| `5293:73` | Case studies — desktop | 1920 × 4131 | 2026-10-04 |
+| `5293:74` | Case studies — mobile | 375 × 3769 | 2026-10-04 |
+
+The two footer nodes are in this same file. `4167:280`'s children are numbered `4134:6xx` — the
 band `4134:616`, the field `4134:619`, the button `4134:621`, the rule
 `4134:634`, the star `4134:637`, the social group `4134:653` — and those ids are
 quoted at the point of use in `src/components/SiteFooter.tsx`.
@@ -48,6 +52,23 @@ to be read again.
 The frame was created by wrapping loose layers, so it has **no auto-layout**.
 Figma therefore emits absolute pixel positions, which cannot be shipped. See
 [SECTIONS.md](SECTIONS.md) for why and what to do instead.
+
+### The desktop app's local MCP server is not capped
+
+`http://127.0.0.1:3845/mcp` — Figma's desktop app, Dev Mode, with the file
+open — answered every call the Case Studies page needed on 2026-10-04 (two
+frames, a dozen loose nodes, some forty 1x screenshots). The 6-a-month cap
+above is the REMOTE server's. Three things about the local one worth knowing
+before relying on it:
+
+- It only reads what is in a frame cleanly. Loose layers and plain groups come
+  back with their positions zeroed; ask for the layers to be wrapped in a
+  frame (⌥⌘G) first.
+- Its screenshots are 1x, 1024px on the long side at most. They are a
+  reference to check against, never an asset.
+- Its generated layout gets rotated and flipped image fills wrong (the
+  rotation-sign trap, and image transforms it cannot express at all). Check
+  anything rotated against the node's own screenshot.
 
 ## Rules
 

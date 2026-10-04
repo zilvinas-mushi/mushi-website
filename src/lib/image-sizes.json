@@ -83,6 +83,358 @@
     "w": 1000,
     "h": 1000
   },
+  "case-studies/art-breezit-phone.webp": {
+    "w": 393,
+    "h": 867
+  },
+  "case-studies/art-breezit.webp": {
+    "w": 888,
+    "h": 1056
+  },
+  "case-studies/art-eany-phone.webp": {
+    "w": 360,
+    "h": 867
+  },
+  "case-studies/art-eany.webp": {
+    "w": 930,
+    "h": 1056
+  },
+  "case-studies/art-holo-phone.webp": {
+    "w": 549,
+    "h": 855
+  },
+  "case-studies/art-holo.webp": {
+    "w": 906,
+    "h": 1044
+  },
+  "case-studies/art-we-phone.webp": {
+    "w": 549,
+    "h": 855
+  },
+  "case-studies/art-we.webp": {
+    "w": 930,
+    "h": 993
+  },
+  "case-studies/detail-call-phone.webp": {
+    "w": 918,
+    "h": 834
+  },
+  "case-studies/detail-call.webp": {
+    "w": 981,
+    "h": 954
+  },
+  "case-studies/detail-field-phone.webp": {
+    "w": 1125,
+    "h": 1794
+  },
+  "case-studies/detail-field.webp": {
+    "w": 3840,
+    "h": 1234
+  },
+  "case-studies/detail-holo-thumb.webp": {
+    "w": 1229,
+    "h": 615
+  },
+  "case-studies/field-phone.webp": {
+    "w": 1125,
+    "h": 4299
+  },
+  "case-studies/field.webp": {
+    "w": 3840,
+    "h": 3570
+  },
+  "case-studies/fl-f-phone.webp": {
+    "w": 294,
+    "h": 300
+  },
+  "case-studies/fl-f.webp": {
+    "w": 579,
+    "h": 429
+  },
+  "case-studies/fl-layers-phone.webp": {
+    "w": 192,
+    "h": 327
+  },
+  "case-studies/fl-layers.webp": {
+    "w": 465,
+    "h": 414
+  },
+  "case-studies/fl-orange-phone.webp": {
+    "w": 324,
+    "h": 291
+  },
+  "case-studies/fl-orange.webp": {
+    "w": 534,
+    "h": 390
+  },
+  "case-studies/fl-pb-phone.webp": {
+    "w": 180,
+    "h": 294
+  },
+  "case-studies/fl-pb.webp": {
+    "w": 600,
+    "h": 423
+  },
+  "case-studies/fl-rhea-phone.webp": {
+    "w": 222,
+    "h": 273
+  },
+  "case-studies/fl-rhea.webp": {
+    "w": 477,
+    "h": 501
+  },
+  "case-studies/fl-sc-phone.webp": {
+    "w": 159,
+    "h": 246
+  },
+  "case-studies/fl-sc.webp": {
+    "w": 777,
+    "h": 699
+  },
+  "case-studies/fl-sintra-phone.webp": {
+    "w": 256,
+    "h": 285
+  },
+  "case-studies/fl-sintra.webp": {
+    "w": 825,
+    "h": 729
+  },
+  "case-studies/landing-axiometa-phone.webp": {
+    "w": 728,
+    "h": 1209
+  },
+  "case-studies/landing-axiometa.webp": {
+    "w": 1238,
+    "h": 695
+  },
+  "case-studies/landing-sintra-home-phone.webp": {
+    "w": 728,
+    "h": 1209
+  },
+  "case-studies/landing-sintra-home.webp": {
+    "w": 1244,
+    "h": 698
+  },
+  "case-studies/landing-sintra-plan-phone.webp": {
+    "w": 764,
+    "h": 1269
+  },
+  "case-studies/landing-sintra-plan.webp": {
+    "w": 1264,
+    "h": 709
+  },
+  "case-studies/scale-agency-phone.webp": {
+    "w": 1035,
+    "h": 927
+  },
+  "case-studies/scale-agency.webp": {
+    "w": 1755,
+    "h": 1575
+  },
+  "case-studies/scale-templates-phone.webp": {
+    "w": 1035,
+    "h": 927
+  },
+  "case-studies/scale-templates.webp": {
+    "w": 1755,
+    "h": 1575
+  },
+  "case-studies/shapes-left.webp": {
+    "w": 768,
+    "h": 1908
+  },
+  "case-studies/shapes-right.webp": {
+    "w": 640,
+    "h": 2016
+  },
+  "case-studies/static-beast-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-beast.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-bluechew-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-bluechew.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-fieldy-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-fieldy.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-heybud-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-heybud.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-hismile-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-hismile.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-inbox-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-inbox.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-luckytime-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-luckytime.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-moerie-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-moerie.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-sintra-clothing-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-sintra-clothing.webp": {
+    "w": 1080,
+    "h": 1080
+  },
+  "case-studies/static-sintra-restaurant-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-sintra-restaurant.webp": {
+    "w": 1080,
+    "h": 1080
+  },
+  "case-studies/static-spacegoods-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-spacegoods.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/static-towels.webp": {
+    "w": 1080,
+    "h": 1080
+  },
+  "case-studies/static-viktor-sm.webp": {
+    "w": 726,
+    "h": 726
+  },
+  "case-studies/static-viktor.webp": {
+    "w": 1452,
+    "h": 1452
+  },
+  "case-studies/video-bride-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-bride.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-celemi-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-celemi.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-dog-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-dog.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-holo-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-holo.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-office-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-office.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-overpaying-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-overpaying.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-postpartum-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-postpartum.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-red-x-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-red-x.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-shadow-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-shadow.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-skin-signs-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-skin-signs.webp": {
+    "w": 900,
+    "h": 1600
+  },
+  "case-studies/video-tattoo-sm.webp": {
+    "w": 540,
+    "h": 960
+  },
+  "case-studies/video-tattoo.webp": {
+    "w": 900,
+    "h": 1600
+  },
   "case-we-interiors-macbook.webp": {
     "w": 680,
     "h": 680
