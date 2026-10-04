@@ -64,14 +64,14 @@ import { SHELL } from "@/lib/layout";
  * the three stop positions, so each still cross-fades.
  */
 const DISC_TONE = {
-  grey: "bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)]",
+  grey: "bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] group-active:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)]",
   black:
-    "bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)]",
+    "bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] group-active:bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)]",
   invert:
-    "bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] group-hover:text-black",
+    "bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] group-hover:text-black group-active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] group-active:text-black",
   // The case study's mail disc: #363636 with a white arrow, inverting to white
   // with a #363636 arrow.
-  mail: "bg-[linear-gradient(117.51deg,#363636_10.47%,#363636_45.54%,#363636_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] group-hover:text-[#363636]",
+  mail: "bg-[linear-gradient(117.51deg,#363636_10.47%,#363636_45.54%,#363636_98.13%)] text-white group-hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] group-hover:text-[#363636] group-active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] group-active:text-[#363636]",
 } as const;
 
 export function ArrowDisc({
@@ -102,7 +102,7 @@ export function ArrowDisc({
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
-        className={`${shared} group-hover:-translate-y-[180%] group-hover:translate-x-[180%]`}
+        className={`${shared} group-hover:-translate-y-[180%] group-hover:translate-x-[180%] group-active:-translate-y-[180%] group-active:translate-x-[180%]`}
       >
         {glyph}
       </svg>
@@ -113,7 +113,7 @@ export function ArrowDisc({
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
-        className={`${shared} -translate-x-[180%] translate-y-[180%] delay-75 group-hover:translate-x-0 group-hover:translate-y-0`}
+        className={`${shared} -translate-x-[180%] translate-y-[180%] delay-75 group-hover:translate-x-0 group-hover:translate-y-0 group-active:translate-x-0 group-active:translate-y-0`}
       >
         {glyph}
       </svg>
@@ -654,7 +654,7 @@ export function Creatives() {
             // The hover gradient repeats the rest state's THREE stop positions
             // in white. A 2-stop hover against a 3-stop rest cannot interpolate,
             // so the fill snapped no matter what the transition said.
-            className="group mr-3 inline-flex h-[2.625rem] w-[6.25rem] shrink-0 items-center justify-end gap-[0.9375rem] rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pr-1 text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:gap-[1.125rem] md:rounded-[1.875rem] md:pr-[0.46875rem] md:text-[1.875rem]"
+            className="group mr-3 inline-flex h-[2.625rem] w-[6.25rem] shrink-0 items-center justify-end gap-[0.9375rem] rounded-[var(--radius-pill)] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pr-1 text-[1.25rem] font-normal leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] active:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:mr-0 md:h-[3.75rem] md:w-[8.9375rem] md:gap-[1.125rem] md:rounded-[1.875rem] md:pr-[0.46875rem] md:text-[1.875rem]"
           >
             {CREATIVES.cta}
             {/* ~/Documents/arrow icon.svg, inlined in ArrowDisc. The path
@@ -1347,7 +1347,7 @@ export function FinalCta() {
               id={FINAL_CTA_ID}
               // Hover repeats the rest state's three stop positions in white so
               // the fill can interpolate instead of snapping at the halfway point.
-              className="group inline-flex h-[2.625rem] items-center gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
+              className="group inline-flex h-[2.625rem] items-center gap-[0.9375rem] rounded-[2.25rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] pl-6 pr-[0.375rem] text-[1rem] font-normal text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] active:bg-[linear-gradient(117.51deg,#222222_10.47%,#222222_45.54%,#222222_98.13%)] md:h-[3.75rem] md:gap-[0.9375rem] md:pl-[1.5625rem] md:pr-[0.625rem] md:text-[1.625rem]"
             >
               {FINAL_CTA.cta}
               {/* 30 across on the phone, 15 after the label, inset 6 from the

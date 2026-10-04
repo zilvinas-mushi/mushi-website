@@ -130,7 +130,7 @@ export function CaseStudiesFieldArt() {
  */
 function StoryButton({ href, brand }: { href: string; brand: string }) {
   const className =
-    "group relative flex h-[44px] w-[197px] cursor-pointer items-center rounded-[22.5px] bg-[linear-gradient(#363636,#363636)] pl-[18px] text-[18px] font-medium leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(#fff,#fff)] hover:text-[#363636] md:h-[2.75rem] md:w-[13.0625rem] md:rounded-[1.40625rem] md:pl-[0.9375rem] md:text-[1.25rem]";
+    "group relative flex h-[44px] w-[197px] cursor-pointer items-center rounded-[22.5px] bg-[linear-gradient(#363636,#363636)] pl-[18px] text-[18px] font-medium leading-none text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(#fff,#fff)] hover:text-[#363636] active:bg-[linear-gradient(#fff,#fff)] active:text-[#363636] md:h-[2.75rem] md:w-[13.0625rem] md:rounded-[1.40625rem] md:pl-[0.9375rem] md:text-[1.25rem]";
   // The file's chevron: 8 x 14 drawn in an 11 x 17 box, stroke 3.
   const chevron =
     "col-start-1 row-start-1 h-[17px] w-[11px] transition-transform duration-300 ease-out md:h-[1.0625rem] md:w-[0.6875rem]";
@@ -161,8 +161,8 @@ function StoryButton({ href, brand }: { href: string; brand: string }) {
           The 2px of left padding seats the chevron 1px right of the disc's
           centre — an arrowhead centred on its box reads as sitting left. */}
       <span className="absolute right-[6px] top-[6px] grid size-[32px] place-items-center overflow-hidden rounded-full bg-[#181818] pl-[2px] text-white md:right-[0.4375rem] md:top-[0.375rem] md:size-[2rem] md:pl-[0.125rem]">
-        {glyph("group-hover:translate-x-[250%]")}
-        {glyph("-translate-x-[250%] delay-75 group-hover:translate-x-0")}
+        {glyph("group-hover:translate-x-[250%] group-active:translate-x-[250%]")}
+        {glyph("-translate-x-[250%] delay-75 group-hover:translate-x-0 group-active:translate-x-0")}
       </span>
     </>
   );
@@ -372,22 +372,28 @@ export function CaseStudiesRails() {
 /* ------------------------------------------------------ ready to scale --- */
 
 /* Gutter to gutter on a phone, like the case cards above — 345 x 309 at the
-   artboard's 375 and the same shape on a wider phone. */
+   artboard's 375 and the same shape on a wider phone.
+
+   EVERYTHING ON THE PHONE CARD IS IN --cu (Žilvinas 2026-10-04, "this seems
+   out of place in mobile"): the artwork fills the card, so on a 430 phone the
+   avatars baked into it sat 16% lower and ran into a status line still at its
+   375 position. .cs-scale-card (globals.css) makes --cu "1px at 345 wide", so
+   the words keep their place on the picture at every phone width. */
 const CARD =
-  "relative aspect-[345/309] w-full md:aspect-auto md:h-[32.8125rem] md:w-[36.5625rem]";
+  "cs-scale-card relative aspect-[345/309] w-full md:aspect-auto md:h-[32.8125rem] md:w-[36.5625rem]";
 /* Two lines of 24/26 (desktop 50/50). The frame's text box is shorter than
    its own two lines, so the box top it reports is not the first line's: the
    lines start 3 (desktop 7) above it. These are the LINE tops. */
 const CARD_TITLE =
-  "absolute left-[25px] text-[24px] font-medium leading-[26px] text-white md:top-[3.25rem] md:text-[3.125rem] md:leading-[3.125rem]";
+  "absolute left-[calc(var(--cu)*25)] text-[length:calc(var(--cu)*24)] font-medium leading-[calc(var(--cu)*26)] text-white md:top-[3.25rem] md:text-[3.125rem] md:leading-[3.125rem]";
 /* Fixed width with the label and the disc pushed to the two ends, rather than
    padding + gap: the frame fixes the pill, the label's left edge and the
    disc's inset, and the space between them is whatever is left. */
 const CARD_BUTTON =
-  "group absolute left-[25px] flex h-[42px] items-center justify-between rounded-[30px] pl-[13px] pr-[5px] text-[18px] font-semibold uppercase leading-none transition-all duration-300 ease-out md:top-[11.25rem] md:h-[3.5625rem] md:rounded-[1.875rem] md:pl-[1.375rem] md:pr-[0.375rem] md:text-[1.5rem]";
+  "group absolute left-[calc(var(--cu)*25)] flex h-[calc(var(--cu)*42)] items-center justify-between rounded-[calc(var(--cu)*30)] pl-[calc(var(--cu)*13)] pr-[calc(var(--cu)*5)] text-[length:calc(var(--cu)*18)] font-semibold uppercase leading-none transition-all duration-300 ease-out md:top-[11.25rem] md:h-[3.5625rem] md:rounded-[1.875rem] md:pl-[1.375rem] md:pr-[0.375rem] md:text-[1.5rem]";
 /** The file's arrow: 15 drawn in an 18 box, stroke 3 — see ArrowDisc on the viewBox. */
-const CARD_DISC = "size-[32px] md:size-[2.8125rem]";
-const CARD_ARROW = "size-[15.2px] md:size-[1.1875rem]";
+const CARD_DISC = "size-[calc(var(--cu)*32)] md:size-[2.8125rem]";
+const CARD_ARROW = "size-[calc(var(--cu)*15.2)] md:size-[1.1875rem]";
 
 export function ReadyToScale() {
   const { heading, templates, agency } = CASE_STUDIES_PAGE.scale;
@@ -419,7 +425,7 @@ export function ReadyToScale() {
             alt=""
             className="absolute inset-0 size-full"
           />
-          <h3 className={`${CARD_TITLE} top-[32px] md:left-[2.75rem]`}>
+          <h3 className={`${CARD_TITLE} top-[calc(var(--cu)*32)] md:left-[2.75rem]`}>
             {templates.titleLines[0]}
             <br />
             {templates.titleLines[1]}
@@ -428,7 +434,7 @@ export function ReadyToScale() {
             href="/templates#buy"
             data-plan
             // white fill / black label  ->  black fill / white label
-            className={`${CARD_BUTTON} top-[106px] w-[147px] md:left-[2.75rem] bg-[linear-gradient(#fff,#fff)] text-black hover:bg-[linear-gradient(#000,#000)] hover:text-white md:w-[12.75rem]`}
+            className={`${CARD_BUTTON} top-[calc(var(--cu)*106)] w-[calc(var(--cu)*147)] md:left-[2.75rem] bg-[linear-gradient(#fff,#fff)] text-black hover:bg-[linear-gradient(#000,#000)] hover:text-white active:bg-[linear-gradient(#000,#000)] active:text-white md:w-[12.75rem]`}
           >
             {templates.cta}
             <ArrowDisc
@@ -441,18 +447,18 @@ export function ReadyToScale() {
           </a>
           <ul
             role="list"
-            className="absolute left-[25px] top-[213px] flex flex-col gap-[9.5px] md:left-[2.75rem] md:top-[23.5rem] md:gap-[0.9375rem]"
+            className="absolute left-[calc(var(--cu)*25)] top-[calc(var(--cu)*213)] flex flex-col gap-[calc(var(--cu)*9.5)] md:left-[2.75rem] md:top-[23.5rem] md:gap-[0.9375rem]"
           >
             {templates.items.map((item) => (
               <li
                 key={item.label}
-                className="flex h-[16px] items-center gap-[8px] text-[16px] font-normal leading-none text-white md:h-[1.5625rem] md:gap-[var(--gap)] md:text-[1.25rem]"
+                className="flex h-[calc(var(--cu)*16)] items-center gap-[calc(var(--cu)*8)] text-[length:calc(var(--cu)*16)] font-normal leading-none text-white md:h-[1.5625rem] md:gap-[var(--gap)] md:text-[1.25rem]"
                 style={{ "--w": r(item.w), "--gap": r(item.gap) } as CSSProperties}
               >
                 {/* The svg is drawn to the outside of its stroke, a twentieth
                     wider than the box Figma reports for it — hence the
                     negative margin: the BOX is what the layout uses. */}
-                <span className="grid h-[16px] w-[16px] shrink-0 place-items-center md:h-[1.5625rem] md:w-[var(--w)]">
+                <span className="grid h-[calc(var(--cu)*16)] w-[calc(var(--cu)*16)] shrink-0 place-items-center md:h-[1.5625rem] md:w-[var(--w)]">
                   <LazyImg
                     src={`/images/case-studies/${item.icon}.svg`}
                     alt=""
@@ -479,7 +485,7 @@ export function ReadyToScale() {
           {/* The phone frame sets this card's title and pill 6.5 and 8 higher
               than the first card's. Desktop sets them level, but starts this
               card's text 43 in where the first card's starts 44. */}
-          <h3 className={`${CARD_TITLE} top-[25.5px] md:left-[2.6875rem]`}>
+          <h3 className={`${CARD_TITLE} top-[calc(var(--cu)*25.5)] md:left-[2.6875rem]`}>
             {agency.titleLines[0]}
             <br />
             {agency.titleLines[1]}
@@ -492,7 +498,7 @@ export function ReadyToScale() {
             // An arrow pill, so it swaps with its disc instead of going white
             // (CLAUDE.md, the second exception) — the disc here is the file's
             // black rather than #222222.
-            className={`${CARD_BUTTON} top-[98px] w-[178px] md:left-[2.6875rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white hover:bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] md:w-[15.375rem]`}
+            className={`${CARD_BUTTON} top-[calc(var(--cu)*98)] w-[calc(var(--cu)*178)] md:left-[2.6875rem] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white hover:bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] active:bg-[linear-gradient(117.51deg,#000_10.47%,#000_45.54%,#000_98.13%)] md:w-[15.375rem]`}
           >
             {agency.cta}
             <ArrowDisc
@@ -503,8 +509,8 @@ export function ReadyToScale() {
               tone="black"
             />
           </a>
-          <p className="absolute left-[25px] top-[269px] flex h-[10px] items-center gap-[8px] whitespace-nowrap text-[16px] font-normal leading-none text-white md:left-[2.6875rem] md:top-[28.8125rem] md:h-[0.9375rem] md:gap-[0.5625rem] md:text-[1.25rem]">
-            <span className="size-[10px] shrink-0 rounded-full bg-[#248a2d] md:size-[0.9375rem]" />
+          <p className="absolute left-[calc(var(--cu)*25)] top-[calc(var(--cu)*269)] flex h-[calc(var(--cu)*10)] items-center gap-[calc(var(--cu)*8)] whitespace-nowrap text-[length:calc(var(--cu)*16)] font-normal leading-none text-white md:left-[2.6875rem] md:top-[28.8125rem] md:h-[0.9375rem] md:gap-[0.5625rem] md:text-[1.25rem]">
+            <span className="size-[calc(var(--cu)*10)] shrink-0 rounded-full bg-[#248a2d] md:size-[0.9375rem]" />
             {agency.status}
           </p>
         </article>

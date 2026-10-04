@@ -2186,6 +2186,18 @@ img[data-src] {
   }
 }
 
+/* ON THE PHONE THE CARD'S ARTWORK IS THE CARD'S WIDTH, so what is set on top
+   of it has to be too: --cu is 1px at the artboard's 345 and grows or shrinks
+   with the card. It is declared on the container and only ever used by what
+   is inside it, which is where its cqw is worked out. From md up the card is
+   rem and --cu is not used. */
+@media (max-width: 767px) {
+  .cs-scale-card {
+    container-type: inline-size;
+    --cu: calc(100cqw / 345);
+  }
+}
+
 /* The cover-flow rails — see CoverflowRail.tsx for the model. Every length
    is a custom property the component sets per card and per breakpoint; the
    rules here only say which set applies and that a change of slot is a
