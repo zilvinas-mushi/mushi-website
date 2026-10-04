@@ -235,6 +235,12 @@ export function PlanSheet() {
       if (opened || !root.hasAttribute("data-ready")) return;
       opened = true;
       seen.disconnect();
+      // THE HASH IS SPENT ONCE IT HAS OPENED THE SHEET (Žilvinas 2026-10-05,
+      // "once you are in this popup view with #, you cannot leave it"): left
+      // in the address, every reload and every Back to this page raised the
+      // sheet again over someone who had already closed it. It is taken out
+      // in place — no new history entry, Next's own state kept.
+      window.history.replaceState(window.history.state, "", window.location.pathname + window.location.search);
       open();
     };
     const seen = new MutationObserver(whenReady);

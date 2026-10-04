@@ -176,6 +176,13 @@ async function buyerCountry(): Promise<string | null> {
  * Stripe.js leaves Submit disabled for good — seen on staging, 2026-10-04.
  */
 const LOAD_LIMIT_MS = 12_000;
+/**
+ * How long the finished card fields wait for the Link button to say whether
+ * it is coming, before the step is shown with the sheet's own green button.
+ * Measured on production: Stripe's button reports within a second of the
+ * fields.
+ */
+const LINK_WAIT_MS = 1500;
 
 export function StripePay({
   planId,
@@ -240,6 +247,10 @@ export function StripePay({
     let shapeWatch: ResizeObserver | null = null;
     let shapeTimer = 0;
     let presentTimer = 0;
+    let linkTimer = 0;
+    // The Link button has answered — it is here, or it is not coming.
+    let linkKnown = () => {};
+    const linkAnswered = new Promise<void>((resolve) => (linkKnown = resolve));
     presentable.current?.(false);
 
     let release = () => {};
@@ -260,8 +271,22 @@ export function StripePay({
       wantsFocus.current = false;
       // Stripe glides its iframe to its final height for a moment after it
       // reports ready (measured: settled inside 300ms), and everything under
-      // the fields moves with it. The step is presentable once that is over.
-      presentTimer = window.setTimeout(() => presentable.current?.(true), next === "ready" ? 350 : 0);
+      // the fields moves with it. The step is presentable once that is over
+      // — AND ONCE THE LINK SLOT IS SETTLED TOO: the step is shown once,
+      // finished, and Stripe's Link button taking the stand-in's place after
+      // the step is up is exactly the swap that rule forbids. LINK_WAIT_MS
+      // bounds it; past that the stand-in is what the step is shown with.
+      presentTimer = window.setTimeout(
+        () => {
+          if (next !== "ready") return presentable.current?.(true);
+          linkTimer = window.setTimeout(linkKnown, LINK_WAIT_MS);
+          void linkAnswered.then(() => {
+            window.clearTimeout(linkTimer);
+            if (!gone) presentable.current?.(true);
+          });
+        },
+        next === "ready" ? 350 : 0,
+      );
     };
     const limit = window.setTimeout(() => {
       console.error("[checkout] the in-sheet payment form did not load in time");
@@ -352,7 +377,12 @@ export function StripePay({
           buttonHeight: 50,
           buttonTheme: {},
           buttonType: {},
-          layout: { maxColumns: 1, maxRows: 1, overflow: "never" },
+          // maxRows 0, "as many rows as it takes": the only value Stripe
+          // accepts overflow "never" with. It was 1, which Stripe.js throws
+          // on — inside the element, so nothing here saw it: the button never
+          // reported ready and the sheet's stand-in stayed for good, sending
+          // every Link buyer through the hosted page first (2026-10-05).
+          layout: { maxColumns: 1, maxRows: 0, overflow: "never" },
           paymentMethodOrder: ["link"],
           paymentMethods: {
             link: "auto",
@@ -365,7 +395,9 @@ export function StripePay({
         });
         express.on("ready", (event) => {
           if (!gone) setLink(Boolean(event.availablePaymentMethods?.link));
+          linkKnown();
         });
+        express.on("loaderror", linkKnown);
         express.on("confirm", (event) => {
           void loaded.actions.confirm({ expressCheckoutConfirmEvent: event }).then((result) => {
             if (!gone && result.type === "error") setError(result.error.message);
@@ -383,6 +415,7 @@ export function StripePay({
       window.clearTimeout(limit);
       window.clearTimeout(shapeTimer);
       window.clearTimeout(presentTimer);
+      window.clearTimeout(linkTimer);
       shapeWatch?.disconnect();
       // Nobody is left waiting on a load that has been abandoned.
       release();
@@ -455,8 +488,20 @@ export function StripePay({
       <div className="relative mt-[17px] md:mt-[19px]">
         {!link && linkFallback}
         {/* Out of sight, not out of layout: Stripe will not draw its button
-            into a box that has no size. */}
-        <div ref={linkMount} className={link ? "" : "pointer-events-none absolute inset-x-0 top-0 opacity-0"} aria-hidden={!link} />
+            into a box that has no size — or into one that clips it to
+            nothing, hence the min-height beside the overflow.
+
+            THE STAND-IN'S BOX, so the swap moves nothing: 50 tall and radius
+            10 on a phone, 62 and 15 from md up. Stripe's button stops at 55
+            and takes its corners from the card fields' appearance (square),
+            so the box is zoomed 1.24 on desktop — 50 drawn as 62 — and its
+            own rounded corners clip the button. Stripe keeps a 4px margin
+            round its iframe outside the box, which the clip takes off too. */}
+        <div
+          ref={linkMount}
+          className={`min-h-[50px] overflow-hidden rounded-[10px] md:rounded-[calc(15px/1.24)] md:[zoom:1.24] ${link ? "" : "pointer-events-none absolute inset-x-0 top-0 opacity-0"}`}
+          aria-hidden={!link}
+        />
       </div>
       {divider}
       {state === "unavailable" ? (
