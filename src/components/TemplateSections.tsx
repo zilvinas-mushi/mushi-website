@@ -137,33 +137,9 @@ export function TemplatesHero() {
           //
           // The phone keeps its own measured 54 box and 17 label and takes
           // the look only: caps, the fill, and the 10 corner Pill has there.
-          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[54px] items-center justify-center gap-2.5 rounded-[10px] bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-7 text-[17px] font-semibold uppercase leading-none text-white transition-all duration-300 ease-out hover:-translate-y-[1px] hover:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] md:h-[calc(var(--tpl-hero-u)*0.67)] md:rounded-[calc(var(--tpl-hero-u)*0.15)] md:px-[calc(var(--tpl-hero-u)*0.32)] md:text-[length:calc(var(--tpl-hero-u)*0.24)]"
+          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[54px] items-center justify-center rounded-[10px] bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-7 text-[17px] font-semibold uppercase leading-none text-white transition-all duration-300 ease-out hover:-translate-y-[1px] hover:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] md:h-[calc(var(--tpl-hero-u)*0.67)] md:rounded-[calc(var(--tpl-hero-u)*0.15)] md:px-[calc(var(--tpl-hero-u)*0.32)] md:text-[length:calc(var(--tpl-hero-u)*0.24)]"
         >
           {TEMPLATES_PAGE.cta}
-          {/* The design's own arrow, from the supplied "arrow icon.svg"
-              (2026-09-06) — its path verbatim, at the artboard's 14 square.
-              The file's own viewBox is 16 x 15, so the glyph lands 14 x 13
-              inside that box, which is the same 13/14 the artboard reports.
-
-              Two changes to the file: `stroke` becomes currentColor, so the
-              arrow inverts with the button's hover instead of staying white
-              on white, and the fixed width/height give way to a class. */}
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 15"
-            fill="none"
-            // md: 13 x 15 against the old 21px label, kept as that share of
-            // the type now the label rides --hero-u.
-            className="size-[14px] shrink-0 md:h-[0.62em] md:w-[0.714em]"
-          >
-            <path
-              d="M1.25293 2.08593C1.0626 1.63108 0.967435 1.40366 1.00923 1.2641C1.04547 1.14311 1.13552 1.0483 1.25054 1.01006C1.38322 0.965948 1.59961 1.06575 2.03241 1.26535L14.3147 6.92981C14.7054 7.10999 14.9008 7.20008 14.9606 7.32603C15.0125 7.43541 15.0125 7.5641 14.9606 7.67348C14.9008 7.79943 14.7054 7.88952 14.3147 8.0697L2.03241 13.7342C1.59961 13.9338 1.38321 14.0336 1.25054 13.9894C1.13552 13.9512 1.04547 13.8564 1.00923 13.7354C0.967435 13.5959 1.0626 13.3684 1.25293 12.9136L3.41344 7.7504C3.45208 7.65807 3.4714 7.61191 3.47903 7.56395C3.48579 7.52145 3.48579 7.47806 3.47903 7.43556C3.4714 7.38761 3.45208 7.34144 3.41344 7.24911L1.25293 2.08593Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
         </a>
       </div>
 

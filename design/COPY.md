@@ -200,7 +200,7 @@ app.mushi.agency) instead of Book a Call.
     Results" chip, "500 Winners in Your Drive" and "500 winner static
     templates" all agree on 500.
 - **H1: Your 8-Minute Shortcut to High-ROAS Ads** *(the only `<h1>`)*
-- CTA: Take the Shortcut *(arrow icon; links to app.mushi.agency)*
+- CTA: Take the Shortcut *(no icon; links to app.mushi.agency)*
 
 ## App-window mockup
 
