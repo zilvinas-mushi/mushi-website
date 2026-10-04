@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { PlanSheet } from "@/components/PlanSheet";
 import {
   CaseStudiesFieldArt,
   CaseStudiesHero,
@@ -145,6 +146,9 @@ export default function CaseStudies() {
         <CaseStudiesRails />
         <ReadyToScale />
       </main>
+      {/* The Pick-your-plan sheet: the Ready To Scale card's Buy Now opens it
+          here, the same one /templates has. Renders nothing until then. */}
+      <PlanSheet />
       <SiteFooter />
       <script
         type="application/ld+json"

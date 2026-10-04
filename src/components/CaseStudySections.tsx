@@ -4,7 +4,7 @@ import { LazyImg } from "./CreativeCard";
 import { CoverflowRail } from "./CoverflowRail";
 import { ArrowDisc } from "./Sections";
 import { CASE_STUDIES_PAGE } from "@/lib/content";
-import { APP_BUY_URL, BOOKING_URL, CASE_STUDIES_CALL_ID, CASE_STUDIES_RAILS_ID } from "@/lib/site";
+import { BOOKING_URL, CASE_STUDIES_CALL_ID, CASE_STUDIES_RAILS_ID } from "@/lib/site";
 
 /**
  * /case-studies, section by section. design/CASE-STUDIES.md is the spec and
@@ -406,7 +406,12 @@ export function ReadyToScale() {
       </h2>
 
       <div className="cs-scale-pair mt-[21px] flex flex-col items-center gap-[15px] md:mt-[2.40625rem] md:flex-row md:justify-center md:gap-[1.625rem]">
-        {/* 500+ templates → the webapp. */}
+        {/* 500+ templates → the Pick-your-plan sheet, in place (Žilvinas
+            2026-10-04: "buy now should lead to the same popup as in
+            templates"). data-plan is what PlanSheet listens for — the page
+            mounts it. The href is where a modified click or a browser
+            without JavaScript goes: /templates#buy, which opens the same
+            sheet on arrival. It went to the webapp before. */}
         <article className={CARD}>
           <Img
             src="case-studies/scale-templates.webp"
@@ -420,7 +425,8 @@ export function ReadyToScale() {
             {templates.titleLines[1]}
           </h3>
           <a
-            href={APP_BUY_URL}
+            href="/templates#buy"
+            data-plan
             // white fill / black label  ->  black fill / white label
             className={`${CARD_BUTTON} top-[106px] w-[147px] md:left-[2.75rem] bg-[linear-gradient(#fff,#fff)] text-black hover:bg-[linear-gradient(#000,#000)] hover:text-white md:w-[12.75rem]`}
           >
