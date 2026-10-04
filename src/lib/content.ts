@@ -25,12 +25,15 @@ import { BOOKING_ANCHOR } from "@/lib/site";
 
 export const NAV = [
   { label: "Agency", href: "/" },
-  { label: "Case Studies", href: "/case-studies" },
-  // Live everywhere again (Žilvinas 2026-10-04, "enable templates page"). It
-  // was held back from 2026-09-19 with `liveOn: []` (the desktop bar) and
-  // `phoneLiveOn: ["/templates"]` (the phone drawer); navHref still honours
-  // both keys, so holding a page back again is one property on its entry.
-  { label: "Templates", href: "/templates" },
+  // BOTH HELD BACK IN THE MENU, ON BOTH SURFACES (Žilvinas 2026-10-04,
+  // later the same day he had enabled them: "disable case studies and
+  // templates as well in the menu. leave it in a path"). The entries stay
+  // in the bar and the drawer, rendered disabled; the pages themselves are
+  // untouched and answer at their URLs, and the footer still links to them.
+  // Empty lists mean "a link on no page" — see navHref. To bring one back,
+  // delete its two keys.
+  { label: "Case Studies", href: "/case-studies", liveOn: [], phoneLiveOn: [] },
+  { label: "Templates", href: "/templates", liveOn: [], phoneLiveOn: [] },
 ] as const;
 
 /**
