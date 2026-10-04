@@ -52,6 +52,30 @@ const BADGE_GRADIENT =
   "linear-gradient(90deg,#6e54b5 0%,#cb76d0 50%,#d07678 100%)";
 
 /**
+ * WHAT THE DESKTOP HERO DOES WITH HEIGHT IT HAS NO USE FOR (Žilvinas
+ * 2026-10-04, a very large window: the text a strip under the header, the
+ * MacBook on the fold, and a screen and a half of bare burst between them —
+ * "this looks so ass"; and on an Apple monitor, "the platform looks gigantic
+ * for no reason").
+ *
+ * The device is capped in the hero's own unit now (AppWindow: 10.4 w wide),
+ * so past a point a taller window is spare height, not a bigger MacBook. Two
+ * of these sit round the text block, above the badge and under the button,
+ * and take that spare between them — up to 1.2 w each, so the text rides in
+ * the middle of the gap and the device still ends on the fold. They give
+ * way FIRST (the shrink factor) when the window is short: a laptop sees
+ * neither, exactly as before.
+ *
+ * Past 2.4 w of spare the hero stops growing: it is as tall as its contents
+ * and the next section comes up under the MacBook, the way any page behaves
+ * in a window larger than its design. A hero pinned to both ends of such a
+ * window is what the screenshot showed.
+ */
+const HERO_SPARE = (
+  <div aria-hidden="true" className="hidden md:block md:min-h-0 md:flex-[0_100000_calc(var(--hero-w)*1.2)]" />
+);
+
+/**
  * /templates hero — badge, headline, CTA, then the app-window mockup with
  * floating category tiles either side. Built from the supplied screenshot of
  * the Templates design; the colour burst behind it lives in globals.css
@@ -62,36 +86,42 @@ export function TemplatesHero() {
     // From md up the section is a flex column inside the 100svh .tpl-bg, so
     // the text block takes its natural height and AppWindow's row takes the
     // rest — see the note on that wrapper.
-    <section aria-labelledby="templates-heading" className="relative md:flex md:min-h-0 md:flex-1 md:flex-col">
+    // SINCE 2026-10-04 THE HERO IS AT MOST 100svh, NOT ALWAYS 100svh — see
+    // the note on HERO_SPARE below. This section is as tall as what is in
+    // it and shrinks when the window is shorter than that.
+    <section aria-labelledby="templates-heading" className="relative md:flex md:min-h-0 md:flex-[0_1_auto] md:flex-col">
+      {HERO_SPARE}
 
       {/* 38, not 40: the phone artboard puts 46 between the header bar's
           bottom edge and the badge, and the bar's own 12px bottom inset (the
           shell's pb-2 plus its rounding) is part of that measurement. */}
       {/* tpl-scale: the text block at the page's 0.8 from md up. The device
           row under it is not inside it — see AppWindow. */}
-      {/* DESKTOP: THE HOME HERO'S RHYTHM, ON THE HOME HERO'S UNIT (Žilvinas
-          2026-10-04, twice: the badge looked "punished", shoved up under the
-          header where nobody reads it, and the headline wanted to be bigger
-          and further down — and a flat 44 -> 64 / 14 -> 17 / 56 -> 62 was
-          "not good enough"). Those were fixed px, so on any window past
-          1280 the block stayed the size of a small laptop's while the header
-          and the button beside it grew.
+      {/* DESKTOP: THE HOME HERO'S BADGE AND HEADLINE, UNIT FOR UNIT (Žilvinas
+          2026-10-04, three times: the badge looked "punished", shoved up
+          under the header; a flat px bump was "not good enough"; and then
+          "match the headline size with the label as on the home page, so
+          when it grows everything adjusts and stays clean"). The button was
+          already the home pill; now the rest of the block is the home hero's
+          too, in its own multiples:
 
-          So the block is drawn in --hero-u now, like the button already is
-          (through --tpl-hero-u, which undoes the 0.8 zoom): 0.83 down to the
-          badge, 0.21 of badge type, 0.26 to the headline, a 0.75 headline —
-          the home hero's eyebrow sits 0.8 down in 0.21 type over a 0.84
-          headline. The old px are the floors, so nothing is smaller than it
-          was. --hero-u is height-capped, so a short window tightens the text
-          before it squeezes the device; the row under this still takes what
-          the text leaves. The phone is its own artboard and is untouched. */}
-      <div className={`${SHELL} tpl-scale relative z-[1] shrink-0 pt-[2.375rem] text-center md:pt-[max(64px,calc(var(--tpl-hero-u)*0.83))]`}>
+            0.8 u    down to the badge          (home: the section's pt)
+            0.45 w   badge height, 0.28 w of side padding, 0.2 w of type
+            0.28 u   badge to headline          (home: the eyebrow's mb)
+            0.8 w    headline, leading 1
+
+          u is --hero-u and w is --hero-w, read through --tpl-hero-u / -w
+          because this block is inside the page's 0.8 zoom and the units
+          have to arrive undone (globals.css). Only the badge's look differs:
+          it keeps the gradient ring on dark that this page's design draws.
+          The phone is its own artboard and is untouched. */}
+      <div className={`${SHELL} tpl-scale relative z-[1] shrink-0 pt-[2.375rem] text-center md:pt-[calc(var(--tpl-hero-u)*0.8)]`}>
         {/* Gradient-ringed chip, not the home hero's frosted white pill. Ring
             and text share ONE purple-to-salmon gradient, sampled from the
             zoomed badge reference (2026-09-03) — the ring via the
             --agb-gradient override, the text via background-clip. */}
         <span
-          className="tpl-badge animated-gradient-border inline-flex items-center rounded-[50px] bg-[#0d0a14]/80 px-5 py-2 md:px-[max(24px,calc(var(--tpl-hero-u)*0.3))] md:py-[max(10px,calc(var(--tpl-hero-u)*0.12))]"
+          className="tpl-badge animated-gradient-border inline-flex items-center rounded-[50px] bg-[#0d0a14]/80 px-5 py-2 md:h-[calc(var(--tpl-hero-w)*0.45)] md:px-[calc(var(--tpl-hero-w)*0.28)] md:py-0"
           // Radius 50, and a 2-weight stroke ON THE PHONE (.tpl-badge in
           // globals.css — the desktop reference keeps the ring's 1px). Figma
           // calls the stroke "Outside"; the ring is masked INSIDE the box
@@ -101,8 +131,8 @@ export function TemplatesHero() {
         >
           <span
             // Poppins Medium 15 on the phone (artboard 2026-09-06); desktop
-            // is 0.21 of the hero unit, floor 17 — see the note on the block.
-            className="tpl-badge-text bg-clip-text text-[15px] font-medium tracking-[0.02em] text-transparent md:text-[length:max(17px,calc(var(--tpl-hero-u)*0.21))]"
+            // is the home eyebrow's 0.2 w — see the note on the block.
+            className="tpl-badge-text bg-clip-text text-[15px] font-medium tracking-[0.02em] text-transparent md:text-[length:calc(var(--tpl-hero-w)*0.2)] md:leading-none"
             style={{ backgroundImage: BADGE_GRADIENT }}
           >
             {TEMPLATES_PAGE.badge}
@@ -112,12 +142,15 @@ export function TemplatesHero() {
         {/* The only <h1> on the page. Figma typography panel (2026-09-03):
             Poppins SemiBold 80/80 (leading 1.0), 0% letter spacing, centred —
             so no tracking-tight, and 80px at the desktop reference width.
-            0.75 of the hero unit here since 2026-10-04 (floor 62; it was a
-            flat 56/60), and the measure is in em so it still breaks after
-            "Shortcut" at every size. */}
+            The home headline's 0.8 w on a leading of 1 since 2026-10-04 (it
+            was a flat 56/60). The measure is in em so it still breaks after
+            "Shortcut" at every size, and it is centred by its margins rather
+            than by mx-auto because past 1800 it is WIDER than the shell: an
+            auto margin cannot go negative, and the third line that made was
+            the shell's doing, not the headline's. */}
         <h1
           id="templates-heading"
-          className="mx-auto mt-6 max-w-[1000px] text-balance text-[28px] font-semibold leading-none sm:text-[38px] md:mt-[max(20px,calc(var(--tpl-hero-u)*0.26))] md:max-w-[12.6em] lg:text-[length:max(62px,calc(var(--tpl-hero-u)*0.75))] lg:leading-[1.065]"
+          className="mx-auto mt-6 max-w-[1000px] text-balance text-[28px] font-semibold leading-none sm:text-[38px] md:mx-[calc((100%-12.6em)/2)] md:mt-[calc(var(--tpl-hero-u)*0.28)] md:w-[12.6em] md:max-w-none md:text-[length:calc(var(--tpl-hero-w)*0.8)] md:leading-none"
         >
           {TEMPLATES_PAGE.heading}
         </h1>
@@ -160,6 +193,7 @@ export function TemplatesHero() {
           {TEMPLATES_PAGE.cta}
         </a>
       </div>
+      {HERO_SPARE}
 
       <AppWindow />
     </section>
@@ -2604,6 +2638,15 @@ function AppWindow() {
     // is NOT scaled. It is there for the reason given above, and at 1152 a
     // 2560 x 1300 monitor was back to 219px of bare burst under the device.
     //
+    // THE CAP IS 10.4 w, AND THE ROW ASKS FOR EXACTLY THAT (2026-10-04, the
+    // evening: on an Apple monitor the 1440 device was "gigantic for no
+    // reason" beside a headline that stops growing at 1920). The device now
+    // stops where the type does: 10.4 of --hero-w wide — 1040 from 1920 up,
+    // 819 at 1512 — which is 6.513 w tall, and that is this row's flex-basis.
+    // In a window too short for it the row shrinks and the height binds, as
+    // it always did on a laptop; in a taller one the row is its basis, the
+    // device fills it, and what is left over goes to HERO_SPARE.
+    //
     // THE DEVICE SITS ON THE FOLD, ALWAYS (Žilvinas 2026-10-04, a tall narrow
     // window with 350px of bare burst under the mac: "laptop should always
     // be on the bottom screen"). When the row's WIDTH binds — a narrow
@@ -2612,7 +2655,7 @@ function AppWindow() {
     // under it. The row is a column that packs to its end now, so the spare
     // goes between the button and the device, and the mac's cut edge is the
     // hero's last line on every window.
-    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[36px] md:flex md:min-h-0 md:flex-1 md:max-w-[1440px] md:flex-col md:justify-end md:[container-type:size]">
+    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[36px] md:flex md:min-h-0 md:flex-[0_1_calc(var(--hero-w)*6.513)] md:max-w-[calc(var(--hero-w)*10.4+2rem)] md:flex-col md:justify-end md:[container-type:size]">
       {/* The device box. The tile field is inset-y-0 INSIDE it (Žilvinas
           2026-09-25, closing the day: "now it is 86 and 81, make the same"
           — measured against the MAC's edges, which is what the eye

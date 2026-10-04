@@ -924,6 +924,8 @@ img[data-src] {
 
      --tpl-hero-u   --hero-u over the zoom, for the hero button, which is
                     the home hero's pill and takes its box from that unit.
+     --tpl-hero-w   --hero-w over the zoom, likewise, for the hero's badge
+                    and headline, which are the home hero's type scale.
 
    They are REGISTERED lengths so that what reaches the zoom is a finished
    px. Unregistered, the vw travels down as text and is resolved inside the
@@ -957,6 +959,11 @@ img[data-src] {
   inherits: true;
   initial-value: 100px;
 }
+@property --tpl-hero-w {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 100px;
+}
 :root {
   --tpl-z: 0.8;
 }
@@ -969,6 +976,7 @@ img[data-src] {
     --tpl-rem: clamp(10.5px, 0.83333vw / var(--tpl-z), 16px);
     --tpl-vw: calc(100vw / var(--tpl-z));
     --tpl-hero-u: calc(var(--hero-u) / var(--tpl-z));
+    --tpl-hero-w: calc(var(--hero-w) / var(--tpl-z));
   }
   .tpl-scale {
     --spacing: calc(var(--tpl-rem) / 4);

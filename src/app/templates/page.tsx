@@ -225,10 +225,15 @@ export default function Templates() {
           // home page: the desktop bar is 63 in flow at 1512, not the phone
           // header's 82, and the 19px difference had the hero's box starting
           // above the page — which came out of its bottom edge.
+          // AT MOST 100svh FROM md UP, not always (2026-10-04): in a window
+          // taller than the hero has use for, the box is as tall as its
+          // contents and the next section follows the MacBook — see
+          // HERO_SPARE in TemplateSections. On a laptop it is the screen,
+          // as before.
           // md:min-h 576 is the 720 floor at the page's 0.8 (.tpl-scale in
           // globals.css). This wrapper is NOT inside the zoom — the hero is
           // a share of the window, and only its text block is scaled.
-          className="tpl-bg relative -mt-[82px] overflow-hidden pt-[82px] md:-mt-[var(--header-h)] md:flex md:h-[100svh] md:min-h-[576px] md:flex-col md:pt-[var(--header-h)]"
+          className="tpl-bg relative -mt-[82px] overflow-hidden pt-[82px] md:-mt-[var(--header-h)] md:flex md:max-h-[100svh] md:min-h-[576px] md:flex-col md:pt-[var(--header-h)]"
         >
           <TemplatesHero />
         </div>
