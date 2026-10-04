@@ -93,12 +93,15 @@ export function CaseStudiesFieldArt() {
         src="case-studies/shapes-left.webp"
         alt=""
         priority="gate"
+        // Desktop-only artwork: a phone must not fetch it. See Img's skipOn.
+        skipOn="(max-width: 767px)"
         className="absolute left-0 top-0 hidden h-[59.625rem] w-[24rem] max-w-none md:block"
       />
       <Img
         src="case-studies/shapes-right.webp"
         alt=""
         priority="gate"
+        skipOn="(max-width: 767px)"
         className="absolute right-0 top-0 hidden h-[63rem] w-[20rem] max-w-none md:block"
       />
       {FLOATERS.map((f) => (

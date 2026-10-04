@@ -55,6 +55,16 @@ type Props = {
    */
   alternate?: { src: string; media: string; width?: number };
   /**
+   * A media query under which this picture is NOT FETCHED AT ALL — for eager
+   * artwork that one breakpoint hides (`hidden md:block`). Hiding does not
+   * stop the fetch: the phone was downloading 150 KB of /case-studies'
+   * desktop shapes, at the head of the queue, for a `display: none` box
+   * (PageSpeed 2026-10-05, mobile LCP 4.3s). Under the query the <picture>
+   * resolves to a 1px inline GIF instead, and being inside a <picture> also
+   * keeps React from preloading the real file in the <head>.
+   */
+  skipOn?: string;
+  /**
    * Turn off the browser's native image drag. Artwork that is PART OF A
    * SURFACE rather than content in its own right — the team cards' cut-out
    * portraits, where the picture and the card behind it read as one object —
@@ -72,6 +82,9 @@ type Props = {
    */
   gateOnly?: boolean;
 };
+
+/** A transparent 1 x 1 GIF: what `skipOn` hands the browser instead of a file. */
+const BLANK_GIF = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 /**
  * Plain <img> with intrinsic dimensions baked in at build time.
@@ -100,6 +113,7 @@ export function Img({
   draggable,
   gateOnly = false,
   alternate,
+  skipOn,
 }: Props) {
   const dim = IMAGE_SIZES[src];
 
@@ -186,6 +200,15 @@ export function Img({
     img
   );
 
+  if (skipOn) {
+    return (
+      <picture className="contents">
+        <source media={skipOn} srcSet={BLANK_GIF} />
+        {withFallback}
+      </picture>
+    );
+  }
+
   if (!alternate || !alt2) return withFallback;
 
   const aw = alternate.width ?? alt2.w;
@@ -200,9 +223,17 @@ export function Img({
      nothing about the layout moves. */
   return (
     <picture className="contents">
+      {/* A DEFERRED PICTURE'S <source> IS DEFERRED TOO. With a real srcSet
+          here the browser took the source the moment it parsed it — the
+          <img>'s missing src does not stop a <picture> — so on a phone every
+          below-fold picture with a phone file skipped the deferral entirely:
+          /case-studies had its rails' and its last section's artwork,
+          590 KB, in flight before its first screen (PageSpeed 2026-10-05).
+          The URL rides in data-srcset and the inline script moves it across
+          just before it gives the <img> its src. */}
       <source
         media={alternate.media}
-        srcSet={`/images/${alternate.src}`}
+        {...(deferred ? { "data-srcset": `/images/${alternate.src}` } : { srcSet: `/images/${alternate.src}` })}
         width={aw}
         height={ah}
       />

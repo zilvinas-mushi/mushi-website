@@ -120,6 +120,15 @@ export const PAINT_GATE_SCRIPT = `
         // is rendered: an eager <img> under display:none is fetched all the
         // same, and that is the other breakpoint's artwork.
         if(el.getClientRects().length)el.loading='eager';
+        // Inside a <picture>, the sources first: their URLs are deferred the
+        // same way (Img.tsx), and they have to be in place before the <img>
+        // gets its src or the browser picks the wrong file and then the
+        // right one.
+        var pic=el.parentNode;
+        if(pic&&pic.tagName==='PICTURE'){
+          var so=pic.querySelectorAll('source[data-srcset]');
+          for(var o=0;o<so.length;o++){so[o].setAttribute('srcset',so[o].getAttribute('data-srcset'));so[o].removeAttribute('data-srcset')}
+        }
         var ss=el.getAttribute('data-srcset');
         if(ss){el.setAttribute('srcset',ss);el.removeAttribute('data-srcset')}
         el.setAttribute('src',s);el.removeAttribute('data-src');
