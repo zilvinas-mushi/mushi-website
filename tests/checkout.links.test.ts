@@ -125,6 +125,10 @@ describe("the plan sheet", () => {
     expect(pay).toContain("disabled={busy}");
     expect(pay).not.toContain('disabled={state === "loading"');
     expect(pay).toContain("await settledOnce.current;");
+    // Buy holds for a step that is still loading, with a ceiling.
+    expect(sheet).toContain("if (!payReady.current) {");
+    expect(sheet).toContain("holdTimer.current = window.setTimeout(showPay, HOLD_MS);");
+    expect(pay).toContain("presentable.current?.(true)");
     // A press on the stand-in fields is honoured when Stripe's arrive.
     expect(pay).toContain('if (next === "ready" && wantsFocus.current) element?.focus();');
   });

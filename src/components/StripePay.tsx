@@ -185,6 +185,7 @@ export function StripePay({
   labels,
   fieldClass,
   submitClass,
+  onPresentable,
 }: {
   planId: PlanId;
   /** The plan's Stripe-hosted checkout, given the email — where Submit goes if this cannot load. */
@@ -200,6 +201,13 @@ export function StripePay({
   labels: { email: string; submit: string };
   fieldClass: string;
   submitClass: string;
+  /**
+   * Told `false` when a load starts and `true` when the step can be shown
+   * without anything in it still arriving: Stripe's fields are in and their
+   * box has stopped moving, or the load has failed and the one-line fallback
+   * stands in their place. The sheet holds the step back until then.
+   */
+  onPresentable?: (ok: boolean) => void;
 }) {
   const [state, setState] = useState<State>("loading");
   const [busy, setBusy] = useState(false);
@@ -218,6 +226,10 @@ export function StripePay({
   // The ring is shaped by the sheet's masks — see appearance().
   const [shaped, setShaped] = useState(true);
   const lastMask = useRef<HTMLDivElement>(null);
+  const presentable = useRef(onPresentable);
+  useEffect(() => {
+    presentable.current = onPresentable;
+  }, [onPresentable]);
   const wantsFocus = useRef(false);
 
   useEffect(() => {
@@ -227,6 +239,8 @@ export function StripePay({
     let express: StripeCheckoutExpressCheckoutElement | null = null;
     let shapeWatch: ResizeObserver | null = null;
     let shapeTimer = 0;
+    let presentTimer = 0;
+    presentable.current?.(false);
 
     let release = () => {};
     stateNow.current = "loading";
@@ -244,6 +258,10 @@ export function StripePay({
       // The press the stand-in took is honoured now.
       if (next === "ready" && wantsFocus.current) element?.focus();
       wantsFocus.current = false;
+      // Stripe glides its iframe to its final height for a moment after it
+      // reports ready (measured: settled inside 300ms), and everything under
+      // the fields moves with it. The step is presentable once that is over.
+      presentTimer = window.setTimeout(() => presentable.current?.(true), next === "ready" ? 350 : 0);
     };
     const limit = window.setTimeout(() => {
       console.error("[checkout] the in-sheet payment form did not load in time");
@@ -364,6 +382,7 @@ export function StripePay({
       gone = true;
       window.clearTimeout(limit);
       window.clearTimeout(shapeTimer);
+      window.clearTimeout(presentTimer);
       shapeWatch?.disconnect();
       // Nobody is left waiting on a load that has been abandoned.
       release();

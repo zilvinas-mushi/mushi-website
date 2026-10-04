@@ -46,6 +46,8 @@ import { APP_URL } from "@/lib/site";
  * 2026-09-25, "smoother"). The backdrop fades on the same clock.
  */
 const OPEN_MS = 560;
+/** How long Buy may hold for the payment step before showing it as it is. */
+const HOLD_MS = 4000;
 
 /** The address that opens the sheet on arrival: `/templates#buy`. The webapp links to it. */
 export const BUY_HASH = "#buy";
@@ -95,6 +97,20 @@ export function PlanSheet() {
   const [stepIn, setStepIn] = useState(true);
   const stepTimer = useRef(0);
   /**
+   * THE PAYMENT STEP IS SHOWN ONCE, FINISHED (Žilvinas 2026-10-04, the card
+   * fields swapping in after the step was already up: "no reloads, just one
+   * time load of this"). The step loads behind the plan step from the moment
+   * the sheet opens, so it is nearly always ready when Buy is pressed. When
+   * it is not — a fast press, a slow network — Buy HOLDS: the button shows
+   * it is working and the step comes in when StripePay says it is
+   * presentable, with nothing in it still arriving. HOLD_MS is the ceiling;
+   * past it the step is shown as it is, stand-in fields and all, because a
+   * buyer must never be stuck on a button.
+   */
+  const payReady = useRef(false);
+  const holdTimer = useRef(0);
+  const [holding, setHolding] = useState(false);
+  /**
    * Desktop only: the step's frame (650 for the plan, 763 for payment)
    * zoomed down just enough to clear the viewport, 1 whenever it fits.
    * Zoom rather than transform so the layout box shrinks with it.
@@ -116,7 +132,10 @@ export function PlanSheet() {
     // this before, and on iOS they were not always two frames apart, which
     // left the sheet snapping into place.
     window.clearTimeout(stepTimer.current);
+    window.clearTimeout(holdTimer.current);
+    payReady.current = false;
     flushSync(() => {
+      setHolding(false);
       setStep("plan");
       setStepIn(true);
       setMounted(true);
@@ -129,6 +148,17 @@ export function PlanSheet() {
     setShown(true);
   };
   const goPay = () => {
+    if (holding) return;
+    if (!payReady.current) {
+      setHolding(true);
+      holdTimer.current = window.setTimeout(showPay, HOLD_MS);
+      return;
+    }
+    showPay();
+  };
+  const showPay = () => {
+    window.clearTimeout(holdTimer.current);
+    setHolding(false);
     const panel = panelRef.current;
     if (!panel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setStep("pay");
@@ -159,6 +189,8 @@ export function PlanSheet() {
   };
   const close = () => {
     window.clearTimeout(stepTimer.current);
+    window.clearTimeout(holdTimer.current);
+    setHolding(false);
     setShown(false);
     closeTimer.current = window.setTimeout(() => setMounted(false), OPEN_MS);
   };
@@ -453,10 +485,16 @@ export function PlanSheet() {
               // white, off the inspector (Žilvinas 2026-09-25). The 50% is
               // an opacity rather than a colour so it still inverts with the
               // button on hover.
-              className={`mt-5 flex h-[47.35px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium ${VIOLET}`}
+              aria-busy={holding || undefined}
+              className={`mt-5 flex h-[47.35px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium ${VIOLET} ${holding ? "cursor-wait" : ""}`}
             >
               {c.ctaPrefix} {plan.price}
               <span className="text-[14px] font-medium opacity-50">{c.perMonth}</span>
+              {/* Holding for the payment step — see payReady. In
+                  currentColor, so it inverts with the button. */}
+              {holding && (
+                <span aria-hidden="true" className="ml-2.5 size-[14px] shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              )}
             </button>
 
             {/* Poppins Regular 14, white at 50%, the whole line — label,
@@ -588,6 +626,11 @@ export function PlanSheet() {
                   <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
                 </>
               }
+              onPresentable={(ok) => {
+                payReady.current = ok;
+                // Buy was pressed and has been waiting for exactly this.
+                if (ok && holdTimer.current && step === "plan") showPay();
+              }}
               labels={{ email: c.pay.email, submit: c.pay.submit }}
               fieldClass={FIELD}
               submitClass={VIOLET}
