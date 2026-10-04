@@ -587,7 +587,11 @@ export function MobileHeader({
                   <span
                     key={item.label}
                     aria-disabled="true"
-                    className={`${CTA_BOX} cursor-default select-none text-white/40`}
+                    // The page being viewed keeps the lit row's plate.
+                    aria-current={item.href === (activePath ?? "/") ? "true" : undefined}
+                    className={`${CTA_BOX} cursor-default select-none ${
+                      item.href === (activePath ?? "/") ? "bg-[#222222] text-white" : "text-white/40"
+                    }`}
                   >
                     {item.label}
                   </span>

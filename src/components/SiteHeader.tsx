@@ -250,7 +250,12 @@ export function SiteHeader({
                 ) : (
                   <span
                     aria-disabled="true"
-                    className="cap-centered cursor-default select-none text-[length:calc(var(--u)*0.28)] font-semibold uppercase leading-none tracking-[0.01em] text-white/40"
+                    // The page being viewed stays lit even when its entry is
+                    // not a link (the whole menu is held back, 2026-10-04).
+                    aria-current={item.href === active ? "page" : undefined}
+                    className={`cap-centered cursor-default select-none text-[length:calc(var(--u)*0.28)] font-semibold uppercase leading-none tracking-[0.01em] ${
+                      item.href === active ? "text-white" : "text-white/40"
+                    }`}
                   >
                     {item.label}
                   </span>

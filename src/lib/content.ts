@@ -24,14 +24,15 @@
 import { BOOKING_ANCHOR } from "@/lib/site";
 
 export const NAV = [
-  { label: "Agency", href: "/" },
-  // BOTH HELD BACK IN THE MENU, ON BOTH SURFACES (Žilvinas 2026-10-04,
-  // later the same day he had enabled them: "disable case studies and
-  // templates as well in the menu. leave it in a path"). The entries stay
-  // in the bar and the drawer, rendered disabled; the pages themselves are
-  // untouched and answer at their URLs, and the footer still links to them.
-  // Empty lists mean "a link on no page" — see navHref. To bring one back,
-  // delete its two keys.
+  // THE WHOLE MENU IS HELD BACK, ON BOTH SURFACES (Žilvinas 2026-10-04:
+  // "disable case studies and templates as well in the menu. leave it in a
+  // path", then "you haven't disabled agency and case studies"). All three
+  // entries stay in the bar and the drawer, but none is a link on any page;
+  // the one for the page being viewed is still lit. The pages themselves are
+  // untouched and answer at their URLs, the wordmark still goes home, and
+  // the footer still links to them. Empty lists mean "a link on no page" —
+  // see navHref. To bring an entry back, delete its two keys.
+  { label: "Agency", href: "/", liveOn: [], phoneLiveOn: [] },
   { label: "Case Studies", href: "/case-studies", liveOn: [], phoneLiveOn: [] },
   { label: "Templates", href: "/templates", liveOn: [], phoneLiveOn: [] },
 ] as const;
