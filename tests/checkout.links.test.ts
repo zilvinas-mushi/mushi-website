@@ -75,10 +75,19 @@ describe("the plan sheet", () => {
     expect(pay).toContain("JSON.stringify({ plan: planFor(planId).lookupKey })");
   });
 
-  it("loads Stripe.js only when the payment step is reached, never with the page", () => {
+  it("loads Stripe.js when the sheet is opened, never with the page", () => {
     expect(pay).toContain('import("@stripe/stripe-js")');
     expect(pay).not.toMatch(/^import \{[^}]*loadStripe[^}]*\} from "@stripe\/stripe-js"/m);
     expect(sheet).not.toContain("@stripe/stripe-js");
+    // The preload hangs on the sheet's open(), which only a click or #buy calls.
+    expect(sheet).toMatch(/const open = \(\) => \{[\s\S]{0,260}preloadStripe\(\);/);
+  });
+
+  it("checks the email itself and says so in the sheet, not in the browser's bubble", () => {
+    expect(pay).toContain("<form onSubmit={onSubmit} noValidate>");
+    expect(pay).toContain('setError("Please enter your email.");');
+    expect(pay).toContain('setError("Enter a valid email address.");');
+    expect(pay).not.toMatch(/name="email"\s+required/);
   });
 
   it("can always be paid: Stripe's hosted page is the fallback and the Pay with Link target", () => {

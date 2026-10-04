@@ -30,33 +30,75 @@ import type { PlanId } from "@/lib/pricing";
 
 // The sheet's field, in Stripe's vocabulary. Kept in step with FIELD in
 // PlanSheet.tsx: #222222, white text, placeholder at 50%, the 8b6ad6 ring.
-const APPEARANCE: Appearance = {
-  theme: "night",
-  labels: "floating",
-  variables: {
-    colorPrimary: "#8b6ad6",
-    colorBackground: "#222222",
-    colorText: "#ffffff",
-    colorTextPlaceholder: "rgba(255,255,255,0.5)",
-    colorDanger: "#de8a8b",
-    fontFamily: "Poppins, system-ui, sans-serif",
-    fontSizeBase: "16px",
-    borderRadius: "10px",
-    gridRowSpacing: "3px",
-    gridColumnSpacing: "3px",
-  },
-  rules: {
-    ".Input": { border: "1px solid transparent", boxShadow: "none", backgroundColor: "#222222" },
-    ".Input:focus": { border: "1px solid #8b6ad6", boxShadow: "0 0 0 1px #8b6ad6" },
-    ".Label": { color: "rgba(255,255,255,0.5)" },
-    ".Error": { color: "#de8a8b" },
-  },
-};
+/**
+ * THE DESKTOP FIELDS ARE DRAWN AT 1.6x (the md:[zoom:1.6] on the mount box
+ * below), so what is given to Stripe there is the frame's field divided by
+ * 1.6: 14px type for the frame's 22, a 35px field for its 56.
+ */
+function appearance(desktop: boolean): Appearance {
+  return {
+    theme: "night",
+    // THE FRAME'S FIELDS HAVE PLACEHOLDERS AND NO LABELS (Žilvinas 2026-10-04,
+    // off the Figma frame): "1234 1234 1234 1234", "MM / YY", "CVC". Stripe
+    // only shows those placeholders in its "above" label mode, so the labels
+    // are kept and collapsed to nothing below.
+    labels: "above",
+    variables: {
+      colorPrimary: "#8b6ad6",
+      colorBackground: "#222222",
+      colorText: "#ffffff",
+      colorTextPlaceholder: "rgba(255,255,255,0.5)",
+      colorDanger: "#de8a8b",
+      fontFamily: "Poppins, system-ui, sans-serif",
+      fontSizeBase: desktop ? "14px" : "18px",
+      // ONE BLOCK WITH SEAMS: square fields 2px apart, and the block's own
+      // rounded corners come from the box they are mounted in.
+      borderRadius: "0px",
+      gridRowSpacing: "2px",
+      gridColumnSpacing: "2px",
+    },
+    rules: {
+      ".Input": {
+        border: "0",
+        boxShadow: "none",
+        backgroundColor: "#222222",
+        padding: desktop ? "9px 14px" : "11px 16px",
+        lineHeight: desktop ? "17px" : "23px",
+      },
+      // No ring on the field itself: its corners are square and the block's
+      // rounded corners would cut it. The ring is drawn around the WHOLE
+      // block, in the sheet (see `focused`); the field in use just lifts.
+      ".Input:focus": { boxShadow: "none", backgroundColor: "#2b2b2b" },
+      ".Input--invalid": { color: "#de8a8b" },
+      ".Label": { fontSize: "0px", lineHeight: "0px", margin: "0", padding: "0", opacity: "0" },
+      ".Error": { color: "#de8a8b", fontSize: desktop ? "10px" : "13px" },
+    },
+  };
+}
 
 // Stripe's iframe cannot see the page's self-hosted Poppins; it loads its own.
 const FONTS = [{ cssSrc: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" }];
 
 type State = "loading" | "ready" | "unavailable";
+
+/**
+ * Stripe.js, fetched once. `preloadStripe` is called when the sheet OPENS
+ * (Žilvinas 2026-10-04, "this one loads just after some time"), so that by
+ * the time the buyer has picked a plan and reached the payment step the
+ * script is already here. Still never with the page itself.
+ */
+let stripeJs: Promise<import("@stripe/stripe-js").Stripe | null> | null = null;
+function getStripe() {
+  stripeJs ??= import("@stripe/stripe-js").then(({ loadStripe }) => loadStripe(STRIPE_PUBLISHABLE_KEY));
+  return stripeJs;
+}
+export function preloadStripe(): void {
+  getStripe().catch(() => {
+    // A failed preload is not an error yet; the payment step will try again
+    // and fall back to Stripe's hosted page if it still cannot load.
+    stripeJs = null;
+  });
+}
 
 /**
  * THE BUYER'S COUNTRY, WITHOUT ASKING FOR IT. Stripe will not confirm a card
@@ -104,7 +146,6 @@ export function StripePay({
   labels,
   fieldClass,
   submitClass,
-  submitIcon,
 }: {
   planId: PlanId;
   /** The plan's Stripe-hosted checkout, given the email — where Submit goes if this cannot load. */
@@ -120,12 +161,12 @@ export function StripePay({
   labels: { email: string; submit: string };
   fieldClass: string;
   submitClass: string;
-  submitIcon: React.ReactNode;
 }) {
   const [state, setState] = useState<State>("loading");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [link, setLink] = useState(false);
+  const [focused, setFocused] = useState(false);
   const mount = useRef<HTMLDivElement>(null);
   const linkMount = useRef<HTMLDivElement>(null);
   const actions = useRef<StripeCheckoutLoadActionsSuccess | null>(null);
@@ -151,8 +192,8 @@ export function StripePay({
     }, LOAD_LIMIT_MS);
 
     (async () => {
-      const [{ loadStripe }, response, where] = await Promise.all([
-        import("@stripe/stripe-js"),
+      const [stripe, response, where] = await Promise.all([
+        getStripe(),
         fetch(CHECKOUT_SESSION_URL, {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -165,11 +206,13 @@ export function StripePay({
       const { clientSecret } = (await response.json()) as { clientSecret?: string };
       if (!clientSecret) throw new Error("the webapp sent no client secret");
 
-      const stripe = await loadStripe(STRIPE_PUBLISHABLE_KEY);
       if (!stripe) throw new Error("Stripe.js did not load");
       const checkout = stripe.initCheckoutElementsSdk({
         clientSecret,
-        elementsOptions: { appearance: APPEARANCE, fonts: FONTS },
+        elementsOptions: {
+          appearance: appearance(window.matchMedia("(min-width: 768px)").matches),
+          fonts: FONTS,
+        },
       });
       const loaded = await checkout.loadActions();
       if (loaded.type !== "success") throw new Error(loaded.error.message);
@@ -189,6 +232,12 @@ export function StripePay({
       });
       element.on("ready", () => settle("ready"));
       element.on("loaderror", () => settle("unavailable"));
+      element.on("focus", () => {
+        if (!gone) setFocused(true);
+      });
+      element.on("blur", () => {
+        if (!gone) setFocused(false);
+      });
       element.mount(mount.current);
       actions.current = loaded.actions;
 
@@ -240,6 +289,17 @@ export function StripePay({
     e.preventDefault();
     const email = String(new FormData(e.currentTarget).get("email") ?? "").trim();
 
+    // The sheet's own message, in the webapp's words — not the browser's
+    // "Please fill in this field" bubble (Žilvinas 2026-10-04).
+    if (!email) {
+      setError("Please enter your email.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+
     if (state === "unavailable") {
       window.location.href = fallbackHref(email);
       return;
@@ -269,7 +329,7 @@ export function StripePay({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate={false}>
+    <form onSubmit={onSubmit} noValidate>
       {/* The Link slot: the sheet's own button until Stripe's is ready, and
           for good if Link is not on offer. Stripe's is mounted from the start
           (it needs a box to draw into) and simply kept out of sight. */}
@@ -287,27 +347,64 @@ export function StripePay({
       ) : (
         // The block holds the fields' height in the sheet's own grey while
         // Stripe draws them, so nothing below it moves when they arrive.
+        // THE FRAME'S ARRANGEMENT: the number across the top, MM/YY and CVC
+        // side by side under it, one block with rounded outer corners. Stripe
+        // arranges its card fields by the WIDTH it is given — stacked like
+        // this when narrow, all in one row when wide — so from md up the box
+        // is zoomed 1.6x: inside it Stripe sees a phone's width and lays out
+        // for it, and the result is drawn at desktop size. (A zoomed box's
+        // own 100% is already the parent's width divided by the zoom.) The
+        // rounded corners are this box's; the fields inside are square.
         <div
           // The height is held only while Stripe draws: once the fields are
           // in, the block is exactly as tall as they are.
-          className={`mt-[13px] rounded-[10px] md:rounded-[15px] ${state === "loading" ? "min-h-[56px] bg-[#222222]" : ""}`}
+          className="relative mt-[13px] overflow-hidden rounded-[10px] md:rounded-[15px]"
           aria-busy={state === "loading"}
         >
-          <div ref={mount} />
+          {/* THE FIELDS ARE THERE FROM THE FIRST FRAME (Žilvinas 2026-10-04):
+              while Stripe draws its own, this stand-in holds their exact
+              shape and placeholders, and is lifted off when they are ready —
+              nothing appears late and nothing below it moves. */}
+          {state === "loading" && (
+            <div aria-hidden="true" className="flex flex-col gap-[2px] text-[18px] leading-[23px] text-white/50 md:gap-[3.2px] md:text-[22.4px] md:leading-[27.2px]">
+              <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">1234 1234 1234 1234</div>
+              <div className="grid grid-cols-2 gap-[2px] md:gap-[3.2px]">
+                <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">MM / YY</div>
+                <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">CVC</div>
+              </div>
+            </div>
+          )}
+          {/* Stripe draws underneath the stand-in, out of flow, until ready. */}
+          <div className={`md:[zoom:1.6] ${state === "loading" ? "pointer-events-none absolute inset-x-0 top-0 opacity-0" : ""}`}>
+            <div ref={mount} />
+          </div>
+          {/* THE FOCUS RING, around the whole card block and with its rounded
+              corners (Žilvinas 2026-10-04, "focus is off, you see no
+              corners"): the same violet ring the email field wears, drawn
+              over Stripe's fields rather than by them. */}
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-0 rounded-[10px] ring-2 ring-inset ring-[#8b6ad6] transition-opacity duration-150 md:rounded-[15px] ${focused ? "opacity-100" : "opacity-0"}`}
+          />
         </div>
       )}
 
       <input
         type="email"
         name="email"
-        required
         autoComplete="email"
+        aria-invalid={error ? true : undefined}
+        onInput={() => error && setError(null)}
         placeholder={labels.email}
         className={`${fieldClass} mt-[22px] rounded-[10px] md:mt-[28px] md:rounded-[15px]`}
       />
 
+      {/* The webapp's alert (its login page): a red-tinted box, red text. */}
       {error && (
-        <p role="alert" className="mt-3 text-[14px] leading-snug text-[#de8a8b] md:text-[17px]">
+        <p
+          role="alert"
+          className="mt-3 rounded-[10px] border border-[#de8a8b]/30 bg-[#de8a8b]/10 px-4 py-2.5 text-[14px] leading-snug text-[#f0b4b5] md:rounded-[15px] md:px-[22px] md:py-3 md:text-[17px]"
+        >
           {error}
         </p>
       )}
@@ -315,9 +412,8 @@ export function StripePay({
       <button
         type="submit"
         disabled={state === "loading" || busy}
-        className={`mt-[27px] flex h-[50px] w-full items-center justify-center gap-[10px] rounded-[10px] text-[16px] font-semibold disabled:cursor-wait disabled:opacity-60 md:mt-[34px] md:h-[62px] md:gap-[14px] md:rounded-[15px] md:text-[24px] md:font-medium ${submitClass}`}
+        className={`mt-[27px] flex h-[50px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium disabled:cursor-wait disabled:opacity-60 md:mt-[34px] md:h-[62px] md:rounded-[15px] md:text-[24px] md:font-medium ${submitClass}`}
       >
-        {submitIcon}
         {labels.submit}
       </button>
     </form>

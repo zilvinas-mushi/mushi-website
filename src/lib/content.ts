@@ -1213,9 +1213,11 @@ export const TEMPLATES_PAGE = {
       expiry: "MM/YY",
       cvv: "CVV",
       email: "Email",
-      submit: "Submit payment",
+      // "Complete purchase", no lock, and the guarantee spelled out — off
+      // the Figma frame (Žilvinas 2026-10-04).
+      submit: "Complete purchase",
       cancel: "Cancel anytime",
-      moneyBack: "14-day money-back",
+      moneyBack: "14-day money-back guarantee",
       badgesAlt: "Verified by Visa, Mastercard ID Check, PCI DSS compliant, McAfee Secure",
       legalPrefix: "By purchasing, you agree to our",
       terms: "Terms and Conditions",

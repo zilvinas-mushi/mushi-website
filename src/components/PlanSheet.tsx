@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { BoltGlyph, LinkMark, LockGlyph, ShieldGlyph } from "./plan-sheet-glyphs";
+import { BoltGlyph, LinkMark, ShieldGlyph } from "./plan-sheet-glyphs";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { StripePay } from "./StripePay";
+import { StripePay, preloadStripe } from "./StripePay";
 import { dueToday } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import { APP_URL } from "@/lib/site";
@@ -97,6 +97,9 @@ export function PlanSheet() {
   const [fit, setFit] = useState(1);
 
   const open = () => {
+    // The buyer has asked for the sheet: start fetching Stripe.js now, so the
+    // payment step's fields are ready by the time they get to it.
+    preloadStripe();
     window.clearTimeout(closeTimer.current);
     // THE RISE STARTS FROM A FORCED LAYOUT, not from a frame or two of
     // waiting (Žilvinas 2026-09-26, "there should be animation for that
@@ -542,7 +545,6 @@ export function PlanSheet() {
               labels={{ email: c.pay.email, submit: c.pay.submit }}
               fieldClass={FIELD}
               submitClass={VIOLET}
-              submitIcon={<LockGlyph className="h-[19px] w-auto md:h-[33px] md:[stroke-width:2.2]" />}
             />
 
             <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[12px] leading-none text-white/60 md:mt-[16px] md:gap-[40px] md:text-[17px]">
