@@ -473,6 +473,34 @@ img[data-src] {
 }
 
 /*
+  A CARD WITH DEFERRED ARTWORK IS SHOWN WHOLE OR NOT AT ALL (Žilvinas
+  2026-10-04, the Inside cards' figures sitting on empty plates: "either
+  don't show anything when pictures are not loaded or load everything
+  beforehand"). An element whose background is deferred (data-bg) is
+  invisible, words and all, until paint-gate-script has its artwork — and the
+  pictures inside it — arrived and decoded; data-bg-wait is the same hold
+  while they are on the wire. Then it fades in, finished, and data-bg-in
+  (which only carries the transition) is taken off again so the element's own
+  transitions are its own.
+
+  Unlayered, so it outranks an opacity utility on the same element for as
+  long as the hold lasts and no longer. With JavaScript off the <noscript>
+  block in layout.tsx lifts it, beside the rule that draws the background.
+*/
+[data-bg],
+[data-bg-wait] {
+  opacity: 0;
+}
+[data-bg-in] {
+  transition: opacity 350ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-bg-in] {
+    transition: none;
+  }
+}
+
+/*
   DESKTOP: centre the hero in the field.
 
   The field is min-h-svh (page.tsx) so the next section can never peek in on

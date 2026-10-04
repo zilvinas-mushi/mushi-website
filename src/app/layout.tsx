@@ -233,7 +233,9 @@ export default function RootLayout({
         <noscript>
           <style
             dangerouslySetInnerHTML={{
-              __html: ".paint-veil{display:none!important}",
+              // The second rule lifts the hold on cards with deferred
+              // artwork (globals.css): nothing will ever load them here.
+              __html: ".paint-veil{display:none!important}[data-bg]{opacity:1!important}",
             }}
           />
         </noscript>

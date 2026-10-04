@@ -32,12 +32,22 @@ Contentful Paint with it — seconds behind the artwork it was waiting for.
 `PaintGate.tsx` is now only the thing that re-arms it on a route change.
 
 The same script owns the other half of the bargain: **below the fold, nothing
-is fetched until it is nearly in view.** `loading="lazy"` does not deliver that
+is fetched until the first screen is done — and then all of it is, in order,
+before anyone scrolls to it.** `loading="lazy"` does not deliver the first part
 (Chrome's threshold runs to ~8000px on a slow connection) and a CSS background
 cannot ask for it at all, so the URL is kept out of anything the browser will
 fetch from — `data-src` on an image, `data-bg` + `background-image: var(--bg,
-none)` on a background — and swapped in by an IntersectionObserver that arms
-itself after the cross-fade, never before.
+none)` on a background. Once the cross-fade has ended the script walks the
+page top to bottom and loads every one, three at a time, each decoded before
+the next (`warm()`); an IntersectionObserver lets whatever the reader gets
+near jump the queue. Save-Data and 2G visitors keep the observer alone.
+
+**A reader must never scroll onto a half-loaded card** (Žilvinas 2026-10-04:
+"either don't show anything when pictures are not loaded or load everything
+beforehand" — both are done). An element with `data-bg` is invisible, words
+and all, until its artwork and the pictures inside it have arrived and
+decoded, then it fades in whole. So a deferred background belongs on the
+CARD, not on a layer inside it.
 
 When you build anything new:
 - Artwork that is a **CSS background** above the fold gets `data-await-bg` on

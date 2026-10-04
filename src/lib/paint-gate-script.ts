@@ -29,7 +29,9 @@
 export const PAINT_GATE_SCRIPT = `
 (function(){
   var d=document,root=d.documentElement;
-  // BELOW THE FOLD, NOTHING IS ON THE WIRE UNTIL IT IS NEARLY IN VIEW.
+  // BELOW THE FOLD, NOTHING IS ON THE WIRE UNTIL THE FIRST SCREEN IS DONE —
+  // AND THEN ALL OF IT IS, IN ORDER (see warm(), 2026-10-04). What follows
+  // is how the URLs are kept from the browser until then.
   //
   // loading=lazy was not enough and a CSS background cannot say it at all.
   // Chrome's own lazy threshold stretches to ~8000px on a slow connection, and
@@ -41,21 +43,75 @@ export const PAINT_GATE_SCRIPT = `
   // So the URL is kept where the browser cannot see it: data-src on an image,
   // a --bg custom property on a background (a url() inside a custom property
   // is NOT fetched until something uses it). It is put back when the element
-  // comes within a screen and a half of the viewport.
+  // comes within a screen and a half of the viewport, or when warm() reaches
+  // it, whichever is first.
   //
   // The failure mode is the same as the gate's: show it anyway. No
   // IntersectionObserver, or an error, and everything is restored at once;
   // with JavaScript off the <noscript> block in layout.tsx does the same.
   var sel='[data-src],[data-bg]';
+  // Calls back once a picture has arrived AND decoded — or failed, or taken
+  // 8s, because nothing here may wait for ever.
+  function settle(img,cb){
+    var f=0,fin=function(){if(f)return;f=1;cb()};
+    var dec=function(){try{img.decode().then(fin,fin)}catch(e){fin()}};
+    setTimeout(fin,8000);
+    if(img.complete&&img.src)dec();
+    else{img.addEventListener('load',dec,{once:true});img.addEventListener('error',fin,{once:true})}
+  }
+  // The file a deferred background will draw at this width, as a probe.
+  function bgProbe(el){
+    var wide=window.matchMedia&&window.matchMedia('(min-width:768px)').matches;
+    var v=(wide&&el.getAttribute('data-bg-md'))||el.getAttribute('data-bg')||'';
+    var m=/url\\((['"]?)(.*?)\\1\\)/.exec(v);
+    if(!m||!m[2]||m[2].indexOf('data:')===0)return null;
+    var p=new Image();p.src=m[2];return p;
+  }
   function load(el){
       var s=el.getAttribute('data-src');
       if(s){
+        // Its turn has come, so it must not wait a second time on Chrome's
+        // own lazy threshold — which is what loading=lazy would do to a
+        // picture warm() reaches while it is still screens away. Only if it
+        // is rendered: an eager <img> under display:none is fetched all the
+        // same, and that is the other breakpoint's artwork.
+        if(el.getClientRects().length)el.loading='eager';
         var ss=el.getAttribute('data-srcset');
         if(ss){el.setAttribute('srcset',ss);el.removeAttribute('data-srcset')}
         el.setAttribute('src',s);el.removeAttribute('data-src');
       }
       var b=el.getAttribute('data-bg');
       if(b){
+        // A CARD IS SHOWN WHOLE OR NOT AT ALL (Žilvinas 2026-10-04, a card's
+        // text sitting on an empty plate: "either don't show anything when
+        // pictures are not loaded or load everything beforehand"). Both are
+        // done; this is the first half. An element with a deferred
+        // background is invisible while it carries data-bg (globals.css),
+        // and from here it carries data-bg-wait instead until its artwork
+        // has arrived and decoded — together with every picture and nested
+        // background inside it, which are loaded now for that reason. Then
+        // it fades in, finished. 4s is the ceiling: late artwork must not
+        // keep a card's words off the page.
+        var n=1,up=0,inner=[];
+        var show=function(){
+          if(up)return;up=1;
+          el.setAttribute('data-bg-in','');el.removeAttribute('data-bg-wait');
+          setTimeout(function(){el.removeAttribute('data-bg-in')},600);
+        };
+        var one=function(){if(!--n)show()};
+        if(el.getClientRects().length){
+          var pr=bgProbe(el);
+          if(pr){n++;settle(pr,one)}
+          var ins=el.querySelectorAll(sel);
+          for(var q=0;q<ins.length;q++){
+            if(!ins[q].getClientRects().length)continue;
+            var ip=ins[q].tagName==='IMG'?ins[q]:bgProbe(ins[q]);
+            if(ip){n++;settle(ip,one)}
+            inner.push(ins[q]);
+          }
+          el.setAttribute('data-bg-wait','');
+          setTimeout(show,4000);
+        }
         // The property is what the stylesheet already points at: every
         // deferred background is background-image:var(--bg,none), so setting
         // it here is the whole of "load it now". --bg-md is the desktop
@@ -64,12 +120,60 @@ export const PAINT_GATE_SCRIPT = `
         var bm=el.getAttribute('data-bg-md');
         if(bm)el.style.setProperty('--bg-md',bm);
         el.removeAttribute('data-bg');el.removeAttribute('data-bg-md');
+        for(var w=0;w<inner.length;w++)load(inner[w]);
+        one();
       }
   }
   function loadGroup(g){
     var kids=g.querySelectorAll(sel);
     for(var k=0;k<kids.length;k++)load(kids[k]);
     load(g);
+  }
+  // THE REST OF THE PAGE LOADS ITSELF, TOP TO BOTTOM, ONCE THE FIRST SCREEN
+  // IS DONE (Žilvinas 2026-10-04: "it can't be that once you scroll down
+  // there are images that weren't yet loaded — that kills the conversion").
+  //
+  // The observer alone meant a picture was asked for when the reader was two
+  // thirds of a screen away from it. For a 950 KB illustration that is not
+  // enough on any connection: it arrived, and was decoded, in front of them.
+  //
+  // So when defer() arms — and not before: the first screen still owes
+  // nothing to what is under it — this walks every deferred picture and
+  // background in document order and loads it, three at a time, waiting for
+  // each to arrive AND decode before taking the next. In order, so the
+  // sections fill in the order they are read; a few at a time, so the next
+  // section is not sharing the line with the last one. The observer stays:
+  // whatever the reader gets near jumps the queue.
+  //
+  // Skipped: anything not rendered (the other breakpoint's artwork), and
+  // the whole pass for a visitor who has asked for less data or is on a 2G
+  // connection — they keep the observer's just-in-time loading.
+  function warm(){
+    var c=navigator.connection;
+    if(c&&(c.saveData||/2g/.test(c.effectiveType||'')))return;
+    var list=d.querySelectorAll(sel+',[data-defer-group]'),i=0,busy=0;
+    function done(){busy--;next()}
+    function next(){
+      while(busy<3&&i<list.length){
+        var el=list[i++];
+        if(!el.getClientRects().length)continue;
+        if(el.hasAttribute('data-defer-group')){
+          var kids=el.querySelectorAll('img[data-src]'),left=kids.length;
+          if(!left&&!el.hasAttribute('data-bg')&&!el.querySelector('[data-bg]'))continue;
+          busy++;loadGroup(el);
+          if(!left){done();continue}
+          for(var k=0;k<kids.length;k++)settle(kids[k],function(){if(!--left)done()});
+          continue;
+        }
+        if(el.closest('[data-defer-group]'))continue;
+        var isImg=el.tagName==='IMG'&&el.hasAttribute('data-src');
+        if(!isImg&&!el.hasAttribute('data-bg'))continue;
+        var probe=isImg?el:bgProbe(el);
+        busy++;load(el);
+        if(probe)settle(probe,done);else done();
+      }
+    }
+    next();
   }
   function defer(){
     // A MARQUEE LOADS AS A GROUP. The showcase wall and the creatives rail
@@ -147,6 +251,7 @@ export const PAINT_GATE_SCRIPT = `
       });
       window.__mushiMO.observe(d.body,{childList:true,subtree:true,attributes:true,attributeFilter:['data-src','data-bg']});
     }
+    try{warm()}catch(e){}
   }
   // The ceiling on the hold, first paint and route change. See PaintGate.tsx.
   function gate(first){
