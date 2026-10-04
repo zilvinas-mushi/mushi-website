@@ -96,7 +96,14 @@ export const PAINT_GATE_SCRIPT = `
     var c=d.querySelectorAll('img[data-src]');
     for(var i=0;i<c.length;i++){
       var el=c[i];
-      if(el.__card||!el.getClientRects().length)continue;
+      if(el.__card)continue;
+      // Rendered pictures only — what this breakpoint does not draw is never
+      // fetched, and a card must not wait for it. EXCEPT in a rail: its far
+      // cards are display:none until the rail turns to them, their pictures
+      // are fetched with the group all the same (gateOnly makes them eager),
+      // and a card that turned up before its picture did is exactly what
+      // the page-quality gate caught on /case-studies' phone rails.
+      if(!el.getClientRects().length&&!(el.loading==='eager'&&el.closest('[data-defer-group]')))continue;
       var card=el.closest('article,li,figure');
       if(!card||card.hasAttribute('data-bg')||card.closest('[data-bg],[data-bg-wait]'))continue;
       card.__n=(card.__n||0)+1;el.__card=card;
