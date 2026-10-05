@@ -197,6 +197,29 @@ export const PAINT_GATE_SCRIPT = `
     for(var k=0;k<kids.length;k++)load(kids[k]);
     load(g);
   }
+  // WHAT IS ON SCREEN IS LOADED, FROM THE START (2026-10-05). defer() below
+  // does not arm until the first screen has finished arriving and the veil
+  // has gone — up to five seconds — and until it does nothing was watching:
+  // a reader who scrolled at once, or a browser that restored the scroll
+  // position late, sat on held cards nobody had asked for yet. This observer
+  // has NO margin, so it fetches nothing the reader is not actually looking
+  // at, and the rule that the first screen owes nothing to what is under it
+  // stands. defer() takes over from it, with its two screens of warning.
+  function onScreen(){
+    if(!('IntersectionObserver' in window))return;
+    if(window.__mushiIO0)window.__mushiIO0.disconnect();
+    var o=window.__mushiIO0=new IntersectionObserver(function(es){
+      for(var i=0;i<es.length;i++){
+        if(!es[i].isIntersecting)continue;
+        var t=es[i].target;o.unobserve(t);
+        if(t.hasAttribute('data-defer-group'))loadGroup(t);else load(t);
+      }
+    });
+    var c=d.querySelectorAll(sel+',[data-defer-group]');
+    for(var j=0;j<c.length;j++){
+      if(c[j].hasAttribute('data-defer-group')||!c[j].closest('[data-defer-group]'))o.observe(c[j]);
+    }
+  }
   // THE REST OF THE PAGE LOADS ITSELF, TOP TO BOTTOM, ONCE THE FIRST SCREEN
   // IS DONE (Žilvinas 2026-10-04: "it can't be that once you scroll down
   // there are images that weren't yet loaded — that kills the conversion").
@@ -256,6 +279,7 @@ export const PAINT_GATE_SCRIPT = `
     // data-defer-group loads everything inside it the moment the GROUP comes
     // into range, and its children are left off the individual pass.
     var groups=d.querySelectorAll('[data-defer-group]');
+    if(window.__mushiIO0){window.__mushiIO0.disconnect();window.__mushiIO0=null}
     // The creatives rail arms itself two viewports out, on its own reasoning
     // (CreativesRail.tsx); this is the handle it pulls.
     window.__mushiLoadGroup=loadGroup;
@@ -378,6 +402,7 @@ export const PAINT_GATE_SCRIPT = `
     function collect(){
       var waits=[];
       try{hold()}catch(e0){}
+      try{onScreen()}catch(e1){}
       // THE FACES THE FIRST SCREEN ACTUALLY USES, not every face the document
       // asks for anywhere. document.fonts.ready waits for all of them —
       // Poppins in five weights here, of which the hero uses two — and each
@@ -415,12 +440,12 @@ export const PAINT_GATE_SCRIPT = `
         if(!imgs[i].getClientRects().length)continue;
         waits.push(painted(imgs[i]));
       }
-      function awaitBg(el){
+      function awaitBg(el,into){
         var layers=getComputedStyle(el).backgroundImage,m,re=/url\\((['"]?)(.*?)\\1\\)/g;
         while((m=re.exec(layers))){
           var u=m[2];
           if(!u||u.indexOf('data:')===0)continue;
-          var probe=new Image();probe.src=u;waits.push(painted(probe));
+          var probe=new Image();probe.src=u;(into||waits).push(painted(probe));
         }
       }
       var els=d.querySelectorAll('[data-await-bg]');
@@ -438,6 +463,37 @@ export const PAINT_GATE_SCRIPT = `
       // against gating on below-fold bytes still holds for everything
       // outside the viewport. A marquee group in view loads whole, as it
       // would from the observer.
+      //
+      // WAITED FOR UNTIL IT IS ON SCREEN, FINISHED (Žilvinas 2026-10-05, the
+      // team's portraits after a reload: "I still sometimes don't see
+      // pictures immediately"). These went through painted(), which trusts
+      // img.complete — and an <img> handed its src a moment ago still answers
+      // complete=true until the browser gets round to the request, so each
+      // one counted as loaded on the spot and the veil lifted over the gap
+      // (measured on the live page: reveal 50-100ms before the last of them).
+      // done() is the stricter test load() already uses to show a picture:
+      // arrived WITH pixels, and decoded. A background, and the card either
+      // sits in, is waited for until its own hold has come off — which is
+      // when every picture inside it is in as well.
+      var shown=function(el){
+        return new Promise(function(res){
+          var n=0,t=setInterval(function(){
+            if(++n>400||!(el.hasAttribute('data-src-wait')||el.hasAttribute('data-bg-wait')||el.hasAttribute('data-hold'))){clearInterval(t);res()}
+          },30);
+        });
+      };
+      var done=function(el){
+        return new Promise(function(res){
+          var box=el.tagName==='IMG'?(el.__card||null):el;
+          var held=function(){return box&&(box.hasAttribute('data-bg-wait')||box.hasAttribute('data-hold'))};
+          var wait=function(){
+            if(!held())return res();
+            var n=0,t=setInterval(function(){if(!held()||++n>400){clearInterval(t);res()}},30);
+          };
+          if(el.tagName==='IMG')settle(el,wait);else wait();
+        });
+      };
+      var sweep=function(into){
       try{
         var vh=window.innerHeight,inView=function(el){
           var r=el.getBoundingClientRect();
@@ -448,7 +504,7 @@ export const PAINT_GATE_SCRIPT = `
           if(!inView(gs[g]))continue;
           var kids=gs[g].querySelectorAll('img[data-src]');
           loadGroup(gs[g]);
-          for(var k=0;k<kids.length;k++)if(inView(kids[k]))waits.push(painted(kids[k]));
+          for(var k=0;k<kids.length;k++)if(inView(kids[k]))into.push(done(kids[k]));
         }
         var dfs=d.querySelectorAll(sel);
         for(var x=0;x<dfs.length;x++){
@@ -456,11 +512,41 @@ export const PAINT_GATE_SCRIPT = `
           if(el.closest('[data-defer-group]')||!inView(el))continue;
           var wasImg=el.tagName==='IMG',hadBg=el.hasAttribute('data-bg');
           load(el);
-          if(wasImg)waits.push(painted(el));
-          if(hadBg)awaitBg(el);
+          if(wasImg)into.push(done(el));
+          if(hadBg){awaitBg(el,into);into.push(done(el))}
         }
+        // And what is in view and ALREADY on its way — asked for by
+        // onScreen() the moment the page jumped here, so no longer carrying
+        // the data-src or data-bg the pass above looks for. Still not shown,
+        // so still waited for.
+        var mid=d.querySelectorAll('img[data-src-wait],[data-bg-wait],[data-hold]');
+        for(var y=0;y<mid.length;y++)if(inView(mid[y]))into.push(shown(mid[y]));
       }catch(e2){}
-      Promise.all(waits).then(open,open);
+      };
+      sweep(waits);
+      // AND ONCE MORE BEFORE THE VEIL LIFTS, because the browser may not have
+      // put us anywhere yet. Chrome restores the scroll position before
+      // DOMContentLoaded; Safari does it after the load event (measured in
+      // WebKit, same day: this pass ran at y=0, the page jumped to y=5543
+      // 13ms after load, and the veil lifted on two portraits that then took
+      // a second to turn up). So on a reload or a Back, the reveal waits for
+      // load and a beat more, and whatever is in view THEN is swept and
+      // waited for as well. A first visit has no position to be restored to
+      // and waits for nothing extra; its second sweep finds nothing new.
+      // The gate's own 4s ceiling still bounds all of it.
+      try{
+        var nav=first&&performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];
+        if(nav&&(nav.type==='reload'||nav.type==='back_forward')&&d.readyState!=='complete'){
+          waits.push(new Promise(function(r){
+            window.addEventListener('load',function(){setTimeout(r,80)},{once:true});
+          }));
+        }
+      }catch(e3){}
+      var again=function(){
+        var more=[];sweep(more);
+        if(more.length)Promise.all(more).then(open,open);else open();
+      };
+      Promise.all(waits).then(again,open);
     }
     // The document has to exist before it can be measured. On the first paint
     // this script runs in the head, so it waits for the parser; on a route

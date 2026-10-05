@@ -54,6 +54,12 @@ the gap short; hiding makes it invisible:
   the same way by the script (`data-hold`), so **a card with pictures must be
   one of those three elements**;
 - a deferred `<img>` in no card is simply not drawn until it has decoded.
+**On a reload the first screen is wherever the browser restores the scroll
+to**, not the top (Chrome before DOMContentLoaded, Safari after `load`). The
+gate sweeps the viewport twice — when it starts and again just before the veil
+lifts — and waits for every deferred picture in it until it is actually shown;
+a zero-margin observer loads whatever is on screen from the start.
+
 Do not leave a picture to `loading="lazy"` with a real `src`: nothing holds
 it. The ceiling on every hold is 12s (`HOLD_MS`), for a line that has stalled.
 
