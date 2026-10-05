@@ -140,3 +140,24 @@ jobs:
         run: npm run pages:check
         env:
           CI: "true"
+
+      # THE CHECKOUT GATE (tools/page-quality/checkout.mjs), on the same
+      # export. A real browser moves, opens the plan sheet, picks each plan
+      # and presses Buy: the payment step has to be up within 400ms of the
+      # press on every plan, with Buy never holding and no plan's Stripe
+      # form built again. The payment tests above read the sheet's source,
+      # and the source read fine on the day a buyer who changed plan waited
+      # for Stripe to be built a second time.
+      #
+      # It talks to the real webapp and to Stripe — the wait it guards
+      # against is theirs — with no key: the export is served to the browser
+      # as https://mushi.agency, the only origin the webapp answers. Six
+      # Checkout Sessions are made and left to expire; nothing is paid.
+      #
+      # So it can go red because the webapp or Stripe did not answer. It
+      # says so when that is why, and it stays red: "could not check" is
+      # not "checked". Like the gates above, it does not stop a deploy.
+      - name: Checkout — Buy is instant on every plan
+        run: npm run checkout:check
+        env:
+          CI: "true"

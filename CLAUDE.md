@@ -154,6 +154,15 @@ price in one place only and `npm test` goes red. PRD and plan:
   can hand it a Stripe session (PRD, Phase 3).
 - `npm test` runs everything; without a key it uses the Stripe CLI login. On
   CI a missing key fails the run — never make that a skip.
+- **Buy is instant on every plan, and `npm run checkout:check` is what says
+  so** (after `npx next build`; CI runs it on every push). A real browser opens
+  the sheet, picks each plan and presses Buy: the payment step is up within
+  400ms, Buy never holds, no plan's Stripe form is built again. `npm test`
+  only reads the sheet's source — it stayed green while a buyer who changed
+  plan waited for Stripe a second time (2026-10-05). A change to
+  `PlanSheet.tsx`, `StripePay.tsx` or `lib/checkout.ts` is not done until this
+  passes. Each plan keeps its own `StripePay`, built off stage; never key one
+  by the chosen plan. `-- --url https://mushi.agency` checks the live site.
 
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.

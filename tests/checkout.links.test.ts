@@ -172,6 +172,13 @@ describe("the plan sheet", () => {
     expect(sheet).toContain("if (ok && on && held.current && step === \"plan\") showPay();");
   });
 
+  it("is held to it in a real browser on every push: the checkout gate is a CI step that cannot be skipped", () => {
+    const workflow = read(".github/workflows/ci.yml");
+    expect(read("package.json")).toContain('"checkout:check": "node tools/page-quality/checkout.mjs"');
+    expect(workflow).toMatch(/^\s+run: npm run checkout:check$/m);
+    expect(workflow).not.toMatch(/^\s*continue-on-error:/m);
+  });
+
   it("shows three card fields and nothing else: no country selector, mandate line or Link sign-up", () => {
     expect(pay).toContain('terms: { card: "never" }');
     expect(pay).toContain('fields: { billingDetails: { address: { country: where ? "never" : "auto" } } }');

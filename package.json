@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "pages:check": "node tools/page-quality/check.mjs",
+    "checkout:check": "node tools/page-quality/checkout.mjs",
     "stripe:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/stripe-catalog.ts check",
     "stripe:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/stripe-catalog.ts apply"
   },
