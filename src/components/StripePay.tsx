@@ -7,7 +7,7 @@ import type {
   StripeCheckoutLoadActionsSuccess,
   StripePaymentElement,
 } from "@stripe/stripe-js";
-import { CHECKOUT_SESSION_URL, STRIPE_PUBLISHABLE_KEY, planFor } from "@/lib/checkout";
+import { CHECKOUT_SESSION_URL, STRIPE_PUBLISHABLE_KEY, checkoutSession } from "@/lib/checkout";
 import type { PlanId } from "@/lib/pricing";
 
 /**
@@ -131,7 +131,25 @@ function getStripe() {
   stripeJs ??= import("@stripe/stripe-js").then(({ loadStripe }) => loadStripe(STRIPE_PUBLISHABLE_KEY));
   return stripeJs;
 }
+/**
+ * The webapp is dialled on the same intent, so the request for a session does
+ * not open with a DNS lookup and a TLS handshake. (Not Stripe's API as well:
+ * that is called from Stripe's own frames, and a browser keeps a frame's
+ * connections apart from the page's.)
+ */
+let dialled = false;
+function preconnect(): void {
+  if (dialled) return;
+  dialled = true;
+  const link = document.createElement("link");
+  link.rel = "preconnect";
+  link.href = new URL(CHECKOUT_SESSION_URL, window.location.href).origin;
+  // The session request carries no credentials, so it rides the anonymous pool.
+  link.crossOrigin = "anonymous";
+  document.head.appendChild(link);
+}
 export function preloadStripe(): void {
+  preconnect();
   getStripe().catch(() => {
     // A failed preload is not an error yet; the payment step will try again
     // and fall back to Stripe's hosted page if it still cannot load.
@@ -183,6 +201,8 @@ const LOAD_LIMIT_MS = 12_000;
  * fields.
  */
 const LINK_WAIT_MS = 1500;
+/** How long the plan step takes to slide out before the payment step is on stage. */
+export const STEP_OUT_MS = 170;
 
 export function StripePay({
   planId,
@@ -285,7 +305,12 @@ export function StripePay({
             if (!gone) presentable.current?.(true);
           });
         },
-        next === "ready" ? 350 : 0,
+        // 350 is how long the frame takes to stop moving. A held press does
+        // not show the step for another STEP_OUT_MS — the plan step slides
+        // out first (PlanSheet's showPay) — so the word is given that much
+        // sooner and the step still arrives on the 350. With reduced motion
+        // there is no slide, and the whole 350 is waited here.
+        next === "ready" ? 350 - (window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : STEP_OUT_MS) : 0,
       );
     };
     const limit = window.setTimeout(() => {
@@ -294,35 +319,42 @@ export function StripePay({
     }, LOAD_LIMIT_MS);
 
     (async () => {
-      const [stripe, response, where] = await Promise.all([
-        getStripe(),
-        fetch(CHECKOUT_SESSION_URL, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ plan: planFor(planId).lookupKey }),
-        }),
-        buyerCountry(),
-      ]);
+      // NOTHING HERE WAITS ITS TURN (Noah 2026-10-05, on the hold after Buy:
+      // "way quicker than this" — and the main market is the USA, a further
+      // hop from everything). It used to be a relay: the session from the
+      // webapp, THEN Stripe's own start-up call with it, THEN the fields'
+      // frames — 700 + 450 + 300ms, each waiting for the last. Stripe takes
+      // the client secret as a promise, so the frames are created and start
+      // loading the moment Stripe.js is here, alongside the session they
+      // will show; and the session itself was asked for when the sheet
+      // opened (checkoutSession, lib/checkout.ts), for every plan.
+      const secret = checkoutSession(planId);
+      // Judged below, where it is awaited; this only keeps a failure from
+      // being reported twice, as an unhandled rejection.
+      secret.catch(() => {});
+      const [stripe, where] = await Promise.all([getStripe(), buyerCountry()]);
       country.current = where;
       if (!gone) setShaped(Boolean(where));
-      if (!response.ok) throw new Error(`the webapp answered ${response.status}`);
-      const { clientSecret } = (await response.json()) as { clientSecret?: string };
-      if (!clientSecret) throw new Error("the webapp sent no client secret");
 
       if (!stripe) throw new Error("Stripe.js did not load");
+      // Too late — the sheet has already given up and shown the fallback, or
+      // the buyer has left the step.
+      if (gone || settled || !mount.current) return;
       const desktop = window.matchMedia("(min-width: 768px)").matches;
       const checkout = stripe.initCheckoutElementsSdk({
-        clientSecret,
+        clientSecret: secret,
         elementsOptions: {
           appearance: appearance(desktop, Boolean(where)),
           fonts: FONTS,
         },
       });
-      const loaded = await checkout.loadActions();
-      if (loaded.type !== "success") throw new Error(loaded.error.message);
-      // Too late — the sheet has already given up and shown the fallback, or
-      // the buyer has left the step.
-      if (gone || settled || !mount.current) return;
+      // READY IS BOTH: the fields drawn, and the session's actions in hand —
+      // Submit needs the second, and the frames now arrive without it.
+      let fieldsIn = false;
+      let actionsIn = false;
+      const ready = () => {
+        if (fieldsIn && actionsIn) settle("ready");
+      };
 
       // THREE FIELDS AND NOTHING ELSE (Žilvinas 2026-10-04, "this info should
       // be enough"): card number, expiry, security code. No country selector
@@ -363,10 +395,12 @@ export function StripePay({
         });
         shapeWatch.observe(mount.current);
       }
-      element.on("ready", () => settle("ready"));
+      element.on("ready", () => {
+        fieldsIn = true;
+        ready();
+      });
       element.on("loaderror", () => settle("unavailable"));
       element.mount(mount.current);
-      actions.current = loaded.actions;
 
       // LINK OPENS IN ITS OWN SMALL WINDOW (Žilvinas 2026-10-04, as on
       // Sintra's checkout) rather than taking the whole page to Stripe: that
@@ -399,12 +433,24 @@ export function StripePay({
         });
         express.on("loaderror", linkKnown);
         express.on("confirm", (event) => {
-          void loaded.actions.confirm({ expressCheckoutConfirmEvent: event }).then((result) => {
+          // Stripe's button cannot be pressed before the session is in, so
+          // the actions are here by the time this fires.
+          void actions.current?.confirm({ expressCheckoutConfirmEvent: event }).then((result) => {
             if (!gone && result.type === "error") setError(result.error.message);
           });
         });
         express.mount(linkMount.current);
       }
+
+      // The webapp's answer, and then Stripe's. A failure of either lands in
+      // the catch below and the sheet offers the hosted page instead.
+      await secret;
+      const loaded = await checkout.loadActions();
+      if (loaded.type !== "success") throw new Error(loaded.error.message);
+      if (gone) return;
+      actions.current = loaded.actions;
+      actionsIn = true;
+      ready();
     })().catch((reason: unknown) => {
       console.error("[checkout] the in-sheet payment form could not load:", reason);
       settle("unavailable");

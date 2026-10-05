@@ -8,7 +8,7 @@
  * from shipping a Buy button that goes nowhere.
  */
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { CHECKOUT_SESSION_URL, STRIPE_PUBLISHABLE_KEYS, dueToday, usd } from "@/lib/checkout";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { CHECKOUT_HOST, PAYMENT_LINKS, PLANS, THANK_YOU_PATH, checkoutUrl } from "@/lib/pricing";
@@ -75,8 +75,17 @@ describe("the plan sheet", () => {
   });
 
   it("asks the webapp for the session of the chosen plan, by lookup key", () => {
-    expect(pay).toContain("fetch(CHECKOUT_SESSION_URL");
-    expect(pay).toContain("JSON.stringify({ plan: planFor(planId).lookupKey })");
+    const lib = read("src/lib/checkout.ts");
+    expect(lib).toContain("fetch(CHECKOUT_SESSION_URL");
+    expect(lib).toContain("JSON.stringify({ plan: planFor(planId).lookupKey })");
+    // The payment step pays for the session of ITS plan, and Stripe is
+    // handed it as a promise so the fields load alongside it.
+    expect(pay).toContain("const secret = checkoutSession(planId);");
+    expect(pay).toContain("clientSecret: secret,");
+  });
+
+  it("asks for every plan's session as the sheet opens, the chosen one first", () => {
+    expect(sheet).toContain("if (mounted) prepareCheckoutSessions(planId as PlanId);");
   });
 
   it("loads Stripe.js when the sheet is opened, never with the page", () => {
@@ -244,5 +253,86 @@ describe("the Thank You page", () => {
     expect(page).toContain("6-digit access code");
     expect(page).toContain("Check your spam folder");
     expect(page).toContain("href={`${APP_URL}/login`}");
+  });
+});
+
+describe("checkoutSession", () => {
+  type Call = { url: string; init: RequestInit };
+  const answer = (secret: string) => ({ ok: true, status: 200, json: async () => ({ clientSecret: secret }) }) as Response;
+
+  async function fresh(respond: (call: Call, n: number) => Promise<Response>) {
+    const calls: Call[] = [];
+    vi.resetModules();
+    vi.stubGlobal("fetch", (url: string, init: RequestInit) => {
+      calls.push({ url, init });
+      return respond({ url, init }, calls.length);
+    });
+    const lib = await import("@/lib/checkout");
+    return { lib, calls };
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  it("asks once per plan and hands the same session back", async () => {
+    const { lib, calls } = await fresh(async (_, n) => answer(`secret_${n}`));
+    const first = lib.checkoutSession("3-months");
+    expect(lib.checkoutSession("3-months")).toBe(first);
+    expect(await first).toBe("secret_1");
+    expect(await lib.checkoutSession("12-months")).toBe("secret_2");
+    expect(calls).toHaveLength(2);
+    expect(JSON.parse(String(calls[0].init.body))).toEqual({ plan: "templates_3_months" });
+  });
+
+  it("is a request a browser sends without a preflight: POST, a string body, no headers", async () => {
+    const { lib, calls } = await fresh(async () => answer("s"));
+    await lib.checkoutSession("1-month");
+    expect(calls[0].url).toBe(lib.CHECKOUT_SESSION_URL);
+    expect(calls[0].init.method).toBe("POST");
+    expect(typeof calls[0].init.body).toBe("string");
+    expect(calls[0].init.headers).toBeUndefined();
+  });
+
+  it("does not keep a failure: the next ask goes to the webapp again", async () => {
+    const { lib, calls } = await fresh(async (_, n) => (n === 1 ? ({ ok: false, status: 503 } as Response) : answer("second")));
+    await expect(lib.checkoutSession("1-month")).rejects.toThrow("503");
+    expect(await lib.checkoutSession("1-month")).toBe("second");
+    expect(calls).toHaveLength(2);
+  });
+
+  it("asks afresh once a session has been kept for half an hour", async () => {
+    vi.useFakeTimers();
+    const { lib, calls } = await fresh(async (_, n) => answer(`secret_${n}`));
+    await lib.checkoutSession("1-month");
+    vi.advanceTimersByTime(31 * 60_000);
+    expect(await lib.checkoutSession("1-month")).toBe("secret_2");
+    expect(calls).toHaveLength(2);
+  });
+
+  it("wakes the webapp once, with a GET that creates nothing", async () => {
+    const { lib, calls } = await fresh(async () => ({ ok: true, status: 204 }) as Response);
+    lib.wakeCheckout();
+    lib.wakeCheckout();
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe(lib.CHECKOUT_SESSION_URL);
+    expect(calls[0].init.method).toBeUndefined();
+    expect(calls[0].init.body).toBeUndefined();
+    // Never a CORS request: it must not be able to fail in a buyer's console.
+    expect(calls[0].init.mode).toBe("no-cors");
+  });
+
+  it("prepares the chosen plan first, then the others", async () => {
+    const { lib, calls } = await fresh(async (_, n) => answer(`secret_${n}`));
+    lib.prepareCheckoutSessions("3-months");
+    expect(calls).toHaveLength(1);
+    await lib.checkoutSession("3-months");
+    await Promise.resolve();
+    expect(calls.map((c) => JSON.parse(String(c.init.body)).plan)).toEqual([
+      "templates_3_months",
+      "templates_1_month",
+      "templates_12_months",
+    ]);
   });
 });

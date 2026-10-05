@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, ShieldGlyph } from "./plan-sheet-glyphs";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { StripePay, preloadStripe } from "./StripePay";
-import { dueToday } from "@/lib/checkout";
+import { STEP_OUT_MS, StripePay, preloadStripe } from "./StripePay";
+import { dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import { APP_URL } from "@/lib/site";
 
@@ -185,7 +185,7 @@ export function PlanSheet() {
         panel.style.height = "";
         panel.style.transition = "";
       }, 500);
-    }, 170);
+    }, STEP_OUT_MS);
   };
   const close = () => {
     window.clearTimeout(stepTimer.current);
@@ -208,7 +208,9 @@ export function PlanSheet() {
     // it. Still never with the page — a visitor who goes nowhere near a
     // Buy button fetches nothing from Stripe.
     function onIntent(e: Event) {
-      if ((e.target as Element).closest?.("a[data-plan]")) preloadStripe();
+      if (!(e.target as Element).closest?.("a[data-plan]")) return;
+      preloadStripe();
+      wakeCheckout();
     }
     document.addEventListener("click", onClick);
     document.addEventListener("pointerover", onIntent, { passive: true });
@@ -219,6 +221,23 @@ export function PlanSheet() {
       document.removeEventListener("pointerover", onIntent);
       document.removeEventListener("touchstart", onIntent);
       document.removeEventListener("focusin", onIntent);
+    };
+  }, []);
+
+  // THE WEBAPP IS WOKEN ONCE THE PAGE IS DONE WITH ITS OWN LOADING — three
+  // seconds after the load event, which is past the first screen and past
+  // the moment the paint gate starts on the rest (lib/checkout.ts on why).
+  // Sooner if a Buy button is approached first: see onIntent above.
+  useEffect(() => {
+    let timer = 0;
+    const later = () => {
+      timer = window.setTimeout(wakeCheckout, 3000);
+    };
+    if (document.readyState === "complete") later();
+    else window.addEventListener("load", later, { once: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("load", later);
     };
   }, []);
 
@@ -253,6 +272,14 @@ export function PlanSheet() {
       cancelAnimationFrame(frame);
     };
   }, []);
+
+  // EVERY PLAN'S SESSION IS ASKED FOR AS THE SHEET OPENS, the chosen one
+  // first, so that picking a plan does not start the wait again
+  // (lib/checkout.ts). Asking twice costs nothing: a session already asked
+  // for is the one handed back.
+  useEffect(() => {
+    if (mounted) prepareCheckoutSessions(planId as PlanId);
+  }, [mounted, planId]);
 
   useEffect(() => {
     if (!mounted) return;

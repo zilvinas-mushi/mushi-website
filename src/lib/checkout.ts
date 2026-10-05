@@ -33,6 +33,71 @@ export const STRIPE_PUBLISHABLE_KEY = STRIPE_PUBLISHABLE_KEYS[STRIPE_MODE];
  */
 export const CHECKOUT_SESSION_URL = process.env.NEXT_PUBLIC_CHECKOUT_API || `${APP_URL}/api/checkout/session`;
 
+/**
+ * A SESSION PER PLAN, ASKED FOR AHEAD OF THE BUYER (Noah 2026-10-05, on the
+ * hold after Buy: "way quicker than this"). The webapp takes the better part
+ * of a second to answer — it has Stripe to ask — and that used to start when
+ * the payment step mounted and START AGAIN each time another plan was picked.
+ * Now the sheet asks the moment it opens: the chosen plan first, the others
+ * behind it, so that by the time a plan is picked and Buy is pressed its
+ * session is already here whichever plan it was.
+ *
+ * A session is only a place to pay: unused, it expires at Stripe within a day
+ * and nothing is charged or granted. They are kept for half an hour — a sheet
+ * reopened after that asks afresh — and a failure is not kept at all.
+ *
+ * NO content-type header, on purpose: a string body goes as text/plain, which
+ * a browser sends across origins without the OPTIONS round trip that
+ * application/json costs first. The webapp reads the body as JSON either way.
+ */
+const SESSION_KEPT_MS = 30 * 60_000;
+const sessions = new Map<PlanId, { at: number; secret: Promise<string> }>();
+
+export function checkoutSession(planId: PlanId): Promise<string> {
+  const kept = sessions.get(planId);
+  if (kept && Date.now() - kept.at < SESSION_KEPT_MS) return kept.secret;
+  const secret = fetch(CHECKOUT_SESSION_URL, {
+    method: "POST",
+    body: JSON.stringify({ plan: planFor(planId).lookupKey }),
+  }).then(async (response) => {
+    if (!response.ok) throw new Error(`the webapp answered ${response.status}`);
+    const { clientSecret } = (await response.json()) as { clientSecret?: string };
+    if (!clientSecret) throw new Error("the webapp sent no client secret");
+    return clientSecret;
+  });
+  const entry = { at: Date.now(), secret };
+  sessions.set(planId, entry);
+  secret.catch(() => {
+    if (sessions.get(planId) === entry) sessions.delete(planId);
+  });
+  return secret;
+}
+
+/** The chosen plan's session first, then the rest — see checkoutSession. */
+export function prepareCheckoutSessions(first: PlanId): void {
+  const rest = () => {
+    for (const plan of PLANS) if (plan.id !== first) checkoutSession(plan.id).catch(() => {});
+  };
+  checkoutSession(first).then(rest, rest);
+}
+
+/**
+ * WAKING THE WEBAPP'S FUNCTION before anyone needs it. One that has not been
+ * called for a while takes over a second to start, and the first buyer after
+ * a quiet spell paid that on top of everything else. A page that can open the
+ * sheet calls this once it has finished its own loading; the webapp answers
+ * 204 and does nothing. Once per page, and a failure is nobody's problem.
+ */
+let woken = false;
+export function wakeCheckout(): void {
+  if (woken) return;
+  woken = true;
+  // no-cors: the answer is of no interest, and asked for this way the call
+  // cannot fail on any origin — a preview, a local build, the page-quality
+  // check — where a CORS refusal would be a failed request in the console.
+  fetch(CHECKOUT_SESSION_URL, { mode: "no-cors", cache: "no-store" }).catch(() => {});
+}
+
 export function planFor(planId: PlanId): Plan {
   const plan = PLANS.find((p) => p.id === planId);
   if (!plan) throw new Error(`no plan ${planId}`);
