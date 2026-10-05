@@ -99,9 +99,8 @@ export function PlanSheet() {
    */
   const [prepared, setPrepared] = useState(false);
   const preparedAt = useRef(0);
-  /** Bumped to build the payment step afresh: see open(). */
+  /** Bumped to build the payment steps afresh: see open(). */
   const [attempt, setAttempt] = useState(0);
-  const payFailed = useRef(false);
   const [shown, setShown] = useState(false);
   const [step, setStep] = useState<"plan" | "pay">("plan");
   const [planId, setPlanId] = useState<string>(c.defaultId);
@@ -128,9 +127,22 @@ export function PlanSheet() {
    * past it the step is shown as it is, stand-in fields and all, because a
    * buyer must never be stuck on a button.
    */
-  const payReady = useRef(false);
+  /**
+   * EVERY PLAN HAS ITS OWN PAYMENT STEP, AND ALL OF THEM ARE KEPT (Žilvinas
+   * 2026-10-05, after "instant" turned out to hold only for the plan the
+   * sheet opens on: "if prices change I think there is a reload"). There
+   * was: one step, keyed by the plan, so picking another plan threw away
+   * the finished one and built Stripe's checkout and fields again — and Buy
+   * held for it, 0.6s here and longer from further away. Now each plan's
+   * step is built once and stays; picking a plan only changes which one is
+   * on stage. This is each plan's word on whether its step is presentable,
+   * or has failed to load.
+   */
+  const pay = useRef<Record<string, { ready: boolean; failed: boolean }>>({});
   const holdTimer = useRef(0);
   const [holding, setHolding] = useState(false);
+  /** Buy has been pressed and is waiting for the chosen plan's step. */
+  const held = useRef(false);
   /**
    * Desktop only: the step's frame (650 for the plan, 763 for payment)
    * zoomed down just enough to clear the viewport, 1 whenever it fits.
@@ -154,17 +166,16 @@ export function PlanSheet() {
     // left the sheet snapping into place.
     window.clearTimeout(stepTimer.current);
     window.clearTimeout(holdTimer.current);
-    // payReady is NOT reset here any more: the step was prepared before
-    // this, and its word that it is presentable may already have come.
+    // The steps' word is NOT reset here any more: they were prepared before
+    // this, and their word that they are presentable may already have come.
     // What is built afresh is a step that could not load — the line may be
-    // back — and one prepared so long ago that its session is near its end
-    // (Stripe keeps one a day).
-    const stale = payFailed.current || (preparedAt.current > 0 && Date.now() - preparedAt.current > STALE_MS);
+    // back — and ones prepared so long ago that their sessions are near
+    // their end (Stripe keeps one a day).
+    const failed = Object.values(pay.current).some((p) => p.failed);
+    const stale = failed || (preparedAt.current > 0 && Date.now() - preparedAt.current > STALE_MS);
     if (stale || !preparedAt.current) preparedAt.current = Date.now();
-    if (stale) {
-      payFailed.current = false;
-      payReady.current = false;
-    }
+    if (stale) pay.current = {};
+    held.current = false;
     flushSync(() => {
       setHolding(false);
       setStep("plan");
@@ -181,15 +192,27 @@ export function PlanSheet() {
     setShown(true);
   };
   const goPay = () => {
-    if (holding) return;
-    if (!payReady.current) {
+    if (held.current) return;
+    if (!pay.current[planId]?.ready) {
+      held.current = true;
       setHolding(true);
       holdTimer.current = window.setTimeout(showPay, HOLD_MS);
       return;
     }
     showPay();
   };
+  // Another plan picked while Buy was holding for the last one: the hold is
+  // dropped with the plan it was for, and Buy is there to be pressed again.
+  const pick = (id: string) => {
+    if (held.current) {
+      held.current = false;
+      window.clearTimeout(holdTimer.current);
+      setHolding(false);
+    }
+    setPlanId(id);
+  };
   const showPay = () => {
+    held.current = false;
     window.clearTimeout(holdTimer.current);
     setHolding(false);
     const panel = panelRef.current;
@@ -223,6 +246,7 @@ export function PlanSheet() {
   const close = () => {
     window.clearTimeout(stepTimer.current);
     window.clearTimeout(holdTimer.current);
+    held.current = false;
     setHolding(false);
     setShown(false);
     closeTimer.current = window.setTimeout(() => setMounted(false), OPEN_MS);
@@ -307,9 +331,9 @@ export function PlanSheet() {
   }, []);
 
   // EVERY PLAN'S SESSION IS ASKED FOR AS THE SHEET OPENS, the chosen one
-  // first, so that picking a plan does not start the wait again
-  // (lib/checkout.ts). Asking twice costs nothing: a session already asked
-  // for is the one handed back.
+  // first (lib/checkout.ts) — and usually before that, by each plan's own
+  // payment step as it is built off stage. Asking twice costs nothing: a
+  // session already asked for is the one handed back.
   useEffect(() => {
     if (mounted) prepareCheckoutSessions(planId as PlanId);
   }, [mounted, planId]);
@@ -398,7 +422,6 @@ export function PlanSheet() {
   // the sheet by StripePay. `hosted` is the same plan on Stripe's own page —
   // where "Pay with Link" goes, and where Submit falls back to if the fields
   // cannot load, so there is always a way to pay.
-  const hosted = checkoutUrl(plan.id as PlanId);
   const due = dueToday(plan.id as PlanId);
   const motion =
     // `translate`, not `transform`: Tailwind's translate-y-* utilities set
@@ -498,7 +521,7 @@ export function PlanSheet() {
                     type="button"
                     role="radio"
                     aria-checked={on}
-                    onClick={() => setPlanId(o.id)}
+                    onClick={() => pick(o.id)}
                     // THE SELECTED ROW, off the inspector (Žilvinas 2026-09-25,
                     // fourth pass, with the 3 x 5 spacer): the row keeps its
                     // full #222222 plate, the same 327 x 78 at radius 14 as
@@ -630,9 +653,11 @@ export function PlanSheet() {
             the width it will have (the panel's on a phone, the 776 frame on
             a desktop), since Stripe arranges its fields by width.
 
-            A different plan picked on step one remounts StripePay (its key)
-            and starts that plan's session; the webapp's endpoint only
-            creates a Stripe session, which costs nothing and expires. */}
+            EVERY PLAN'S, not only the chosen one's — see `pay`. A different
+            plan picked on step one builds nothing: its step has been
+            loading beside the others and is put on stage in the chosen
+            one's place. The webapp's endpoint only creates a Stripe
+            session, which costs nothing and expires. */}
         <div
           className={step === "plan" ? "pointer-events-none absolute inset-0 overflow-hidden opacity-0" : undefined}
           inert={step === "plan"}
@@ -679,65 +704,83 @@ export function PlanSheet() {
             </div>
 
             {/* The card fields, the email and Submit: Stripe's own fields in
-                the sheet's clothes — see StripePay. Keyed by plan, so
-                choosing another plan starts a session for THAT plan. */}
-            <StripePay
-              key={`${plan.id}:${attempt}`}
-              planId={plan.id as PlanId}
-              fallbackHref={(email) => checkoutUrl(plan.id as PlanId, undefined, email || undefined)}
-              // Stripe Link, in its own green: this one opens the plan on
-              // Stripe's hosted page, and stands in until Stripe's own Link
-              // button (which opens Link in a small window) is ready.
-              linkFallback={
-                <a
-                  href={hosted}
-                  // IN ITS OWN SMALL WINDOW (Žilvinas 2026-10-04, as on
-                  // Sintra's checkout), not by taking this page away: the
-                  // sheet stays where it is behind it. A blocked popup falls
-                  // through to the plain link. /thank-you hands the result
-                  // back to this tab and closes the window.
-                  onClick={(e) => {
-                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-                    const w = 480;
-                    const h = 760;
-                    const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - w) / 2));
-                    const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - h) / 2));
-                    const popup = window.open(hosted, "mushi-checkout", `popup,width=${w},height=${h},left=${left},top=${top}`);
-                    if (popup) e.preventDefault();
-                  }}
-                  className="flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90 md:h-[62px] md:gap-[8px] md:rounded-[15px] md:text-[25px]"
-                >
-                  {/* Medium 18 and the client's 61 x 21 mark (Žilvinas 2026-09-25). */}
-                  {c.pay.payWith}
-                  <LinkMark className="h-[21px] w-[61px] md:h-[29px] md:w-[84px]" />
-                </a>
-              }
-              divider={
-                <>
-                  {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
-                  {/* 11 between the rules and the word (Žilvinas 2026-09-25, the 11 x 9 spacer; it was 13). */}
-                  <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090] md:mt-[24px] md:h-[32px] md:gap-[16px] md:text-[24px]">
-                    {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
-                    <span className="h-[2px] flex-1 bg-white/25" />
-                    {c.pay.or}
-                    <span className="h-[2px] flex-1 bg-white/25" />
-                  </div>
+                the sheet's clothes — see StripePay. ONE FOR EACH PLAN, each
+                paying for its own plan's session, and only the chosen plan's
+                on stage. The others stand under it exactly as the whole step
+                stands behind step one: out of flow, see-through and inert,
+                but at their full size, because Stripe will not draw into a
+                box that has none. They are never unmounted for a change of
+                plan — only `attempt` builds them again. */}
+            <div className="relative">
+              {c.options.map((o) => {
+                const on = o.id === plan.id;
+                const hosted = checkoutUrl(o.id as PlanId);
+                return (
+                  <div
+                    key={`${o.id}:${attempt}`}
+                    className={on ? undefined : "pointer-events-none absolute inset-x-0 top-0 opacity-0"}
+                    inert={!on}
+                    aria-hidden={on ? undefined : true}
+                  >
+                  <StripePay
+                    planId={o.id as PlanId}
+                    fallbackHref={(email) => checkoutUrl(o.id as PlanId, undefined, email || undefined)}
+                    // Stripe Link, in its own green: this one opens the plan on
+                    // Stripe's hosted page, and stands in until Stripe's own Link
+                    // button (which opens Link in a small window) is ready.
+                    linkFallback={
+                      <a
+                        href={hosted}
+                        // IN ITS OWN SMALL WINDOW (Žilvinas 2026-10-04, as on
+                        // Sintra's checkout), not by taking this page away: the
+                        // sheet stays where it is behind it. A blocked popup falls
+                        // through to the plain link. /thank-you hands the result
+                        // back to this tab and closes the window.
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                          const w = 480;
+                          const h = 760;
+                          const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - w) / 2));
+                          const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - h) / 2));
+                          const popup = window.open(hosted, "mushi-checkout", `popup,width=${w},height=${h},left=${left},top=${top}`);
+                          if (popup) e.preventDefault();
+                        }}
+                        className="flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90 md:h-[62px] md:gap-[8px] md:rounded-[15px] md:text-[25px]"
+                      >
+                        {/* Medium 18 and the client's 61 x 21 mark (Žilvinas 2026-09-25). */}
+                        {c.pay.payWith}
+                        <LinkMark className="h-[21px] w-[61px] md:h-[29px] md:w-[84px]" />
+                      </a>
+                    }
+                    divider={
+                      <>
+                        {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
+                        {/* 11 between the rules and the word (Žilvinas 2026-09-25, the 11 x 9 spacer; it was 13). */}
+                        <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090] md:mt-[24px] md:h-[32px] md:gap-[16px] md:text-[24px]">
+                          {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
+                          <span className="h-[2px] flex-1 bg-white/25" />
+                          {c.pay.or}
+                          <span className="h-[2px] flex-1 bg-white/25" />
+                        </div>
       
-                  {/* Medium 20, 25 under the rule — the inspector's 14 x 25 spacer
-                      (Žilvinas 2026-09-25; the message said 28, the spacer 25). */}
-                  <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
-                </>
-              }
-              onPresentable={(ok, state) => {
-                payReady.current = ok;
-                payFailed.current = state === "unavailable";
-                // Buy was pressed and has been waiting for exactly this.
-                if (ok && holdTimer.current && step === "plan") showPay();
-              }}
-              labels={{ email: c.pay.email, submit: c.pay.submit }}
-              fieldClass={FIELD}
-              submitClass={VIOLET}
-            />
+                        {/* Medium 20, 25 under the rule — the inspector's 14 x 25 spacer
+                            (Žilvinas 2026-09-25; the message said 28, the spacer 25). */}
+                        <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
+                      </>
+                    }
+                    onPresentable={(ok, state) => {
+                      pay.current[o.id] = { ready: ok, failed: state === "unavailable" };
+                      // Buy was pressed and has been waiting for exactly this.
+                      if (ok && on && held.current && step === "plan") showPay();
+                    }}
+                    labels={{ email: c.pay.email, submit: c.pay.submit }}
+                    fieldClass={FIELD}
+                    submitClass={VIOLET}
+                  />
+                  </div>
+                );
+              })}
+            </div>
 
             <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[12px] leading-none text-white/60 md:mt-[16px] md:gap-[40px] md:text-[17px]">
               <span className="flex items-center gap-[6px]">

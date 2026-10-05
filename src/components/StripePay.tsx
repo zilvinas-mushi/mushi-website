@@ -20,9 +20,9 @@ import type { PlanId } from "@/lib/pricing";
  * typed into Stripe's own fields.
  *
  * NOTHING LOADS UNTIL THIS MOUNTS, AND IT MOUNTS WITH THE SHEET — behind the
- * plan step, so the session, Stripe's checkout and its fields load while the
- * buyer is choosing a plan and are simply there when Buy is pressed
- * (PlanSheet.tsx). Never with the page: the first screen owes them nothing
+ * plan step, one of these for each plan, so the session, Stripe's checkout
+ * and its fields load while the buyer is choosing a plan and are simply
+ * there when Buy is pressed, whichever plan it is (PlanSheet.tsx). Never with the page: the first screen owes them nothing
  * (CLAUDE.md, the paint gate).
  *
  * NOTHING HERE IS DEAD WHILE IT LOADS (Žilvinas 2026-10-04, "you cannot
@@ -172,7 +172,7 @@ export function preloadStripe(): void {
  * This is a location guess, good for a card payment. If VAT is ever charged
  * on these plans the country has to be ASKED for — see the PRD's Risks.
  */
-async function buyerCountry(): Promise<string | null> {
+async function findBuyerCountry(): Promise<string | null> {
   try {
     const response = await fetch("/cdn-cgi/trace", { cache: "no-store" });
     const loc = response.ok ? /^loc=([A-Z]{2})$/m.exec(await response.text())?.[1] : undefined;
@@ -186,6 +186,12 @@ async function buyerCountry(): Promise<string | null> {
     if (region) return region.toUpperCase();
   }
   return null;
+}
+/** Asked once for the page: every plan's payment step wants the same answer. */
+let whereOnce: Promise<string | null> | null = null;
+function buyerCountry(): Promise<string | null> {
+  whereOnce ??= findBuyerCountry();
+  return whereOnce;
 }
 
 /**

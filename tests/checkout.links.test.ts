@@ -133,9 +133,9 @@ describe("the plan sheet", () => {
   });
 
   it("can always be paid: Stripe's hosted page is the fallback and the Pay with Link target", () => {
-    expect(sheet).toContain("const hosted = checkoutUrl(plan.id as PlanId);");
+    expect(sheet).toContain("const hosted = checkoutUrl(o.id as PlanId);");
     expect(sheet).toMatch(/<a\s+href=\{hosted\}/);
-    expect(sheet).toContain("fallbackHref={(email) => checkoutUrl(plan.id as PlanId, undefined, email || undefined)}");
+    expect(sheet).toContain("fallbackHref={(email) => checkoutUrl(o.id as PlanId, undefined, email || undefined)}");
     expect(pay).toContain('if (stateNow.current === "unavailable") {');
     expect(pay).toContain("window.location.href = fallbackHref(email);");
   });
@@ -149,12 +149,27 @@ describe("the plan sheet", () => {
     expect(pay).not.toContain('disabled={state === "loading"');
     expect(pay).toContain("await settledOnce.current;");
     // Buy holds for a step that is still loading, with a ceiling.
-    expect(sheet).toContain("if (!payReady.current) {");
+    expect(sheet).toContain("if (!pay.current[planId]?.ready) {");
     expect(sheet).toContain("holdTimer.current = window.setTimeout(showPay, HOLD_MS);");
     expect(pay).toContain('presentable.current?.(true, "ready")');
     expect(pay).toContain('presentable.current?.(true, "unavailable")');
     // A press on the stand-in fields is honoured when Stripe's arrive.
     expect(pay).toContain('if (next === "ready" && wantsFocus.current) element?.focus();');
+  });
+
+  it("keeps a payment step for every plan: picking another plan builds nothing again", () => {
+    // One StripePay per plan, each paying for its own plan...
+    expect(sheet).toMatch(/\{c\.options\.map\(\(o\) => \{\s+const on = o\.id === plan\.id;/);
+    expect(sheet).toContain("planId={o.id as PlanId}");
+    // ...and none of them keyed by the CHOSEN plan, which is what threw the
+    // finished step away each time the choice changed.
+    expect(sheet).toContain("key={`${o.id}:${attempt}`}");
+    expect(sheet).not.toContain("key={`${plan.id}");
+    // The ones not chosen are off stage but keep their size, for Stripe.
+    expect(sheet).toContain('className={on ? undefined : "pointer-events-none absolute inset-x-0 top-0 opacity-0"}');
+    expect(sheet).toContain("inert={!on}");
+    // Buy goes by the chosen plan's word, and only that plan's ends a hold.
+    expect(sheet).toContain("if (ok && on && held.current && step === \"plan\") showPay();");
   });
 
   it("shows three card fields and nothing else: no country selector, mandate line or Link sign-up", () => {
