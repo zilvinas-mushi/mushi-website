@@ -234,7 +234,7 @@ export function StripePay({
    * box has stopped moving, or the load has failed and the one-line fallback
    * stands in their place. The sheet holds the step back until then.
    */
-  onPresentable?: (ok: boolean) => void;
+  onPresentable?: (ok: boolean, state?: "ready" | "unavailable") => void;
 }) {
   const [state, setState] = useState<State>("loading");
   const [busy, setBusy] = useState(false);
@@ -298,11 +298,11 @@ export function StripePay({
       // bounds it; past that the stand-in is what the step is shown with.
       presentTimer = window.setTimeout(
         () => {
-          if (next !== "ready") return presentable.current?.(true);
+          if (next !== "ready") return presentable.current?.(true, "unavailable");
           linkTimer = window.setTimeout(linkKnown, LINK_WAIT_MS);
           void linkAnswered.then(() => {
             window.clearTimeout(linkTimer);
-            if (!gone) presentable.current?.(true);
+            if (!gone) presentable.current?.(true, "ready");
           });
         },
         // 350 is how long the frame takes to stop moving. A held press does

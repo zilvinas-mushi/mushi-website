@@ -29,10 +29,19 @@ import { APP_URL } from "@/lib/site";
  * sections are server components and would each have to become client
  * components to hold a handler. The attribute is the contract.
  *
- * IT RISES FROM THE BOTTOM, see OPEN_MS, the backdrop fading with it; it
- * is mounted only while open (and for the time it takes to leave),
- * so a closed sheet is nothing in the DOM. Escape and the backdrop dismiss
- * it, and the page behind it does not scroll.
+ * IT RISES FROM THE BOTTOM, see OPEN_MS, the backdrop fading with it.
+ * Escape and the backdrop dismiss it, and the page behind it does not scroll.
+ *
+ * IT IS BUILT BEFORE IT IS ASKED FOR (Žilvinas 2026-10-05, on the hold
+ * after Buy: "can we make it instant???"). The payment step needs a session
+ * from the webapp, Stripe's own start-up call and Stripe's frames — a
+ * second and a half however it is arranged, and a buyer who opens the sheet
+ * and presses Buy does it in less. So the whole sheet is put in the DOM
+ * off stage, inert and unseen, at the first sign of a person on the page
+ * (see `prepared`), and its payment step loads there. Opening it is then
+ * only the rise, and Buy only the step change. Before that first sign — a
+ * crawler, a visitor who never moves — it is nothing in the DOM, and
+ * nothing is fetched from Stripe.
  *
  * STRIPE IS WIRED (2026-10-04). Step two pays in place: the card fields are
  * Stripe's own, mounted by StripePay from a session the webapp creates
@@ -48,6 +57,8 @@ import { APP_URL } from "@/lib/site";
 const OPEN_MS = 560;
 /** How long Buy may hold for the payment step before showing it as it is. */
 const HOLD_MS = 4000;
+/** How old a prepared payment step may be before opening the sheet builds it again. */
+const STALE_MS = 6 * 60 * 60_000;
 
 /** The address that opens the sheet on arrival: `/templates#buy`. The webapp links to it. */
 export const BUY_HASH = "#buy";
@@ -81,6 +92,16 @@ const FIELD =
 export function PlanSheet() {
   const c = TEMPLATES_PAGE.plans;
   const [mounted, setMounted] = useState(false);
+  /**
+   * In the DOM, off stage: true from the first sign of a person (or the
+   * first open) and for good. `mounted` still means what it did — open, or
+   * on its way out — and is what the scroll lock and the keys go by.
+   */
+  const [prepared, setPrepared] = useState(false);
+  const preparedAt = useRef(0);
+  /** Bumped to build the payment step afresh: see open(). */
+  const [attempt, setAttempt] = useState(0);
+  const payFailed = useRef(false);
   const [shown, setShown] = useState(false);
   const [step, setStep] = useState<"plan" | "pay">("plan");
   const [planId, setPlanId] = useState<string>(c.defaultId);
@@ -133,11 +154,23 @@ export function PlanSheet() {
     // left the sheet snapping into place.
     window.clearTimeout(stepTimer.current);
     window.clearTimeout(holdTimer.current);
-    payReady.current = false;
+    // payReady is NOT reset here any more: the step was prepared before
+    // this, and its word that it is presentable may already have come.
+    // What is built afresh is a step that could not load — the line may be
+    // back — and one prepared so long ago that its session is near its end
+    // (Stripe keeps one a day).
+    const stale = payFailed.current || (preparedAt.current > 0 && Date.now() - preparedAt.current > STALE_MS);
+    if (stale || !preparedAt.current) preparedAt.current = Date.now();
+    if (stale) {
+      payFailed.current = false;
+      payReady.current = false;
+    }
     flushSync(() => {
       setHolding(false);
       setStep("plan");
       setStepIn(true);
+      setPrepared(true);
+      if (stale) setAttempt((n) => n + 1);
       setMounted(true);
     });
     if (panelRef.current) {
@@ -281,8 +314,36 @@ export function PlanSheet() {
     if (mounted) prepareCheckoutSessions(planId as PlanId);
   }, [mounted, planId]);
 
+  // THE FIRST SIGN OF A PERSON — a pointer moving, a finger landing, a key,
+  // a wheel — and the sheet is put together off stage (see the note at the
+  // top). Real input only: a page that is merely loaded, or scrolled by a
+  // script, prepares nothing, so a crawler and Lighthouse fetch nothing from
+  // Stripe and no session is made for them. Not before the page has
+  // finished its own loading, and not at all for a visitor who has asked
+  // for less data or is on a 2G line — they get it when they open it.
   useEffect(() => {
-    if (!mounted) return;
+    if (prepared) return;
+    const line = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (line && (line.saveData || /2g/.test(line.effectiveType ?? ""))) return;
+    const signs = ["pointermove", "pointerdown", "touchstart", "keydown", "wheel"] as const;
+    const go = () => {
+      if (!preparedAt.current) preparedAt.current = Date.now();
+      setPrepared(true);
+    };
+    const seen = () => {
+      for (const sign of signs) window.removeEventListener(sign, seen);
+      if (document.readyState === "complete") go();
+      else window.addEventListener("load", go, { once: true });
+    };
+    for (const sign of signs) window.addEventListener(sign, seen, { passive: true });
+    return () => {
+      for (const sign of signs) window.removeEventListener(sign, seen);
+      window.removeEventListener("load", go);
+    };
+  }, [prepared]);
+
+  useEffect(() => {
+    if (!mounted && !prepared) return;
     const size = () => {
       const desktop = window.matchMedia("(min-width: 768px)").matches;
       const frame = step === "plan" ? 650 : 763;
@@ -291,7 +352,10 @@ export function PlanSheet() {
     size();
     window.addEventListener("resize", size);
     return () => window.removeEventListener("resize", size);
-  }, [mounted, step]);
+    // Sized off stage as well: Stripe lays its fields out by the width it
+    // is given, and a zoom that changed as the sheet opened would have it
+    // lay them out twice.
+  }, [mounted, prepared, step]);
 
   // THE PAGE BEHIND DOES NOT SCROLL — by swallowing the wheel, touch and
   // key scrolling, NOT overflow:hidden on the body (Žilvinas 2026-09-25,
@@ -327,7 +391,7 @@ export function PlanSheet() {
     };
   }, [mounted]);
 
-  if (!mounted) return null;
+  if (!mounted && !prepared) return null;
 
   const plan = c.options.find((o) => o.id === planId) ?? c.options[0];
   // STEP TWO PAYS IN PLACE (2026-10-04): Stripe's own card fields, mounted in
@@ -355,16 +419,21 @@ export function PlanSheet() {
       // A BOTTOM SHEET ON THE DESKTOP AS WELL (Žilvinas 2026-09-25, "it's
       // not a popup, even for desktop it comes from the bottom"): anchored
       // to the bottom edge, centred across, top corners round.
-      className="fixed inset-0 z-[100] md:flex md:items-end md:justify-center md:px-6"
+      // OFF STAGE it is inert, unannounced and untouchable: the panel is
+      // already below the bottom edge (translate-y-full) and the backdrop
+      // is not drawn at all, so there is nothing to see or to press.
+      className={`fixed inset-0 z-[100] md:flex md:items-end md:justify-center md:px-6 ${mounted ? "" : "pointer-events-none"}`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="plan-sheet-title"
+      aria-hidden={mounted ? undefined : true}
+      inert={!mounted}
     >
       <button
         type="button"
         aria-label="Close"
         onClick={close}
-        className={`absolute inset-0 bg-black/60 md:backdrop-blur-[9px] ${motion} ${shown ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 bg-black/60 md:backdrop-blur-[9px] ${motion} ${shown ? "opacity-100" : "opacity-0"} ${mounted ? "" : "invisible"}`}
       />
       <div
         // The md: half overrides the sheet geometry wholesale — static in
@@ -613,7 +682,7 @@ export function PlanSheet() {
                 the sheet's clothes — see StripePay. Keyed by plan, so
                 choosing another plan starts a session for THAT plan. */}
             <StripePay
-              key={plan.id}
+              key={`${plan.id}:${attempt}`}
               planId={plan.id as PlanId}
               fallbackHref={(email) => checkoutUrl(plan.id as PlanId, undefined, email || undefined)}
               // Stripe Link, in its own green: this one opens the plan on
@@ -659,8 +728,9 @@ export function PlanSheet() {
                   <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
                 </>
               }
-              onPresentable={(ok) => {
+              onPresentable={(ok, state) => {
                 payReady.current = ok;
+                payFailed.current = state === "unavailable";
                 // Buy was pressed and has been waiting for exactly this.
                 if (ok && holdTimer.current && step === "plan") showPay();
               }}

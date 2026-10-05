@@ -88,12 +88,22 @@ describe("the plan sheet", () => {
     expect(sheet).toContain("if (mounted) prepareCheckoutSessions(planId as PlanId);");
   });
 
-  it("loads Stripe.js when the sheet is opened, never with the page", () => {
+  it("loads Stripe.js for a person, never with the page", () => {
     expect(pay).toContain('import("@stripe/stripe-js")');
     expect(pay).not.toMatch(/^import \{[^}]*loadStripe[^}]*\} from "@stripe\/stripe-js"/m);
     expect(sheet).not.toContain("@stripe/stripe-js");
-    // The preload hangs on the sheet's open(), which only a click or #buy calls.
+    // The preload still hangs on the sheet's open()...
     expect(sheet).toMatch(/const open = \(\) => \{[\s\S]{0,260}preloadStripe\(\);/);
+    // ...and the sheet is otherwise built only at real input: a page that
+    // has merely loaded, or been scrolled by a script, prepares nothing.
+    expect(sheet).toContain('const signs = ["pointermove", "pointerdown", "touchstart", "keydown", "wheel"] as const;');
+    expect(sheet).toContain("if (!mounted && !prepared) return null;");
+    expect(sheet).not.toMatch(/const signs = \[[^\]]*"(scroll|load)"/);
+  });
+
+  it("is inert and unannounced while it waits off stage", () => {
+    expect(sheet).toContain("inert={!mounted}");
+    expect(sheet).toContain("aria-hidden={mounted ? undefined : true}");
   });
 
   it("says what is wrong once: Stripe's per-field line is collapsed, the sheet's alert speaks", () => {
@@ -141,7 +151,8 @@ describe("the plan sheet", () => {
     // Buy holds for a step that is still loading, with a ceiling.
     expect(sheet).toContain("if (!payReady.current) {");
     expect(sheet).toContain("holdTimer.current = window.setTimeout(showPay, HOLD_MS);");
-    expect(pay).toContain("presentable.current?.(true)");
+    expect(pay).toContain('presentable.current?.(true, "ready")');
+    expect(pay).toContain('presentable.current?.(true, "unavailable")');
     // A press on the stand-in fields is honoured when Stripe's arrive.
     expect(pay).toContain('if (next === "ready" && wantsFocus.current) element?.focus();');
   });
