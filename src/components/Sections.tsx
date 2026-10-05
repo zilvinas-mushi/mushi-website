@@ -121,7 +121,7 @@ export function ArrowDisc({
   );
 }
 
-function Pill({
+export function Pill({
   href,
   children,
   variant = "primary",
@@ -171,9 +171,9 @@ function Pill({
   const style =
     variant === "primary"
       ? // purple bg / white text  ->  white bg / purple text
-        "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_0.5rem_1.625rem_-0.625rem_rgba(110,84,181,0.95)] hover:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] hover:shadow-[0_0.5rem_1.625rem_-0.75rem_rgba(255,255,255,0.45)]"
+        "text-white bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] shadow-[0_0.5rem_1.625rem_-0.625rem_rgba(110,84,181,0.95)] hover:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] hover:shadow-[0_0.5rem_1.625rem_-0.75rem_rgba(255,255,255,0.45)] active:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] active:text-[#6e54b5] active:shadow-[0_0.5rem_1.625rem_-0.75rem_rgba(255,255,255,0.45)]"
       : // white bg / black text  ->  black bg / white text
-        "bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] text-black hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white";
+        "bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] text-black hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white active:bg-[linear-gradient(147deg,#000_0%,#000_100%)] active:text-white";
   return (
     <a href={href} className={`${base} ${style}`}>
       {children}

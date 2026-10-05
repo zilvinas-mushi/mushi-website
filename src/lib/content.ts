@@ -318,6 +318,21 @@ const HERO_SUB_LINES = [
   `${HERO_SUB_PARTS.c} ${HERO_SUB_PARTS.d}`,
 ] as const;
 
+/**
+ * The 404 — src/app/not-found.tsx. The home hero's first screen with these
+ * words in it; the booking button carries the hero's own label so the two
+ * read as the same button.
+ */
+export const NOT_FOUND = {
+  title: "Page not found",
+  eyebrow: "Error 404",
+  heading: "This Page Doesn’t Exist.",
+  headingLines: ["This Page", "Doesn’t Exist."],
+  sub: "The link is broken, or the page has moved.",
+  primaryCta: "Back to Home",
+  secondaryCta: "30 Minute Fit-Check",
+} as const;
+
 export const HERO = {
   // Scarcity line rather than the tagline (Žilvinas 2026-09-06). The
   // tagline itself is unchanged — SITE_TAGLINE still carries it for

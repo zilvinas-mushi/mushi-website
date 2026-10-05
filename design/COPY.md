@@ -422,3 +422,14 @@ Four cards, in this order on both breakpoints. Line breaks are the frames':
   THE RESULTS, WHY THIS WORKED. **Placeholder** — the file's copy under these
   heads is another client's story; it lives verbatim in `CASE_STUDY_DETAILS`
   and is not repeated here.
+
+# 404 (`src/app/not-found.tsx`)
+
+The home hero's first screen — same field, pill, type and buttons — with these
+words. Served by Cloudflare Pages for every address the site does not have.
+
+- Eyebrow: Error 404
+- **H1: This Page / Doesn’t Exist.**
+- Sub: The link is broken, or the page has moved.
+- Buttons: BACK TO HOME (violet, `/`) · 30 MINUTE FIT-CHECK (white, the
+  booking link)
