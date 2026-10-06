@@ -1,11 +1,26 @@
-# The check that runs BEFORE Cloudflare tries to deploy.
+# The check that decides what Cloudflare may deploy.
 #
-# Cloudflare Pages already builds this repo on every push to main — that is the
-# deploy pipeline and this does not replace it. What Cloudflare does NOT do is
-# tell you about a lint failure, and it only tells you about a type error by
-# failing the deploy itself, minutes later, in a log you have to go and open.
-# This runs the same three commands on the push that triggers that build, so a
-# red X appears next to the commit instead.
+# FIVE STEPS, EACH ONE QUESTION (Žilvinas 2026-10-06, off a run with thirteen
+# lines in it: "why there is so much noise? can we somehow combine into
+# sections? and max 4-5 steps?"):
+#
+#   Code            does it install, lint and type-check?
+#   Payment tests   does what the site says it charges match Stripe?
+#   Pages           does it build, with no secret in it, fast and fully drawn?
+#   Checkout        can a buyer press Buy on every plan, in a real browser?
+#   Release         all four said yes: this commit becomes the `live` branch.
+#
+# Inside a step each command has its own folding group in the log. The lines
+# GitHub adds round them (Set up job, the two actions, their Post steps) are
+# its own and cannot be folded away.
+#
+# NOTHING THAT FAILS GOES LIVE (same message: "and if something fails - not
+# pushed?") — once Cloudflare Pages is told to deploy `live` instead of `main`
+# (Pages project > Settings > Builds > Production branch; a person does that,
+# once). Release moves `live` up to a commit only after every step before it
+# has passed, so `live` is always the last commit that was checked. Until that
+# setting is changed Cloudflare still deploys every push to main, whatever
+# this says, and a failure here is only a red X on the commit.
 #
 # Free: the repo is public, so Actions minutes on standard runners are
 # unmetered. (The 2,000/month cap applies to private repos only.)
@@ -33,6 +48,9 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    # For Release, which moves a branch. Nothing else here writes.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v5
 
@@ -50,20 +68,29 @@ jobs:
 
       # `ci`, not `install`: it installs exactly what package-lock.json pins and
       # fails if the two have drifted, which is the point of running it here.
-      - run: npm ci
-
-      # ESLint is the only one of the three that nothing else runs. `next build`
-      # already type-checks, so a broken type would be caught below either
-      # way — but it would be caught as a failed BUILD, which reads like an
-      # infrastructure problem rather than a two-line fix.
-      - run: npx eslint src --max-warnings=0
-
-      - run: npx tsc --noEmit
-
-      # The payment tests, the sync script and their helpers have a config of
-      # their own, so that a type error in a TEST can never fail the Cloudflare
-      # deploy — `next build` type-checks everything tsconfig.json includes.
-      - run: npx tsc --noEmit -p tsconfig.tools.json
+      # The page-quality gate's dependencies are its own lockfile's, not the
+      # site's: Lighthouse is 180 MB of tooling that has no business in a
+      # Cloudflare build.
+      #
+      # ESLint is the only check that nothing else runs. `next build` already
+      # type-checks, so a broken type would be caught below either way — but
+      # as a failed BUILD, which reads like an infrastructure problem rather
+      # than a two-line fix. The payment tests, the sync script and their
+      # helpers have a tsconfig of their own, so that a type error in a TEST
+      # can never fail the Cloudflare deploy.
+      - name: Code — install, lint, types
+        run: |
+          echo "::group::Install"
+          npm ci
+          npm ci --prefix tools/page-quality
+          echo "::endgroup::"
+          echo "::group::Lint"
+          npx eslint src --max-warnings=0
+          echo "::endgroup::"
+          echo "::group::Types"
+          npx tsc --noEmit
+          npx tsc --noEmit -p tsconfig.tools.json
+          echo "::endgroup::"
 
       # THE PAYMENT GATE (docs/features/0001-stripe-pricing). Three layers: the
       # site's copy against the catalog; the catalog against Stripe test mode,
@@ -78,10 +105,6 @@ jobs:
       # STRIPE_KEYS_REQUIRED become "false", and then the copy-against-catalog
       # layer still runs. (`tests/stripe.gate.test.ts` holds this step to that.)
       #
-      # WHAT IT DOES NOT DO is stop a deploy: Cloudflare Pages builds main on
-      # its own, whatever this job says. A failure here is a red X on the
-      # commit. Making it block the deploy is an open decision in the PRD.
-      #
       # Neither key can move money in live: the test key is test-mode only and
       # the live one may read Products and Prices and nothing else.
       - name: Payment tests
@@ -94,15 +117,32 @@ jobs:
           STRIPE_LIVE_READONLY_KEY: ${{ secrets.STRIPE_LIVE_READONLY_KEY }}
           STRIPE_KEYS_REQUIRED: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
 
-      # The real thing, with the same command Cloudflare uses. If this passes,
-      # the deploy will too.
-      - run: npx next build
-
-      # The site has no server, so nothing that needs a Stripe secret can run
-      # in it. This makes sure nothing tries: no secret-shaped string and no
-      # call to Stripe's API anywhere in what gets deployed.
-      - name: The export carries no Stripe secret
+      # THE BUILD, with the same command Cloudflare uses: if this passes, the
+      # deploy will too.
+      #
+      # NO STRIPE SECRET IN IT. The site has no server, so nothing that needs
+      # one can run in it; this makes sure nothing tries — no secret-shaped
+      # string and no call to Stripe's API anywhere in what gets deployed.
+      #
+      # THE PAGE-QUALITY GATE (tools/page-quality/check.mjs), on that export.
+      # Two promises, checked together because they pull against each other:
+      #
+      #   - Lighthouse's mobile performance score — the number PageSpeed
+      #     shows — is above 90 on /, /templates and /case-studies, median of
+      #     three runs;
+      #   - scrolling each page straight down from the instant it appears, on
+      #     a 10 Mbit/s line, at a laptop's width and a phone's, never puts an
+      #     unloaded picture — or a card waiting for one — on screen.
+      #
+      # The runner's own Chrome is what it drives.
+      - name: Pages — build, no secret in it, PageSpeed above 90, no unloaded picture
+        env:
+          CI: "true"
         run: |
+          echo "::group::Build"
+          npx next build
+          echo "::endgroup::"
+          echo "::group::The export carries no Stripe secret"
           # A missing out/ must fail too: grep on a directory that is not there
           # finds nothing, and "found nothing" is exactly what passes.
           test -d out || { echo "::error::out/ does not exist; nothing was checked"; exit 1; }
@@ -115,49 +155,41 @@ jobs:
             echo "::error::grep failed with status $status; nothing was checked"
             exit 1
           fi
-
-      # THE PAGE-QUALITY GATE (tools/page-quality/check.mjs), on the export
-      # that was just built. Two promises, checked together because they pull
-      # against each other:
-      #
-      #   - Lighthouse's mobile performance score — the number PageSpeed
-      #     shows — is above 90 on /, /templates and /case-studies, median of
-      #     three runs;
-      #   - scrolling each page straight down from the instant it appears, on
-      #     a 10 Mbit/s line, at a laptop's width and a phone's, never puts an
-      #     unloaded picture — or a card waiting for one — on screen.
-      #
-      # Its dependencies are its own lockfile's, not the site's: Lighthouse
-      # is 180 MB of tooling that has no business in a Cloudflare build. The
-      # runner's own Chrome is what it drives.
-      #
-      # Like the payment tests, it does not stop a deploy — Cloudflare builds
-      # main regardless. It is a red X on the commit that broke it.
-      - name: Install the page-quality gate
-        run: npm ci --prefix tools/page-quality
-
-      - name: Page quality — PageSpeed above 90, no unloaded picture on screen
-        run: npm run pages:check
-        env:
-          CI: "true"
+          echo "::endgroup::"
+          npm run pages:check
 
       # THE CHECKOUT GATE (tools/page-quality/checkout.mjs), on the same
       # export. A real browser moves, opens the plan sheet, picks each plan
       # and presses Buy: the payment step has to be up within 400ms of the
-      # press on every plan, with Buy never holding and no plan's Stripe
-      # form built again. The payment tests above read the sheet's source,
-      # and the source read fine on the day a buyer who changed plan waited
-      # for Stripe to be built a second time.
+      # press on every plan, with Buy never holding, no plan's Stripe form
+      # built again, and the card fields wearing the sheet's own ring. The
+      # payment tests above read the sheet's source, and the source read fine
+      # on the day a buyer who changed plan waited for Stripe to be built a
+      # second time.
       #
       # It talks to the real webapp and to Stripe — the wait it guards
       # against is theirs — with no key: the export is served to the browser
       # as https://mushi.agency, the only origin the webapp answers. Six
       # Checkout Sessions are made and left to expire; nothing is paid.
       #
-      # So it can go red because the webapp or Stripe did not answer. It
+      # IT RUNS WHERE THE MAIN MARKET IS. GitHub's runners are in the United
+      # States, so Stripe shows this browser what it shows a US buyer — a ZIP
+      # field under the card — which no laptop in Europe sees. That is how it
+      # was red for four runs while the same gate passed locally (2026-10-06):
+      # a red here that will not reproduce is not thereby wrong.
+      #
+      # So it can also go red because the webapp or Stripe did not answer. It
       # says so when that is why, and it stays red: "could not check" is
-      # not "checked". Like the gates above, it does not stop a deploy.
-      - name: Checkout — Buy is instant on every plan
+      # not "checked".
+      - name: Checkout — Buy works on every plan
         run: npm run checkout:check
         env:
           CI: "true"
+
+      # ONLY WHAT PASSED. Reached when every step above has succeeded, and
+      # only for a push to main — not a pull request, not the daily run.
+      # `live` is moved up to this commit, never sideways: if main was ever
+      # rewritten this fails, and a person looks.
+      - name: Release — this commit is what goes live
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: git push origin "HEAD:refs/heads/live"

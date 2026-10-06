@@ -191,6 +191,19 @@ write the findings back into `design/` in the same commit.
 Cloudflare Pages, git-based. Build command `npx next build`,
 output directory `out`.
 
+**CI decides what goes live** (`.github/workflows/ci.yml`, five steps: Code,
+Payment tests, Pages, Checkout, Release). Release moves the `live` branch up
+to a commit only after the four before it have passed, and `live` is what
+Cloudflare's production branch should be. Until a person has set that in the
+Pages project (Settings > Builds > Production branch), Cloudflare still
+deploys every push to `main` and a red run is only a red X — check which it
+is before telling anyone a failure "did not ship".
+
+The Checkout step runs in the United States, against the real Stripe, so it
+sees what a US buyer sees (a ZIP field under the card) and a laptop in Europe
+does not. A red there that passes locally is not thereby wrong. `/fix-ci`
+(`.claude/skills/fix-ci`) is the routine for a red run.
+
 ## Related
 The webapp at app.mushi.agency is a separate repo. Nothing in this repo
 should try to share code with it.
