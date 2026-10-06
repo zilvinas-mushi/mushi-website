@@ -12,7 +12,11 @@
  *     - the payment step is up within MAX_MS of the press;
  *     - Buy never held for it (no spinner);
  *     - the step on stage is that plan's own;
- *     - no plan's payment form was built again along the way.
+ *     - no plan's payment form was built again along the way;
+ *     - the focus ring on its card fields is the shaped one — round only at
+ *       the block's own corners (it fell back to Stripe's plain ring on every
+ *       plan, unnoticed, when the fields began loading ahead of the session:
+ *       2026-10-06).
  *
  * IT IS THE REAL THING: the webapp makes real Checkout Sessions and Stripe
  * draws its real fields, because the wait this guards against is theirs. The
@@ -154,6 +158,8 @@ function pickAndBuy(index, giveUpMs) {
             // The step on stage is the one that is not inert.
             onStage: forms.findIndex((form) => !form.parentElement.inert),
             rebuilt: forms.filter((form) => !form.dataset.kept).length,
+            // Said by the card block itself (StripePay.tsx).
+            ring: forms.find((form) => !form.parentElement.inert)?.querySelector("[data-ring]")?.dataset.ring,
           });
         };
         const seen = new MutationObserver(() => {
@@ -223,6 +229,7 @@ async function buy(browser, window) {
       if (result.held) problems.push("Buy held with a spinner");
       if (result.onStage !== index) problems.push(`the step on stage is plan ${result.onStage + 1}'s`);
       if (result.rebuilt) problems.push(`${result.rebuilt} payment form(s) were built again`);
+      if (result.ring !== "shaped") problems.push(`the card fields' focus ring is ${result.ring ?? "missing"}, not the shaped one`);
       console.log(
         `  ${problems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} ${result.name.padEnd(12)} ${result.ms === null ? "—" : `${result.ms}ms`}`,
       );
@@ -261,7 +268,7 @@ const browser = await puppeteer.launch({
 const failures = [];
 try {
   console.log(`Checkout — ${remote ?? `the export in out/, served as ${ORIGIN}`}`);
-  console.log(`\nBuy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again`);
+  console.log(`\nBuy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped`);
   for (const window of WINDOWS) {
     try {
       failures.push(...(await buy(browser, window)));

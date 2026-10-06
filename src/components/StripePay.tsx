@@ -382,10 +382,16 @@ export function StripePay({
       // one Stripe draws by itself, which is right in any arrangement.
       // Stripe glides the iframe to its height, so this is asked once the
       // height has stopped moving, and again if it ever moves later.
+      //
+      // AND NOT BEFORE THE FIELDS ARE IN. The frames are created ahead of
+      // the session now, so the iframe can stand 2px tall for longer than
+      // the 250ms below; judged then, every plan lost its shaped ring for
+      // good (Žilvinas 2026-10-06, off Noah's screenshot: all four corners
+      // of the expiry's ring round).
       const checkShape = () => {
         const box = mount.current;
         const mask = lastMask.current;
-        if (gone || !box || !mask) return;
+        if (gone || !fieldsIn || !actionsIn || !box || !mask) return;
         const m = mask.getBoundingClientRect();
         const scale = m.height / (desktop ? 32.5 : 41);
         const under = (box.getBoundingClientRect().bottom - m.bottom) / scale;
@@ -394,16 +400,19 @@ export function StripePay({
         setShaped(false);
         checkout.changeAppearance(appearance(desktop, false));
       };
+      const shapeSoon = () => {
+        window.clearTimeout(shapeTimer);
+        shapeTimer = window.setTimeout(checkShape, 250);
+      };
       if (where && "ResizeObserver" in window) {
-        shapeWatch = new ResizeObserver(() => {
-          window.clearTimeout(shapeTimer);
-          shapeTimer = window.setTimeout(checkShape, 250);
-        });
+        shapeWatch = new ResizeObserver(shapeSoon);
         shapeWatch.observe(mount.current);
       }
       element.on("ready", () => {
         fieldsIn = true;
         ready();
+        // The height may already be the final one, with no resize to come.
+        if (shapeWatch) shapeSoon();
       });
       element.on("loaderror", () => settle("unavailable"));
       element.mount(mount.current);
@@ -457,6 +466,7 @@ export function StripePay({
       actions.current = loaded.actions;
       actionsIn = true;
       ready();
+      if (shapeWatch) shapeSoon();
     })().catch((reason: unknown) => {
       console.error("[checkout] the in-sheet payment form could not load:", reason);
       settle("unavailable");
@@ -576,6 +586,8 @@ export function StripePay({
           // in, the block is exactly as tall as they are.
           className="relative mt-[13px] overflow-hidden rounded-[10px] md:rounded-[15px]"
           aria-busy={state === "loading"}
+          // For the checkout gate (tools/page-quality/checkout.mjs).
+          data-ring={shaped ? "shaped" : "plain"}
         >
           {/* THE FIELDS ARE THERE FROM THE FIRST FRAME (Žilvinas 2026-10-04):
               while Stripe draws its own, this stand-in holds their exact
