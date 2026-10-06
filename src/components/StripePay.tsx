@@ -101,8 +101,17 @@ function appearance(desktop: boolean, shaped: boolean): Appearance {
         // Square when the ring is shaped by the sheet (see .Input:focus);
         // otherwise the block's radius: 10 on a phone, 15 on desktop (÷1.6).
         borderRadius: shaped ? "0px" : desktop ? "9.375px" : "10px",
-        padding: desktop ? `${9 + over}px ${14 + over}px` : `${11 + over}px ${16 + over}px`,
-        lineHeight: desktop ? "17px" : "23px",
+        // A ROW IS 35 TALL ON DESKTOP AND 45 ON A PHONE, AND THE LINE IS
+        // TALLER THAN POPPINS' OWN (Žilvinas 2026-10-06, "it's very bad for
+        // phone"). The rows were 17 + 2x9 and 23 + 2x11. WebKit will not give
+        // a text field a line shorter than its font's natural one — 1.5em
+        // for Poppins, 21 and 27 — so in Safari, which is every browser on
+        // an iPhone, each row came out 4px taller: the seams and the masks
+        // sat 4px off the fields and the ring fell back to the plain one.
+        // 23 + 2x6 and 29 + 2x8 are the same rows, with the line clear of
+        // the font's at any zoom; the text sits where it did.
+        padding: desktop ? `${6 + over}px ${14 + over}px` : `${8 + over}px ${16 + over}px`,
+        lineHeight: desktop ? "23px" : "29px",
       },
       // THE RING IS ON THE FIELD IN USE, NOT ON THE BLOCK (Žilvinas
       // 2026-10-04, "why the selection is for all combined section"), AND IT
