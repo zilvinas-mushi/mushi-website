@@ -16,7 +16,7 @@
  *    problem like any other.
  */
 import type Stripe from "stripe";
-import { CURRENCY, PLANS, TEMPLATES_PRODUCT, type Plan } from "../src/lib/pricing.ts";
+import { CURRENCY, LOCAL_CURRENCIES, PLANS, TEMPLATES_PRODUCT, type LocalCurrency, type Plan } from "../src/lib/pricing.ts";
 import type { Mode } from "./access.ts";
 
 /** Stamped on everything the script creates, so the Dashboard shows where it came from. */
@@ -30,9 +30,14 @@ export type Snapshot = {
   onProduct: Stripe.Price[];
 };
 
+/** A local-currency amount a price should carry and does not (pricing.ts, LOCAL_CURRENCIES). */
+export type MissingOption = { plan: Plan; priceId: string; currency: LocalCurrency; amount: number };
+
 export type CatalogDiff = {
   missingProduct: boolean;
   missingPlans: Plan[];
+  /** Added by apply: the one edit a price takes, and it changes nothing the price already charges. */
+  missingOptions: MissingOption[];
   /** Things that exist and are wrong. Never fixed automatically. */
   problems: string[];
 };
@@ -105,6 +110,7 @@ export function diffCatalog(snapshot: Snapshot, mode: Mode): CatalogDiff {
   }
 
   const missingPlans: Plan[] = [];
+  const missingOptions: MissingOption[] = [];
   for (const plan of PLANS) {
     const found = snapshot.keyed.filter((p) => p.lookup_key === plan.lookupKey);
     if (found.length === 0) {
@@ -130,13 +136,22 @@ export function diffCatalog(snapshot: Snapshot, mode: Mode): CatalogDiff {
     must(what, "custom_unit_amount", price.custom_unit_amount ?? null, null);
     must(what, "transform_quantity", price.transform_quantity ?? null, null);
     must(what, "metadata.plan_id", price.metadata?.plan_id, plan.id);
-    // A second currency added in the Dashboard would charge some customers a
-    // figure that is in no file here.
+    // THE LOCAL CURRENCIES, each an amount of its own on the same price
+    // (pricing.ts, LOCAL_CURRENCIES). One that is missing is added by apply;
+    // one that differs, or a currency added in the Dashboard that is in no
+    // file here, would charge some customers a figure nobody decided.
+    const sold = [CURRENCY, ...LOCAL_CURRENCIES] as string[];
     for (const [currency, option] of Object.entries(price.currency_options ?? {})) {
-      if (currency !== CURRENCY) {
-        problems.push(`${what}: has a ${currency} amount (${option.unit_amount}) in currency_options, the catalog bills in ${CURRENCY} only`);
+      if (!sold.includes(currency)) {
+        problems.push(`${what}: has a ${currency} amount (${option.unit_amount}) in currency_options, the catalog sells in ${sold.join(", ")} only`);
       } else {
-        must(what, `currency_options.${currency}.unit_amount`, option.unit_amount, plan.amount);
+        const expected = currency === CURRENCY ? plan.amount : plan.local[currency as LocalCurrency];
+        must(what, `currency_options.${currency}.unit_amount`, option.unit_amount, expected);
+      }
+    }
+    for (const currency of LOCAL_CURRENCIES) {
+      if (!price.currency_options?.[currency]) {
+        missingOptions.push({ plan, priceId: price.id, currency, amount: plan.local[currency] });
       }
     }
     if (price.recurring) {
@@ -157,7 +172,7 @@ export function diffCatalog(snapshot: Snapshot, mode: Mode): CatalogDiff {
     }
   }
 
-  return { missingProduct: product === null, missingPlans, problems };
+  return { missingProduct: product === null, missingPlans, missingOptions, problems };
 }
 
 export async function inspectCatalog(stripe: Stripe, mode: Mode): Promise<{ snapshot: Snapshot; diff: CatalogDiff }> {
@@ -197,6 +212,7 @@ export async function applyCatalog(stripe: Stripe, mode: Mode): Promise<{ create
       product: TEMPLATES_PRODUCT.id,
       currency: CURRENCY,
       unit_amount: plan.amount,
+      currency_options: Object.fromEntries(LOCAL_CURRENCIES.map((c) => [c, { unit_amount: plan.local[c] }])),
       recurring: { interval: plan.interval, interval_count: plan.intervalCount },
       lookup_key: plan.lookupKey,
       nickname: `Templates, ${plan.id}`,
@@ -204,11 +220,17 @@ export async function applyCatalog(stripe: Stripe, mode: Mode): Promise<{ create
     });
     created.push(`price ${price.lookup_key}`);
   }
+  // A local amount that a price made before its currency was in the catalog
+  // does not carry yet.
+  for (const { plan, priceId, currency, amount } of before.diff.missingOptions) {
+    await stripe.prices.update(priceId, { currency_options: { [currency]: { unit_amount: amount } } });
+    created.push(`${currency} amount on price ${plan.lookupKey}`);
+  }
 
   // Read it all back: what was written has to be what the catalog says.
   const after = await inspectCatalog(stripe, mode);
   if (after.diff.problems.length > 0) throw new CatalogMismatchError(mode, after.diff.problems);
-  if (after.diff.missingProduct || after.diff.missingPlans.length > 0) {
+  if (after.diff.missingProduct || after.diff.missingPlans.length > 0 || after.diff.missingOptions.length > 0) {
     throw new Error(`Stripe ${mode} mode is still incomplete after apply: ${show(after.diff)}`);
   }
   return { created, diff: after.diff };

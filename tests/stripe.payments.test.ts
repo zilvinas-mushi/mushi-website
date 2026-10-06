@@ -16,7 +16,7 @@
  */
 import type Stripe from "stripe";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { CHECKOUT_HOST, CURRENCY, PLANS, TEMPLATES_PRODUCT, monthsIn, type Plan, type PlanId } from "@/lib/pricing";
+import { CHECKOUT_HOST, CURRENCY, PLANS, TEMPLATES_PRODUCT, monthsIn, type Plan, type PlanId, LOCAL_CURRENCIES } from "@/lib/pricing";
 import { connect } from "./helpers/stripe.ts";
 
 const connection = connect("test");
@@ -241,6 +241,31 @@ describe.skipIf(connection.skip)("a subscription in Stripe test mode", () => {
       expect(url.origin).toBe(`https://${CHECKOUT_HOST}`);
       expect(url.pathname).toMatch(/^\/c\/pay\//);
       expect(url.pathname).toContain(session.id);
+    });
+
+    // THE SAME NUMBER IN EACH LOCAL CURRENCY (pricing.ts, LOCAL_CURRENCIES;
+    // docs/features/0002-local-currency): a session asked for in that
+    // currency charges the plan's local amount, not a conversion of the
+    // dollar one. This is what the webapp does for a buyer the site has
+    // placed in that currency.
+    it.each(LOCAL_CURRENCIES)("can be sold through Checkout in %s, for the plan's own amount in it", async (currency) => {
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        currency,
+        line_items: [{ price: run().priceId, quantity: 1 }],
+        success_url: "https://mushi.agency/templates?checkout=success",
+        cancel_url: "https://mushi.agency/templates",
+        metadata: TAG,
+      });
+      const expired = await stripe.checkout.sessions.expire(session.id);
+      expect(expired.status).toBe("expired");
+      expect(session).toMatchObject({
+        mode: "subscription",
+        currency,
+        amount_subtotal: plan.local[currency],
+        amount_total: plan.local[currency],
+        livemode: false,
+      });
     });
   });
 

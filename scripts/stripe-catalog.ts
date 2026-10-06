@@ -39,7 +39,7 @@ const mode: Mode = flags.includes("--live") ? "live" : "test";
 const confirmed = flags.includes("--yes");
 
 function differences(diff: CatalogDiff): number {
-  return diff.problems.length + diff.missingPlans.length + (diff.missingProduct ? 1 : 0);
+  return diff.problems.length + diff.missingPlans.length + diff.missingOptions.length + (diff.missingProduct ? 1 : 0);
 }
 
 function report(of: Mode, snapshot: Snapshot, diff: CatalogDiff): void {
@@ -56,10 +56,16 @@ function report(of: Mode, snapshot: Snapshot, diff: CatalogDiff): void {
       price
         ? `  price   ${plan.lookupKey.padEnd(20)} ${price.id}  ${price.unit_amount} ${price.currency} ` +
             `every ${price.recurring?.interval_count} ${price.recurring?.interval}  ` +
-            `active: ${price.active}  livemode: ${price.livemode}`
+            `active: ${price.active}  livemode: ${price.livemode}` +
+            // The local amounts (pricing.ts, LOCAL_CURRENCIES), as Stripe holds them.
+            Object.entries(price.currency_options ?? {})
+              .filter(([c]) => c !== price.currency)
+              .map(([c, o]) => `  ${o.unit_amount} ${c}`)
+              .join("")
         : `  price   ${plan.lookupKey.padEnd(20)} MISSING`,
     );
   }
+  for (const o of diff.missingOptions) console.log(`  MISSING ${o.currency} amount on price ${o.plan.lookupKey} (${o.amount})`);
   for (const problem of diff.problems) console.log(`  PROBLEM ${problem}`);
 }
 
@@ -95,6 +101,7 @@ async function main(): Promise<number> {
     const toCreate = [
       ...(before.diff.missingProduct ? [`product ${TEMPLATES_PRODUCT.id} "${TEMPLATES_PRODUCT.name}"`] : []),
       ...before.diff.missingPlans.map((p) => `price ${p.lookupKey}: ${p.amount} cents every ${p.intervalCount} ${p.interval}`),
+      ...before.diff.missingOptions.map((o) => `${o.currency} amount on price ${o.plan.lookupKey}: ${o.amount}`),
     ];
     if (before.diff.problems.length === 0 && toCreate.length === 0) {
       console.log("\n0 differences: live already holds the catalog. Nothing to create.\n");
