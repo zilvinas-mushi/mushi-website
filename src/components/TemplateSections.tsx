@@ -186,9 +186,12 @@ export function TemplatesHero() {
           // 2026-09-19, "the proportions should stay"), and there is still
           // no shadow: the button does not glow (same note).
           //
-          // The phone keeps its own measured 54 box and 17 label and takes
-          // the look only: caps, the fill, and the 10 corner Pill has there.
-          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[54px] items-center justify-center rounded-[10px] bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-7 text-[17px] font-semibold uppercase leading-none text-white transition-all duration-300 ease-out hover:-translate-y-[1px] hover:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] md:h-[calc(var(--tpl-hero-u)*0.67)] md:rounded-[calc(var(--tpl-hero-u)*0.15)] md:px-[calc(var(--tpl-hero-u)*0.32)] md:text-[length:calc(var(--tpl-hero-u)*0.24)]"
+          // ON THE PHONE IT IS PILL'S BOX TOO (Žilvinas 2026-10-06, "it
+          // should be the same as in the first page button size"): 44 tall,
+          // a 14 label, 10 either side of it and the 10 corner. It had kept
+          // a box of its own there — 54 tall, a 17 label, 28 a side — and
+          // taken only the look.
+          className="group mt-[1.875rem] md:!mt-[45px] inline-flex h-[44px] items-center justify-center rounded-[0.625rem] bg-[linear-gradient(147deg,#a08ade_8%,#7c54b5_42%,#6e54b5_93%)] px-[0.625rem] text-[14px] font-semibold uppercase leading-none text-white transition-all duration-300 ease-out hover:-translate-y-[1px] hover:bg-[linear-gradient(147deg,#fff_8%,#fff_42%,#fff_93%)] hover:text-[#6e54b5] md:h-[calc(var(--tpl-hero-u)*0.67)] md:rounded-[calc(var(--tpl-hero-u)*0.15)] md:px-[calc(var(--tpl-hero-u)*0.32)] md:text-[length:calc(var(--tpl-hero-u)*0.24)]"
         >
           {TEMPLATES_PAGE.cta}
         </a>
