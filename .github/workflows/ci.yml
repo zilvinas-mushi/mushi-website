@@ -1,6 +1,6 @@
-# The check that decides what Cloudflare may deploy.
+# The check that decides what reaches main — and main is what Cloudflare deploys.
 #
-# FIVE STEPS, EACH ONE QUESTION (Žilvinas 2026-10-06, off a run with thirteen
+# FOUR STEPS, EACH ONE QUESTION (Žilvinas 2026-10-06, off a run with thirteen
 # lines in it: "why there is so much noise? can we somehow combine into
 # sections? and max 4-5 steps?"):
 #
@@ -8,19 +8,21 @@
 #   Payment tests   does what the site says it charges match Stripe?
 #   Pages           does it build, with no secret in it, fast and fully drawn?
 #   Checkout        can a buyer press Buy on every plan, in a real browser?
-#   Release         all four said yes: this commit becomes the `live` branch.
 #
 # Inside a step each command has its own folding group in the log. The lines
 # GitHub adds round them (Set up job, the two actions, their Post steps) are
 # its own and cannot be folded away.
 #
 # NOTHING THAT FAILS GOES LIVE (same message: "and if something fails - not
-# pushed?") — once Cloudflare Pages is told to deploy `live` instead of `main`
-# (Pages project > Settings > Builds > Production branch; a person does that,
-# once). Release moves `live` up to a commit only after every step before it
-# has passed, so `live` is always the last commit that was checked. Until that
-# setting is changed Cloudflare still deploys every push to main, whatever
-# this says, and a failure here is only a red X on the commit.
+# pushed?"; then, of a separate `live` branch: "main should be the one. so we
+# just restrict people of pushing to it?"). main is a protected branch: GitHub
+# refuses any commit there that this job — `check` — has not passed, for
+# admins too. So a change travels on a branch and a pull request; this runs
+# on the pull request; green, it merges and Cloudflare Pages deploys main as
+# it always has; red, it never arrives. The protection is a repository
+# setting (Settings > Branches), not something in this file: if `check` is
+# ever renamed here, the required check there has to be renamed with it, or
+# nothing can merge.
 #
 # Free: the repo is public, so Actions minutes on standard runners are
 # unmetered. (The 2,000/month cap applies to private repos only.)
@@ -48,9 +50,6 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    # For Release, which moves a branch. Nothing else here writes.
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v5
 
@@ -185,11 +184,3 @@ jobs:
         run: npm run checkout:check
         env:
           CI: "true"
-
-      # ONLY WHAT PASSED. Reached when every step above has succeeded, and
-      # only for a push to main — not a pull request, not the daily run.
-      # `live` is moved up to this commit, never sideways: if main was ever
-      # rewritten this fails, and a person looks.
-      - name: Release — this commit is what goes live
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: git push origin "HEAD:refs/heads/live"

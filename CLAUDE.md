@@ -191,13 +191,14 @@ write the findings back into `design/` in the same commit.
 Cloudflare Pages, git-based. Build command `npx next build`,
 output directory `out`.
 
-**CI decides what goes live** (`.github/workflows/ci.yml`, five steps: Code,
-Payment tests, Pages, Checkout, Release). Release moves the `live` branch up
-to a commit only after the four before it have passed, and `live` is what
-Cloudflare's production branch should be. Until a person has set that in the
-Pages project (Settings > Builds > Production branch), Cloudflare still
-deploys every push to `main` and a red run is only a red X — check which it
-is before telling anyone a failure "did not ship".
+**CI decides what reaches `main`, and `main` is what goes live**
+(`.github/workflows/ci.yml`, four steps: Code, Payment tests, Pages,
+Checkout). `main` is a protected branch: GitHub refuses a commit there that
+the `check` job has not passed, for admins too — so there is no pushing to
+it. A change goes on a branch, then `gh pr create` and
+`gh pr merge --auto --squash`; CI runs on the pull request (about five
+minutes) and it merges itself when green, which is when Cloudflare deploys.
+A red run never arrives. Do not work round it by lifting the protection.
 
 The Checkout step runs in the United States, against the real Stripe, so it
 sees what a US buyer sees (a ZIP field under the card) and a laptop in Europe
