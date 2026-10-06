@@ -77,7 +77,8 @@ describe("the plan sheet", () => {
   it("asks the webapp for the session of the chosen plan, by lookup key", () => {
     const lib = read("src/lib/checkout.ts");
     expect(lib).toContain("fetch(CHECKOUT_SESSION_URL");
-    expect(lib).toContain("JSON.stringify({ plan: planFor(planId).lookupKey })");
+    // ...and, for a buyer the page placed in a local currency, that currency (tests/local-currency.test.ts).
+    expect(lib).toContain("JSON.stringify({ plan: planFor(planId).lookupKey, ...(currencyOnPage() === CURRENCY ? {} : { currency: currencyOnPage() }) })");
     // The payment step pays for the session of ITS plan, and Stripe is
     // handed it as a promise so the fields load alongside it.
     expect(pay).toContain("const secret = checkoutSession(planId);");

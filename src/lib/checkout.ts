@@ -12,7 +12,8 @@
  * If the webapp cannot be reached the sheet falls back to the plan's Payment
  * Link (`PAYMENT_LINKS` in pricing.ts), so there is always a way to pay.
  */
-import { PLANS, STRIPE_MODE, monthsIn, type Plan, type PlanId } from "@/lib/pricing";
+import { CURRENCY, PLANS, STRIPE_MODE, monthsIn, type Plan, type PlanId } from "@/lib/pricing";
+import { currencyOnPage, money } from "@/lib/money";
 import { APP_URL } from "@/lib/site";
 
 /**
@@ -58,7 +59,10 @@ export function checkoutSession(planId: PlanId): Promise<string> {
   if (kept && Date.now() - kept.at < SESSION_KEPT_MS) return kept.secret;
   const secret = fetch(CHECKOUT_SESSION_URL, {
     method: "POST",
-    body: JSON.stringify({ plan: planFor(planId).lookupKey }),
+    // IN THE CURRENCY THE PAGE WAS PAINTED IN (money.ts): a buyer who read
+    // €60 is charged €60. Dollars, the price's own currency, are the webapp's
+    // default and are not named.
+    body: JSON.stringify({ plan: planFor(planId).lookupKey, ...(currencyOnPage() === CURRENCY ? {} : { currency: currencyOnPage() }) }),
   }).then(async (response) => {
     if (!response.ok) throw new Error(`the webapp answered ${response.status}`);
     const { clientSecret } = (await response.json()) as { clientSecret?: string };
@@ -104,9 +108,9 @@ export function planFor(planId: PlanId): Plan {
   return plan;
 }
 
-/** "$10", or "$7.50" when the cents are not zero. */
+/** "$10", or "$7.50" when the cents are not zero. The dollar string; <Money> renders the others from it. */
 export function usd(cents: number): string {
-  return cents % 100 === 0 ? `$${cents / 100}` : `$${(cents / 100).toFixed(2)}`;
+  return money(cents, CURRENCY);
 }
 
 /**

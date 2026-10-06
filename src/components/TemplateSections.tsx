@@ -1,6 +1,7 @@
 import { Fragment, type CSSProperties } from "react";
 import { BgFallback, Img } from "./Img";
 import { Logo } from "./Logo";
+import { Money } from "./Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { APP_URL, BOOKING_URL, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID } from "@/lib/site";
 
@@ -993,7 +994,9 @@ function CompareValue({ v, mushi }: { v: string | boolean; mushi?: boolean }) {
             : "text-[20px] font-semibold text-[#ff5b5b] md:text-[36px]"
         }
       >
-        {v}
+        {/* Mushi's own price is sold in the visitor's currency; the others'
+            are what those products charge, in dollars. */}
+        {mushi && v.includes("$") ? <Money>{v}</Money> : v}
       </span>
     );
   }
@@ -1587,7 +1590,7 @@ export function TemplatesAccess() {
                   them centres on the row. Centring all three put "/month"
                   halfway up the 40 and left the chip riding high. */}
               <span className="flex shrink-0 items-baseline gap-[5px] whitespace-nowrap md:gap-1.5">
-                <span className="inline-block tabular-nums bg-[linear-gradient(180deg,#a08ade_0%,#9275ce_50%,#7f56b6_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[69px]">{a.templates.figure}</span>
+                <span className="inline-block tabular-nums bg-[linear-gradient(180deg,#a08ade_0%,#9275ce_50%,#7f56b6_100%)] bg-clip-text text-[40px] font-semibold leading-none text-transparent md:text-[69px]"><Money>{a.templates.figure}</Money></span>
                 {/* 1.5 below the figure's baseline on the phone (Figma). */}
                 <span className="translate-y-[1.5px] text-[20px] font-semibold tracking-normal text-[#9b79e2] md:translate-y-0 md:text-[29px] md:font-semibold">
                   {a.templates.unit}
