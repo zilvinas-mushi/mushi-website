@@ -117,8 +117,9 @@ Depends on Phase 4.
 - [deferred] GitHub disables scheduled workflows on a repo with no activity for
   60 days; the daily drift check would stop without a sound. Fine while the
   repo is pushed to weekly; revisit if it goes quiet.
-- [deferred] The red gate marks the commit but does not stop Cloudflare Pages
-  (PRD risk 3).
+- [done 2026-10-06] The red gate used to mark the commit but not stop
+  Cloudflare Pages (PRD risk 3). `main` is now a protected branch: a commit
+  the `check` job has not passed cannot land on it, so it cannot deploy.
 
 ## Launch addendum (2026-10-04, evening)
 
