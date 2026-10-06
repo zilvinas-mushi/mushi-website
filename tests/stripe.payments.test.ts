@@ -249,12 +249,14 @@ describe.skipIf(connection.skip)("a subscription in Stripe test mode", () => {
     // dollar one. This is what the webapp does for a buyer the site has
     // placed in that currency.
     it.each(LOCAL_CURRENCIES)("can be sold through Checkout in %s, for the plan's own amount in it", async (currency) => {
+      // The session's shape is the webapp's (mushi-app, lib/billing/checkout.ts):
+      // the sheet's in-place card fields, with the currency named.
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
+        ui_mode: "elements",
         currency,
         line_items: [{ price: run().priceId, quantity: 1 }],
-        success_url: "https://mushi.agency/templates?checkout=success",
-        cancel_url: "https://mushi.agency/templates",
+        return_url: "https://mushi.agency/thank-you?session_id={CHECKOUT_SESSION_ID}",
         metadata: TAG,
       });
       const expired = await stripe.checkout.sessions.expire(session.id);
