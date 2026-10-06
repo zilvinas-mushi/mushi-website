@@ -116,7 +116,9 @@ describe("the plan sheet", () => {
     // ...in the block's shape: Stripe's ring is square and thick, and the
     // sheet's three masks leave only the band the ring should be.
     expect(pay).toContain('const drawn = shaped ? (desktop ? "5px" : "6px") : ring;');
-    expect(pay.match(/border-\[6px\] border-\[#222222\]/g)).toHaveLength(3);
+    // Number, expiry, security code — and the ZIP Stripe adds for a US buyer.
+    expect(pay.match(/border-\[6px\] border-\[#222222\]/g)).toHaveLength(4);
+    expect(pay).toContain("[2, 3].find((n) => Math.abs(tall - (n * (desktop ? 35 : 45) + (n - 1) * 2 + 8)) <= 1)");
     expect(pay).not.toContain("setFocused");
   });
 

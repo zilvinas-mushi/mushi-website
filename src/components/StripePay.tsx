@@ -292,6 +292,8 @@ export function StripePay({
   const [wanted, setWanted] = useState(false);
   // The ring is shaped by the sheet's masks — see appearance().
   const [shaped, setShaped] = useState(true);
+  // Stripe has put a ZIP row under the card's three fields — see checkShape.
+  const [zip, setZip] = useState(false);
   const ruler = useRef<HTMLDivElement>(null);
   const fields = useRef<HTMLDivElement>(null);
   // A scaled box keeps its unscaled height in the layout, so the block is
@@ -387,6 +389,9 @@ export function StripePay({
       const [stripe, where] = await Promise.all([getStripe(), buyerCountry()]);
       country.current = where;
       if (!gone) setShaped(Boolean(where));
+      // Where Stripe will ask for a ZIP, as far as can be told before it
+      // does; checkShape has the last word.
+      if (!gone) setZip(where === "US");
 
       if (!stripe) throw new Error("Stripe.js did not load");
       // Too late — the sheet has already given up and shown the fallback, or
@@ -410,7 +415,10 @@ export function StripePay({
       };
 
       // THREE FIELDS AND NOTHING ELSE (Žilvinas 2026-10-04, "this info should
-      // be enough"): card number, expiry, security code. No country selector
+      // be enough"): card number, expiry, security code — and, for a buyer
+      // in the United States, the ZIP that Stripe adds on its own account
+      // (see checkShape; taking it away is a payments decision, not a
+      // styling one: it is what a US card is checked against). No country selector
       // (see buyerCountry), no mandate line, no Link sign-up block — the sheet
       // has its own email field, its own legal line and its own Link button.
       element = checkout.createPaymentElement({
@@ -441,17 +449,32 @@ export function StripePay({
       // one look at a frame Stripe had not finished redrawing — it takes its
       // time over a change of appearance — cost the shaped ring until the
       // sheet was built again. Now the plain ring is judged the same way,
-      // and gives way to the shaped one as soon as the rows are the two
+      // and gives way to the shaped one as soon as the rows are the ones
       // expected.
+      //
+      // TWO ROWS, OR THREE WITH A ZIP (2026-10-06; CI had been saying so
+      // since the gate first asked about the ring, and it runs in the USA).
+      // For a buyer Stripe places in the United States — the main market —
+      // it adds a ZIP field under the expiry and the security code: it
+      // checks a US card against its postcode. The masks knew two rows, so
+      // every US buyer got the plain ring, a seam down the middle of the ZIP
+      // field and none above it. The block now has both arrangements, and
+      // which one Stripe chose is read off the same height.
       let shapedNow = Boolean(where);
+      let zipNow = where === "US";
       const checkShape = () => {
         const box = mount.current;
         // What 1px of the fields comes to on screen: the box is scaled.
         const scale = (ruler.current?.getBoundingClientRect().height ?? 0) / 100;
         if (gone || !fieldsIn || !actionsIn || !box || !scale) return;
-        const tall = box.getBoundingClientRect().height / scale;
-        const rows = 2 * (desktop ? 35 : 45) + 2 + 8;
-        const fits = Boolean(where) && Math.abs(tall - rows - (shapedNow ? 2 * OVERSCAN : 0)) <= 1;
+        const tall = box.getBoundingClientRect().height / scale - (shapedNow ? 2 * OVERSCAN : 0);
+        // n rows, the seams between them, and the 4px the iframe keeps round itself.
+        const rows = where ? [2, 3].find((n) => Math.abs(tall - (n * (desktop ? 35 : 45) + (n - 1) * 2 + 8)) <= 1) : undefined;
+        const fits = rows !== undefined;
+        if (fits && zipNow !== (rows === 3)) {
+          zipNow = rows === 3;
+          setZip(zipNow);
+        }
         if (fits === shapedNow) return;
         shapedNow = fits;
         setShaped(fits);
@@ -667,6 +690,7 @@ export function StripePay({
           aria-busy={state === "loading"}
           // For the checkout gate (tools/page-quality/checkout.mjs).
           data-ring={shaped ? "shaped" : "plain"}
+          data-rows={zip ? 3 : 2}
         >
           {/* THE FIELDS ARE THERE FROM THE FIRST FRAME (Žilvinas 2026-10-04):
               while Stripe draws its own, this stand-in holds their exact
@@ -689,6 +713,8 @@ export function StripePay({
                 <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">MM / YY</div>
                 <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">CVC</div>
               </div>
+              {/* Stripe's ZIP field and its own placeholder, where it will ask for one. */}
+              {zip && <div className="bg-[#222222] px-4 py-[11px] md:px-[22.4px] md:py-[14.4px]">12345</div>}
             </div>
           )}
           {/* Stripe draws underneath the stand-in, out of flow, until ready.
@@ -735,16 +761,23 @@ export function StripePay({
                 number is the phone's idea times 1.6: a row is 45 tall on a
                 phone and 56 here. */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[45px] h-[2px] bg-[#181818] md:top-[56px] md:h-[3.2px]" />
-            <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-[calc(50%-1px)] top-[47px] w-[2px] bg-[#181818] md:left-[calc(50%-1.6px)] md:top-[59.2px] md:w-[3.2px]" />
+            {/* Between the expiry and the security code: one row tall, so it
+                stops above a ZIP row when there is one. */}
+            <div aria-hidden="true" className="pointer-events-none absolute left-[calc(50%-1px)] top-[47px] h-[45px] w-[2px] bg-[#181818] md:left-[calc(50%-1.6px)] md:top-[59.2px] md:h-[56px] md:w-[3.2px]" />
+            {zip && <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[92px] h-[2px] bg-[#181818] md:top-[115.2px] md:h-[3.2px]" />}
             {/* THE RING'S SHAPE — see .Input:focus in appearance(). One frame
                 per field, in the field's grey, sitting one ring-width inside
-                it: number, expiry, security code. Each is rounded only at
-                the block's own corner, by the block's radius less the ring. */}
+                it: number, expiry, security code, and the ZIP when Stripe
+                asks for one. Each is rounded only at the block's own corner,
+                by the block's radius less the ring — so with a ZIP row under
+                them the expiry and the security code are square all round,
+                and the block's two bottom corners are the ZIP's. */}
             {shaped && (
               <>
                 <div aria-hidden="true" className="pointer-events-none absolute inset-x-[2px] top-[2px] h-[41px] rounded-t-[8px] border-[6px] border-[#222222] md:h-[52px] md:rounded-t-[13px] md:border-[9.6px]" />
-                <div aria-hidden="true" className="pointer-events-none absolute left-[2px] right-[calc(50%+3px)] top-[49px] h-[41px] rounded-bl-[8px] border-[6px] border-[#222222] md:right-[calc(50%+3.6px)] md:top-[61.2px] md:h-[52px] md:rounded-bl-[13px] md:border-[9.6px]" />
-                <div aria-hidden="true" className="pointer-events-none absolute left-[calc(50%+3px)] right-[2px] top-[49px] h-[41px] rounded-br-[8px] border-[6px] border-[#222222] md:left-[calc(50%+3.6px)] md:top-[61.2px] md:h-[52px] md:rounded-br-[13px] md:border-[9.6px]" />
+                <div aria-hidden="true" className={`pointer-events-none absolute left-[2px] right-[calc(50%+3px)] top-[49px] h-[41px] border-[6px] border-[#222222] md:right-[calc(50%+3.6px)] md:top-[61.2px] md:h-[52px] md:border-[9.6px] ${zip ? "" : "rounded-bl-[8px] md:rounded-bl-[13px]"}`} />
+                <div aria-hidden="true" className={`pointer-events-none absolute left-[calc(50%+3px)] right-[2px] top-[49px] h-[41px] border-[6px] border-[#222222] md:left-[calc(50%+3.6px)] md:top-[61.2px] md:h-[52px] md:border-[9.6px] ${zip ? "" : "rounded-br-[8px] md:rounded-br-[13px]"}`} />
+                {zip && <div aria-hidden="true" className="pointer-events-none absolute inset-x-[2px] top-[96px] h-[41px] rounded-b-[8px] border-[6px] border-[#222222] md:top-[120.4px] md:h-[52px] md:rounded-b-[13px] md:border-[9.6px]" />}
               </>
             )}
           </div>
