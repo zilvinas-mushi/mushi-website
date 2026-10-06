@@ -17,6 +17,11 @@
  *       the block's own corners (it fell back to Stripe's plain ring on every
  *       plan, unnoticed, when the fields began loading ahead of the session:
  *       2026-10-06).
+ *   And once, on the laptop: the window is narrowed to a phone's width with
+ *   the payment step up, and widened again. The card fields are still the
+ *   shaped ones both times — Stripe's fields used to stay the size of the
+ *   window the sheet was built in, under the other width's seams
+ *   (2026-10-06).
  *
  * IT IS THE REAL THING: the webapp makes real Checkout Sessions and Stripe
  * draws its real fields, because the wait this guards against is theirs. The
@@ -59,6 +64,10 @@ const LOAD_MS = 25_000;
 const PRESENTABLE_MS = 2000;
 /** The sheet's rise and fall, and a little (OPEN_MS in PlanSheet.tsx). */
 const SHEET_MS = 800;
+/** Stripe redrawing its fields for another width, and the sheet reading the result. */
+const REDRAW_MS = 2500;
+/** Under the sheet's md breakpoint (768). */
+const NARROW = 421;
 
 const WINDOWS = [
   { name: "desktop", width: 1512, height: 860, deviceScaleFactor: 1, isMobile: false },
@@ -237,6 +246,33 @@ async function buy(browser, window) {
       await page.keyboard.press("Escape");
       await pause(SHEET_MS);
     }
+
+    // The window changes width under the payment step. (Not `isMobile`:
+    // changing that reloads the page, and a reload is not what is checked.)
+    if (!window.isMobile && plans) {
+      await page.evaluate(() => document.querySelector("a[data-plan]").click());
+      await pause(SHEET_MS);
+      await page.evaluate(pickAndBuy, 0, 6000);
+      for (const [name, width] of [
+        [`narrowed to ${NARROW}`, NARROW],
+        [`widened to ${window.width}`, window.width],
+      ]) {
+        await page.setViewport({ ...window, width });
+        await pause(REDRAW_MS);
+        const ring = await page.evaluate(
+          () =>
+            [...document.querySelectorAll('[role="dialog"] form')]
+              .find((form) => !form.parentElement.inert)
+              ?.querySelector("[data-ring]")?.dataset.ring,
+        );
+        console.log(`  ${ring === "shaped" ? "pass" : "FAIL"}  ${window.name.padEnd(8)} ${name}`);
+        if (ring !== "shaped") {
+          failures.push(`${window.name}, ${name}: the card fields did not follow the window — their ring is ${ring ?? "missing"}, not the shaped one`);
+        }
+      }
+      await page.keyboard.press("Escape");
+      await pause(SHEET_MS);
+    }
   } finally {
     await context.close().catch(() => {});
   }
@@ -268,7 +304,9 @@ const browser = await puppeteer.launch({
 const failures = [];
 try {
   console.log(`Checkout — ${remote ?? `the export in out/, served as ${ORIGIN}`}`);
-  console.log(`\nBuy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped`);
+  console.log(
+    `\nBuy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped — and still shaped when the window changes width`,
+  );
   for (const window of WINDOWS) {
     try {
       failures.push(...(await buy(browser, window)));

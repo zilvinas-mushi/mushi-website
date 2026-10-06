@@ -44,11 +44,33 @@ import type { PlanId } from "@/lib/pricing";
  * below), so what is given to Stripe there is the frame's field divided by
  * 1.6: 14px type for the frame's 22, a 35px field for its 56.
  */
+/**
+ * EVERY EDGE OF THE RING IS THE SHEET'S, NONE OF THEM STRIPE'S (Žilvinas
+ * 2026-10-06, "the top seems to be cut"). The ring's inner edge was always
+ * the sheet's mask, but its outer edge was the edge of Stripe's field — and
+ * the two are drawn by different documents, each snapped to the screen's
+ * pixels on its own. Where they disagreed by a pixel the ring lost it: on a
+ * 1x screen the expiry's and the security code's top edge was 1px against 2
+ * on the other three sides, and on a short window the number's was 5 over 3.
+ *
+ * So while the ring is shaped, each of Stripe's fields is this much LARGER
+ * than the cell the buyer sees, on every side: the gaps between the fields
+ * are closed (2px less this, twice), the padding is grown to match so nothing
+ * inside a field moves, and the mount box hangs out of the block by the same
+ * amount (the -m-px beside it). The extra is under the sheet's seams and
+ * outside the block's clip, so what bounds the ring is the seam or the clip
+ * on one side and the mask on the other — one document, one pixel grid.
+ * It is 1 because the seams are 2: the fields then meet under the middle of
+ * each seam.
+ */
+const OVERSCAN = 1;
+
 function appearance(desktop: boolean, shaped: boolean): Appearance {
   // The ring as the buyer sees it, and as Stripe is asked to draw it — see
   // the note on .Input:focus.
   const ring = desktop ? "1.25px" : "2px";
   const drawn = shaped ? (desktop ? "4px" : "6px") : ring;
+  const over = shaped ? OVERSCAN : 0;
   return {
     theme: "night",
     // THE FRAME'S FIELDS HAVE PLACEHOLDERS AND NO LABELS (Žilvinas 2026-10-04,
@@ -68,8 +90,8 @@ function appearance(desktop: boolean, shaped: boolean): Appearance {
       // seams are drawn by the sheet (see the mount box); the fields carry
       // the block's corner radius themselves, for the focus ring below.
       borderRadius: "0px",
-      gridRowSpacing: "2px",
-      gridColumnSpacing: "2px",
+      gridRowSpacing: `${2 - 2 * over}px`,
+      gridColumnSpacing: `${2 - 2 * over}px`,
     },
     rules: {
       ".Input": {
@@ -79,7 +101,7 @@ function appearance(desktop: boolean, shaped: boolean): Appearance {
         // Square when the ring is shaped by the sheet (see .Input:focus);
         // otherwise the block's radius: 10 on a phone, 15 on desktop (÷1.6).
         borderRadius: shaped ? "0px" : desktop ? "9.375px" : "10px",
-        padding: desktop ? "9px 14px" : "11px 16px",
+        padding: desktop ? `${9 + over}px ${14 + over}px` : `${11 + over}px ${16 + over}px`,
         lineHeight: desktop ? "17px" : "23px",
       },
       // THE RING IS ON THE FIELD IN USE, NOT ON THE BLOCK (Žilvinas
@@ -258,7 +280,7 @@ export function StripePay({
   const [wanted, setWanted] = useState(false);
   // The ring is shaped by the sheet's masks — see appearance().
   const [shaped, setShaped] = useState(true);
-  const lastMask = useRef<HTMLDivElement>(null);
+  const ruler = useRef<HTMLDivElement>(null);
   const presentable = useRef(onPresentable);
   useEffect(() => {
     presentable.current = onPresentable;
@@ -272,6 +294,7 @@ export function StripePay({
     let express: StripeCheckoutExpressCheckoutElement | null = null;
     let shapeWatch: ResizeObserver | null = null;
     let shapeTimer = 0;
+    let unwatchWidth = () => {};
     let presentTimer = 0;
     let linkTimer = 0;
     // The Link button has answered — it is here, or it is not coming.
@@ -346,7 +369,8 @@ export function StripePay({
       // Too late — the sheet has already given up and shown the fallback, or
       // the buyer has left the step.
       if (gone || settled || !mount.current) return;
-      const desktop = window.matchMedia("(min-width: 768px)").matches;
+      const wide = window.matchMedia("(min-width: 768px)");
+      let desktop = wide.matches;
       const checkout = stripe.initCheckoutElementsSdk({
         clientSecret: secret,
         elementsOptions: {
@@ -376,29 +400,39 @@ export function StripePay({
       // the number over the expiry and the security code, in rows of the
       // height asked for. That is Stripe's decision (it arranges by the
       // width it measures), and it cannot be read from inside the iframe —
-      // but it shows in the iframe's height. The last mask should end one
-      // ring-width above the fields' bottom edge (plus the 4px the iframe
-      // keeps round itself); if it does not, the ring goes back to the plain
-      // one Stripe draws by itself, which is right in any arrangement.
-      // Stripe glides the iframe to its height, so this is asked once the
-      // height has stopped moving, and again if it ever moves later.
+      // but it shows in the iframe's height: two rows and the seam between
+      // them, the 4px the iframe keeps round itself, and the OVERSCAN while
+      // the ring is shaped. If it is anything else, the ring goes back to
+      // the plain one Stripe draws by itself, which is right in any
+      // arrangement. Stripe glides the iframe to its height, so this is
+      // asked once the height has stopped moving, and again whenever it
+      // moves later.
       //
       // AND NOT BEFORE THE FIELDS ARE IN. The frames are created ahead of
       // the session now, so the iframe can stand 2px tall for longer than
       // the 250ms below; judged then, every plan lost its shaped ring for
       // good (Žilvinas 2026-10-06, off Noah's screenshot: all four corners
       // of the expiry's ring round).
+      //
+      // AND NEVER FOR GOOD. It used to stop watching at the first misfit, so
+      // one look at a frame Stripe had not finished redrawing — it takes its
+      // time over a change of appearance — cost the shaped ring until the
+      // sheet was built again. Now the plain ring is judged the same way,
+      // and gives way to the shaped one as soon as the rows are the two
+      // expected.
+      let shapedNow = Boolean(where);
       const checkShape = () => {
         const box = mount.current;
-        const mask = lastMask.current;
-        if (gone || !fieldsIn || !actionsIn || !box || !mask) return;
-        const m = mask.getBoundingClientRect();
-        const scale = m.height / (desktop ? 32.5 : 41);
-        const under = (box.getBoundingClientRect().bottom - m.bottom) / scale;
-        if (Math.abs(under - (desktop ? 5.25 : 6)) <= 1.5) return;
-        shapeWatch?.disconnect();
-        setShaped(false);
-        checkout.changeAppearance(appearance(desktop, false));
+        // What 1px of the fields comes to on screen: the box is zoomed.
+        const scale = (ruler.current?.getBoundingClientRect().height ?? 0) / 100;
+        if (gone || !fieldsIn || !actionsIn || !box || !scale) return;
+        const tall = box.getBoundingClientRect().height / scale;
+        const rows = 2 * (desktop ? 35 : 45) + 2 + 8;
+        const fits = Boolean(where) && Math.abs(tall - rows - (shapedNow ? 2 * OVERSCAN : 0)) <= 1;
+        if (fits === shapedNow) return;
+        shapedNow = fits;
+        setShaped(fits);
+        checkout.changeAppearance(appearance(desktop, fits));
       };
       const shapeSoon = () => {
         window.clearTimeout(shapeTimer);
@@ -408,6 +442,24 @@ export function StripePay({
         shapeWatch = new ResizeObserver(shapeSoon);
         shapeWatch.observe(mount.current);
       }
+      // THE FIELDS FOLLOW THE WINDOW ACROSS THE BREAKPOINT (Žilvinas
+      // 2026-10-06, "on mobile its completely fucked"). Which fields Stripe
+      // is asked for — the phone's, or the desktop's that are drawn at 1.6x —
+      // was decided once, here, while the zoom, the seams and the masks are
+      // CSS and change with the window. A sheet built wide and then narrowed
+      // (a window dragged in, a tablet turned) kept the desktop's 35px rows
+      // at 1x under the phone's 45px seams. Now Stripe is told, and the ring
+      // starts over as the shaped one.
+      const onWidth = () => {
+        if (gone) return;
+        desktop = wide.matches;
+        shapedNow = Boolean(where);
+        setShaped(shapedNow);
+        checkout.changeAppearance(appearance(desktop, shapedNow));
+        if (shapeWatch) shapeSoon();
+      };
+      wide.addEventListener("change", onWidth);
+      unwatchWidth = () => wide.removeEventListener("change", onWidth);
       element.on("ready", () => {
         fieldsIn = true;
         ready();
@@ -479,6 +531,7 @@ export function StripePay({
       window.clearTimeout(presentTimer);
       window.clearTimeout(linkTimer);
       shapeWatch?.disconnect();
+      unwatchWidth();
       // Nobody is left waiting on a load that has been abandoned.
       release();
       actions.current = null;
@@ -614,13 +667,21 @@ export function StripePay({
           )}
           {/* Stripe draws underneath the stand-in, out of flow, until ready. */}
           <div className={`relative flow-root bg-[#222222] md:[zoom:1.6] ${state === "loading" ? "pointer-events-none absolute inset-x-0 top-0 opacity-0" : ""}`}>
-            <div ref={mount} />
+            {/* Out of the block by OVERSCAN on every side while the ring is
+                shaped — see the note there. A flow-root of its own, or its
+                margin and Stripe's -4px would collapse into one. */}
+            <div className={shaped ? "-m-px flow-root" : "flow-root"}>
+              <div ref={mount} />
+            </div>
+            {/* 100 of the fields' own pixels, for the fit check to read the
+                zoom off. */}
+            <div ref={ruler} aria-hidden="true" className="pointer-events-none invisible absolute left-0 top-0 h-[100px] w-0" />
             {/* THE SEAMS. Stripe's fields are rounded (for the focus ring) and
                 sit on a box of their own grey, so the 2px gaps between them
                 would not show; these two lines, in the sheet's colour, are
                 those gaps. A row is 45 tall on a phone and 35 here on desktop
-                (56 once zoomed). `flow-root` keeps Stripe's -4px iframe
-                margin inside this box, so its top edge is the fields'. */}
+                (56 once zoomed). `flow-root` keeps the mount box's margins
+                inside this box, so its top edge is the first row's. */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[45px] h-[2px] bg-[#181818] md:top-[35px]" />
             <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-[calc(50%-1px)] top-[47px] w-[2px] bg-[#181818] md:top-[37px]" />
             {/* THE RING'S SHAPE — see .Input:focus in appearance(). One frame
@@ -631,7 +692,7 @@ export function StripePay({
               <>
                 <div aria-hidden="true" className="pointer-events-none absolute inset-x-[2px] top-[2px] h-[41px] rounded-t-[8px] border-[6px] border-[#222222] md:inset-x-[1.25px] md:top-[1.25px] md:h-[32.5px] md:rounded-t-[8.125px] md:border-[6px]" />
                 <div aria-hidden="true" className="pointer-events-none absolute left-[2px] right-[calc(50%+3px)] top-[49px] h-[41px] rounded-bl-[8px] border-[6px] border-[#222222] md:left-[1.25px] md:right-[calc(50%+2.25px)] md:top-[38.25px] md:h-[32.5px] md:rounded-bl-[8.125px] md:border-[6px]" />
-                <div ref={lastMask} aria-hidden="true" className="pointer-events-none absolute left-[calc(50%+3px)] right-[2px] top-[49px] h-[41px] rounded-br-[8px] border-[6px] border-[#222222] md:left-[calc(50%+2.25px)] md:right-[1.25px] md:top-[38.25px] md:h-[32.5px] md:rounded-br-[8.125px] md:border-[6px]" />
+                <div aria-hidden="true" className="pointer-events-none absolute left-[calc(50%+3px)] right-[2px] top-[49px] h-[41px] rounded-br-[8px] border-[6px] border-[#222222] md:left-[calc(50%+2.25px)] md:right-[1.25px] md:top-[38.25px] md:h-[32.5px] md:rounded-br-[8.125px] md:border-[6px]" />
               </>
             )}
           </div>
