@@ -487,7 +487,9 @@ export function PlanSheet() {
         className={`absolute inset-x-0 -bottom-[40px] max-h-[calc(100dvh+16px)] overflow-y-auto rounded-t-[14px] bg-[#181818] pb-[calc(max(27px,env(safe-area-inset-bottom))+40px)] overscroll-contain md:static md:overflow-visible md:rounded-t-[20px] md:shadow-[0_24px_80px_rgba(0,0,0,0.6)] ${
           step === "plan" ? "md:w-[547px] md:pb-0" : "md:w-[776px] md:pb-6"
         } ${motion} ${shown ? "translate-y-0" : "translate-y-full"}`}
-        style={{ zoom: fit }}
+        // --fit and --unfit: for the boxes that hold Stripe's frames, which
+        // no zoom may reach (StripePay, the scaled box).
+        style={{ zoom: fit, "--fit": fit, "--unfit": 1 / fit } as React.CSSProperties}
         ref={panelRef}
       >
         <div

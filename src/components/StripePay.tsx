@@ -40,7 +40,7 @@ import type { PlanId } from "@/lib/pricing";
 // The sheet's field, in Stripe's vocabulary. Kept in step with FIELD in
 // PlanSheet.tsx: #222222, white text, placeholder at 50%, the 8b6ad6 ring.
 /**
- * THE DESKTOP FIELDS ARE DRAWN AT 1.6x (the md:[zoom:1.6] on the mount box
+ * THE DESKTOP FIELDS ARE DRAWN AT 1.6x (the scaled box round the mount,
  * below), so what is given to Stripe there is the frame's field divided by
  * 1.6: 14px type for the frame's 22, a 35px field for its 56.
  */
@@ -69,7 +69,10 @@ function appearance(desktop: boolean, shaped: boolean): Appearance {
   // The ring as the buyer sees it, and as Stripe is asked to draw it — see
   // the note on .Input:focus.
   const ring = desktop ? "1.25px" : "2px";
-  const drawn = shaped ? (desktop ? "4px" : "6px") : ring;
+  // Thick enough to fill the masks' rounded corners after the OVERSCAN has
+  // taken its share: the curve reaches 3.6 into a desktop field (2.7 on a
+  // phone) and at 4 the ring stopped at 3, leaving a nick in each corner.
+  const drawn = shaped ? (desktop ? "5px" : "6px") : ring;
   const over = shaped ? OVERSCAN : 0;
   return {
     theme: "night",
@@ -290,6 +293,17 @@ export function StripePay({
   // The ring is shaped by the sheet's masks — see appearance().
   const [shaped, setShaped] = useState(true);
   const ruler = useRef<HTMLDivElement>(null);
+  const fields = useRef<HTMLDivElement>(null);
+  // A scaled box keeps its unscaled height in the layout, so the block is
+  // told how tall the fields are and does the multiplying itself (--rows,
+  // on the layer below). See the note on the scaled box.
+  useEffect(() => {
+    const box = fields.current;
+    if (!box || !("ResizeObserver" in window)) return;
+    const watch = new ResizeObserver(() => box.parentElement?.style.setProperty("--rows", String(box.offsetHeight)));
+    watch.observe(box);
+    return () => watch.disconnect();
+  }, []);
   const presentable = useRef(onPresentable);
   useEffect(() => {
     presentable.current = onPresentable;
@@ -432,7 +446,7 @@ export function StripePay({
       let shapedNow = Boolean(where);
       const checkShape = () => {
         const box = mount.current;
-        // What 1px of the fields comes to on screen: the box is zoomed.
+        // What 1px of the fields comes to on screen: the box is scaled.
         const scale = (ruler.current?.getBoundingClientRect().height ?? 0) / 100;
         if (gone || !fieldsIn || !actionsIn || !box || !scale) return;
         const tall = box.getBoundingClientRect().height / scale;
@@ -618,14 +632,19 @@ export function StripePay({
             THE STAND-IN'S BOX, so the swap moves nothing: 50 tall and radius
             10 on a phone, 62 and 15 from md up. Stripe's button stops at 55
             and takes its corners from the card fields' appearance (square),
-            so the box is zoomed 1.24 on desktop — 50 drawn as 62 — and its
-            own rounded corners clip the button. Stripe keeps a 4px margin
-            round its iframe outside the box, which the clip takes off too. */}
+            so on desktop it is drawn at 1.24x — 50 as 62 — and this box's
+            own rounded corners clip it. Stripe keeps a 4px margin round its
+            iframe outside the box, which the clip takes off too. Scaled the
+            way the card fields are, and for the same reason: see there. */}
         <div
-          ref={linkMount}
-          className={`min-h-[50px] overflow-hidden rounded-[10px] md:rounded-[calc(15px/1.24)] md:[zoom:1.24] ${link ? "" : "pointer-events-none absolute inset-x-0 top-0 opacity-0"}`}
+          className={`h-[50px] overflow-hidden rounded-[10px] md:h-[62px] md:rounded-[15px] ${link ? "" : "pointer-events-none absolute inset-x-0 top-0 opacity-0"}`}
           aria-hidden={!link}
-        />
+        >
+          <div
+            ref={linkMount}
+            className="min-h-[50px] md:w-[calc(100%/(1.24*var(--fit,1)))] md:origin-top-left md:[scale:calc(1.24*var(--fit,1))] md:[zoom:var(--unfit,1)]"
+          />
+        </div>
       </div>
       {divider}
       {state === "unavailable" ? (
@@ -638,11 +657,9 @@ export function StripePay({
         // THE FRAME'S ARRANGEMENT: the number across the top, MM/YY and CVC
         // side by side under it, one block with rounded outer corners. Stripe
         // arranges its card fields by the WIDTH it is given — stacked like
-        // this when narrow, all in one row when wide — so from md up the box
-        // is zoomed 1.6x: inside it Stripe sees a phone's width and lays out
-        // for it, and the result is drawn at desktop size. (A zoomed box's
-        // own 100% is already the parent's width divided by the zoom.) The
-        // rounded corners are this box's; the fields inside are square.
+        // this when narrow, all in one row when wide — so from md up it is
+        // given a phone's width and drawn at 1.6x (the scaled box below).
+        // The rounded corners are this block's; the fields inside are square.
         <div
           // The height is held only while Stripe draws: once the fields are
           // in, the block is exactly as tall as they are.
@@ -674,34 +691,60 @@ export function StripePay({
               </div>
             </div>
           )}
-          {/* Stripe draws underneath the stand-in, out of flow, until ready. */}
-          <div className={`relative flow-root bg-[#222222] md:[zoom:1.6] ${state === "loading" ? "pointer-events-none absolute inset-x-0 top-0 opacity-0" : ""}`}>
-            {/* Out of the block by OVERSCAN on every side while the ring is
-                shaped — see the note there. A flow-root of its own, or its
-                margin and Stripe's -4px would collapse into one. */}
-            <div className={shaped ? "-m-px flow-root" : "flow-root"}>
-              <div ref={mount} />
+          {/* Stripe draws underneath the stand-in, out of flow, until ready.
+              From md up this layer is as tall as the scaled fields: --rows is
+              their own height, kept by the observer above. */}
+          <div className={`relative md:h-[calc(var(--rows,72)*1.6px)] ${state === "loading" ? "pointer-events-none absolute inset-x-0 top-0 opacity-0" : ""}`}>
+            {/* THE SCALED BOX: 1/1.6 of the block's width, drawn at 1.6x from
+                its top left corner, so Stripe sees a phone's width and lays
+                the fields out for one.
+
+                A TRANSFORM, NOT `zoom` (Žilvinas 2026-10-06, after the phone:
+                "did you fix it?" — of desktop Safari). It was md:[zoom:1.6].
+                WebKit draws what is inside an iframe at the zoom of the box
+                round it but lays it out at the UNZOOMED width, so in Safari —
+                and on every iPad, which gets this layout — Stripe saw 727px,
+                put the three fields in one row and drew that row 1.6x too
+                wide for its frame: the security code was off the edge.
+                A transform is the same in every browser.
+
+                So no zoom at all may reach Stripe's frames, and the sheet
+                itself is zoomed to fit a short window (`fit`, PlanSheet).
+                --unfit undoes that here and --fit goes into the scale
+                instead; both are 1 unless the window is short. */}
+            <div
+              ref={fields}
+              className="relative flow-root bg-[#222222] md:w-[calc(100%/(1.6*var(--fit,1)))] md:origin-top-left md:[scale:calc(1.6*var(--fit,1))] md:[zoom:var(--unfit,1)]"
+            >
+              {/* Out of the block by OVERSCAN on every side while the ring is
+                  shaped — see the note there. A flow-root of its own, or its
+                  margin and Stripe's -4px would collapse into one; the one
+                  round it keeps both inside, so the box's top edge is the
+                  first row's. */}
+              <div className={shaped ? "-m-px flow-root" : "flow-root"}>
+                <div ref={mount} />
+              </div>
+              {/* 100 of the fields' own pixels, for the fit check to read the
+                  scale off. */}
+              <div ref={ruler} aria-hidden="true" className="pointer-events-none invisible absolute left-0 top-0 h-[100px] w-0" />
             </div>
-            {/* 100 of the fields' own pixels, for the fit check to read the
-                zoom off. */}
-            <div ref={ruler} aria-hidden="true" className="pointer-events-none invisible absolute left-0 top-0 h-[100px] w-0" />
-            {/* THE SEAMS. Stripe's fields are rounded (for the focus ring) and
-                sit on a box of their own grey, so the 2px gaps between them
-                would not show; these two lines, in the sheet's colour, are
-                those gaps. A row is 45 tall on a phone and 35 here on desktop
-                (56 once zoomed). `flow-root` keeps the mount box's margins
-                inside this box, so its top edge is the first row's. */}
-            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[45px] h-[2px] bg-[#181818] md:top-[35px]" />
-            <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-[calc(50%-1px)] top-[47px] w-[2px] bg-[#181818] md:top-[37px]" />
+            {/* THE SEAMS. Stripe's fields meet under them (OVERSCAN), so the
+                2px gaps between the fields are these two lines in the sheet's
+                colour. They and the masks are in the SHEET's pixels, outside
+                the scaled box — whose every edge is soft — so from md up each
+                number is the phone's idea times 1.6: a row is 45 tall on a
+                phone and 56 here. */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[45px] h-[2px] bg-[#181818] md:top-[56px] md:h-[3.2px]" />
+            <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-[calc(50%-1px)] top-[47px] w-[2px] bg-[#181818] md:left-[calc(50%-1.6px)] md:top-[59.2px] md:w-[3.2px]" />
             {/* THE RING'S SHAPE — see .Input:focus in appearance(). One frame
                 per field, in the field's grey, sitting one ring-width inside
                 it: number, expiry, security code. Each is rounded only at
                 the block's own corner, by the block's radius less the ring. */}
             {shaped && (
               <>
-                <div aria-hidden="true" className="pointer-events-none absolute inset-x-[2px] top-[2px] h-[41px] rounded-t-[8px] border-[6px] border-[#222222] md:inset-x-[1.25px] md:top-[1.25px] md:h-[32.5px] md:rounded-t-[8.125px] md:border-[6px]" />
-                <div aria-hidden="true" className="pointer-events-none absolute left-[2px] right-[calc(50%+3px)] top-[49px] h-[41px] rounded-bl-[8px] border-[6px] border-[#222222] md:left-[1.25px] md:right-[calc(50%+2.25px)] md:top-[38.25px] md:h-[32.5px] md:rounded-bl-[8.125px] md:border-[6px]" />
-                <div aria-hidden="true" className="pointer-events-none absolute left-[calc(50%+3px)] right-[2px] top-[49px] h-[41px] rounded-br-[8px] border-[6px] border-[#222222] md:left-[calc(50%+2.25px)] md:right-[1.25px] md:top-[38.25px] md:h-[32.5px] md:rounded-br-[8.125px] md:border-[6px]" />
+                <div aria-hidden="true" className="pointer-events-none absolute inset-x-[2px] top-[2px] h-[41px] rounded-t-[8px] border-[6px] border-[#222222] md:h-[52px] md:rounded-t-[13px] md:border-[9.6px]" />
+                <div aria-hidden="true" className="pointer-events-none absolute left-[2px] right-[calc(50%+3px)] top-[49px] h-[41px] rounded-bl-[8px] border-[6px] border-[#222222] md:right-[calc(50%+3.6px)] md:top-[61.2px] md:h-[52px] md:rounded-bl-[13px] md:border-[9.6px]" />
+                <div aria-hidden="true" className="pointer-events-none absolute left-[calc(50%+3px)] right-[2px] top-[49px] h-[41px] rounded-br-[8px] border-[6px] border-[#222222] md:left-[calc(50%+3.6px)] md:top-[61.2px] md:h-[52px] md:rounded-br-[13px] md:border-[9.6px]" />
               </>
             )}
           </div>

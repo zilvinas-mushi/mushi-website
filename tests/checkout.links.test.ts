@@ -115,9 +115,43 @@ describe("the plan sheet", () => {
     expect(pay).toContain('".Input:focus": { boxShadow: `inset 0 0 0 ${drawn} #8b6ad6` }');
     // ...in the block's shape: Stripe's ring is square and thick, and the
     // sheet's three masks leave only the band the ring should be.
-    expect(pay).toContain('const drawn = shaped ? (desktop ? "4px" : "6px") : ring;');
+    expect(pay).toContain('const drawn = shaped ? (desktop ? "5px" : "6px") : ring;');
     expect(pay.match(/border-\[6px\] border-\[#222222\]/g)).toHaveLength(3);
     expect(pay).not.toContain("setFocused");
+  });
+
+  it("keeps every edge of the ring the sheet's own: Stripe's fields run under the seams", () => {
+    // 2026-10-06: the ring's top was a pixel short wherever Stripe's frame
+    // and the sheet's masks snapped to the screen differently.
+    expect(pay).toContain("const OVERSCAN = 1;");
+    expect(pay).toContain("gridRowSpacing: `${2 - 2 * over}px`");
+    expect(pay).toContain('<div className={shaped ? "-m-px flow-root" : "flow-root"}>');
+  });
+
+  it("asks Stripe for rows Safari will not make taller", () => {
+    // WebKit gives a text field no line shorter than its font's own (1.5em
+    // for Poppins); a 17 or 23px line came out 21 and 27 and every row 4px
+    // taller on an iPhone (2026-10-06).
+    expect(pay).toContain('lineHeight: desktop ? "23px" : "29px"');
+    expect(pay).toContain("padding: desktop ? `${6 + over}px ${14 + over}px` : `${8 + over}px ${16 + over}px`");
+  });
+
+  it("draws Stripe's frames larger with a transform, and lets no zoom reach them", () => {
+    // WebKit lays out an iframe under CSS zoom at the unzoomed width: on a
+    // desktop Safari and every iPad the fields were one clipped row
+    // (2026-10-06).
+    // (In a class, that is; the notes still say what it used to be.)
+    expect(pay).not.toMatch(/className=.*\[zoom:\d/);
+    expect(pay.match(/md:\[zoom:var\(--unfit,1\)\]/g)).toHaveLength(2);
+    expect(pay).toContain("md:[scale:calc(1.6*var(--fit,1))]");
+    expect(pay).toContain("md:[scale:calc(1.24*var(--fit,1))]");
+    expect(sheet).toContain('style={{ zoom: fit, "--fit": fit, "--unfit": 1 / fit } as React.CSSProperties}');
+  });
+
+  it("follows the window across the breakpoint, and never keeps the plain ring for good", () => {
+    expect(pay).toContain('wide.addEventListener("change", onWidth);');
+    expect(pay).toContain("checkout.changeAppearance(appearance(desktop, shapedNow));");
+    expect(pay).toContain("if (fits === shapedNow) return;");
   });
 
   it("keeps the email field dark when the browser autofills it", () => {
