@@ -3,7 +3,7 @@ import { BgFallback, Img } from "./Img";
 import { Logo } from "./Logo";
 import { Money } from "./Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { APP_URL, BOOKING_URL, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID } from "@/lib/site";
+import { APP_URL, BOOKING_URL, CALL_ADDRESS, CALL_PATH, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID } from "@/lib/site";
 
 // 15 either side on the phone (artboard 2026-09-06: the cards measure
 // 345 inside a 375 frame); the desktop reference keeps its 20.
@@ -626,6 +626,26 @@ export function TemplatesProcess() {
 }
 
 /**
+ * An FAQ answer with the site's own call address in it (Žilvinas 2026-10-07,
+ * "highlighted link, so that pressing that part of the text leads there"):
+ * the address is written out as the copy has it and is the link, in white
+ * against the answer's 60% grey. Answers without it are returned as they are.
+ */
+function linkedAnswer(answer: string): React.ReactNode {
+  const at = answer.indexOf(CALL_ADDRESS);
+  if (at === -1) return answer;
+  return (
+    <>
+      {answer.slice(0, at)}
+      <a href={CALL_PATH} className="text-white underline underline-offset-[3px] transition-colors duration-150 hover:text-[#a08ade]">
+        {CALL_ADDRESS}
+      </a>
+      {answer.slice(at + CALL_ADDRESS.length)}
+    </>
+  );
+}
+
+/**
  * FAQ — ten disclosure rows. Native <details>/<summary>, the house pattern
  * (see the home testimonials): every answer stays in the DOM for crawlers
  * and the section works with no JS. The reference shows the rows collapsed;
@@ -677,7 +697,7 @@ export function TemplatesFaq() {
                 </svg>
               </summary>
               <p className="disclosure-body px-5 pb-5 text-[14px] leading-relaxed text-white/60 md:px-6 md:text-[15px]">
-                {item.a}
+                {linkedAnswer(item.a)}
               </p>
             </details>
           ))}
