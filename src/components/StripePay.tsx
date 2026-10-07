@@ -319,6 +319,7 @@ export function StripePay({
     let express: StripeCheckoutExpressCheckoutElement | null = null;
     let shapeWatch: ResizeObserver | null = null;
     let shapeTimer = 0;
+    let rechecks: number[] = [];
     let unwatchWidth = () => {};
     let presentTimer = 0;
     let linkTimer = 0;
@@ -484,6 +485,16 @@ export function StripePay({
         window.clearTimeout(shapeTimer);
         shapeTimer = window.setTimeout(checkShape, 250);
       };
+      // AND AGAIN, A FEW TIMES, WITHOUT BEING ASKED. The check runs 250ms
+      // after the frame last moved — but a frame can pause mid-glide for
+      // longer than that, be judged there, and then settle without another
+      // resize to prompt a second look; CI saw two plans of three stay plain
+      // that way (2026-10-07, US runner). So after the fields are in it is
+      // asked once more at each of these, whatever the frame has done.
+      const recheckLater = () => {
+        for (const timer of rechecks) window.clearTimeout(timer);
+        rechecks = [800, 2000, 4500].map((ms) => window.setTimeout(() => shapeWatch && shapeSoon(), ms));
+      };
       if (where && "ResizeObserver" in window) {
         shapeWatch = new ResizeObserver(shapeSoon);
         shapeWatch.observe(mount.current);
@@ -503,6 +514,7 @@ export function StripePay({
         setShaped(shapedNow);
         checkout.changeAppearance(appearance(desktop, shapedNow));
         if (shapeWatch) shapeSoon();
+        recheckLater();
       };
       wide.addEventListener("change", onWidth);
       unwatchWidth = () => wide.removeEventListener("change", onWidth);
@@ -511,6 +523,7 @@ export function StripePay({
         ready();
         // The height may already be the final one, with no resize to come.
         if (shapeWatch) shapeSoon();
+        recheckLater();
       });
       element.on("loaderror", () => settle("unavailable"));
       element.mount(mount.current);
@@ -574,6 +587,7 @@ export function StripePay({
       gone = true;
       window.clearTimeout(limit);
       window.clearTimeout(shapeTimer);
+      for (const timer of rechecks) window.clearTimeout(timer);
       window.clearTimeout(presentTimer);
       window.clearTimeout(linkTimer);
       shapeWatch?.disconnect();
@@ -665,7 +679,9 @@ export function StripePay({
         >
           <div
             ref={linkMount}
-            className="min-h-[50px] md:w-[calc(100%/(1.24*var(--fit,1)))] md:origin-top-left md:[scale:calc(1.24*var(--fit,1))] md:[zoom:var(--unfit,1)]"
+            // touch-none: a finger panning over Stripe's frame must not scroll
+            // the page behind the sheet (PlanSheet, the lock).
+            className="min-h-[50px] touch-none md:w-[calc(100%/(1.24*var(--fit,1)))] md:origin-top-left md:[scale:calc(1.24*var(--fit,1))] md:[zoom:var(--unfit,1)]"
           />
         </div>
       </div>
@@ -740,7 +756,8 @@ export function StripePay({
                 instead; both are 1 unless the window is short. */}
             <div
               ref={fields}
-              className="relative flow-root bg-[#222222] md:w-[calc(100%/(1.6*var(--fit,1)))] md:origin-top-left md:[scale:calc(1.6*var(--fit,1))] md:[zoom:var(--unfit,1)]"
+              // touch-none: see the Link slot.
+              className="relative flow-root touch-none bg-[#222222] md:w-[calc(100%/(1.6*var(--fit,1)))] md:origin-top-left md:[scale:calc(1.6*var(--fit,1))] md:[zoom:var(--unfit,1)]"
             >
               {/* Out of the block by OVERSCAN on every side while the ring is
                   shaped — see the note there. A flow-root of its own, or its
