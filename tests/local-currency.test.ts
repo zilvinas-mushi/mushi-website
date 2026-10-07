@@ -13,7 +13,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Money } from "@/components/Money";
 import { SYMBOL, inCurrency, money } from "@/lib/money";
-import { PAINT_GATE_SCRIPT } from "@/lib/paint-gate-script";
+import { CURRENCY_ZONES, PAINT_GATE_SCRIPT } from "@/lib/paint-gate-script";
 import { CURRENCY, LOCAL_CURRENCIES, PLANS, amountIn } from "@/lib/pricing";
 
 const read = (path: string) => readFileSync(path, "utf8");
@@ -32,14 +32,17 @@ describe("the catalog", () => {
   });
 
   it("has a symbol for every currency it sells in", () => {
-    for (const currency of [CURRENCY, ...LOCAL_CURRENCIES] as const) expect(SYMBOL[currency]).toMatch(/^\S$/);
+    for (const currency of [CURRENCY, ...LOCAL_CURRENCIES] as const) expect(SYMBOL[currency]).toMatch(/^(\S|[A-Z]{3} )$/);
   });
 
   it("writes a figure the way content.ts does", () => {
     expect(money(1000)).toBe("$10");
     expect(money(750)).toBe("$7.50");
     expect(money(6000, "eur")).toBe("€60");
+    expect(money(6000, "gbp")).toBe("£60");
+    expect(money(6000, "chf")).toBe("CHF 60");
     expect(inCurrency("SAVE $60", "eur")).toBe("SAVE €60");
+    expect(inCurrency("$24 total", "chf")).toBe("CHF 24 total");
     expect(inCurrency("$24 total", "usd")).toBe("$24 total");
   });
 });
@@ -55,10 +58,15 @@ describe("the head script", () => {
     expect(PAINT_GATE_SCRIPT).toContain("ss.getItem('currency')");
     expect(PAINT_GATE_SCRIPT).toContain("Intl.DateTimeFormat().resolvedOptions().timeZone");
     expect(PAINT_GATE_SCRIPT).toContain("root.setAttribute('data-currency',c)");
-    // The euro area, with its slashes escaped inside the regex literal.
+    // Every local currency has its zones, with the slashes escaped inside the regex literal.
+    expect(CURRENCY_ZONES.map(([c]) => c)).toEqual([...LOCAL_CURRENCIES]);
+    for (const currency of LOCAL_CURRENCIES) expect(PAINT_GATE_SCRIPT).toContain(`.test(tz))c='${currency}';`);
     expect(PAINT_GATE_SCRIPT).toContain("Europe\\/(");
     expect(PAINT_GATE_SCRIPT).not.toMatch(/Europe\/\(/);
-    expect(PAINT_GATE_SCRIPT).not.toContain("Vaduz");
+    // Liechtenstein is on the franc; the Channel Islands on the pound.
+    expect(CURRENCY_ZONES.find(([c]) => c === "chf")?.[1].join()).toContain("Vaduz");
+    expect(CURRENCY_ZONES.find(([c]) => c === "eur")?.[1].join()).not.toContain("Vaduz");
+    expect(CURRENCY_ZONES.find(([c]) => c === "gbp")?.[1].join()).toContain("Jersey");
   });
 });
 
@@ -75,7 +83,10 @@ describe("the page", () => {
 
   it("renders a figure in every currency, the dollar one first", () => {
     const html = renderToStaticMarkup(createElement(Money, null, "SAVE $60"));
-    expect(html).toBe('<span data-money="usd">SAVE $60</span><span data-money="eur">SAVE €60</span>');
+    expect(html).toContain('<span data-money="usd">SAVE $60</span><span data-money="eur">SAVE €60</span><span data-money="gbp">SAVE £60</span>');
+    // A code with no sign of its own is set small beside the figure, joined by a narrow no-break space.
+    expect(html).toContain('<span data-money="chf">SAVE <span class="inline-block text-[0.55em] font-semibold">CHF</span>\u202f60</span>');
+    expect(html.match(/data-money=/g)).toHaveLength(1 + LOCAL_CURRENCIES.length);
   });
 
   it("sends every plan figure through <Money>", () => {

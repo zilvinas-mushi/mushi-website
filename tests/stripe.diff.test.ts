@@ -102,7 +102,7 @@ describe("diffCatalog", () => {
     const diff = diffCatalog(withPrice(quarterly, { currency_options: { usd: option(2400) } }), "test");
     expect(diff.problems).toEqual([]);
     expect(diff.missingPlans).toEqual([]);
-    expect(diff.missingOptions).toEqual([{ plan: quarterly, priceId: "price_templates_3_months", currency: "eur", amount: 2400 }]);
+    expect(diff.missingOptions).toEqual(LOCAL_CURRENCIES.map((currency) => ({ plan: quarterly, priceId: "price_templates_3_months", currency, amount: 2400 })));
   });
 
   it("reports only the plan whose price is absent", () => {
@@ -124,7 +124,7 @@ describe("diffCatalog", () => {
     ["a price sold in packs", { transform_quantity: { divide_by: 3, round: "up" } }, /templates_3_months.*transform_quantity/],
     ["a price tagged for another plan", { metadata: { plan_id: "1-month", managed_by: "mushi-website" } }, /templates_3_months.*metadata\.plan_id is "1-month"/],
     ["a euro amount that is not the catalog's", { currency_options: options(quarterly, { eur: option(2200) }) }, /templates_3_months.*currency_options\.eur\.unit_amount is 2200.*2400/],
-    ["a currency added in the Dashboard that the catalog does not sell in", { currency_options: options(quarterly, { gbp: option(2400) }) }, /templates_3_months.*gbp amount \(2400\).*sells in usd, eur only/],
+    ["a currency added in the Dashboard that the catalog does not sell in", { currency_options: options(quarterly, { jpy: option(2400) }) }, /templates_3_months.*jpy amount \(2400\).*sells in usd, eur, gbp, chf only/],
     ["a dollar amount changed through currency_options", { currency_options: options(quarterly, { usd: option(2500) }) }, /templates_3_months.*currency_options\.usd\.unit_amount is 2500.*2400/],
   ])("notices %s", (_what, over, message) => {
     const diff = diffCatalog(withPrice(quarterly, over), "test");
@@ -292,19 +292,19 @@ describe("applyCatalog", () => {
     });
     expect(writes.slice(1).map((w) => w.params)).toEqual([
       {
-        product: "mushi_templates", currency: "usd", unit_amount: 1000, currency_options: { eur: { unit_amount: 1000 } },
+        product: "mushi_templates", currency: "usd", unit_amount: 1000, currency_options: { eur: { unit_amount: 1000 }, gbp: { unit_amount: 1000 }, chf: { unit_amount: 1000 } },
         recurring: { interval: "month", interval_count: 1 },
         lookup_key: "templates_1_month", nickname: "Templates, 1-month",
         metadata: { plan_id: "1-month", managed_by: "mushi-website" },
       },
       {
-        product: "mushi_templates", currency: "usd", unit_amount: 2400, currency_options: { eur: { unit_amount: 2400 } },
+        product: "mushi_templates", currency: "usd", unit_amount: 2400, currency_options: { eur: { unit_amount: 2400 }, gbp: { unit_amount: 2400 }, chf: { unit_amount: 2400 } },
         recurring: { interval: "month", interval_count: 3 },
         lookup_key: "templates_3_months", nickname: "Templates, 3-months",
         metadata: { plan_id: "3-months", managed_by: "mushi-website" },
       },
       {
-        product: "mushi_templates", currency: "usd", unit_amount: 6000, currency_options: { eur: { unit_amount: 6000 } },
+        product: "mushi_templates", currency: "usd", unit_amount: 6000, currency_options: { eur: { unit_amount: 6000 }, gbp: { unit_amount: 6000 }, chf: { unit_amount: 6000 } },
         recurring: { interval: "year", interval_count: 1 },
         lookup_key: "templates_12_months", nickname: "Templates, 12-months",
         metadata: { plan_id: "12-months", managed_by: "mushi-website" },
@@ -388,8 +388,10 @@ describe("applyCatalog", () => {
     const prices = [price(monthly, { currency_options: { usd: option(1000) } }), price(quarterly), price(yearly)];
     const { client, writes } = fakeStripe({ product: product(), keyed: prices, onProduct: prices });
     const result = await applyCatalog(client, "test");
-    expect(writes).toEqual([{ kind: "price-update", id: "price_templates_1_month", params: { currency_options: { eur: { unit_amount: 1000 } } }, options: undefined }]);
-    expect(result.created).toEqual(["eur amount on price templates_1_month"]);
+    expect(writes).toEqual(
+      LOCAL_CURRENCIES.map((currency) => ({ kind: "price-update", id: "price_templates_1_month", params: { currency_options: { [currency]: { unit_amount: 1000 } } }, options: undefined })),
+    );
+    expect(result.created).toEqual(LOCAL_CURRENCIES.map((currency) => `${currency} amount on price templates_1_month`));
   });
 
   it("creates nothing when Stripe already holds the catalog", async () => {

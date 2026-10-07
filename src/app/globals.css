@@ -462,6 +462,18 @@ html[data-currency="eur"] [data-money="usd"] {
 html[data-currency="eur"] [data-money="eur"] {
   display: inline;
 }
+html[data-currency="gbp"] [data-money="usd"] {
+  display: none;
+}
+html[data-currency="gbp"] [data-money="gbp"] {
+  display: inline;
+}
+html[data-currency="chf"] [data-money="usd"] {
+  display: none;
+}
+html[data-currency="chf"] [data-money="chf"] {
+  display: inline;
+}
 
 /*
   A DEFERRED IMAGE SHOWS NOTHING UNTIL IT HAS ITS URL. Below the fold every

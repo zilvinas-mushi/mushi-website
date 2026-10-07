@@ -19,7 +19,8 @@
  */
 import { CURRENCY, LOCAL_CURRENCIES, type Currency } from "@/lib/pricing";
 
-export const SYMBOL: Record<Currency, string> = { usd: "$", eur: "€" };
+/** What goes before the figure: "$5", "€5", "£5" — and "CHF 5", the franc having no sign of its own. */
+export const SYMBOL: Record<Currency, string> = { usd: "$", eur: "€", gbp: "£", chf: "CHF " };
 
 /** A dollar string from content.ts ("$24 total", "SAVE $60") in another currency. */
 export function inCurrency(text: string, currency: Currency): string {

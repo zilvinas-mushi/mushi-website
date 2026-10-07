@@ -31,7 +31,7 @@ export const CURRENCY = "usd";
  * then holds Stripe to it, and `npm run stripe:apply` adds it to the prices
  * that lack it (adding an amount is the one edit Stripe allows a price).
  */
-export const LOCAL_CURRENCIES = ["eur"] as const;
+export const LOCAL_CURRENCIES = ["eur", "gbp", "chf"] as const;
 export type LocalCurrency = (typeof LOCAL_CURRENCIES)[number];
 export type Currency = typeof CURRENCY | LocalCurrency;
 
@@ -65,9 +65,9 @@ export type Plan = {
 };
 
 export const PLANS: readonly Plan[] = [
-  { id: "1-month", lookupKey: "templates_1_month", amount: 1000, local: { eur: 1000 }, interval: "month", intervalCount: 1 },
-  { id: "3-months", lookupKey: "templates_3_months", amount: 2400, local: { eur: 2400 }, interval: "month", intervalCount: 3 },
-  { id: "12-months", lookupKey: "templates_12_months", amount: 6000, local: { eur: 6000 }, interval: "year", intervalCount: 1 },
+  { id: "1-month", lookupKey: "templates_1_month", amount: 1000, local: { eur: 1000, gbp: 1000, chf: 1000 }, interval: "month", intervalCount: 1 },
+  { id: "3-months", lookupKey: "templates_3_months", amount: 2400, local: { eur: 2400, gbp: 2400, chf: 2400 }, interval: "month", intervalCount: 3 },
+  { id: "12-months", lookupKey: "templates_12_months", amount: 6000, local: { eur: 6000, gbp: 6000, chf: 6000 }, interval: "year", intervalCount: 1 },
 ];
 
 /** What a plan costs each period in a currency, in that currency's minor unit. */
