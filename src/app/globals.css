@@ -446,6 +446,24 @@ body {
 }
 
 /*
+  THE PRICE IN THE VISITOR'S CURRENCY (src/lib/money.ts). Every plan figure
+  is in the page in every currency it is sold in, one <span data-money> each
+  (components/Money.tsx); the head script names the visitor's on <html> as
+  data-currency, before anything is painted, and these show that one and no
+  other. With no JavaScript nothing is named and the dollars show. A new
+  currency in pricing.ts is one more pair of lines here — npm test says so.
+*/
+[data-money]:not([data-money="usd"]) {
+  display: none;
+}
+html[data-currency="eur"] [data-money="usd"] {
+  display: none;
+}
+html[data-currency="eur"] [data-money="eur"] {
+  display: inline;
+}
+
+/*
   A DEFERRED IMAGE SHOWS NOTHING UNTIL IT HAS ITS URL. Below the fold every
   <img> carries its address in data-src and gets `src` only when the observer
   in paint-gate-script reaches it — after load, the cross-fade and a beat. An

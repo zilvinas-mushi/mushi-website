@@ -62,7 +62,7 @@ describe.each(["test", "live"] as const)("Stripe %s mode", (mode) => {
     });
 
     it("differs from the catalog in nothing", () => {
-      expect(diffCatalog(snapshot, mode)).toEqual({ missingProduct: false, missingPlans: [], problems: [] });
+      expect(diffCatalog(snapshot, mode)).toEqual({ missingProduct: false, missingPlans: [], missingOptions: [], problems: [] });
     });
 
     // Test mode only, and declared only there rather than skipped in live: a
@@ -72,7 +72,7 @@ describe.each(["test", "live"] as const)("Stripe %s mode", (mode) => {
       it("running apply again creates nothing", async () => {
         // apply is only called on a catalog already known to be complete, so
         // this can never be the thing that quietly repairs a broken one.
-        expect(diffCatalog(snapshot, mode)).toEqual({ missingProduct: false, missingPlans: [], problems: [] });
+        expect(diffCatalog(snapshot, mode)).toEqual({ missingProduct: false, missingPlans: [], missingOptions: [], problems: [] });
         const result = await applyCatalog(stripe, mode);
         expect(result.created).toEqual([]);
         // And not only by its own account of it: the same price ids are

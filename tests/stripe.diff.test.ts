@@ -9,7 +9,7 @@
  */
 import type Stripe from "stripe";
 import { describe, expect, it } from "vitest";
-import { CURRENCY, PLANS, TEMPLATES_PRODUCT, type Plan } from "@/lib/pricing";
+import { CURRENCY, LOCAL_CURRENCIES, PLANS, TEMPLATES_PRODUCT, type Plan } from "@/lib/pricing";
 import { CatalogMismatchError, applyCatalog, diffCatalog, type Snapshot } from "../stripe/catalog.ts";
 
 const [monthly, quarterly, yearly] = PLANS;
@@ -52,12 +52,19 @@ function price(plan: Plan, over: Partial<Stripe.Price> = {}): Stripe.Price {
     type: "recurring",
     unit_amount: plan.amount,
     unit_amount_decimal: String(plan.amount),
+    // The local amounts, as Stripe returns them when currency_options is expanded.
+    currency_options: Object.fromEntries(LOCAL_CURRENCIES.map((c) => [c, option(plan.local[c])])),
     ...over,
   } as Stripe.Price;
 }
 
 function option(unitAmount: number): Stripe.Price.CurrencyOptions {
   return { custom_unit_amount: null, tax_behavior: "unspecified", unit_amount: unitAmount } as Stripe.Price.CurrencyOptions;
+}
+
+/** currency_options with the dollar amount restated beside the local ones, which is how Stripe returns it. */
+function options(plan: Plan, over: Record<string, Stripe.Price.CurrencyOptions> = {}): Record<string, Stripe.Price.CurrencyOptions> {
+  return { usd: option(plan.amount), ...Object.fromEntries(LOCAL_CURRENCIES.map((c) => [c, option(plan.local[c])])), ...over };
 }
 
 /** A snapshot of Stripe holding exactly the catalog. */
@@ -74,20 +81,28 @@ function withPrice(plan: Plan, over: Partial<Stripe.Price>): Snapshot {
 
 describe("diffCatalog", () => {
   it("finds nothing to do and nothing wrong when Stripe holds the catalog", () => {
-    expect(diffCatalog(complete(), "test")).toEqual({ missingProduct: false, missingPlans: [], problems: [] });
+    expect(diffCatalog(complete(), "test")).toEqual({ missingProduct: false, missingPlans: [], missingOptions: [], problems: [] });
   });
 
   it("accepts the dollar amount restated in currency_options, which is how Stripe returns it when expanded", () => {
-    const diff = diffCatalog(withPrice(quarterly, { currency_options: { usd: option(2400) } }), "test");
-    expect(diff).toEqual({ missingProduct: false, missingPlans: [], problems: [] });
+    const diff = diffCatalog(withPrice(quarterly, { currency_options: options(quarterly) }), "test");
+    expect(diff).toEqual({ missingProduct: false, missingPlans: [], missingOptions: [], problems: [] });
   });
 
   it("an empty account is missing everything and has nothing wrong", () => {
     expect(diffCatalog({ product: null, keyed: [], onProduct: [] }, "test")).toEqual({
       missingProduct: true,
       missingPlans: [...PLANS],
+      missingOptions: [],
       problems: [],
     });
+  });
+
+  it("reports a price that lacks a local amount as something to add, not as a problem", () => {
+    const diff = diffCatalog(withPrice(quarterly, { currency_options: { usd: option(2400) } }), "test");
+    expect(diff.problems).toEqual([]);
+    expect(diff.missingPlans).toEqual([]);
+    expect(diff.missingOptions).toEqual([{ plan: quarterly, priceId: "price_templates_3_months", currency: "eur", amount: 2400 }]);
   });
 
   it("reports only the plan whose price is absent", () => {
@@ -108,8 +123,9 @@ describe("diffCatalog", () => {
     ["a pay-what-you-want price", { custom_unit_amount: { maximum: null, minimum: 100, preset: null } }, /templates_3_months.*custom_unit_amount/],
     ["a price sold in packs", { transform_quantity: { divide_by: 3, round: "up" } }, /templates_3_months.*transform_quantity/],
     ["a price tagged for another plan", { metadata: { plan_id: "1-month", managed_by: "mushi-website" } }, /templates_3_months.*metadata\.plan_id is "1-month"/],
-    ["a euro amount added in the Dashboard", { currency_options: { usd: option(2400), eur: option(2200) } }, /templates_3_months.*eur amount \(2200\)/],
-    ["a dollar amount changed through currency_options", { currency_options: { usd: option(2500) } }, /templates_3_months.*currency_options\.usd\.unit_amount is 2500.*2400/],
+    ["a euro amount that is not the catalog's", { currency_options: options(quarterly, { eur: option(2200) }) }, /templates_3_months.*currency_options\.eur\.unit_amount is 2200.*2400/],
+    ["a currency added in the Dashboard that the catalog does not sell in", { currency_options: options(quarterly, { gbp: option(2400) }) }, /templates_3_months.*gbp amount \(2400\).*sells in usd, eur only/],
+    ["a dollar amount changed through currency_options", { currency_options: options(quarterly, { usd: option(2500) }) }, /templates_3_months.*currency_options\.usd\.unit_amount is 2500.*2400/],
   ])("notices %s", (_what, over, message) => {
     const diff = diffCatalog(withPrice(quarterly, over), "test");
     expect(diff.problems).toHaveLength(1);
@@ -179,7 +195,7 @@ function fakeStripe(
   behave: { readFails?: Error; hasMore?: boolean; storesAmountAs?: number } = {},
 ) {
   const state = { ...snapshot, keyed: [...snapshot.keyed], onProduct: [...snapshot.onProduct] };
-  const writes: Array<{ kind: "product" | "price"; params: Record<string, unknown>; options: unknown }> = [];
+  const writes: Array<{ kind: "product" | "price" | "price-update"; params: Record<string, unknown>; options: unknown; id?: string }> = [];
   const reads: Stripe.PriceListParams[] = [];
   const client = {
     products: {
@@ -240,10 +256,23 @@ function fakeStripe(
           transform_quantity: null,
           type: params.recurring ? "recurring" : "one_time",
           unit_amount: behave.storesAmountAs ?? params.unit_amount ?? null,
+          currency_options: Object.fromEntries(
+            Object.entries(params.currency_options ?? {}).map(([c, o]) => [c, option(behave.storesAmountAs ?? (o as { unit_amount: number }).unit_amount)]),
+          ),
         } as Stripe.Price;
         state.keyed.push(made);
         state.onProduct.push(made);
         return made;
+      },
+      update: async (id: string, params: Stripe.PriceUpdateParams, options?: Stripe.RequestOptions) => {
+        writes.push({ kind: "price-update", id, params: { ...params }, options });
+        const found = state.keyed.find((p) => p.id === id);
+        if (!found) throw Object.assign(new Error(`No such price: '${id}'`), { code: "resource_missing" });
+        const added = Object.fromEntries(
+          Object.entries(params.currency_options ?? {}).map(([c, o]) => [c, option(behave.storesAmountAs ?? (o as { unit_amount: number }).unit_amount)]),
+        );
+        found.currency_options = { ...found.currency_options, ...added };
+        return found;
       },
     },
   };
@@ -263,19 +292,19 @@ describe("applyCatalog", () => {
     });
     expect(writes.slice(1).map((w) => w.params)).toEqual([
       {
-        product: "mushi_templates", currency: "usd", unit_amount: 1000,
+        product: "mushi_templates", currency: "usd", unit_amount: 1000, currency_options: { eur: { unit_amount: 1000 } },
         recurring: { interval: "month", interval_count: 1 },
         lookup_key: "templates_1_month", nickname: "Templates, 1-month",
         metadata: { plan_id: "1-month", managed_by: "mushi-website" },
       },
       {
-        product: "mushi_templates", currency: "usd", unit_amount: 2400,
+        product: "mushi_templates", currency: "usd", unit_amount: 2400, currency_options: { eur: { unit_amount: 2400 } },
         recurring: { interval: "month", interval_count: 3 },
         lookup_key: "templates_3_months", nickname: "Templates, 3-months",
         metadata: { plan_id: "3-months", managed_by: "mushi-website" },
       },
       {
-        product: "mushi_templates", currency: "usd", unit_amount: 6000,
+        product: "mushi_templates", currency: "usd", unit_amount: 6000, currency_options: { eur: { unit_amount: 6000 } },
         recurring: { interval: "year", interval_count: 1 },
         lookup_key: "templates_12_months", nickname: "Templates, 12-months",
         metadata: { plan_id: "12-months", managed_by: "mushi-website" },
@@ -353,6 +382,14 @@ describe("applyCatalog", () => {
     const result = await applyCatalog(client, "test");
     expect(writes.map((w) => w.params.lookup_key)).toEqual(["templates_3_months"]);
     expect(result.created).toEqual(["price templates_3_months"]);
+  });
+
+  it("adds a local amount to a price that lacks it, and nothing else", async () => {
+    const prices = [price(monthly, { currency_options: { usd: option(1000) } }), price(quarterly), price(yearly)];
+    const { client, writes } = fakeStripe({ product: product(), keyed: prices, onProduct: prices });
+    const result = await applyCatalog(client, "test");
+    expect(writes).toEqual([{ kind: "price-update", id: "price_templates_1_month", params: { currency_options: { eur: { unit_amount: 1000 } } }, options: undefined }]);
+    expect(result.created).toEqual(["eur amount on price templates_1_month"]);
   });
 
   it("creates nothing when Stripe already holds the catalog", async () => {

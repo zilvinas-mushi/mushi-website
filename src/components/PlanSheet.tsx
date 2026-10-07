@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, ShieldGlyph } from "./plan-sheet-glyphs";
+import { Money } from "./Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { STEP_OUT_MS, StripePay, preloadStripe } from "./StripePay";
 import { dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
@@ -569,7 +570,7 @@ export function PlanSheet() {
                         // sub-pixel, but Poppins' $ and 0 lean the word left and low.
                         className="absolute -top-[7.5px] left-[41px] z-[1] flex h-[20px] w-[74px] items-center justify-center rounded-[5px] bg-white pb-[1px] pl-[1px] text-center text-[12px] font-semibold leading-none text-black"
                       >
-                        {o.save}
+                        <Money>{o.save}</Money>
                       </span>
                     )}
                     <span className="relative flex h-full w-full items-center gap-3 px-4">
@@ -587,14 +588,14 @@ export function PlanSheet() {
                       <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
                         {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
                         <span className="text-[20px] font-semibold leading-none text-white">{o.name}</span>
-                        <span className="text-[14px] leading-none text-white/45">{o.total}</span>
+                        <span className="text-[14px] leading-none text-white/45"><Money>{o.total}</Money></span>
                       </span>
                       <span className="flex shrink-0 flex-col items-end gap-[3px]">
                         <span className="flex items-baseline gap-2">
                           {/* SemiBold 32 off the inspector (Žilvinas 2026-09-25); the
                               struck price at 24, its proportion in the frame. */}
-                          {o.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}>{o.was}</span>}
-                          <span className="text-[32px] font-semibold leading-none text-white">{o.price}</span>
+                          {o.was && <span className={`text-[24px] font-semibold leading-none ${WAS}`}><Money>{o.was}</Money></span>}
+                          <span className="text-[32px] font-semibold leading-none text-white"><Money>{o.price}</Money></span>
                         </span>
                         {/* SemiBold 14 off the inspector (Žilvinas 2026-09-25). */}
                         <span className="text-[14px] font-semibold leading-none text-white/45">{c.perMonth}</span>
@@ -615,7 +616,11 @@ export function PlanSheet() {
               aria-busy={holding || undefined}
               className={`mt-5 flex h-[47.35px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium ${VIOLET} ${holding ? "cursor-wait" : ""}`}
             >
-              {c.ctaPrefix} {plan.price}
+              {/* One inline run: as separate items of this flex row the
+                  space between the words and the figure would be dropped. */}
+              <span>
+                {c.ctaPrefix} <Money>{plan.price}</Money>
+              </span>
               <span className="text-[14px] font-medium opacity-50">{c.perMonth}</span>
               {/* Holding for the payment step — see payReady. In
                   currentColor, so it inverts with the button. */}
@@ -700,8 +705,8 @@ export function PlanSheet() {
                 {/* WHAT IS CHARGED TODAY — the whole period, $60 for the year —
                     not the per-month $5 the plan rows show (2026-10-04). The
                     struck figure is the same months at the 1-month price. */}
-                {due.was && <span className={`text-[24px] font-semibold leading-none md:text-[32px] ${WAS}`}>{due.was}</span>}
-                <span className="text-[32px] font-semibold leading-none text-white md:text-[44px]">{due.price}</span>
+                {due.was && <span className={`text-[24px] font-semibold leading-none md:text-[32px] ${WAS}`}><Money>{due.was}</Money></span>}
+                <span className="text-[32px] font-semibold leading-none text-white md:text-[44px]"><Money>{due.price}</Money></span>
               </span>
             </div>
 

@@ -26,9 +26,39 @@
  * would choke on — a syntax error here would leave `data-ready` unset and the
  * page blank until the timeout.
  */
+import { LOCAL_CURRENCIES } from "@/lib/pricing";
+
+/**
+ * THE EURO AREA BY TIME ZONE: the one thing about where a visitor is that a
+ * static page knows before it has painted. Cloudflare's country would mean a
+ * request first, and a "$5" that turns into "€5" on screen is the swap the
+ * paint gate exists to prevent. Every zone of a country whose currency is
+ * the euro, and no other — Liechtenstein (Vaduz) is on the franc, so it is
+ * not here. `?currency=eur` or `?currency=usd` overrides it for the visit
+ * (kept in sessionStorage), which is how it is tested without a VPN.
+ */
+const EURO_ZONES = [
+  "Europe/(Amsterdam|Andorra|Athens|Berlin|Bratislava|Brussels|Busingen|Dublin|Helsinki|Lisbon|Ljubljana|Luxembourg|Madrid|Malta|Mariehamn|Monaco|Nicosia|Paris|Podgorica|Riga|Rome|San_Marino|Tallinn|Vatican|Vienna|Vilnius|Zagreb)",
+  "Atlantic/(Azores|Canary|Madeira)",
+  "Asia/Nicosia",
+]
+  .join("|")
+  // Inside a regex literal a slash ends it: escaped, or the whole gate is a
+  // syntax error and the page never shows (seen 2026-10-06, first build).
+  .replace(/\//g, "\\/");
+
 export const PAINT_GATE_SCRIPT = `
 (function(){
   var d=document,root=d.documentElement;
+  // THE VISITOR'S CURRENCY, named on <html> before anything is painted — see
+  // src/lib/money.ts. Only a currency the catalog sells in may be named.
+  try{
+    var sold=${JSON.stringify(["usd", ...LOCAL_CURRENCIES])},q=/[?&]currency=([a-z]{3})/i.exec(location.search),c=q?q[1].toLowerCase():'',ss=window.sessionStorage;
+    if(sold.indexOf(c)<0)c='';
+    if(c)ss.setItem('currency',c);else c=ss.getItem('currency')||'';
+    if(sold.indexOf(c)<0){c=/^(${EURO_ZONES})$/.test((Intl.DateTimeFormat().resolvedOptions().timeZone||''))?'eur':'usd'}
+    if(c!=='usd')root.setAttribute('data-currency',c);
+  }catch(e){}
   // BELOW THE FOLD, NOTHING IS ON THE WIRE UNTIL THE FIRST SCREEN IS DONE —
   // AND THEN ALL OF IT IS, IN ORDER (see warm(), 2026-10-04). What follows
   // is how the URLs are kept from the browser until then.

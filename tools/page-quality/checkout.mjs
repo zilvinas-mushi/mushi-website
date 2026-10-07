@@ -22,6 +22,11 @@
  *   shaped ones both times — Stripe's fields used to stay the size of the
  *   window the sheet was built in, under the other width's seams
  *   (2026-10-06).
+ *   And once at each width, IN EUROS (docs/features/0002-local-currency):
+ *   /templates?currency=eur shows every plan figure in euros and not one in
+ *   dollars, on the page, in the sheet and on the payment step, and every
+ *   session the sheet asks the webapp for names the euro — what is shown
+ *   is what is charged.
  *
  * IT IS THE REAL THING: the webapp makes real Checkout Sessions and Stripe
  * draws its real fields, because the wait this guards against is theirs. The
@@ -68,6 +73,8 @@ const SHEET_MS = 800;
 const REDRAW_MS = 2500;
 /** Under the sheet's md breakpoint (768). */
 const NARROW = 421;
+/** The local currency the euro pass asks for, and its symbol (pricing.ts, LOCAL_CURRENCIES; money.ts). */
+const EURO = { query: "?currency=eur", symbol: "€", code: "eur" };
 
 const WINDOWS = [
   { name: "desktop", width: 1512, height: 860, deviceScaleFactor: 1, isMobile: false },
@@ -279,6 +286,73 @@ async function buy(browser, window) {
   return failures;
 }
 
+/* --------------------------------------------------------------- euros --- */
+
+/** In the page: every plan figure that is on screen, and whether a dollar one is among them. */
+function figuresOnScreen() {
+  const shown = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && getComputedStyle(el).display !== "none";
+  };
+  const figures = [...document.querySelectorAll("[data-money]")].filter(shown).map((el) => el.textContent.trim());
+  return { currency: document.documentElement.getAttribute("data-currency"), figures: [...new Set(figures)] };
+}
+
+async function inEuros(browser, window) {
+  const failures = [];
+  const context = await browser.createBrowserContext();
+  const page = await context.newPage();
+  const sessions = [];
+  try {
+    await page.setViewport(window);
+    await page.setRequestInterception(true);
+    page.on("request", (request) => {
+      const url = new URL(request.url());
+      if (request.method() === "POST" && url.pathname.endsWith("/checkout/session")) sessions.push(request.postData() ?? "");
+      if (!remote && url.origin === ORIGIN) void request.respond(fromExport(url.pathname)).catch(() => {});
+      else void request.continue().catch(() => {});
+    });
+    await page.goto(`${remote ?? ORIGIN}${PAGE}${EURO.query}`, { waitUntil: "load", timeout: 60_000 });
+    await page.waitForFunction(() => document.documentElement.hasAttribute("data-ready"), { timeout: 30_000 });
+    const onPage = await page.evaluate(figuresOnScreen);
+    await page.mouse.move(200, 200);
+    await page.mouse.move(230, 260, { steps: 4 });
+    const deadline = Date.now() + LOAD_MS;
+    let steps = [];
+    while (Date.now() < deadline) {
+      steps = await page.evaluate(paymentSteps);
+      if (steps.length && steps.every((step) => step !== "loading")) break;
+      await pause(100);
+    }
+    await page.evaluate(() => document.querySelector("a[data-plan]").click());
+    await pause(SHEET_MS);
+    const inSheet = await page.evaluate(figuresOnScreen);
+    await page.evaluate(pickAndBuy, 0, 6000);
+    await pause(SHEET_MS);
+    const onStep = await page.evaluate(figuresOnScreen);
+    const problems = [];
+    for (const [where, seen] of [["the page", onPage], ["the sheet", inSheet], ["the payment step", onStep]]) {
+      if (seen.currency !== EURO.code) problems.push(`${where}: <html> names ${seen.currency ?? "no currency"}, not ${EURO.code}`);
+      const dollars = seen.figures.filter((f) => f.includes("$"));
+      if (dollars.length) problems.push(`${where}: in dollars — ${dollars.join(", ")}`);
+      const euros = seen.figures.filter((f) => f.includes(EURO.symbol));
+      if (!euros.length) problems.push(`${where}: no figure in euros on screen`);
+    }
+    const asked = [...new Set(sessions)];
+    if (!asked.length) problems.push("no session was asked of the webapp");
+    for (const body of asked) {
+      let parsed = null;
+      try { parsed = JSON.parse(body); } catch { /* reported below */ }
+      if (parsed?.currency !== EURO.code) problems.push(`a session was asked for without the euro: ${body}`);
+    }
+    console.log(`  ${problems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} in euros     ${inSheet.figures.filter((f) => f.includes(EURO.symbol)).slice(0, 4).join(" ")}`);
+    for (const problem of problems) failures.push(`${window.name}, in euros: ${problem}`);
+  } finally {
+    await context.close().catch(() => {});
+  }
+  return failures;
+}
+
 /* ----------------------------------------------------------------- run --- */
 
 let puppeteer;
@@ -305,11 +379,12 @@ const failures = [];
 try {
   console.log(`Checkout — ${remote ?? `the export in out/, served as ${ORIGIN}`}`);
   console.log(
-    `\nBuy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped — and still shaped when the window changes width`,
+    `\nBuy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped — still shaped when the window changes width — and in euros when asked`,
   );
   for (const window of WINDOWS) {
     try {
       failures.push(...(await buy(browser, window)));
+      failures.push(...(await inEuros(browser, window)));
     } catch (reason) {
       failures.push(`${window.name}: the check itself broke — ${reason instanceof Error ? reason.message : String(reason)}`);
     }

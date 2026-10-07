@@ -18,8 +18,22 @@
  * from this file is an error it reports and refuses to touch.
  */
 
-/** ISO 4217, lower case, as Stripe writes it. Every price on the site is in dollars. */
+/** ISO 4217, lower case, as Stripe writes it. Every price is MADE in dollars: this is its own currency. */
 export const CURRENCY = "usd";
+
+/**
+ * THE OTHER CURRENCIES EACH PLAN IS SOLD IN (docs/features/0002-local-currency;
+ * Žilvinas 2026-10-06, "same $5 and €5 — so that people feel the product is
+ * meant for them"). The SAME NUMBER in each, not a conversion: a plan's
+ * `local` amounts sit on the dollar price as Stripe's currency_options, and
+ * a buyer the site places in that currency is charged in it. Adding a
+ * currency is one entry here and one amount per plan below; `npm test`
+ * then holds Stripe to it, and `npm run stripe:apply` adds it to the prices
+ * that lack it (adding an amount is the one edit Stripe allows a price).
+ */
+export const LOCAL_CURRENCIES = ["eur"] as const;
+export type LocalCurrency = (typeof LOCAL_CURRENCIES)[number];
+export type Currency = typeof CURRENCY | LocalCurrency;
 
 /**
  * ONE PRODUCT for the three plans: they are billing variants of the same
@@ -44,15 +58,22 @@ export type Plan = {
   lookupKey: string;
   /** Charged each period, in cents. */
   amount: number;
+  /** The same amount in each local currency, in its minor unit — see LOCAL_CURRENCIES. */
+  local: Record<LocalCurrency, number>;
   interval: "month" | "year";
   intervalCount: number;
 };
 
 export const PLANS: readonly Plan[] = [
-  { id: "1-month", lookupKey: "templates_1_month", amount: 1000, interval: "month", intervalCount: 1 },
-  { id: "3-months", lookupKey: "templates_3_months", amount: 2400, interval: "month", intervalCount: 3 },
-  { id: "12-months", lookupKey: "templates_12_months", amount: 6000, interval: "year", intervalCount: 1 },
+  { id: "1-month", lookupKey: "templates_1_month", amount: 1000, local: { eur: 1000 }, interval: "month", intervalCount: 1 },
+  { id: "3-months", lookupKey: "templates_3_months", amount: 2400, local: { eur: 2400 }, interval: "month", intervalCount: 3 },
+  { id: "12-months", lookupKey: "templates_12_months", amount: 6000, local: { eur: 6000 }, interval: "year", intervalCount: 1 },
 ];
+
+/** What a plan costs each period in a currency, in that currency's minor unit. */
+export function amountIn(plan: Pick<Plan, "amount" | "local">, currency: Currency): number {
+  return currency === CURRENCY ? plan.amount : plan.local[currency];
+}
 
 /** The length of one billing period in months — what the per-month figure divides by. */
 export function monthsIn(plan: Pick<Plan, "interval" | "intervalCount">): number {

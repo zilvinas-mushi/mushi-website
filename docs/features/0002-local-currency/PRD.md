@@ -1,14 +1,15 @@
 ---
-status: draft
+status: testing
 created: 2026-10-06
-last-updated: 2026-10-06
+last-updated: 2026-10-07
 last-updated-by: Zilvinas Aleksa
 ---
 
 # 0002 — Prices in the buyer's own currency · PRD
 
-**Draft, not started. Nothing here is built.** It is waiting on the three
-decisions at the end.
+**Built, waiting on two acts of a person** (2026-10-07): the live Stripe
+write and the merge order — see "Decisions" at the end. "go" was given on
+2026-10-06 ("can you do it with the cli?" — "go").
 
 ## Why
 
@@ -77,18 +78,32 @@ site, the webapp and Stripe have to agree on the currency for every buyer.
 3. **The fallback** — with the webapp unreachable, Submit lands on Stripe's
    hosted page in the same currency the sheet showed.
 
-## Decisions needed before this starts
+## Decisions
 
-- **D1 — Which currencies.** EUR for the euro area is the ask. GBP (UK) and
-  CHF (Switzerland) were mentioned earlier the same day; each is the same
-  work again in Stripe and one more column in the tests. Recommended: EUR
-  first, the mechanism built so the others are a line each.
-- **D2 — VAT.** A consumer in the EU is owed a price that includes VAT. At
-  €5 that is €4.20 to Mushi in Germany and less elsewhere, where $5 from the
-  USA is $5. Either that is accepted, or EU prices are not the same number.
-  (Already an open risk in 0001.)
-- **D3 — The webapp.** Its session endpoint has to take a currency. That is
-  work in the other repository and has to ship first or together.
+Taken on "go" (2026-10-06), as the recommendation stood; say so if any is
+wrong:
+
+- **D1 — Which currencies.** EUR, for the euro area. GBP and CHF are one
+  entry in `LOCAL_CURRENCIES`, one amount per plan, one pair of CSS lines
+  and one line in the head script's zone list each, when wanted.
+- **D2 — VAT.** €5 is €5: the EU price includes whatever VAT is due, so
+  Mushi keeps less of a euro sale than of a dollar one. (Open risk in 0001
+  still.)
+- **D3 — The webapp.** Done in the same stroke: zilvinas-mushi/mushi-app
+  PR #1. It ships FIRST.
+
+## What is left to a person
+
+1. Merge mushi-app PR #1 and let Vercel deploy it.
+2. `npm run stripe:apply -- --live --yes` — adds the three euro amounts to
+   the live prices; charges nothing. Until then the live layer of `npm test`
+   is red on purpose, and the site's PR cannot merge.
+3. Merge the site's PR (#4). Not before 1 and 2: it would show €5 and charge
+   $5.
+
+Known: Stripe's own hosted page (the fallback when the webapp is down, and
+the Payment Links) picks its currency by the buyer's location, not by the
+site's choice, so a VPN user could see €5 here and $5 there. Same number.
 
 ## Not in this
 
