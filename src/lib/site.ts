@@ -64,6 +64,16 @@ export const abs = (path: string) =>
 export const BOOKING_URL = "https://calendly.com/mushiagency/call";
 
 /**
+ * THE SITE'S OWN ADDRESS FOR A CALL (Žilvinas 2026-10-07): "www.mushi.agency/call"
+ * is what the FAQ answer says and links to, so that the address in the copy
+ * is one of ours and keeps working whatever the scheduler is. For now
+ * public/_redirects sends it on to BOOKING_URL; when the booking moves, that
+ * one line moves with it and the copy stays.
+ */
+export const CALL_PATH = "/call";
+export const CALL_ADDRESS = "www.mushi.agency/call";
+
+/**
  * Anchor the booking CTAs land on until BOOKING_URL points at a real
  * scheduler. Without this they target a non-existent #book-a-call and clicking
  * them does nothing.

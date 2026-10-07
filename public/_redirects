@@ -7,3 +7,6 @@
 /pages/waitlist    /                                  301
 /blogs/news        /                                  301
 /pages/templates   https://app.mushi.agency/templates 301
+# The site's own address for a call (CALL_PATH, src/lib/site.ts), sent on to
+# the scheduler for now — 302, so the address stays ours when it moves.
+/call              https://calendly.com/mushiagency/call 302
