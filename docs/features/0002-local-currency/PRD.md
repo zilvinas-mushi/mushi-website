@@ -7,9 +7,8 @@ last-updated-by: Zilvinas Aleksa
 
 # 0002 — Prices in the buyer's own currency · PRD
 
-**Built, waiting on two acts of a person** (2026-10-07): the live Stripe
-write and the merge order — see "Decisions" at the end. "go" was given on
-2026-10-06 ("can you do it with the cli?" — "go").
+**Live since 2026-10-07.** mushi-app #1 and #2, mushi-website #4, and the
+euro amounts on the live prices (`stripe:apply --live`, run by Žilvinas).
 
 ## Why
 
@@ -92,14 +91,18 @@ wrong:
 - **D3 — The webapp.** Done in the same stroke: zilvinas-mushi/mushi-app
   PR #1. It ships FIRST.
 
-## What is left to a person
+## Done, and one thing learnt on the way
 
-1. Merge mushi-app PR #1 and let Vercel deploy it.
-2. `npm run stripe:apply -- --live --yes` — adds the three euro amounts to
-   the live prices; charges nothing. Until then the live layer of `npm test`
-   is red on purpose, and the site's PR cannot merge.
-3. Merge the site's PR (#4). Not before 1 and 2: it would show €5 and charge
-   $5.
+Merged in the order the plan said: the webapp first, then the live Stripe
+write, then the site. The live checkout gate passes from the Netherlands
+in euros and from CI in dollars.
+
+The first look at the live sheet in euros showed Stripe offering KLARNA
+beside the card — a euro session for a Dutch buyer gets whatever the
+Dashboard enables, where a dollar one got a card and Link — and the card
+block became "Card | Klarna" tabs. The webapp's session now names its
+methods, card and Link (mushi-app #2). Other methods for the EU (iDEAL,
+SEPA, Bancontact) are a product decision and a sheet redesign, not a flag.
 
 Known: Stripe's own hosted page (the fallback when the webapp is down, and
 the Payment Links) picks its currency by the buyer's location, not by the
