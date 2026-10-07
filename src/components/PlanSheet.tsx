@@ -390,9 +390,25 @@ export function PlanSheet() {
   // off screen, the whole time the sheet was open and snapped back the
   // instant the lock came off. Scrolling inside the sheet's own panel is
   // still allowed when it has somewhere to go (the phone).
+  //
+  // AND THE ROOT IS HELD STILL AS WELL (Žilvinas 2026-10-07, "you can scroll
+  // background with the popup?? what?"). Swallowing the events was not
+  // enough once the payment step was Stripe's: a wheel over its card fields
+  // lands in Stripe's iframe, which this document never hears about, and
+  // the scroll chains out of the frame into the page. So while the sheet is
+  // open <html> — the viewport's scroller, which sticky still answers to;
+  // the trouble above was overflow on BODY — is given overflow hidden, and
+  // a scroll that chains out of a frame finds nowhere to go. The scrollbar
+  // it takes away is paid for with padding, so nothing shifts. Touch has
+  // its own cure: touch-action on the frames' boxes (StripePay).
   useEffect(() => {
     if (!mounted) return;
     const panel = panelRef.current;
+    const root = document.documentElement;
+    const gutter = window.innerWidth - root.clientWidth;
+    const was = { overflowY: root.style.overflowY, paddingRight: document.body.style.paddingRight };
+    root.style.overflowY = "hidden";
+    if (gutter > 0) document.body.style.paddingRight = `${gutter}px`;
     const inPanel = (t: EventTarget | null) =>
       !!panel && t instanceof Node && panel.contains(t) && panel.scrollHeight > panel.clientHeight;
     const block = (e: Event) => {
@@ -413,6 +429,8 @@ export function PlanSheet() {
       document.removeEventListener("wheel", block);
       document.removeEventListener("touchmove", block);
       document.removeEventListener("keydown", onKey);
+      root.style.overflowY = was.overflowY;
+      document.body.style.paddingRight = was.paddingRight;
     };
   }, [mounted]);
 
