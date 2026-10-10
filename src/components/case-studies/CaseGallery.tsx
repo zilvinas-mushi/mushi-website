@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Img } from "./Img";
+import { Img } from "@/components/shared/Img";
 
 /**
  * The stills at the foot of a case study.

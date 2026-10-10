@@ -19,69 +19,9 @@
     "w": 1600,
     "h": 1185
   },
-  "akvile-zelnyte1.webp": {
-    "w": 240,
-    "h": 240
-  },
   "background-light.webp": {
     "w": 1600,
     "h": 1600
-  },
-  "bluechew-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "bluechew.webp": {
-    "w": 900,
-    "h": 1595
-  },
-  "case-breezit-cut.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-breezit-v2-sm.webp": {
-    "w": 700,
-    "h": 700
-  },
-  "case-breezit-v2.webp": {
-    "w": 1200,
-    "h": 1200
-  },
-  "case-breezit.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-eany-cut.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-eany-v2-sm.webp": {
-    "w": 700,
-    "h": 700
-  },
-  "case-eany-v2.webp": {
-    "w": 1200,
-    "h": 1200
-  },
-  "case-eany.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-holo-cut.webp": {
-    "w": 1000,
-    "h": 1000
-  },
-  "case-holo-v2-sm.webp": {
-    "w": 700,
-    "h": 700
-  },
-  "case-holo-v2.webp": {
-    "w": 1200,
-    "h": 1200
-  },
-  "case-holo.webp": {
-    "w": 1000,
-    "h": 1000
   },
   "case-studies/art-breezit-phone.webp": {
     "w": 393,
@@ -435,77 +375,269 @@
     "w": 900,
     "h": 1600
   },
-  "case-we-interiors-macbook.webp": {
-    "w": 680,
-    "h": 680
-  },
   "case-we-interiors-v2.webp": {
     "w": 680,
     "h": 680
-  },
-  "case-we-interiors-v4-sm.webp": {
-    "w": 700,
-    "h": 694
-  },
-  "case-we-interiors-v4.webp": {
-    "w": 1200,
-    "h": 1190
-  },
-  "celemi-pouch-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "celemi-pouch.webp": {
-    "w": 900,
-    "h": 1595
-  },
-  "celemi-serum-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "celemi-serum.webp": {
-    "w": 900,
-    "h": 1595
-  },
-  "cta-card-phone.webp": {
-    "w": 1380,
-    "h": 1280
-  },
-  "deividas-kovger2.webp": {
-    "w": 240,
-    "h": 240
-  },
-  "dogfood-real-results-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "dogfood-real-results.webp": {
-    "w": 900,
-    "h": 1595
   },
   "effects-layer.webp": {
     "w": 2400,
     "h": 1696
   },
-  "emoji-sunglasses.png": {
+  "home/akvile-zelnyte1.webp": {
+    "w": 240,
+    "h": 240
+  },
+  "home/badges/firstpick.webp": {
+    "w": 192,
+    "h": 192
+  },
+  "home/badges/foreplay.webp": {
+    "w": 192,
+    "h": 192
+  },
+  "home/badges/trustpilot.webp": {
+    "w": 192,
+    "h": 192
+  },
+  "home/bluechew-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/bluechew.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/case-breezit-cut.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "home/case-breezit-v2-sm.webp": {
+    "w": 700,
+    "h": 700
+  },
+  "home/case-breezit-v2.webp": {
+    "w": 1200,
+    "h": 1200
+  },
+  "home/case-breezit.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "home/case-eany-cut.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "home/case-eany-v2-sm.webp": {
+    "w": 700,
+    "h": 700
+  },
+  "home/case-eany-v2.webp": {
+    "w": 1200,
+    "h": 1200
+  },
+  "home/case-eany.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "home/case-holo-cut.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "home/case-holo-v2-sm.webp": {
+    "w": 700,
+    "h": 700
+  },
+  "home/case-holo-v2.webp": {
+    "w": 1200,
+    "h": 1200
+  },
+  "home/case-holo.webp": {
+    "w": 1000,
+    "h": 1000
+  },
+  "home/case-we-interiors-macbook.webp": {
+    "w": 680,
+    "h": 680
+  },
+  "home/case-we-interiors-v4-sm.webp": {
+    "w": 700,
+    "h": 694
+  },
+  "home/case-we-interiors-v4.webp": {
+    "w": 1200,
+    "h": 1190
+  },
+  "home/celemi-pouch-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/celemi-pouch.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/celemi-serum-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/celemi-serum.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/creatives/bluechew-logo.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "home/creatives/celemi-logo.webp": {
+    "w": 45,
+    "h": 45
+  },
+  "home/creatives/persybooths-logo.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "home/creatives/sintra-logo.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "home/creatives/superiorcarepet-logo.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "home/creatives/tevaplanter-logo.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "home/creatives/tryholo-logo.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "home/creatives/unive-logo.webp": {
+    "w": 96,
+    "h": 96
+  },
+  "home/cta-card-phone.webp": {
+    "w": 1380,
+    "h": 1280
+  },
+  "home/deividas-kovger2.webp": {
+    "w": 240,
+    "h": 240
+  },
+  "home/dogfood-real-results-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/dogfood-real-results.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/emoji-sunglasses.png": {
     "w": 112,
     "h": 112
   },
-  "erika-zakareviciute1.webp": {
+  "home/erika-zakareviciute1.webp": {
     "w": 240,
     "h": 240
   },
-  "hana-skomra-budre1.webp": {
+  "home/floater-facebook.webp": {
+    "w": 1200,
+    "h": 1200
+  },
+  "home/floater-google.webp": {
+    "w": 1080,
+    "h": 1080
+  },
+  "home/floater-instagram.webp": {
+    "w": 640,
+    "h": 640
+  },
+  "home/floater-tiktok.webp": {
+    "w": 980,
+    "h": 980
+  },
+  "home/hana-skomra-budre1.webp": {
     "w": 240,
     "h": 240
   },
-  "hero-light-mobile.webp": {
+  "home/hero-light-mobile.webp": {
     "w": 640,
     "h": 1539
   },
-  "hero-light.webp": {
+  "home/hero-light.webp": {
     "w": 1920,
     "h": 1080
+  },
+  "home/iphone11.webp": {
+    "w": 1600,
+    "h": 1600
+  },
+  "home/iphone21.webp": {
+    "w": 1600,
+    "h": 1600
+  },
+  "home/juste-semetaite1.webp": {
+    "w": 240,
+    "h": 240
+  },
+  "home/lukas-rasciauskas1.webp": {
+    "w": 80,
+    "h": 80
+  },
+  "home/macbook-clean.webp": {
+    "w": 680,
+    "h": 674
+  },
+  "home/rectangle161125747.webp": {
+    "w": 1600,
+    "h": 931
+  },
+  "home/sintra-soshie-ad-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/sintra-soshie-ad.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/sintra-soshie-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/sintra-soshie.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/tevaplanter-ad-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/tevaplanter-ad.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/tryholo-10x-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/tryholo-10x.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/unive-dream-college-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/unive-dream-college.webp": {
+    "w": 900,
+    "h": 1595
+  },
+  "home/used-by-10000-sm.webp": {
+    "w": 512,
+    "h": 908
+  },
+  "home/used-by-10000.webp": {
+    "w": 900,
+    "h": 1595
   },
   "image139.webp": {
     "w": 631,
@@ -555,57 +687,13 @@
     "w": 1042,
     "h": 956
   },
-  "image42.webp": {
-    "w": 640,
-    "h": 640
-  },
-  "image43.webp": {
-    "w": 1200,
-    "h": 1200
-  },
-  "image44.webp": {
-    "w": 1080,
-    "h": 1080
-  },
-  "image45.webp": {
-    "w": 980,
-    "h": 980
-  },
   "iphone-front1.webp": {
     "w": 1500,
     "h": 3000
   },
-  "iphone11.webp": {
-    "w": 1600,
-    "h": 1600
-  },
-  "iphone21.webp": {
-    "w": 1600,
-    "h": 1600
-  },
-  "juste-semetaite1.webp": {
-    "w": 240,
-    "h": 240
-  },
   "logo-without-bg-white102.webp": {
     "w": 672,
     "h": 199
-  },
-  "lukas-rasciauskas1.webp": {
-    "w": 80,
-    "h": 80
-  },
-  "macbook-clean.webp": {
-    "w": 680,
-    "h": 674
-  },
-  "og-mushi-rail.jpg": {
-    "w": 2400,
-    "h": 1260
-  },
-  "og-mushi.jpg": {
-    "w": 1200,
-    "h": 1200
   },
   "rectangle161124919.webp": {
     "w": 90,
@@ -635,10 +723,6 @@
     "w": 378,
     "h": 68
   },
-  "rectangle161125747.webp": {
-    "w": 1600,
-    "h": 931
-  },
   "rectangle161125751.webp": {
     "w": 1422,
     "h": 1392
@@ -667,21 +751,17 @@
     "w": 960,
     "h": 1775
   },
-  "sintra-soshie-ad-sm.webp": {
-    "w": 512,
-    "h": 908
+  "shared/logos/we-interiors.webp": {
+    "w": 849,
+    "h": 153
   },
-  "sintra-soshie-ad.webp": {
-    "w": 900,
-    "h": 1595
+  "shared/og-mushi-rail.jpg": {
+    "w": 2400,
+    "h": 1260
   },
-  "sintra-soshie-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "sintra-soshie.webp": {
-    "w": 900,
-    "h": 1595
+  "shared/og-mushi.jpg": {
+    "w": 1200,
+    "h": 1200
   },
   "templates/access-banner-emoji-glyph.webp": {
     "w": 112,
@@ -1035,40 +1115,8 @@
     "w": 42,
     "h": 42
   },
-  "tevaplanter-ad-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "tevaplanter-ad.webp": {
-    "w": 900,
-    "h": 1595
-  },
-  "tryholo-10x-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "tryholo-10x.webp": {
-    "w": 900,
-    "h": 1595
-  },
-  "unive-dream-college-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "unive-dream-college.webp": {
-    "w": 900,
-    "h": 1595
-  },
   "untitled2.webp": {
     "w": 1600,
     "h": 1600
-  },
-  "used-by-10000-sm.webp": {
-    "w": 512,
-    "h": 908
-  },
-  "used-by-10000.webp": {
-    "w": 900,
-    "h": 1595
   }
 }

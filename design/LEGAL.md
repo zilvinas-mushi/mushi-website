@@ -2,7 +2,7 @@
 
 Built 2026-10-10 from the Figma page **"WEB: Legal"** (canvas `3803:7658`)
 over the desktop app's local MCP server (`http://127.0.0.1:3845/mcp`, see
-README). Three documents, one page: the layout is `src/components/LegalPage.tsx`,
+README). Three documents, one page: the layout is `src/components/legal/LegalPage.tsx`,
 the words are `src/lib/legal.ts`. Change the layout once and all three follow.
 
 ## Nodes (verified 2026-10-10)
@@ -76,7 +76,7 @@ the modal values. The footer follows 60 under the last line.
 
 The frames' raster was soft (Žilvinas: "make this quality max … or remake
 it, as clear as possible"; of the live page, "tragic!!!"), so
-`src/components/LegalHero.tsx` draws it as vector in the 1920 × 392 design
+`src/components/legal/LegalHero.tsx` draws it as vector in the 1920 × 392 design
 space, and both crops above are windows on that one scene (the phone's is
 `viewBox -2 0 684 388`, mirrored). The two WebP crops are gone. What was
 read off the master:

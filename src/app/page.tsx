@@ -1,7 +1,7 @@
-import { SiteHeader } from "@/components/SiteHeader";
-import { HeroPanels } from "@/components/HeroPanels";
-import { HeroFloaters } from "@/components/HeroFloaters";
-import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { HeroPanels } from "@/components/home/HeroPanels";
+import { HeroFloaters } from "@/components/home/HeroFloaters";
+import { SiteFooter } from "@/components/layout/SiteFooter";
 import {
   Hero,
   SocialProof,
@@ -9,7 +9,7 @@ import {
   CaseStudies,
   Testimonials,
   FinalCta,
-} from "@/components/Sections";
+} from "@/components/home/HomeSections";
 
 /**
  * Home page.

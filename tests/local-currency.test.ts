@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Money } from "@/components/Money";
+import { Money } from "@/components/shared/Money";
 import { SYMBOL, inCurrency, money } from "@/lib/money";
 import { PAINT_GATE_SCRIPT } from "@/lib/paint-gate-script";
 import { CURRENCY, LOCAL_CURRENCIES, PLANS, amountIn } from "@/lib/pricing";
@@ -93,12 +93,12 @@ describe("the page", () => {
   });
 
   it("sends every plan figure through <Money>", () => {
-    const sheet = read("src/components/PlanSheet.tsx");
+    const sheet = read("src/components/checkout/PlanSheet.tsx");
     for (const figure of ["o.save", "o.total", "o.was", "o.price", "plan.price", "due.was", "due.price"]) {
       expect(sheet).toContain(`<Money>{${figure}}</Money>`);
       expect(sheet).not.toMatch(new RegExp(`[^>]\\{${figure.replace(".", "\\.")}\\}`));
     }
-    const sections = read("src/components/TemplateSections.tsx");
+    const sections = read("src/components/templates/TemplateSections.tsx");
     expect(sections).toContain("<Money>{a.templates.figure}</Money>");
     expect(sections).toContain('{mushi && v.includes("$") ? <Money>{v}</Money> : v}');
   });

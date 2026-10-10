@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { LegalPage } from "@/components/LegalPage";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import { LegalPage } from "@/components/legal/LegalPage";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { LEGAL_DOCS, legalHref } from "@/lib/legal";
 import { APP_URL, OG_IMAGE, SITE_NAME, SITE_TAGLINE, SITE_URL, abs } from "@/lib/site";
 

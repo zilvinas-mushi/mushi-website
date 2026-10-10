@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { PlanSheet } from "@/components/PlanSheet";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { PlanSheet } from "@/components/checkout/PlanSheet";
 import {
   CaseStudiesFieldArt,
   CaseStudiesHero,
   CaseStudiesRails,
   ReadyToScale,
-} from "@/components/CaseStudySections";
+} from "@/components/case-studies/CaseStudySections";
 import { CASE_STUDIES_PAGE } from "@/lib/content";
 import {
   BOOKING_URL,

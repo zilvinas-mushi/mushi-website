@@ -47,7 +47,7 @@ by a future session, or by you.
 The two footer nodes are in this same file. `4167:280`'s children are numbered `4134:6xx` — the
 band `4134:616`, the field `4134:619`, the button `4134:621`, the rule
 `4134:634`, the star `4134:637`, the social group `4134:653` — and those ids are
-quoted at the point of use in `src/components/SiteFooter.tsx`.
+quoted at the point of use in `src/components/layout/SiteFooter.tsx`.
 [SECTIONS.md](SECTIONS.md) holds every number they gave up, so neither node has
 to be read again.
 

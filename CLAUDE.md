@@ -12,6 +12,20 @@ Static marketing site for mushi.agency. Deployed to Cloudflare Pages.
 - next/image optimization is off. Use explicit width/height, WebP sources,
   lazy-load below the fold, eager-load the hero.
 
+## Where things live
+Components and artwork are grouped by the page they belong to, and anything
+two pages use is `shared`:
+- `src/components/{home,templates,case-studies,legal,checkout}/` — one folder
+  per page (checkout is the plan sheet, opened from two pages).
+- `src/components/layout/` — header, footer, paint gate: on every page.
+- `src/components/shared/` — `Img`, `Logo`, `Money`, `ArrowDisc`/`Pill`,
+  `LazyImg`, the volume icons: used by more than one page.
+- `public/images/{home,templates,case-studies,shared}/` and
+  `public/videos/{home,case-studies}/` the same way. `shared/logos` are the
+  client marks (home and /case-studies), `shared/og-*` the social images.
+A new page gets its own folder in each. Nothing goes at the root of
+`components/` or `images/`.
+
 ## Nothing paints half-built
 **A visitor must never watch this site assemble itself.** No headline on flat
 black while the hero's lighting is still on the wire, no fallback face swapping
@@ -29,7 +43,7 @@ a fade-in once the fade has finished, which billed the whole 400ms to LCP.
 It is INLINE and not a component for a reason: inside React it could not
 start until the bundle had hydrated, which put the reveal — and Largest
 Contentful Paint with it — seconds behind the artwork it was waiting for.
-`PaintGate.tsx` is now only the thing that re-arms it on a route change.
+`layout/PaintGate.tsx` is now only the thing that re-arms it on a route change.
 
 The same script owns the other half of the bargain: **below the fold, nothing
 is fetched until the first screen is done — and then all of it is, in order,
@@ -121,7 +135,7 @@ https://mushi.agency` runs it against the live site.
   are still on screen in the same amounts, just swapped. Label and arrow stay
   white at both ends. Both pills also fly the arrow out along its diagonal and
   bring a second one in from behind it. All of it lives in one component —
-  `ArrowDisc` in `Sections.tsx` — so the two can never drift apart.
+  `ArrowDisc` in `shared/ArrowDisc.tsx` — so the two can never drift apart.
 
 ## Payments
 **What Mushi charges lives in one file, `src/lib/pricing.ts`.** Stripe is held
@@ -160,7 +174,7 @@ price in one place only and `npm test` goes red. PRD and plan:
   400ms, Buy never holds, no plan's Stripe form is built again. `npm test`
   only reads the sheet's source — it stayed green while a buyer who changed
   plan waited for Stripe a second time (2026-10-05). A change to
-  `PlanSheet.tsx`, `StripePay.tsx` or `lib/checkout.ts` is not done until this
+  `checkout/PlanSheet.tsx`, `checkout/StripePay.tsx` or `lib/checkout.ts` is not done until this
   passes. Each plan keeps its own `StripePay`; never key one by the chosen
   plan. `-- --url https://mushi.agency` checks the live site.
 - **Nothing from Stripe until the sheet is opened, and the gate checks that

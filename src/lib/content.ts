@@ -97,10 +97,10 @@ export function navHref(
  * design/TOKENS.md if an asset is ever replaced.
  */
 export const HERO_FLOATERS = [
-  { name: "Instagram", image: "image42.webp", ink: 1.0, x: 20.51, y: 24.73, rotate: "-19.81deg" },
-  { name: "Google", image: "image44.webp", ink: 0.754, x: 79.98, y: 29.06, rotate: "26.63deg" },
-  { name: "TikTok", image: "image45.webp", ink: 0.755, x: 19.46, y: 66.54, rotate: "12.88deg" },
-  { name: "Facebook", image: "image43.webp", ink: 0.997, x: 82.86, y: 68.85, rotate: "-15.24deg" },
+  { name: "Instagram", image: "home/floater-instagram.webp", ink: 1.0, x: 20.51, y: 24.73, rotate: "-19.81deg" },
+  { name: "Google", image: "home/floater-google.webp", ink: 0.754, x: 79.98, y: 29.06, rotate: "26.63deg" },
+  { name: "TikTok", image: "home/floater-tiktok.webp", ink: 0.755, x: 19.46, y: 66.54, rotate: "12.88deg" },
+  { name: "Facebook", image: "home/floater-facebook.webp", ink: 0.997, x: 82.86, y: 68.85, rotate: "-15.24deg" },
 ] as const;
 
 /**
@@ -387,7 +387,7 @@ export const SOCIAL_PROOF = {
   /**
    * Client wordmarks in the order the design lays them out.
    *
-   * Official logo SVGs supplied by Žilvinas on 2026-07-28, in /public/logos.
+   * Official logo SVGs supplied by Žilvinas on 2026-07-28, in /public/images/shared/logos.
    * Widths are the artwork's own viewBox width so each mark keeps its true
    * proportions; they are NOT normalised to a common width, which would
    * distort the relative sizing the design intends.
@@ -452,7 +452,7 @@ export const SOCIAL_PROOF = {
  * `handle` is the account the ad ran under and `caption` is the line beneath
  * it — both render in the card's account header, matching the design.
  * `avatar` is optional: cards fall back to a neutral initial disc rather than
- * a stand-in photo. Put avatars in /public/creatives, media in /public/images.
+ * a stand-in photo. Put avatars in /public/images/home/creatives, media in /public/images/home.
  *
  * `w`/`h` are the media's intrinsic pixel size. They are required — every
  * image needs explicit dimensions (CLAUDE.md) so the rail does not reflow as
@@ -497,12 +497,12 @@ export const CREATIVES = {
     // Only these four survived extraction. The design shows roughly ten, but
     // the get_design_context response truncated at 100KB before reaching the
     // rest, so their assets were never exported. Supply the remaining creative
-    // files to complete the rail — see public/creatives/README.md.
+    // files to complete the rail — see public/images/home/creatives/README.md.
     {
       handle: "sintra.ai",
       caption: "AI Agents Comparison Video Ad",
-      image: "sintra-soshie-ad.webp",
-      video: "sintra-soshie-ad.mp4",
+      image: "home/sintra-soshie-ad.webp",
+      video: "home/sintra-soshie-ad.mp4",
       w: 900,
       h: 1595,
       avatar: "sintra-logo.webp",
@@ -511,7 +511,7 @@ export const CREATIVES = {
     {
       handle: "celemi",
       caption: "Minimalistic Skincare Static Ad",
-      image: "celemi-pouch.webp",
+      image: "home/celemi-pouch.webp",
       w: 900,
       h: 1595,
       avatar: "celemi-logo.webp",
@@ -519,8 +519,8 @@ export const CREATIVES = {
     {
       handle: "tryholo.ai",
       caption: "AI Marketing UGC Video Ad",
-      image: "tryholo-10x.webp",
-      video: "tryholo-10x.mp4",
+      image: "home/tryholo-10x.webp",
+      video: "home/tryholo-10x.mp4",
       w: 900,
       h: 1595,
       avatar: "tryholo-logo.webp",
@@ -529,7 +529,7 @@ export const CREATIVES = {
     {
       handle: "tevaplanter",
       caption: "Planter Comparison Static Ad",
-      image: "tevaplanter-ad.webp",
+      image: "home/tevaplanter-ad.webp",
       w: 900,
       h: 1595,
       avatar: "tevaplanter-logo.webp",
@@ -552,8 +552,8 @@ export const CREATIVES = {
     {
       handle: "SuperiorCarePet",
       caption: "Dog Food Voiceover Video Ad",
-      image: "dogfood-real-results.webp",
-      video: "dogfood-real-results.mp4",
+      image: "home/dogfood-real-results.webp",
+      video: "home/dogfood-real-results.mp4",
       w: 900,
       h: 1595,
       avatar: "superiorcarepet-logo.webp",
@@ -562,7 +562,7 @@ export const CREATIVES = {
     {
       handle: "unive",
       caption: "Dream College Tool Static Ad",
-      image: "unive-dream-college.webp",
+      image: "home/unive-dream-college.webp",
       w: 900,
       h: 1595,
       avatar: "unive-logo.webp",
@@ -571,8 +571,8 @@ export const CREATIVES = {
     {
       handle: "celemi",
       caption: "Serum Product Video Ad",
-      image: "celemi-serum.webp",
-      video: "celemi-serum.mp4",
+      image: "home/celemi-serum.webp",
+      video: "home/celemi-serum.mp4",
       w: 900,
       h: 1595,
       avatar: "celemi-logo.webp",
@@ -580,7 +580,7 @@ export const CREATIVES = {
     {
       handle: "bluechew",
       caption: "Tablet Benefit Static Ad",
-      image: "bluechew.webp",
+      image: "home/bluechew.webp",
       w: 900,
       h: 1595,
       avatar: "bluechew-logo.webp",
@@ -589,8 +589,8 @@ export const CREATIVES = {
     {
       handle: "PersyBooths",
       caption: "Booth Storytelling Video Ad",
-      image: "used-by-10000.webp",
-      video: "used-by-10000.mp4",
+      image: "home/used-by-10000.webp",
+      video: "home/used-by-10000.mp4",
       w: 900,
       h: 1595,
       avatar: "persybooths-logo.webp",
@@ -599,7 +599,7 @@ export const CREATIVES = {
     {
       handle: "sintra.ai",
       caption: "3D Character Hook Video Ad",
-      image: "sintra-soshie.webp",
+      image: "home/sintra-soshie.webp",
       w: 900,
       h: 1595,
       avatar: "sintra-logo.webp",
@@ -667,7 +667,7 @@ export const CASE_STUDIES = {
       // nothing to arrange:
       //
       //   python3 scripts/build-case-cards.py breezit
-      image: "case-breezit-v2.webp",
+      image: "home/case-breezit-v2.webp",
       logo: "breezit.svg",
       logoW: 98,
       // Figma's fill with the device deleted: ONE radial ramp, #C5611E out of
@@ -701,7 +701,7 @@ export const CASE_STUDIES = {
       // have to be re-seated on it:
       //
       //   python3 scripts/build-case-cards.py holo
-      image: "case-holo-v2.webp",
+      image: "home/case-holo-v2.webp",
       logo: "holo.svg",
       logoW: 62,
       // Same ramp as Breezit, same 27% near-black share of the square — only
@@ -723,8 +723,8 @@ export const CASE_STUDIES = {
       // onto the export as a plain rotation + scale (both phones independently
       // at 0.794 / 60deg). Every visible pixel is still the export's:
       //
-      //   python3 scripts/key-case-artwork.py case-eany.webp \
-      //     case-eany-cut.webp --silhouette iphone21.webp,iphone11.webp
+      //   python3 scripts/key-case-artwork.py home/case-eany.webp \
+      //     home/case-eany-cut.webp --silhouette home/iphone21.webp,home/iphone11.webp
       //
       // SUPERSEDED, same complaint as we interiors: every pixel of that came
       // from a 1000-square export driving a 650px slot, so the screen copy on
@@ -742,7 +742,7 @@ export const CASE_STUDIES = {
       // and the card no longer matched Figma. Shadows stay.
       //
       //   python3 scripts/build-case-cards.py eany
-      image: "case-eany-v2.webp",
+      image: "home/case-eany-v2.webp",
       logo: "eany.svg",
       logoW: 96,
       // The only fill here read straight off Figma's own gradient panel rather
@@ -773,14 +773,14 @@ export const CASE_STUDIES = {
       //   python3 scripts/build-we-interiors-card.py
       //
       // SUPERSEDED by a straight export. That script's output
-      // (case-we-interiors-macbook.webp) is 680 square — 0.7x the pixels the
+      // (home/case-we-interiors-macbook.webp) is 680 square — 0.7x the pixels the
       // 650px slot needs at dpr 2, i.e. upscaled and soft, which is exactly the
       // quality complaint. Žilvinas then supplied the whole card already
       // composed at 2720 square, so there is nothing left to build: this is
       // that file at 1950, alpha intact so the card's own fill still shows
       // through behind the laptop. Keep the script for reference in case the
       // screen content ever has to be re-mapped.
-      image: "case-we-interiors-v4.webp",
+      image: "home/case-we-interiors-v4.webp",
       logo: "we-interiors.webp",
       logoW: 133,
       bg: "radial-gradient(ellipse 114% 114% at 85% 97%, #d9a422 0%, #000000 100%)",
@@ -832,7 +832,7 @@ export const TESTIMONIALS = {
       iso: "2024-11-01",
       author: "David Kovger",
       country: "GB",
-      avatar: "deividas-kovger2.webp",
+      avatar: "home/deividas-kovger2.webp",
     },
     {
       title: "Media Buying Best Kept Secret...",
@@ -843,7 +843,7 @@ export const TESTIMONIALS = {
       iso: "2025-01-23",
       author: "Hana Skomra",
       country: "PL",
-      avatar: "hana-skomra-budre1.webp",
+      avatar: "home/hana-skomra-budre1.webp",
     },
     {
       title: "They make ads that convert",
@@ -855,7 +855,7 @@ export const TESTIMONIALS = {
       iso: "2024-11-11",
       author: "Akvilė Želnytė",
       country: "CH",
-      avatar: "akvile-zelnyte1.webp",
+      avatar: "home/akvile-zelnyte1.webp",
     },
     {
       title: "Professional and reliable partner",
@@ -869,7 +869,7 @@ export const TESTIMONIALS = {
       iso: "2025-01-27",
       author: "Erika Zakarevičiūtė",
       country: "LT",
-      avatar: "erika-zakareviciute1.webp",
+      avatar: "home/erika-zakareviciute1.webp",
     },
     {
       title: "Amazing quality ads",
@@ -892,7 +892,7 @@ export const TESTIMONIALS = {
       author: "Lukas Raščiauskas",
       country: "LT",
       // `initials` stays as the fallback if the file ever goes missing.
-      avatar: "lukas-rasciauskas1.webp",
+      avatar: "home/lukas-rasciauskas1.webp",
       initials: "LR",
     },
     {
@@ -904,7 +904,7 @@ export const TESTIMONIALS = {
       iso: "2024-09-12",
       author: "Justė Semetaitė",
       country: "LT",
-      avatar: "juste-semetaite1.webp",
+      avatar: "home/juste-semetaite1.webp",
     },
   ] satisfies Testimonial[],
 } as const;

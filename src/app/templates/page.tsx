@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { PlanSheet } from "@/components/PlanSheet";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { PlanSheet } from "@/components/checkout/PlanSheet";
 import {
   TemplatesAccess,
   TemplatesBgFallbacks,
@@ -13,7 +13,7 @@ import {
   TemplatesProcess,
   TemplatesShowcase,
   TemplatesTeam,
-} from "@/components/TemplateSections";
+} from "@/components/templates/TemplateSections";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";

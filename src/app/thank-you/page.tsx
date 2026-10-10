@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Logo } from "@/components/Logo";
+import { Logo } from "@/components/shared/Logo";
 import { APP_URL, CONTACT_EMAIL } from "@/lib/site";
 
 /**

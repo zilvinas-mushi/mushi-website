@@ -1,7 +1,7 @@
-import { Img } from "./Img";
-import { CaseGallery } from "./CaseGallery";
-import { Broken } from "./CaseStudySections";
-import { ArrowDisc } from "./Sections";
+import { Img } from "@/components/shared/Img";
+import { CaseGallery } from "@/components/case-studies/CaseGallery";
+import { Broken } from "@/components/case-studies/CaseStudySections";
+import { ArrowDisc } from "@/components/shared/ArrowDisc";
 import { CASE_STUDY_CALL, CASE_STUDY_DETAILS, type CaseStudySlug } from "@/lib/content";
 import { BOOKING_URL, CASE_STUDY_CALL_ID, CASE_STUDY_HERO_CTA_ID, bookingTarget } from "@/lib/site";
 

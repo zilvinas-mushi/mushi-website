@@ -1,6 +1,7 @@
 import type { Creative } from "@/lib/content";
-import { CreativeVideo } from "./CreativeVideo";
-import { CARD_SIZES, srcSet } from "./creative-media";
+import { LazyImg } from "@/components/shared/LazyImg";
+import { CreativeVideo } from "@/components/home/CreativeVideo";
+import { CARD_SIZES, srcSet } from "@/components/home/creative-media";
 
 /**
  * Instagram-post card used in the creatives rail.
@@ -14,65 +15,16 @@ import { CARD_SIZES, srcSet } from "./creative-media";
  * export and this avoids shipping a dependency for six glyphs.
  */
 
-/**
- * A DEFERRED <img> for this card: the URL rides in data-src (and data-srcset)
- * and the inline paint-gate script moves it across as the card comes within
- * range, with a <noscript> twin for visitors and crawlers without JavaScript
- * — the same contract Img keeps (CLAUDE.md, "below the fold, nothing is
- * fetched until it is nearly in view").
- *
- * WHY NOT `loading="lazy"` ALONE (2026-09-25): Chrome starts a lazy image
- * 1250px ahead of the viewport, 3000 on a slow link, and the rail sits inside
- * that window on every phone — so the stills, avatars and the five action
- * icons (some 90 KB together) were on the wire before the first screen had
- * painted, sharing the pipe with the fonts and the hero the paint gate was
- * waiting on. PageSpeed counted every byte of it against the hero's Largest
- * Contentful Paint. The rail's own arming (CreativesRail) already calls the
- * group loader, so nothing about the marquee changes: the cards are still
- * fully painted two viewports before anyone reaches them.
- */
-export function LazyImg({
-  src,
-  srcSet,
-  sizes,
-  alt,
-  width,
-  height,
-  className,
-  ariaHidden,
-}: {
-  src: string;
-  srcSet?: string;
-  sizes?: string;
-  alt: string;
-  width: number;
-  height: number;
-  className: string;
-  ariaHidden?: boolean;
-}) {
-  const shared = { width, height, className, decoding: "async" as const, ...(ariaHidden ? { "aria-hidden": true as const } : {}) };
-  return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img data-src={src} data-srcset={srcSet} sizes={srcSet ? sizes : undefined} alt={alt} loading="lazy" {...shared} />
-      <noscript>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} srcSet={srcSet} sizes={srcSet ? sizes : undefined} alt={alt} loading="lazy" {...shared} />
-      </noscript>
-    </>
-  );
-}
-
 function Verified() {
   return (
     // The design's own badge artwork, not a redrawn tick.
-    <LazyImg src="/creatives/icons/verified.svg" alt="Verified account" width={21} height={21} className="size-[0.9375rem] shrink-0" />
+    <LazyImg src="/images/home/creatives/icons/verified.svg" alt="Verified account" width={21} height={21} className="size-[0.9375rem] shrink-0" />
   );
 }
 
 /**
  * Action-row icons — the design's own exported artwork from
- * /public/creatives/icons, not redrawn approximations. Each keeps its native
+ * /public/images/home/creatives/icons, not redrawn approximations. Each keeps its native
  * aspect ratio (they are not square: 45x41, 43x39, 45x41, 46x42) and renders
  * at a fixed 21px height; forcing them square is what made earlier versions
  * look stretched. The browser fetches each file once and reuses it across all
@@ -80,7 +32,7 @@ function Verified() {
  */
 function ActionIcon({ name, w, h }: { name: string; w: number; h: number }) {
   return (
-    <LazyImg src={`/creatives/icons/${name}.svg`} alt="" width={w} height={h} className="h-[2rem] w-auto" ariaHidden />
+    <LazyImg src={`/images/home/creatives/icons/${name}.svg`} alt="" width={w} height={h} className="h-[2rem] w-auto" ariaHidden />
   );
 }
 
@@ -98,7 +50,7 @@ export function CreativeCard({ item }: { item: Creative }) {
     <article className="w-[17.5rem] shrink-0 snap-start overflow-hidden rounded-[0.9375rem] bg-white sm:w-[18.75rem]">
       <header className="flex items-center gap-2.5 px-3 py-2.5">
         {item.avatar ? (
-          <LazyImg src={`/creatives/${item.avatar}`} alt="" width={32} height={32} className="size-8 shrink-0 rounded-full object-cover" />
+          <LazyImg src={`/images/home/creatives/${item.avatar}`} alt="" width={32} height={32} className="size-8 shrink-0 rounded-full object-cover" />
         ) : (
           // Placeholder until account avatars are supplied — a neutral disc
           // with the handle's initial, never a stand-in photo.
