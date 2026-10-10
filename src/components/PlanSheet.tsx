@@ -8,7 +8,7 @@ import { TEMPLATES_PAGE } from "@/lib/content";
 import { STEP_OUT_MS, StripePay, preloadStripe } from "./StripePay";
 import { dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
-import { APP_URL } from "@/lib/site";
+import Link from "next/link";
 
 /**
  * The purchase sheet (Žilvinas 2026-09-25, from the two supplied frames;
@@ -916,13 +916,13 @@ export function PlanSheet() {
             {/* Regular 12 on a 16 line, the full 326 (Žilvinas 2026-09-25). */}
             <p className="mt-[5px] text-center text-[12px] leading-[16px] text-white/45 md:mt-[14px] md:text-[17px] md:leading-[24px]">
               {c.pay.legalPrefix}{" "}
-              <a href={`${APP_URL}/terms`} className="text-white/70 underline underline-offset-2">
+              <Link href="/legal/terms-and-conditions" className="text-white/70 underline underline-offset-2">
                 {c.pay.terms}
-              </a>{" "}
+              </Link>{" "}
               {c.pay.and}{" "}
-              <a href={`${APP_URL}/privacy`} className="text-white/70 underline underline-offset-2">
+              <Link href="/legal/privacy-policy" className="text-white/70 underline underline-offset-2">
                 {c.pay.privacy}
-              </a>
+              </Link>
             </p>
           </div>
         </div>

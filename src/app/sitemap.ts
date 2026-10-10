@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { LEGAL_DOCS, legalHref } from "@/lib/legal";
 import { SITE_URL } from "@/lib/site";
 
 /**
@@ -34,5 +35,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    // The three legal documents, one entry each; their dates are the
+    // "Last updated" each one shows (src/lib/legal.ts).
+    ...LEGAL_DOCS.map((doc) => ({
+      url: `${SITE_URL}${legalHref(doc)}`,
+      lastModified: new Date(`${doc.updated} UTC`),
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    })),
   ];
 }

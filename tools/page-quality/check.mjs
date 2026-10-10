@@ -44,7 +44,7 @@ import { fileURLToPath } from "node:url";
 import { brotliCompressSync, gzipSync } from "node:zlib";
 
 /** The pages Google indexes and visitors land on. */
-const PAGES = ["/", "/templates", "/case-studies"];
+const PAGES = ["/", "/templates", "/case-studies", "/legal/privacy-policy"];
 /** "Above 90" (Žilvinas). The score is an integer, so 90 itself is a fail. */
 const MIN_SCORE = 90;
 const RUNS = Number(process.env.LH_RUNS ?? 3);
