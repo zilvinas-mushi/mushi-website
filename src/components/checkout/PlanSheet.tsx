@@ -5,7 +5,7 @@ import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, ShieldGlyph } from "@/components/checkout/plan-sheet-glyphs";
 import { Money } from "@/components/shared/Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { STEP_OUT_MS, StripePay, preloadStripe } from "@/components/checkout/StripePay";
+import { STEP_OUT_MS, StripePay, fetchStripeJs, preloadStripe } from "@/components/checkout/StripePay";
 import { checkoutSession, dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import Link from "next/link";
@@ -160,6 +160,7 @@ function PlanStep({
     >
       <StripePay
         planId={planId}
+        on={on}
         fallbackHref={(email) => checkoutUrl(planId, undefined, email || undefined)}
         // Stripe Link, in its own green: this one opens the plan on
         // Stripe's hosted page, and stands in until Stripe's own Link
@@ -362,19 +363,29 @@ export function PlanSheet() {
       }
       setMounted(true);
     });
-    // THE RISE COMES FIRST, STRIPE AFTER IT (Žilvinas 2026-10-10, "a VERY
-    // VERY BUG when popup was going upwards"): the first step used to be
-    // built in the same breath as the sheet was shown, and Stripe.js being
-    // evaluated and its frames created stalled the rise for 200ms on a
-    // throttled CPU — a visible hitch a third of the way up. Now nothing of
-    // Stripe's starts until the panel has settled and the thread is idle
-    // (whenQuiet): the chosen plan's step — the one chosen by then, should
-    // a row be picked during the rise — or the queue carrying on where it
-    // stopped. A buyer quicker than that is held by Buy, as before. With
-    // reduced motion there is no rise.
+    // THE CHOSEN STEP IS BUILT AS THE SHEET RISES, NOT AFTER (Žilvinas
+    // 2026-10-10, from his phone: "there was loading after the first step.
+    // it can't be that"). It was built after the rise — the first build
+    // used to come in the same breath as the sheet was shown, and on a
+    // throttled CPU the main thread's frames ran to 200ms under it, which
+    // was taken for a hitch ("a VERY VERY BUG when popup was going
+    // upwards") — but the rise is the compositor's (a transition of
+    // translate and opacity, will-change set), and the compositor's own
+    // frames, taken by screencast with the build under the rise on a 4x
+    // CPU, never gapped past 35ms. What the wait cost was the whole rise:
+    // Stripe's frames need 1.2s from the mount to say ready, on a good
+    // line, so a step mounted at 600ms was a hold for any finger on Buy
+    // inside two seconds. Now the mount comes in the first idle moment
+    // after the rise has started, with the session and the script's bytes
+    // already asked for on the touch (fetchStripeJs), and the rise carries
+    // on above it. The queue's later steps and a row picked during the rise
+    // still wait for it to end (quietAt). With reduced motion there is no
+    // rise.
     quietAt.current = Date.now() + (window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : OPEN_MS);
     scheduled.current = false;
-    whenQuiet(quietAt.current, () => {
+    fetchStripeJs();
+    checkoutSession(planRef.current).catch(() => {});
+    whenQuiet(Date.now(), () => {
       if (!openRef.current) return;
       scheduled.current = true;
       preloadStripe();
@@ -477,15 +488,23 @@ export function PlanSheet() {
     // hover): a hover comes well before the click, on a page that is still.
     // A finger's touchstart is 100ms before the tap, which put that work in
     // the middle of the rise (2026-10-10); a touch or a key gets Stripe.js
-    // after the rise, from open(), and only its session is asked for here.
-    // Still never with the page — a visitor who goes nowhere near a Buy
-    // button fetches nothing from Stripe.
+    // after the rise, from open(). What a touch does get is Stripe.js's
+    // BYTES and its plan's session — two downloads, which the main thread
+    // never feels — so that after the rise the script runs from the cache
+    // and the step is built with the session in hand (Žilvinas 2026-10-10,
+    // on a phone: "there was loading after the first step"). Still never
+    // with the page — a visitor who goes nowhere near a Buy button fetches
+    // nothing from Stripe.
     function onIntent(e: Event) {
       if (!(e.target as Element).closest?.("a[data-plan]")) return;
       wakeCheckout();
       if (e.type === "pointerover" && (e as PointerEvent).pointerType === "mouse") {
         preloadStripe();
         hover();
+      }
+      if (e.type === "touchstart") {
+        fetchStripeJs();
+        checkoutSession(planRef.current).catch(() => {});
       }
     }
     const onScroll = () => {
@@ -624,10 +643,24 @@ export function PlanSheet() {
   // a scroll that chains out of a frame finds nowhere to go. The scrollbar
   // it takes away is paid for with padding, so nothing shifts. Touch has
   // its own cure: touch-action on the frames' boxes (StripePay).
+  //
+  // ON THE PHONE THE PAGE IS PINNED (Žilvinas 2026-10-10, from his phone:
+  // "you can still scroll while you are in popup, shouldnt!!!"). None of
+  // the above holds on iOS: Safari scrolls the page from a touch that began
+  // in Stripe's frame — which this document never hears about — whatever
+  // <html>'s overflow says, and touch-action on the frame's box is not
+  // honoured for what is inside it. The one thing iOS cannot scroll is a
+  // page with nothing to scroll: below md the body is fixed in place at the
+  // offset it was scrolled to, so the viewport's scroller is empty, and it
+  // is put back — and the scroll with it, in the same task, so nothing is
+  // seen to move — as the sheet starts to fall, under a backdrop that is
+  // still black. The headers measure their pills, not scrollY, so a body
+  // that holds its place on screen leaves them where they were.
   useEffect(() => {
-    if (!mounted) return;
+    if (!shown) return;
     const panel = panelRef.current;
     const root = document.documentElement;
+    const body = document.body;
     // THE PAGE'S OWN ANIMATIONS HOLD STILL UNDER THE SHEET (2026-10-10): the
     // hero's tile rows, the drifting tiles and the gradient rings tick on
     // the main thread every frame — a trace of an open sheet showed 500
@@ -639,6 +672,14 @@ export function PlanSheet() {
     const was = { overflowY: root.style.overflowY, paddingRight: document.body.style.paddingRight };
     root.style.overflowY = "hidden";
     if (gutter > 0) document.body.style.paddingRight = `${gutter}px`;
+    const phone = !window.matchMedia("(min-width: 768px)").matches;
+    const y = window.scrollY;
+    const bodyWas = { position: body.style.position, top: body.style.top, width: body.style.width };
+    if (phone) {
+      body.style.position = "fixed";
+      body.style.top = `${-y}px`;
+      body.style.width = "100%";
+    }
     const inPanel = (t: EventTarget | null) =>
       !!panel && t instanceof Node && panel.contains(t) && panel.scrollHeight > panel.clientHeight;
     const block = (e: Event) => {
@@ -661,9 +702,17 @@ export function PlanSheet() {
       document.removeEventListener("keydown", onKey);
       root.style.overflowY = was.overflowY;
       document.body.style.paddingRight = was.paddingRight;
+      if (phone) {
+        body.style.position = bodyWas.position;
+        body.style.top = bodyWas.top;
+        body.style.width = bodyWas.width;
+        // Instant, whatever scroll-behavior says: this is the page being
+        // put back where it was, not a scroll.
+        window.scrollTo({ top: y, behavior: "instant" });
+      }
       root.removeAttribute("data-sheet");
     };
-  }, [mounted]);
+  }, [shown]);
 
   useEffect(() => {
     presentable.current = (id, ok, state) => {
@@ -730,7 +779,15 @@ export function PlanSheet() {
         type="button"
         aria-label="Close"
         onClick={close}
-        className={`absolute inset-0 bg-black/60 md:backdrop-blur-[9px] ${motion} ${shown ? "opacity-100" : "opacity-0"} ${mounted ? "" : "invisible"}`}
+        // BLACK ON THE PHONE (Žilvinas 2026-10-10, a photo of the payment
+        // step with the dimmed menu showing above it: "gap from the menu and
+        // it looks odd - black colour?"). A sheet that stops short of the
+        // top leaves a band of the page above it, and on a phone that band
+        // is the menu bar at 40% — a second, greyer header over the sheet's
+        // own. So below md the backdrop is the page's own black and the band
+        // is simply dark; from md the page shows through, blurred, as a
+        // centred dialog wants.
+        className={`absolute inset-0 bg-black md:bg-black/60 md:backdrop-blur-[9px] ${motion} ${shown ? "opacity-100" : "opacity-0"} ${mounted ? "" : "invisible"}`}
       />
       <div
         // The md: half overrides the sheet geometry wholesale — static in

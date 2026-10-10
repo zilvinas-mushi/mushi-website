@@ -182,6 +182,35 @@ function preconnect(): void {
   link.crossOrigin = "anonymous";
   document.head.appendChild(link);
 }
+/**
+ * STRIPE.JS'S BYTES, WITHOUT RUNNING IT (Žilvinas 2026-10-10, on a phone:
+ * "there was loading after the first step. it can't be that"). A finger
+ * gets no hover, so on touch the script was first asked for after the rise,
+ * and on a phone's line that was 400ms of waiting before a byte of it ran,
+ * with Stripe's frames — a second more — behind it. This fetches it on the
+ * tap itself: a download costs the main thread nothing, so it may run under
+ * the rise, and `preloadStripe` after the rise evaluates it from the cache.
+ * The address is the loader's own (STRIPE_JS_URL in @stripe/stripe-js —
+ * tests/checkout.links.test.ts holds the two together), with no crossorigin,
+ * so the preload is what the script tag the loader injects will find.
+ */
+export const STRIPE_JS_SRC = "https://js.stripe.com/endive/stripe.js";
+let fetched = false;
+export function fetchStripeJs(): void {
+  if (fetched) return;
+  fetched = true;
+  if (stripeJs) return;
+  for (const [rel, href, as] of [
+    ["preconnect", new URL(STRIPE_JS_SRC).origin, ""],
+    ["preload", STRIPE_JS_SRC, "script"],
+  ]) {
+    const link = document.createElement("link");
+    link.rel = rel;
+    link.href = href;
+    if (as) link.as = as;
+    document.head.appendChild(link);
+  }
+}
 export function preloadStripe(): void {
   preconnect();
   getStripe().catch(() => {
@@ -259,6 +288,7 @@ export function StripePay({
   fieldClass,
   submitClass,
   onPresentable,
+  on = true,
 }: {
   planId: PlanId;
   /** The plan's Stripe-hosted checkout, given the email — where Submit goes if this cannot load. */
@@ -281,6 +311,8 @@ export function StripePay({
    * stands in their place. The sheet holds the step back until then.
    */
   onPresentable?: (ok: boolean, state?: "ready" | "unavailable") => void;
+  /** Whether this step is the one on stage: the ring is looked at again the moment it is. */
+  on?: boolean;
 }) {
   const [state, setState] = useState<State>("loading");
   const [busy, setBusy] = useState(false);
@@ -313,6 +345,11 @@ export function StripePay({
     return () => watch.disconnect();
   }, []);
   const presentable = useRef(onPresentable);
+  /** The build's own checkShape, for the moment the step comes on stage. */
+  const shapeNow = useRef<() => void>(() => {});
+  useEffect(() => {
+    if (on) shapeNow.current();
+  }, [on]);
   useEffect(() => {
     presentable.current = onPresentable;
   }, [onPresentable]);
@@ -326,6 +363,7 @@ export function StripePay({
     let shapeWatch: ResizeObserver | null = null;
     let shapeTimer = 0;
     let rechecks: number[] = [];
+    let plainTimer = 0;
     let unwatchWidth = () => {};
     let presentTimer = 0;
     let linkTimer = 0;
@@ -500,10 +538,26 @@ export function StripePay({
       // resize to prompt a second look; CI saw two plans of three stay plain
       // that way (2026-10-07, US runner). So after the fields are in it is
       // asked once more at each of these, whatever the frame has done.
+      // AND WHILE THE RING IS PLAIN, EVERY SECOND AND A HALF FOR HALF A
+      // MINUTE MORE (2026-10-11, the US runner: the first plan's step, now
+      // built as the sheet rises on a 4x CPU, came to its payment step
+      // with the plain ring once, the other two shaped — its three looks
+      // had fallen on a frame Stripe was still redrawing for the ZIP row,
+      // and nothing moved after). A plain ring is a wrong one on every
+      // arrangement Stripe has shown here, so it is never left to stand
+      // on the strength of three looks. And the moment the step comes on
+      // stage it is looked at again, outright (shapeNow).
       const recheckLater = () => {
         for (const timer of rechecks) window.clearTimeout(timer);
         rechecks = [800, 2000, 4500].map((ms) => window.setTimeout(() => shapeWatch && shapeSoon(), ms));
+        window.clearInterval(plainTimer);
+        let looks = 0;
+        plainTimer = window.setInterval(() => {
+          if (shapeWatch && !shapedNow) checkShape();
+          if (++looks >= 20 || gone) window.clearInterval(plainTimer);
+        }, 1500);
       };
+      shapeNow.current = () => shapeWatch && checkShape();
       if (where && "ResizeObserver" in window) {
         shapeWatch = new ResizeObserver(shapeSoon);
         shapeWatch.observe(mount.current);
@@ -603,6 +657,8 @@ export function StripePay({
       window.clearTimeout(limit);
       window.clearTimeout(shapeTimer);
       for (const timer of rechecks) window.clearTimeout(timer);
+      window.clearInterval(plainTimer);
+      shapeNow.current = () => {};
       window.clearTimeout(presentTimer);
       window.clearTimeout(linkTimer);
       shapeWatch?.disconnect();

@@ -188,9 +188,17 @@ price in one place only and `npm test` goes red. PRD and plan:
   for someone who has not asked to buy. A mouse resting on a Buy button IS
   asking: the chosen plan's step (one, not three) is built then, in an
   idle moment and never while the page scrolls, so Buy on a fresh open is
-  instant; a finger gets no warning before its tap, so on touch the first
-  step follows the rise. Nothing of Stripe's ever starts under an
-  animation of the sheet (`whenQuiet`).
+  instant; a finger gets no warning before its tap, so on touch the tap
+  fetches the script's bytes and the session, and the chosen step is
+  mounted in the first idle moment as the sheet rises — the rise is the
+  compositor's and does not feel it (screencast-measured, and the gate
+  measures it so), while a step mounted after the rise was a hold for any
+  finger on Buy inside two seconds ("there was loading after the first
+  step. it can't be that"). Everything else of Stripe's — the other plans,
+  a row picked mid-rise — waits for the sheet to be still (`whenQuiet`).
+  On the phone the page is pinned under the sheet (body fixed at its
+  scroll) because iOS scrolls it from a touch inside Stripe's frame, and
+  the backdrop there is black.
 
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.
