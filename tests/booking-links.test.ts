@@ -33,7 +33,7 @@ describe("links that open the calendar", () => {
       // Each <a href={X} …> whose X is the booking URL, /call, the Pill's
       // href, or a CTA prop that may hold it, has {...bookingTarget(X)}
       // right after it. Nav rows (item.href) are the site's own routes.
-      const anchors = [...source.matchAll(/<a\s+href=\{([^}]+)\}([^>]*)>/gs)];
+      const anchors = [...source.matchAll(/<a\s+href=\{([^}]+)\}([^>]*)>/g)];
       const risky = anchors.filter(([, href]) =>
         /BOOKING_URL|CALL_PATH|^(cta\??|to|from|drawer\.wide)\.href\b/.test(href.trim()) ||
         // The Pill's own href: the hero and the 404 hand it the booking URL.
