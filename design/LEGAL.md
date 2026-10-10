@@ -72,6 +72,36 @@ clause number Medium 18; section heading SemiBold 23/28; paragraphs 30 apart,
 headings 38 under / 36 over. The frame boxes are hand-placed and these are
 the modal values. The footer follows 60 under the last line.
 
+## The hero, remade (2026-10-10)
+
+The frames' raster was soft (Žilvinas: "make this quality max … or remake
+it, as clear as possible"; of the live page, "tragic!!!"), so
+`src/components/LegalHero.tsx` draws it as vector in the 1920 × 392 design
+space, and both crops above are windows on that one scene (the phone's is
+`viewBox -2 0 684 388`, mirrored). The two WebP crops are gone. What was
+read off the master:
+
+- **The grid**: pitch 94.65 master px (24 columns from x 275 to 2452, 8
+  rows from y 433), i.e. cells 69.36 × 56.42 in the band. 42 cells are
+  drawn, found by their fill (a few percent of white over the gradient,
+  judged against the cell's own surroundings) with the bottom row — washed
+  out by the glow — read by eye off the enhanced foot. Stroke white at 20%,
+  fill white at 7%, 1px `vector-effect: non-scaling-stroke`.
+- **The gradient**: sampled down a square-free column, 17 stops, `#000010`
+  at the top through `#160a3a` at mid to `#e0c8f9` at the foot.
+- **The edge glows**: a lavender light 99 design px in from each side,
+  falling 1 → .62 → .38 → .24 → .16 → .09 → .055 → .03 → 0 at 11px steps
+  (the master's profile at mid height), masked 0.15 at the top to 1 at the
+  foot, plus a whiter layer over the lower half.
+
+`src/lib/legal-hero-data.ts` holds the cells and the stops; the numbers
+above are the way to regenerate it.
+
+**app.mushi.agency does not render these pages.** Its auth screens' Terms
+and Privacy links, and its old `/terms` and `/privacy` routes, go to the
+pages here (Žilvinas 2026-10-10: "those buttons should just redirect to
+mushi.agency"). The documents are written once, in `src/lib/legal.ts`.
+
 ## Copy
 
 Verbatim from the frames, with Figma's manual line wraps removed. Noted

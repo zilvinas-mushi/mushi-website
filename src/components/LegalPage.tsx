@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Img } from "./Img";
+import { LegalHero } from "./LegalHero";
 import { LegalToc } from "./LegalToc";
 import {
   LEGAL_DOCS,
@@ -154,23 +154,16 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
       {/* THE HERO: the violet grid artwork, 392 tall at 1920 and 196 on the
           phone, with the title and the date centred on it. It runs up behind
           the floating header (the negative margin, as on every other page).
-          The artwork is a stretched <img> rather than a background so the
-          paint gate picks it up on its own: it is the first screen. */}
+          The artwork is inline vector (LegalHero): nothing is fetched and
+          nothing is soft, so the paint gate has only the fonts to wait for.
+          Each device gets its own window on the scene — the phone's is the
+          panel's left third, mirrored, as its frame crops it (design/LEGAL.md). */}
       <section
         className="relative h-[196px] overflow-hidden md:h-[24.5rem]"
         style={{ marginTop: "calc(var(--header-h) * -1)" }}
       >
-        <Img
-          src="legal-hero.webp"
-          alt=""
-          priority
-          // The frames stretch one master non-uniformly, and each device gets
-          // its own crop of it — the phone's is the panel's left third,
-          // mirrored (design/LEGAL.md). <picture> fetches only the one shown.
-          alternate={{ src: "legal-hero-phone.webp", media: "(max-width: 767px)" }}
-          className="absolute inset-0 h-full w-full"
-          draggable={false}
-        />
+        <LegalHero variant="desktop" className="absolute inset-0 hidden h-full w-full md:block" />
+        <LegalHero variant="phone" className="absolute inset-0 h-full w-full md:hidden" />
         {/* SemiBold 70 on 80, centred, its top 191 down; the phone's 30 on 30
             at 102. The date is Regular 24 on 20 at 290 (phone 15 on 20 at 143). */}
         <h1 className="absolute inset-x-0 top-[102px] text-center text-[30px] font-semibold leading-[30px] text-white md:top-[11.9375rem] md:text-[4.375rem] md:leading-[5rem]">
