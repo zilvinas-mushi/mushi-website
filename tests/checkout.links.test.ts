@@ -216,7 +216,7 @@ describe("the plan sheet", () => {
     expect(sheet).toContain("whenQuiet(quietAt.current, () => setBuilt((b) => (b.includes(id as PlanId) ? b : [...b, id as PlanId])));");
     // ...and each step that settles starts the next, one at a time, while
     // the sheet is up — never behind a page the buyer has gone back to.
-    expect(sheet).toMatch(/if \(ok && shown\) \{\s+whenQuiet\(quietAt\.current, \(\) => \{/);
+    expect(sheet).toMatch(/if \(ok && shown && step === "plan"\) \{\s+whenQuiet\(quietAt\.current, \(\) => \{/);
     // ...and never under an animation: the rise, or the step change.
     expect(sheet).toContain("quietAt.current = Date.now() + STEP_OUT_MS + 500;");
     expect(sheet).toContain('window.requestIdleCallback(() => fn(), { timeout: IDLE_MS });');
