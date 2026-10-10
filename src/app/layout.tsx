@@ -5,7 +5,9 @@ import "./globals.css";
 import { CanvasTint } from "@/components/CanvasTint";
 import { PaintGate } from "@/components/PaintGate";
 import { PAINT_GATE_SCRIPT } from "@/lib/paint-gate-script";
+import { LOGIN_SPECULATION_RULES } from "@/lib/prerender";
 import {
+  APP_URL,
   SITE_URL,
   SITE_NAME,
   SITE_DESCRIPTION,
@@ -211,6 +213,12 @@ export default function RootLayout({
             kilobyte, build-time constant, no user input. See
             src/lib/paint-gate-script.ts. */}
         <script dangerouslySetInnerHTML={{ __html: PAINT_GATE_SCRIPT }} />
+        {/* THE WEBAPP, ONE HOP CLOSER: Login and Buy both go to
+            app.mushi.agency, so the connection is opened with the page, and
+            the login page is rendered ahead while the pointer rests on
+            Login — see src/lib/prerender.ts. Build-time constants. */}
+        <link rel="preconnect" href={APP_URL} />
+        <script type="speculationrules" dangerouslySetInnerHTML={{ __html: JSON.stringify(LOGIN_SPECULATION_RULES) }} />
         <script
           type="application/ld+json"
           // Static, build-time constant — no user input reaches this.
