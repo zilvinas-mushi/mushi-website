@@ -105,6 +105,15 @@ const RISE_MS = 600;
 const ACT_FRAME_MS = 250;
 const ACT_MS = 2600;
 /**
+ * THE FRAME BUDGETS ARE IN THIS LAPTOP'S MILLISECONDS. A CI runner under
+ * the same 4x throttle is three times slower again, and Stripe.js's one
+ * evaluation came to 533ms there against 130 here (2026-10-10, the first
+ * run). So the machine is measured first — a fixed workload, timed under
+ * the throttle — and every budget is scaled by how much slower than this
+ * laptop it is. REF_MS is that workload here (perf/ref.mjs: 37ms, 4x).
+ */
+const REF_MS = 37;
+/**
  * From the fields being in to the step calling itself presentable: 350ms for
  * Stripe's frame to stop moving and up to 1500 for the Link button's answer
  * (StripePay.tsx).
@@ -302,8 +311,19 @@ async function buy(browser, window) {
     // frame timed; then it is opened again and its three steps are built
     // in turn while it is up.
     await page.emulateCPUThrottling(4);
+    const machine = await page.evaluate(() => {
+      const once = () => {
+        const t = performance.now();
+        let x = 1;
+        for (let i = 0; i < 2_000_000; i++) x = (x * 1103515245 + 12345) & 0x7fffffff;
+        return performance.now() - t + (x > 1e12 ? 1 : 0);
+      };
+      return [once(), once(), once(), once(), once()].sort((a, b) => a - b)[2];
+    });
+    const scale = Math.max(1, machine / REF_MS);
+    const budget = (ms) => Math.round(ms * scale);
     const act = await page.evaluate(
-      async ({ riseMs, actMs }) => {
+      async ({ riseMs, actMs, slowMs }) => {
         const frames = [];
         const t0 = performance.now();
         let last = t0;
@@ -327,9 +347,9 @@ async function buy(browser, window) {
         const longest = (list) => list.reduce((a, f) => (f.ms > a.ms ? f : a), { ms: 0, at: 0 });
         const rise = longest(frames.filter((f) => f.at <= riseMs));
         const all = longest(frames);
-        return { frames: frames.length, rise: Math.round(rise.ms), riseAt: Math.round(rise.at), worst: Math.round(all.ms), worstAt: Math.round(all.at), slow: frames.filter((f) => f.ms > 100).length };
+        return { frames: frames.length, rise: Math.round(rise.ms), riseAt: Math.round(rise.at), worst: Math.round(all.ms), worstAt: Math.round(all.at), slow: frames.filter((f) => f.ms > slowMs).length };
       },
-      { riseMs: RISE_MS, actMs: ACT_MS },
+      { riseMs: RISE_MS, actMs: ACT_MS, slowMs: budget(RISE_FRAME_MS) },
     );
     await page.emulateCPUThrottling(1);
     // The sheet is on the payment step, or holding for it: back to the top.
@@ -337,10 +357,11 @@ async function buy(browser, window) {
     await pause(SHEET_MS);
     await page.evaluate(() => document.querySelector("a[data-plan]").click());
     const actProblems = [];
-    if (act.rise > RISE_FRAME_MS) actProblems.push(`a ${act.rise}ms frame ${act.riseAt}ms into the rise, over ${RISE_FRAME_MS}`);
-    if (act.worst > ACT_FRAME_MS) actProblems.push(`a ${act.worst}ms frame at ${act.worstAt}ms, over ${ACT_FRAME_MS}`);
-    if (act.slow > 1) actProblems.push(`${act.slow} frames over ${RISE_FRAME_MS}ms in the first ${ACT_MS}ms, more than Stripe.js's one`);
-    console.log(`  ${actProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} acting fast  ${actProblems.length ? actProblems.join("; ") : `${act.frames} frames, the rise's longest ${act.rise}ms, the longest ${act.worst}ms at ${act.worstAt}ms`}`);
+    if (act.rise > budget(RISE_FRAME_MS)) actProblems.push(`a ${act.rise}ms frame ${act.riseAt}ms into the rise, over ${budget(RISE_FRAME_MS)}`);
+    if (act.worst > budget(ACT_FRAME_MS)) actProblems.push(`a ${act.worst}ms frame at ${act.worstAt}ms, over ${budget(ACT_FRAME_MS)}`);
+    if (act.slow > 1) actProblems.push(`${act.slow} frames over ${budget(RISE_FRAME_MS)}ms in the first ${ACT_MS}ms, more than Stripe.js's one`);
+    const machineNote = scale > 1 ? ` (this machine is ${scale.toFixed(1)}x slower than the laptop the budgets were set on; budgets scaled)` : "";
+    console.log(`  ${actProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} acting fast  ${actProblems.length ? actProblems.join("; ") : `${act.frames} frames, the rise's longest ${act.rise}ms, the longest ${act.worst}ms at ${act.worstAt}ms`}${machineNote}`);
     for (const problem of actProblems) failures.push(`${window.name}, opening the sheet and acting at once on a 4x-throttled CPU: ${problem}`);
     const deadline = Date.now() + LOAD_MS;
     let steps = [];
