@@ -23,6 +23,14 @@ import { sectionId } from "@/lib/legal";
  * remaining distance each frame — so a flick of the wheel reads as a glide,
  * not a snap, the way Apple's scroll-driven marks move.
  *
+ * The foot of the page is the last entry. A short closing section (Terms'
+ * "Contact", five lines) never gets a third of the window above it, so the
+ * reader's line could not reach it and the rail stopped one short ("it
+ * seems that you can't reach last point", Žilvinas 2026-10-10). Over the
+ * last half-window of scroll the line is carried the rest of the way, so
+ * that at the bottom of the page it sits on the last heading exactly, and
+ * everything above moved in proportion.
+ *
  * A CLICK ON AN ENTRY scrolls the page there itself, on the platform's own
  * settle — cubic-bezier(0.32, 0.72, 0, 1), the curve the plan sheet rises
  * on — over 0.65 to 1.3 seconds by distance: it is moving on the first
@@ -103,7 +111,9 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
     // must not be spent in layout.
     let tops: number[] = [];
     let ys: number[] = [];
+    let maxY = 0; // the furthest the page scrolls
     const measure = () => {
+      maxY = document.documentElement.scrollHeight - window.innerHeight;
       tops = headings.map((el) => el.getBoundingClientRect().top + window.scrollY);
       const top = list.getBoundingClientRect().top;
       ys = dots.map((d) => {
@@ -114,7 +124,13 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
 
     const read = () => {
       if (!ride) measure();
-      const line = window.scrollY + window.innerHeight / 3;
+      const third = window.innerHeight / 3;
+      // What the line is short of the last heading at the foot of the page,
+      // made up over the last half-window of scroll.
+      const short = Math.max(0, tops[tops.length - 1] - (maxY + third));
+      const half = window.innerHeight / 2;
+      const carry = short * Math.min(1, Math.max(0, (window.scrollY - (maxY - half)) / half));
+      const line = window.scrollY + third + carry;
       let i = 0;
       while (i < tops.length - 1 && tops[i + 1] <= line) i++;
       const span = i < tops.length - 1 ? tops[i + 1] - tops[i] : 0;
