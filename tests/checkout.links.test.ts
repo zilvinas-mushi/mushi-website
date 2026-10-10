@@ -179,9 +179,9 @@ describe("the plan sheet", () => {
   });
 
   it("can always be paid: Stripe's hosted page is the fallback and the Pay with Link target", () => {
-    expect(sheet).toContain("const hosted = checkoutUrl(o.id as PlanId);");
+    expect(sheet).toContain("const hosted = checkoutUrl(planId);");
     expect(sheet).toMatch(/<a\s+href=\{hosted\}/);
-    expect(sheet).toContain("fallbackHref={(email) => checkoutUrl(o.id as PlanId, undefined, email || undefined)}");
+    expect(sheet).toContain("fallbackHref={(email) => checkoutUrl(planId, undefined, email || undefined)}");
     expect(pay).toContain('if (stateNow.current === "unavailable") {');
     expect(pay).toContain("window.location.href = fallbackHref(email);");
   });
@@ -208,7 +208,7 @@ describe("the plan sheet", () => {
     // iframes, 11 MB and close to five seconds of CPU behind a page the
     // visitor was merely reading. Only the plans in `built` have a step...
     expect(sheet).toContain("const [built, setBuilt] = useState<PlanId[]>([]);");
-    expect(sheet).toMatch(/\{c\.options\.filter\(\(o\) => built\.includes\(o\.id as PlanId\)\)\.map\(\(o\) => \{\s+const on = o\.id === plan\.id;/);
+    expect(sheet).toMatch(/\{c\.options\.filter\(\(o\) => built\.includes\(o\.id as PlanId\)\)\.map\(\(o\) => \(\s+<PlanStep key=\{`\$\{o\.id\}:\$\{attempt\}`\} planId=\{o\.id as PlanId\} on=\{o\.id === plan\.id\} onPresentable=\{report\} \/>/);
     // ...the chosen plan's goes in when the sheet opens, never before...
     expect(sheet).toContain("const steps = b.length ? b : [planRef.current];");
     expect(sheet).not.toMatch(/setBuilt\([^)]*\)[^\n]*\n[^\n]*setPrepared\(true\);\s*\}/);
@@ -236,7 +236,11 @@ describe("the plan sheet", () => {
     expect(sheet).toContain('className={on ? undefined : "pointer-events-none absolute inset-x-0 top-0 opacity-0"}');
     expect(sheet).toContain("inert={!on}");
     // Buy goes by the chosen plan's word, and only that plan's ends a hold.
-    expect(sheet).toContain("if (ok && on && held.current && step === \"plan\") showPay();");
+    expect(sheet).toContain("if (ok && id === planId && held.current && step === \"plan\") showPay();");
+    // Each step holds one function that never changes, so the sheet's own
+    // state — a step change, a hold — re-renders no step (2026-10-10).
+    expect(sheet).toContain("const report = useCallback((id: PlanId, ok: boolean, state?: \"ready\" | \"unavailable\") => presentable.current(id, ok, state), []);");
+    expect(sheet).toContain("onPresentable={(ok, state) => onPresentable(planId, ok, state)}");
   });
 
   it("is held to it in a real browser on every push: the checkout gate is a CI step that cannot be skipped", () => {
