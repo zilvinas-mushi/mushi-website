@@ -97,8 +97,13 @@ describe("the plan sheet", () => {
     // first step's build (2026-10-10, the hitch a third of the way up)...
     expect(sheet).toMatch(/whenQuiet\(quietAt\.current, \(\) => \{\s+if \(!openRef\.current\) return;\s+scheduled\.current = true;\s+preloadStripe\(\);\s+setBuilt\(/);
     expect(sheet).toContain('quietAt.current = Date.now() + (window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : OPEN_MS);');
-    // ...and on intent only for a mouse, whose hover comes well before the click.
-    expect(sheet).toContain('if (e.type === "pointerover" && (e as PointerEvent).pointerType === "mouse") preloadStripe();');
+    // ...and on intent only for a mouse, whose hover comes well before the
+    // click — with the chosen plan's step, so Buy is instant on a fresh open
+    // (2026-10-10, "when pressing buy now there is loading"), in a quiet
+    // moment and never while the page scrolls.
+    expect(sheet).toMatch(/if \(e\.type === "pointerover" && \(e as PointerEvent\)\.pointerType === "mouse"\) \{\s+preloadStripe\(\);\s+hover\(\);/);
+    expect(sheet).toContain("whenQuiet(Math.max(quietAt.current, lastScroll.current + SCROLL_QUIET_MS), () => {");
+    expect(sheet).toContain("setBuilt((b) => (b.length ? b : [planRef.current]));");
     // ...and the sheet is otherwise built only at real input: a page that
     // has merely loaded, or been scrolled by a script, prepares nothing.
     expect(sheet).toContain('const signs = ["pointermove", "pointerdown", "touchstart", "keydown", "wheel"] as const;');
@@ -211,7 +216,7 @@ describe("the plan sheet", () => {
     expect(sheet).toContain("whenQuiet(quietAt.current, () => setBuilt((b) => (b.includes(id as PlanId) ? b : [...b, id as PlanId])));");
     // ...and each step that settles starts the next, one at a time, while
     // the sheet is up — never behind a page the buyer has gone back to.
-    expect(sheet).toMatch(/if \(ok && shown\) \{\s+whenQuiet\(quietAt\.current, \(\) => \{/);
+    expect(sheet).toMatch(/if \(ok && shown && step === "plan"\) \{\s+whenQuiet\(quietAt\.current, \(\) => \{/);
     // ...and never under an animation: the rise, or the step change.
     expect(sheet).toContain("quietAt.current = Date.now() + STEP_OUT_MS + 500;");
     expect(sheet).toContain('window.requestIdleCallback(() => fn(), { timeout: IDLE_MS });');

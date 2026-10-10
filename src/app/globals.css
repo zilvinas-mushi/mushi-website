@@ -2122,6 +2122,20 @@ img[data-src-wait] {
   }
 }
 
+/*
+  UNDER THE PLAN SHEET THE PAGE HOLDS STILL (PlanSheet.tsx sets data-sheet on
+  <html> while it is open). These animations run on the main thread every
+  frame, behind a backdrop that blurs them away; paused, not stopped, so
+  they carry on from where they were when the sheet closes.
+*/
+html[data-sheet] .animate-gradient-x,
+html[data-sheet] .animated-gradient-border::before,
+html[data-sheet] .tile-drift,
+html[data-sheet] .marquee-track,
+html[data-sheet] .tile-marquee-track {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-gradient-x,
   .animated-gradient-border::before,

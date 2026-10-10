@@ -6,7 +6,7 @@ import { BoltGlyph, LinkMark, ShieldGlyph } from "./plan-sheet-glyphs";
 import { Money } from "./Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { STEP_OUT_MS, StripePay, preloadStripe } from "./StripePay";
-import { dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
+import { checkoutSession, dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import Link from "next/link";
 
@@ -90,6 +90,8 @@ export const BUY_HASH = "#buy";
  * pointer. Safari has no requestIdleCallback and gets the next tick.
  */
 const IDLE_MS = 1500;
+/** How long after the last scroll the page counts as still — a build under a scrolling reader is the lag this all exists to prevent. */
+const SCROLL_QUIET_MS = 300;
 function whenQuiet(until: number, fn: () => void): void {
   const idle = () => {
     if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(() => fn(), { timeout: IDLE_MS });
@@ -155,6 +157,8 @@ export function PlanSheet() {
   const planRef = useRef<PlanId>(c.defaultId as PlanId);
   /** Whether the first build has been scheduled since the sheet opened; a pick before that leaves it to the schedule. */
   const scheduled = useRef(false);
+  /** When the page last scrolled: a build on hover waits for the page to be still (SCROLL_QUIET_MS). */
+  const lastScroll = useRef(0);
   const panelRef = useRef<HTMLDivElement>(null);
   /**
    * STEP ONE TO STEP TWO IS A HAND-OFF, NOT A CUT (Žilvinas 2026-09-26,
@@ -208,6 +212,28 @@ export function PlanSheet() {
    * Zoom rather than transform so the layout box shrinks with it.
    */
   const [fit, setFit] = useState(1);
+
+  // A MOUSE RESTING ON A BUY BUTTON IS A BUYER (Žilvinas 2026-10-10, on the
+  // first screen: "when pressing buy now there is loading"). With every
+  // build moved behind the rise, a buyer who opened the sheet and pressed
+  // Buy at once was held for the step — a second and more — and the step
+  // then came in while Stripe's frame was still settling. A hover comes
+  // well before the click, on a page that is still, so for a mouse the
+  // CHOSEN plan's step is built then: the sheet is put in the DOM off
+  // stage, its session asked for, and the one step scheduled for the next
+  // quiet, idle moment — never while the page scrolls. One plan, not three;
+  // the others follow once the sheet is open. A finger gets no warning
+  // before its tap and keeps the rise-first order.
+  const hover = useEffectEvent(() => {
+    if (built.length) return;
+    if (!preparedAt.current) preparedAt.current = Date.now();
+    setPrepared(true);
+    checkoutSession(planId as PlanId).catch(() => {});
+    whenQuiet(Math.max(quietAt.current, lastScroll.current + SCROLL_QUIET_MS), () => {
+      scheduled.current = true;
+      setBuilt((b) => (b.length ? b : [planRef.current]));
+    });
+  });
 
   // AN EFFECT EVENT, not a plain closure: it is called from listeners bound
   // once, at mount, and this way it still reads the latest choice of plan
@@ -357,26 +383,35 @@ export function PlanSheet() {
     }
     // THE WEBAPP IS WOKEN ON INTENT, a moment before the click: the pointer
     // arriving on a Buy button, a finger landing on it, or focus reaching
-    // it. Stripe.js too, but ONLY FOR A MOUSE: a hover comes well before
-    // the click, so the script is evaluated while the page is still; a
-    // finger's touchstart is 100ms before the tap, which put that work in
-    // the middle of the rise (2026-10-10). A touch or a key gets Stripe.js
-    // after the rise, from open(). Still never with the page — a visitor
-    // who goes nowhere near a Buy button fetches nothing from Stripe.
+    // it. For a MOUSE, Stripe.js and the chosen plan's step as well (see
+    // hover): a hover comes well before the click, on a page that is still.
+    // A finger's touchstart is 100ms before the tap, which put that work in
+    // the middle of the rise (2026-10-10); a touch or a key gets Stripe.js
+    // after the rise, from open(), and only its session is asked for here.
+    // Still never with the page — a visitor who goes nowhere near a Buy
+    // button fetches nothing from Stripe.
     function onIntent(e: Event) {
       if (!(e.target as Element).closest?.("a[data-plan]")) return;
       wakeCheckout();
-      if (e.type === "pointerover" && (e as PointerEvent).pointerType === "mouse") preloadStripe();
+      if (e.type === "pointerover" && (e as PointerEvent).pointerType === "mouse") {
+        preloadStripe();
+        hover();
+      }
     }
+    const onScroll = () => {
+      lastScroll.current = Date.now();
+    };
     document.addEventListener("click", onClick);
     document.addEventListener("pointerover", onIntent, { passive: true });
     document.addEventListener("touchstart", onIntent, { passive: true });
     document.addEventListener("focusin", onIntent);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       document.removeEventListener("click", onClick);
       document.removeEventListener("pointerover", onIntent);
       document.removeEventListener("touchstart", onIntent);
       document.removeEventListener("focusin", onIntent);
+      window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
@@ -503,6 +538,13 @@ export function PlanSheet() {
     if (!mounted) return;
     const panel = panelRef.current;
     const root = document.documentElement;
+    // THE PAGE'S OWN ANIMATIONS HOLD STILL UNDER THE SHEET (2026-10-10): the
+    // hero's tile rows, the drifting tiles and the gradient rings tick on
+    // the main thread every frame — a trace of an open sheet showed 500
+    // style recalculations from them in a few seconds — behind a backdrop
+    // that blurs them past recognition. globals.css pauses them while
+    // <html> carries this.
+    root.setAttribute("data-sheet", "");
     const gutter = window.innerWidth - root.clientWidth;
     const was = { overflowY: root.style.overflowY, paddingRight: document.body.style.paddingRight };
     root.style.overflowY = "hidden";
@@ -529,6 +571,7 @@ export function PlanSheet() {
       document.removeEventListener("keydown", onKey);
       root.style.overflowY = was.overflowY;
       document.body.style.paddingRight = was.paddingRight;
+      root.removeAttribute("data-sheet");
     };
   }, [mounted]);
 
@@ -898,8 +941,14 @@ export function PlanSheet() {
                     onPresentable={(ok, state) => {
                       pay.current[o.id] = { ready: ok, failed: state === "unavailable" };
                       // One settled: the queue takes the next plan — in the
-                      // next quiet moment, and only while the sheet is up.
-                      if (ok && shown) {
+                      // next quiet moment, and only while the sheet is up ON
+                      // THE PLAN STEP, where another plan can still be
+                      // picked. A buyer on the payment step is typing an
+                      // email; mounting a step there (30–45ms of style and
+                      // layout, more on a slow CPU) is a hitch under their
+                      // hands for a plan they can no longer choose. A sheet
+                      // closed and opened again picks the queue up.
+                      if (ok && shown && step === "plan") {
                         whenQuiet(quietAt.current, () => {
                           if (!openRef.current) return;
                           setBuilt((b) => {
