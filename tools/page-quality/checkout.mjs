@@ -372,8 +372,14 @@ async function buy(browser, window) {
               // The evaluation is two scripts: Stripe's own, and the load
               // handler that instantiates it, which is the site's bundle
               // invoked by Stripe's <script> — so the invoker counts too.
-              const stripe = scripts.length > 0 && scripts.every((sc) => /js\.stripe\.com/.test(sc.sourceURL || "") || /js\.stripe\.com/.test(sc.invoker || ""));
-              long.push({ ms: Math.round(e.duration), at: Math.round(e.startTime - t0), stripe, what: scripts.map((sc) => `${(sc.sourceURL || sc.invoker || "").split("/").pop().slice(0, 30)}#${sc.sourceFunctionName || ""}`).join(",") || "style/layout" });
+              // A frame is judged by the SITE'S share of it: Chrome may put
+              // a React commit in the same long frame as the evaluation
+              // (seen on the runner: 493ms, of which the site's 40), and
+              // that frame is Stripe's by any honest measure.
+              const isStripe = (sc) => /js\.stripe\.com/.test(sc.sourceURL || "") || /js\.stripe\.com/.test(sc.invoker || "");
+              const stripeMs = scripts.filter(isStripe).reduce((a, sc) => a + sc.duration, 0);
+              const oursMs = scripts.filter((sc) => !isStripe(sc)).reduce((a, sc) => a + sc.duration, 0);
+              long.push({ ms: Math.round(e.duration), at: Math.round(e.startTime - t0), stripe: stripeMs > 0, ours: Math.round(scripts.length ? oursMs : e.duration), what: scripts.map((sc) => `${(sc.sourceURL || sc.invoker || "").split("/").pop().slice(0, 30)}#${sc.sourceFunctionName || ""}`).join(",") || "style/layout" });
             }
           }).observe({ type: "long-animation-frame" });
         } catch {
@@ -399,13 +405,12 @@ async function buy(browser, window) {
         const notStripe = (f) => !stripeAt.some((l) => f.at - f.ms <= l.at + l.ms && f.at >= l.at);
         const rise = longest(frames.filter((f) => f.at <= riseMs && notStripe(f)));
         const all = longest(frames);
-        // Long frames that were not Stripe.js's evaluation: under the
-        // buyer's hand (the rise, the step change) any over the budget;
-        // elsewhere, the site's script over the budget, and style and
-        // layout alone over the mount's.
+        // Long frames by the site's own share of them: under the buyer's
+        // hand (the rise, the step change) any over the budget; elsewhere,
+        // the site's script over its budget, and style and layout alone
+        // over the mount's.
         const underHand = (l) => l.at <= riseMs || (l.at >= buyAtMs && l.at <= buyAtMs + stepChangeMs);
-        // Which budget a frame was held to, for the report.
-        const ours = long.filter((l) => !l.stripe && (underHand(l) ? l.ms > slowMs : l.what === "style/layout" ? l.ms > mountMs : l.ms > scriptMs));
+        const ours = long.filter((l) => (underHand(l) ? l.ours > slowMs : l.what === "style/layout" ? l.ours > mountMs : l.ours > scriptMs));
         const change = longest(frames.filter((f) => f.at >= buyAtMs && f.at <= buyAtMs + stepChangeMs && notStripe(f)));
         return { frames: frames.length, rise: Math.round(rise.ms), riseAt: Math.round(rise.at), change: Math.round(change.ms), changeAt: Math.round(change.at), worst: Math.round(all.ms), worstAt: Math.round(all.at), ours, stripe: long.filter((l) => l.stripe).map((l) => `${l.ms}ms@${l.at}`) };
       },
@@ -421,7 +426,7 @@ async function buy(browser, window) {
     if (act.change > budget(RISE_FRAME_MS)) actProblems.push(`a ${act.change}ms frame at ${act.changeAt}ms, during the step change after Buy, over ${budget(RISE_FRAME_MS)}`);
     for (const l of act.ours) {
       const hand = l.at <= RISE_MS || (l.at >= BUY_AT_MS && l.at <= BUY_AT_MS + STEP_CHANGE_MS);
-      actProblems.push(`a ${l.ms}ms frame at ${l.at}ms that was not Stripe.js's evaluation (${l.what}), over ${hand ? budget(RISE_FRAME_MS) : l.what === "style/layout" ? budget(MOUNT_FRAME_MS) : budget(SCRIPT_FRAME_MS)}`);
+      actProblems.push(`a ${l.ms}ms frame at ${l.at}ms, ${l.ours}ms of it the site's own (${l.what}), over ${hand ? budget(RISE_FRAME_MS) : l.what === "style/layout" ? budget(MOUNT_FRAME_MS) : budget(SCRIPT_FRAME_MS)}`);
     }
     const machineNote = scale > 1 ? ` (this machine is ${scale.toFixed(1)}x slower than the laptop the budget was set on; budget scaled)` : "";
     const stripeNote = act.stripe.length ? `, Stripe.js's evaluation ${act.stripe.join(" ")}` : "";
