@@ -77,6 +77,29 @@ export const BUY_HASH = "#buy";
  * closed (the callers check): a buyer who left it is reading the page
  * again, and nothing may load behind them.
  */
+/**
+ * WHEN THE SHEET IS QUIET (Žilvinas 2026-10-10, "when you open a popup and
+ * try to quickly do the actions"): a Stripe build is never started while
+ * the sheet is animating — the rise, the fall, the step change — and only
+ * in an idle moment after that, so a row picked or a Buy pressed in those
+ * first seconds is answered before Stripe.js is evaluated or a frame of
+ * Stripe's is created (35ms and more of main thread each, 160ms on a slow
+ * CPU; measured landing mid-rise when a row was picked at 300ms). `until`
+ * is when the current animation ends; the idle callback runs within
+ * IDLE_MS regardless, so a build is never put off for good by a restless
+ * pointer. Safari has no requestIdleCallback and gets the next tick.
+ */
+const IDLE_MS = 1500;
+function whenQuiet(until: number, fn: () => void): void {
+  const idle = () => {
+    if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(() => fn(), { timeout: IDLE_MS });
+    else window.setTimeout(fn, 50);
+  };
+  const wait = until - Date.now();
+  if (wait > 0) window.setTimeout(idle, wait);
+  else idle();
+}
+
 function nextToBuild(built: readonly PlanId[], steps: Record<string, { ready: boolean }>): PlanId | undefined {
   if (built.some((id) => !steps[id]?.ready)) return undefined;
   return TEMPLATES_PAGE.plans.options.map((o) => o.id as PlanId).find((id) => !built.includes(id));
@@ -124,8 +147,14 @@ export function PlanSheet() {
   const [step, setStep] = useState<"plan" | "pay">("plan");
   const [planId, setPlanId] = useState<string>(c.defaultId);
   const closeTimer = useRef(0);
-  /** The first Stripe build waits for the rise to end — see open(). */
-  const riseTimer = useRef(0);
+  /** When the sheet's current animation ends — nothing of Stripe's starts before it (whenQuiet). */
+  const quietAt = useRef(0);
+  /** Open, as of the last open() or close(): a build scheduled for a sheet that has since closed is dropped. */
+  const openRef = useRef(false);
+  /** The chosen plan, for the build scheduled at open(): a row picked during the rise is the one built first. */
+  const planRef = useRef<PlanId>(c.defaultId as PlanId);
+  /** Whether the first build has been scheduled since the sheet opened; a pick before that leaves it to the schedule. */
+  const scheduled = useRef(false);
   const panelRef = useRef<HTMLDivElement>(null);
   /**
    * STEP ONE TO STEP TWO IS A HAND-OFF, NOT A CUT (Žilvinas 2026-09-26,
@@ -185,7 +214,6 @@ export function PlanSheet() {
   // and the steps built so far.
   const open = useEffectEvent(() => {
     window.clearTimeout(closeTimer.current);
-    window.clearTimeout(riseTimer.current);
     // THE RISE STARTS FROM A FORCED LAYOUT, not from a frame or two of
     // waiting (Žilvinas 2026-09-26, "there should be animation for that
     // popup, both desktop and mobile"): flushSync commits the panel at
@@ -206,6 +234,7 @@ export function PlanSheet() {
     if (stale || !preparedAt.current) preparedAt.current = Date.now();
     if (stale) pay.current = {};
     held.current = false;
+    openRef.current = true;
     flushSync(() => {
       setHolding(false);
       setStep("plan");
@@ -222,21 +251,23 @@ export function PlanSheet() {
     // built in the same breath as the sheet was shown, and Stripe.js being
     // evaluated and its frames created stalled the rise for 200ms on a
     // throttled CPU — a visible hitch a third of the way up. Now nothing of
-    // Stripe's starts until the panel has settled: the chosen plan's step,
-    // or the queue carrying on where it stopped. A buyer quicker than the
-    // rise plus the build is held by Buy, as before. With reduced motion
-    // there is no rise, and it starts at once.
-    const chosen = planId as PlanId;
-    const afterRise = () => {
+    // Stripe's starts until the panel has settled and the thread is idle
+    // (whenQuiet): the chosen plan's step — the one chosen by then, should
+    // a row be picked during the rise — or the queue carrying on where it
+    // stopped. A buyer quicker than that is held by Buy, as before. With
+    // reduced motion there is no rise.
+    quietAt.current = Date.now() + (window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : OPEN_MS);
+    scheduled.current = false;
+    whenQuiet(quietAt.current, () => {
+      if (!openRef.current) return;
+      scheduled.current = true;
       preloadStripe();
       setBuilt((b) => {
-        const steps = b.length ? b : [chosen];
+        const steps = b.length ? b : [planRef.current];
         const next = nextToBuild(steps, pay.current);
         return next ? [...steps, next] : steps;
       });
-    };
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) afterRise();
-    else riseTimer.current = window.setTimeout(afterRise, OPEN_MS);
+    });
     if (panelRef.current) {
       panelRef.current.style.height = "";
       panelRef.current.style.transition = "";
@@ -263,8 +294,13 @@ export function PlanSheet() {
       setHolding(false);
     }
     setPlanId(id);
-    // Its step starts now, ahead of the queue, in case Buy is next.
-    if (!built.includes(id as PlanId)) setBuilt([...built, id as PlanId]);
+    planRef.current = id as PlanId;
+    // Its step is next, ahead of the queue, in case Buy follows — in the
+    // next quiet moment, never under the pick itself. Before the first
+    // build is scheduled it is simply the plan that build starts with.
+    if (scheduled.current && !built.includes(id as PlanId)) {
+      whenQuiet(quietAt.current, () => setBuilt((b) => (b.includes(id as PlanId) ? b : [...b, id as PlanId])));
+    }
   };
   const showPay = () => {
     held.current = false;
@@ -276,6 +312,9 @@ export function PlanSheet() {
       return;
     }
     setStepIn(false);
+    // The step change — the slide out, the height, the slide in — is an
+    // animation on the main thread; nothing of Stripe's starts under it.
+    quietAt.current = Date.now() + STEP_OUT_MS + 500;
     window.clearTimeout(stepTimer.current);
     stepTimer.current = window.setTimeout(() => {
       // The plan step is off stage. Pin the panel at its height, swap the
@@ -299,7 +338,7 @@ export function PlanSheet() {
     }, STEP_OUT_MS);
   };
   const close = () => {
-    window.clearTimeout(riseTimer.current);
+    openRef.current = false;
     window.clearTimeout(stepTimer.current);
     window.clearTimeout(holdTimer.current);
     held.current = false;
@@ -858,10 +897,17 @@ export function PlanSheet() {
                     }
                     onPresentable={(ok, state) => {
                       pay.current[o.id] = { ready: ok, failed: state === "unavailable" };
-                      // One settled: the queue takes the next plan — while
-                      // the sheet is up, not one that is closing or closed.
-                      const next = ok && shown ? nextToBuild(built, pay.current) : undefined;
-                      if (next) setBuilt([...built, next]);
+                      // One settled: the queue takes the next plan — in the
+                      // next quiet moment, and only while the sheet is up.
+                      if (ok && shown) {
+                        whenQuiet(quietAt.current, () => {
+                          if (!openRef.current) return;
+                          setBuilt((b) => {
+                            const next = nextToBuild(b, pay.current);
+                            return next ? [...b, next] : b;
+                          });
+                        });
+                      }
                       // Buy was pressed and has been waiting for exactly this.
                       if (ok && on && held.current && step === "plan") showPay();
                     }}

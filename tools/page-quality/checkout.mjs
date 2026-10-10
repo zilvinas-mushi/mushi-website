@@ -13,10 +13,20 @@
  *   built at that first move — 13 iframes and 11 MB behind a page the
  *   visitor was reading.
  *
- *   THE RISE IS SMOOTH (Žilvinas 2026-10-10, "a VERY VERY BUG when popup
- *   was going upwards"): the sheet is opened on a CPU throttled 4x, and no
- *   frame of its rise may take longer than RISE_FRAME_MS. The first Stripe
- *   build used to start in the same breath, and stalled the rise for 200ms.
+ *   THE RISE IS SMOOTH, AND SO ARE THE FIRST SECONDS (Žilvinas 2026-10-10,
+ *   "a VERY VERY BUG when popup was going upwards", then "when you open a
+ *   popup and try to quickly do the actions"): the sheet is opened on a CPU
+ *   throttled 4x, a row is picked at 300, 700 and 1100ms and Buy pressed at
+ *   1500, and no frame of the rise may take longer than RISE_FRAME_MS, and
+ *   no frame of the whole sequence longer than that unless Chrome's own
+ *   attribution says it was Stripe.js's script and nothing else — the one
+ *   evaluation of it, in an idle moment, which costs what the machine's
+ *   compiler costs (130ms on this laptop at 4x, 650 on a CI runner) and
+ *   which no budget in milliseconds can hold across machines. A long frame
+ *   of the site's own script, or of style and layout alone, is a failure.
+ *   The first Stripe build used to start in the same breath as the rise, and
+ *   a pick during the rise used to start that plan's at once; both stalled
+ *   the sheet for 160–200ms under a buyer's hand.
  *
  *   BUY IS INSTANT ON EVERY PLAN. The visitor opens the sheet; its three
  *   payment steps are built in turn while it is up. Then, for each plan,
@@ -95,6 +105,17 @@ const READER_CPU_MS = 1500;
  */
 const RISE_FRAME_MS = 100;
 const RISE_MS = 600;
+/** How long a buyer's first actions in the sheet are watched. */
+const ACT_MS = 2600;
+/**
+ * THE FRAME BUDGET IS IN THIS LAPTOP'S MILLISECONDS. A CI runner under the
+ * same 4x throttle is slower again, so the machine is measured first — a
+ * fixed workload, timed under the throttle — and the budget is scaled by
+ * how much slower than this laptop it is. REF_MS is that workload here
+ * (perf/ref.mjs: 37ms at 4x). Stripe.js's evaluation is not held to it at
+ * all (see above): a compiler's speed does not scale like arithmetic.
+ */
+const REF_MS = 37;
 /**
  * From the fields being in to the step calling itself presentable: 350ms for
  * Stripe's frame to stop moving and up to 1500 for the Link button's answer
@@ -289,31 +310,84 @@ async function buy(browser, window) {
     console.log(`  ${readerProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} a reader     ${readerProblems.length ? readerProblems.join("; ") : `nothing from Stripe, ${cpuMs}ms of CPU`}`);
     for (const problem of readerProblems) failures.push(`${window.name}, a reader who has moved but not opened the sheet: ${problem}`);
 
-    // The sheet is opened — on a slow CPU, its rise's frames timed — and
-    // its three steps are built in turn while it is up.
+    // The sheet is opened on a slow CPU and a buyer acts at once, every
+    // frame timed; then it is opened again and its three steps are built
+    // in turn while it is up.
     await page.emulateCPUThrottling(4);
-    const rise = await page.evaluate(async (riseMs) => {
-      const frames = [];
-      const t0 = performance.now();
-      let last = t0;
-      let stop = false;
-      const tick = (t) => {
-        frames.push({ ms: t - last, at: t - t0 });
-        last = t;
-        if (!stop) requestAnimationFrame(tick);
+    const machine = await page.evaluate(() => {
+      const once = () => {
+        const t = performance.now();
+        let x = 1;
+        for (let i = 0; i < 2_000_000; i++) x = (x * 1103515245 + 12345) & 0x7fffffff;
+        return performance.now() - t + (x > 1e12 ? 1 : 0);
       };
-      requestAnimationFrame(tick);
-      document.querySelector("a[data-plan]").click();
-      await new Promise((done) => setTimeout(done, riseMs + 100));
-      stop = true;
-      const inRise = frames.filter((f) => f.at <= riseMs);
-      const worst = inRise.reduce((a, f) => (f.ms > a.ms ? f : a), { ms: 0, at: 0 });
-      return { frames: inRise.length, worst: Math.round(worst.ms), at: Math.round(worst.at) };
-    }, RISE_MS);
+      return [once(), once(), once(), once(), once()].sort((a, b) => a - b)[2];
+    });
+    const scale = Math.max(1, machine / REF_MS);
+    const budget = (ms) => Math.round(ms * scale);
+    const act = await page.evaluate(
+      async ({ riseMs, actMs, slowMs }) => {
+        const frames = [];
+        const t0 = performance.now();
+        let last = t0;
+        let stop = false;
+        const tick = (t) => {
+          frames.push({ ms: t - last, at: t - t0 });
+          last = t;
+          if (!stop) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        // Chrome's word on what each long frame was doing: its scripts, by
+        // source. A frame whose every script is Stripe.js's own is the
+        // evaluation and is allowed; anything of the site's, or a frame of
+        // style and layout with no script at all, is not.
+        const long = [];
+        try {
+          new PerformanceObserver((list) => {
+            for (const e of list.getEntries()) {
+              const scripts = e.scripts ?? [];
+              // The evaluation is two scripts: Stripe's own, and the load
+              // handler that instantiates it, which is the site's bundle
+              // invoked by Stripe's <script> — so the invoker counts too.
+              const stripe = scripts.length > 0 && scripts.every((sc) => /js\.stripe\.com/.test(sc.sourceURL || "") || /js\.stripe\.com/.test(sc.invoker || ""));
+              long.push({ ms: Math.round(e.duration), at: Math.round(e.startTime - t0), stripe, what: scripts.map((sc) => `${(sc.sourceURL || sc.invoker || "").split("/").pop().slice(0, 30)}#${sc.sourceFunctionName || ""}`).join(",") || "style/layout" });
+            }
+          }).observe({ type: "long-animation-frame" });
+        } catch {
+          // No long-animation-frame API: the rAF gaps below still judge the rise.
+        }
+        const at = (ms) => new Promise((done) => setTimeout(done, Math.max(0, ms - (performance.now() - t0))));
+        const dialog = () => document.querySelector('[role="dialog"]');
+        document.querySelector("a[data-plan]").click();
+        // A buyer in a hurry: three rows, then Buy.
+        await at(300); dialog().querySelectorAll('[role="radio"]')[0].click();
+        await at(700); dialog().querySelectorAll('[role="radio"]')[1].click();
+        await at(1100); dialog().querySelectorAll('[role="radio"]')[2].click();
+        await at(1500); dialog().querySelector('[role="radiogroup"] + button').click();
+        await at(actMs);
+        stop = true;
+        await new Promise((done) => setTimeout(done, 100));
+        const longest = (list) => list.reduce((a, f) => (f.ms > a.ms ? f : a), { ms: 0, at: 0 });
+        const rise = longest(frames.filter((f) => f.at <= riseMs));
+        const all = longest(frames);
+        // Long frames that were not Stripe.js's evaluation, over the budget.
+        const ours = long.filter((l) => l.ms > slowMs && !l.stripe && l.at > riseMs);
+        return { frames: frames.length, rise: Math.round(rise.ms), riseAt: Math.round(rise.at), worst: Math.round(all.ms), worstAt: Math.round(all.at), ours, stripe: long.filter((l) => l.stripe).map((l) => `${l.ms}ms@${l.at}`) };
+      },
+      { riseMs: RISE_MS, actMs: ACT_MS, slowMs: budget(RISE_FRAME_MS) },
+    );
     await page.emulateCPUThrottling(1);
-    const riseProblem = rise.worst > RISE_FRAME_MS ? `a ${rise.worst}ms frame ${rise.at}ms into the rise, over ${RISE_FRAME_MS}` : null;
-    console.log(`  ${riseProblem ? "FAIL" : "pass"}  ${window.name.padEnd(8)} the rise     ${riseProblem ?? `${rise.frames} frames, the longest ${rise.worst}ms`}`);
-    if (riseProblem) failures.push(`${window.name}, the sheet's rise on a 4x-throttled CPU: ${riseProblem}`);
+    // The sheet is on the payment step, or holding for it: back to the top.
+    await page.keyboard.press("Escape");
+    await pause(SHEET_MS);
+    await page.evaluate(() => document.querySelector("a[data-plan]").click());
+    const actProblems = [];
+    if (act.rise > budget(RISE_FRAME_MS)) actProblems.push(`a ${act.rise}ms frame ${act.riseAt}ms into the rise, over ${budget(RISE_FRAME_MS)}`);
+    for (const l of act.ours) actProblems.push(`a ${l.ms}ms frame at ${l.at}ms that was not Stripe.js's evaluation (${l.what}), over ${budget(RISE_FRAME_MS)}`);
+    const machineNote = scale > 1 ? ` (this machine is ${scale.toFixed(1)}x slower than the laptop the budget was set on; budget scaled)` : "";
+    const stripeNote = act.stripe.length ? `, Stripe.js's evaluation ${act.stripe.join(" ")}` : "";
+    console.log(`  ${actProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} acting fast  ${actProblems.length ? actProblems.join("; ") : `${act.frames} frames, the rise's longest ${act.rise}ms, the longest ${act.worst}ms at ${act.worstAt}ms${stripeNote}`}${machineNote}`);
+    for (const problem of actProblems) failures.push(`${window.name}, opening the sheet and acting at once on a 4x-throttled CPU: ${problem}`);
     const deadline = Date.now() + LOAD_MS;
     let steps = [];
     while (Date.now() < deadline) {

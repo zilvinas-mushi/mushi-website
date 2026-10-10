@@ -244,6 +244,12 @@ const LINK_WAIT_MS = 1500;
 /** How long the plan step takes to slide out before the payment step is on stage. */
 export const STEP_OUT_MS = 170;
 
+/** Let the main thread draw a frame and answer input before carrying on. */
+function yieldToMain(): Promise<void> {
+  const s = (window as Window & { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  return s?.yield ? s.yield() : new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 export function StripePay({
   planId,
   fallbackHref,
@@ -530,6 +536,12 @@ export function StripePay({
       });
       element.on("loaderror", () => settle("unavailable"));
       element.mount(mount.current);
+      // The Link button's frames in a task of their own (2026-10-10): the
+      // card fields' frames above and these together were one long task,
+      // and a buyer acting in the sheet while a step builds behind it felt
+      // it. A yield between them halves it.
+      await yieldToMain();
+      if (gone || settled) return;
 
       // LINK OPENS IN ITS OWN SMALL WINDOW (Žilvinas 2026-10-04, as on
       // Sintra's checkout) rather than taking the whole page to Stripe: that
