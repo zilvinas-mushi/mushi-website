@@ -124,6 +124,8 @@ export function PlanSheet() {
   const [step, setStep] = useState<"plan" | "pay">("plan");
   const [planId, setPlanId] = useState<string>(c.defaultId);
   const closeTimer = useRef(0);
+  /** The first Stripe build waits for the rise to end — see open(). */
+  const riseTimer = useRef(0);
   const panelRef = useRef<HTMLDivElement>(null);
   /**
    * STEP ONE TO STEP TWO IS A HAND-OFF, NOT A CUT (Žilvinas 2026-09-26,
@@ -182,11 +184,8 @@ export function PlanSheet() {
   // once, at mount, and this way it still reads the latest choice of plan
   // and the steps built so far.
   const open = useEffectEvent(() => {
-    // The buyer has asked for the sheet. Stripe.js is usually here already
-    // (see the intent listener below); the chosen plan's payment step is
-    // built from here and loads behind the plan step.
-    preloadStripe();
     window.clearTimeout(closeTimer.current);
+    window.clearTimeout(riseTimer.current);
     // THE RISE STARTS FROM A FORCED LAYOUT, not from a frame or two of
     // waiting (Žilvinas 2026-09-26, "there should be animation for that
     // popup, both desktop and mobile"): flushSync commits the panel at
@@ -207,19 +206,37 @@ export function PlanSheet() {
     if (stale || !preparedAt.current) preparedAt.current = Date.now();
     if (stale) pay.current = {};
     held.current = false;
-    // The first step, or all of them again: the chosen plan's. A sheet
-    // opened again carries on where its queue stopped.
-    const steps = stale || !built.length ? [planId as PlanId] : built;
-    const next = nextToBuild(steps, pay.current);
     flushSync(() => {
       setHolding(false);
       setStep("plan");
       setStepIn(true);
       setPrepared(true);
-      if (stale) setAttempt((n) => n + 1);
-      setBuilt(next ? [...steps, next] : steps);
+      if (stale) {
+        setAttempt((n) => n + 1);
+        setBuilt([]);
+      }
       setMounted(true);
     });
+    // THE RISE COMES FIRST, STRIPE AFTER IT (Žilvinas 2026-10-10, "a VERY
+    // VERY BUG when popup was going upwards"): the first step used to be
+    // built in the same breath as the sheet was shown, and Stripe.js being
+    // evaluated and its frames created stalled the rise for 200ms on a
+    // throttled CPU — a visible hitch a third of the way up. Now nothing of
+    // Stripe's starts until the panel has settled: the chosen plan's step,
+    // or the queue carrying on where it stopped. A buyer quicker than the
+    // rise plus the build is held by Buy, as before. With reduced motion
+    // there is no rise, and it starts at once.
+    const chosen = planId as PlanId;
+    const afterRise = () => {
+      preloadStripe();
+      setBuilt((b) => {
+        const steps = b.length ? b : [chosen];
+        const next = nextToBuild(steps, pay.current);
+        return next ? [...steps, next] : steps;
+      });
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) afterRise();
+    else riseTimer.current = window.setTimeout(afterRise, OPEN_MS);
     if (panelRef.current) {
       panelRef.current.style.height = "";
       panelRef.current.style.transition = "";
@@ -282,6 +299,7 @@ export function PlanSheet() {
     }, STEP_OUT_MS);
   };
   const close = () => {
+    window.clearTimeout(riseTimer.current);
     window.clearTimeout(stepTimer.current);
     window.clearTimeout(holdTimer.current);
     held.current = false;
@@ -298,14 +316,18 @@ export function PlanSheet() {
       e.preventDefault();
       open();
     }
-    // STRIPE.JS STARTS ON INTENT, a moment before the click: the pointer
+    // THE WEBAPP IS WOKEN ON INTENT, a moment before the click: the pointer
     // arriving on a Buy button, a finger landing on it, or focus reaching
-    // it. Still never with the page — a visitor who goes nowhere near a
-    // Buy button fetches nothing from Stripe.
+    // it. Stripe.js too, but ONLY FOR A MOUSE: a hover comes well before
+    // the click, so the script is evaluated while the page is still; a
+    // finger's touchstart is 100ms before the tap, which put that work in
+    // the middle of the rise (2026-10-10). A touch or a key gets Stripe.js
+    // after the rise, from open(). Still never with the page — a visitor
+    // who goes nowhere near a Buy button fetches nothing from Stripe.
     function onIntent(e: Event) {
       if (!(e.target as Element).closest?.("a[data-plan]")) return;
-      preloadStripe();
       wakeCheckout();
+      if (e.type === "pointerover" && (e as PointerEvent).pointerType === "mouse") preloadStripe();
     }
     document.addEventListener("click", onClick);
     document.addEventListener("pointerover", onIntent, { passive: true });
