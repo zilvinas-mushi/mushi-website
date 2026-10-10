@@ -22,16 +22,21 @@
  */
 import { APP_URL } from "@/lib/site";
 
-/** The rule in the document, for a pointer resting on a Login button. */
-export const LOGIN_SPECULATION_RULES = {
-  prerender: [
-    {
-      source: "document",
-      where: { and: [{ href_matches: `${APP_URL}/*` }, { not: { selector_matches: "[data-plan]" } }] },
-      eagerness: "moderate",
-    },
-  ],
+/**
+ * The rule in the document, for a pointer resting on a Login button. PREFETCH
+ * AS WELL AS PRERENDER: a prerender is refused in more places than a fetch
+ * — a low-end device, memory pressure, Data Saver, DevTools open — and
+ * Chrome does not fall back on its own. The prefetch rule has the page's
+ * bytes here either way, so the click starts from a document already in
+ * hand (seen 2026-10-10: under DevTools the prerender was refused and the
+ * click used the prefetched response, PrefetchResponseUsed).
+ */
+const LOGIN_LINKS = {
+  source: "document",
+  where: { and: [{ href_matches: `${APP_URL}/*` }, { not: { selector_matches: "[data-plan]" } }] },
+  eagerness: "moderate",
 } as const;
+export const LOGIN_SPECULATION_RULES = { prefetch: [LOGIN_LINKS], prerender: [LOGIN_LINKS] } as const;
 
 let asked = false;
 
@@ -41,6 +46,7 @@ export function prerenderLogin(): void {
   asked = true;
   const rules = document.createElement("script");
   rules.type = "speculationrules";
-  rules.textContent = JSON.stringify({ prerender: [{ urls: [`${APP_URL}/`], eagerness: "immediate" }] });
+  const now = { urls: [`${APP_URL}/`], eagerness: "immediate" };
+  rules.textContent = JSON.stringify({ prefetch: [now], prerender: [now] });
   document.head.appendChild(rules);
 }

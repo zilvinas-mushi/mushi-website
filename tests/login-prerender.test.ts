@@ -18,15 +18,13 @@ describe("the login page is rendered ahead", () => {
     const layout = read("src/app/layout.tsx");
     expect(layout).toContain('<link rel="preconnect" href={APP_URL} />');
     expect(layout).toContain('<script type="speculationrules" dangerouslySetInnerHTML={{ __html: JSON.stringify(LOGIN_SPECULATION_RULES) }} />');
-    expect(LOGIN_SPECULATION_RULES).toEqual({
-      prerender: [
-        {
-          source: "document",
-          where: { and: [{ href_matches: `${APP_URL}/*` }, { not: { selector_matches: "[data-plan]" } }] },
-          eagerness: "moderate",
-        },
-      ],
-    });
+    const links = {
+      source: "document",
+      where: { and: [{ href_matches: `${APP_URL}/*` }, { not: { selector_matches: "[data-plan]" } }] },
+      eagerness: "moderate",
+    };
+    // Prefetch as well as prerender: the fetch runs where a prerender is refused.
+    expect(LOGIN_SPECULATION_RULES).toEqual({ prefetch: [links], prerender: [links] });
   });
 
   it("is asked for the moment the phone's drawer opens, since a tap gives no warning", () => {
@@ -34,7 +32,8 @@ describe("the login page is rendered ahead", () => {
     expect(header).toContain("if (!open) prerenderLogin();");
     const lib = read("src/lib/prerender.ts");
     expect(lib).toContain('rules.type = "speculationrules";');
-    expect(lib).toContain('JSON.stringify({ prerender: [{ urls: [`${APP_URL}/`], eagerness: "immediate" }] })');
+    expect(lib).toContain("const now = { urls: [`${APP_URL}/`], eagerness: \"immediate\" };");
+    expect(lib).toContain("JSON.stringify({ prefetch: [now], prerender: [now] })");
     // Once, and only where the browser knows the rules.
     expect(lib).toContain('if (asked || typeof document === "undefined" || !HTMLScriptElement.supports?.("speculationrules")) return;');
   });
