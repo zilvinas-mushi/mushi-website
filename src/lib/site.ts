@@ -38,8 +38,8 @@ export const SITE_TITLE = "Premium Ads for $1M to $100M Brands | Mushi";
  * here rather than by them. The square is second — iMessage and WhatsApp
  * prefer it, and a client that wants 1:1 takes the one that already is.
  */
-export const OG_IMAGE = "/images/og-mushi-rail.jpg";
-export const OG_IMAGE_SQUARE = "/images/og-mushi.jpg";
+export const OG_IMAGE = "/images/shared/og-mushi-rail.jpg";
+export const OG_IMAGE_SQUARE = "/images/shared/og-mushi.jpg";
 
 /**
  * The hero sub plus the social-proof line, which is what a search result and a

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CREATIVES } from "@/lib/content";
 import { RAIL_GUTTER, SHELL } from "@/lib/layout";
-import { CreativeCard } from "./CreativeCard";
+import { CreativeCard } from "@/components/home/CreativeCard";
 
 /**
  * Spring stiffness in rad/s. The spring is critically damped, so the rail

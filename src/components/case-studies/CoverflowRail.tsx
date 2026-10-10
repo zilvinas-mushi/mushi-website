@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import { VolumeOff, VolumeOn } from "./CreativeVideo";
-import { Img } from "./Img";
+import { VolumeOff, VolumeOn } from "@/components/shared/VolumeIcons";
+import { Img } from "@/components/shared/Img";
 
 /**
  * The /case-studies rails: Video Ads, Landing Pages, Static Ads.

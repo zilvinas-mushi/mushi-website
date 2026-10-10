@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
-import { Img } from "./Img";
-import { LazyImg } from "./CreativeCard";
-import { CoverflowRail } from "./CoverflowRail";
-import { ArrowDisc } from "./Sections";
+import { Img } from "@/components/shared/Img";
+import { LazyImg } from "@/components/shared/LazyImg";
+import { CoverflowRail } from "@/components/case-studies/CoverflowRail";
+import { ArrowDisc } from "@/components/shared/ArrowDisc";
 import { CASE_STUDIES_PAGE } from "@/lib/content";
 import { BOOKING_URL, CASE_STUDIES_CALL_ID, CASE_STUDIES_RAILS_ID, bookingTarget } from "@/lib/site";
 
@@ -310,7 +310,7 @@ export function CaseStudiesHero() {
                 {i < 3 ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={`/logos/${card.logo.src}`}
+                    src={`/images/shared/logos/${card.logo.src}`}
                     alt={card.brand}
                     width={card.logo.w}
                     height={card.logo.h}
@@ -319,7 +319,7 @@ export function CaseStudiesHero() {
                   />
                 ) : (
                   <LazyImg
-                    src={`/logos/${card.logo.src}`}
+                    src={`/images/shared/logos/${card.logo.src}`}
                     alt={card.brand}
                     width={card.logo.w}
                     height={card.logo.h}

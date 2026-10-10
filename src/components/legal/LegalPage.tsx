@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { LegalHero } from "./LegalHero";
-import { LegalToc } from "./LegalToc";
+import { LegalHero } from "@/components/legal/LegalHero";
+import { LegalToc } from "@/components/legal/LegalToc";
 import {
   LEGAL_DOCS,
   legalHref,

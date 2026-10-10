@@ -821,7 +821,7 @@ img[data-src-wait] {
      `100% 100%`, not `cover`: the vignette's dark corners have to land on the
      hero's real corners at whatever height it ends up, and stretching a blur
      costs nothing. */
-  background-image: url("/images/hero-light.webp");
+  background-image: url("/images/home/hero-light.webp");
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
@@ -877,7 +877,7 @@ img[data-src-wait] {
      heavier file is the price of that export's grain, which is exactly what
      lossy WebP cannot compress. */
   .hero-light {
-    background-image: url("/images/hero-light-mobile.webp");
+    background-image: url("/images/home/hero-light-mobile.webp");
   }
 
   .hero-grid {
@@ -1852,7 +1852,7 @@ img[data-src-wait] {
     only just lifts off the black.
   */
   background:
-    url("/images/cta-streaks.svg") center / 100% 100% no-repeat,
+    url("/images/home/cta-streaks.svg") center / 100% 100% no-repeat,
     linear-gradient(180deg, rgba(29, 9, 55, 0) 0%, rgba(29, 9, 55, 1) 100%),
     var(--bg);
 }
@@ -1956,7 +1956,7 @@ img[data-src-wait] {
    there was no reason to hand a retina phone anything less. */
 @media (max-width: 767px) {
   .cta-card {
-    background: url("/images/cta-card-phone.webp") center / 100% 100% no-repeat,
+    background: url("/images/home/cta-card-phone.webp") center / 100% 100% no-repeat,
       var(--bg);
   }
 }

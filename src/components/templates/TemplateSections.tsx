@@ -1,7 +1,7 @@
 import { Fragment, type CSSProperties } from "react";
-import { BgFallback, Img } from "./Img";
-import { Logo } from "./Logo";
-import { Money } from "./Money";
+import { BgFallback, Img } from "@/components/shared/Img";
+import { Logo } from "@/components/shared/Logo";
+import { Money } from "@/components/shared/Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { APP_URL, BOOKING_URL, CALL_ADDRESS, CALL_PATH, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, bookingTarget } from "@/lib/site";
 

@@ -28,7 +28,7 @@ describe("the login page is rendered ahead", () => {
   });
 
   it("is asked for the moment the phone's drawer opens, since a tap gives no warning", () => {
-    const header = read("src/components/MobileHeader.tsx");
+    const header = read("src/components/layout/MobileHeader.tsx");
     expect(header).toContain("if (!open) prerenderLogin();");
     const lib = read("src/lib/prerender.ts");
     expect(lib).toContain('rules.type = "speculationrules";');

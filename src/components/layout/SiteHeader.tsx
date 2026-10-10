@@ -1,9 +1,9 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { Logo } from "./Logo";
-import { MobileHeader, type MobileCtaConfig, type MobileDrawerActions } from "./MobileHeader";
-import { HeaderCtaSwap } from "./HeaderCtaSwap";
-import { CTA_FILL, type HeaderCta } from "./headerCta";
+import { Logo } from "@/components/shared/Logo";
+import { MobileHeader, type MobileCtaConfig, type MobileDrawerActions } from "@/components/layout/MobileHeader";
+import { HeaderCtaSwap } from "@/components/layout/HeaderCtaSwap";
+import { CTA_FILL, type HeaderCta } from "@/components/layout/headerCta";
 import { NAV, navHref } from "@/lib/content";
 import { BOOKING_URL, SITE_NAME, bookingTarget } from "@/lib/site";
 

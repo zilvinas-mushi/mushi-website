@@ -17,7 +17,7 @@ describe("the call address", () => {
   });
 
   it("is a link in the answer, to the site's own path", () => {
-    const sections = readFileSync("src/components/TemplateSections.tsx", "utf8");
+    const sections = readFileSync("src/components/templates/TemplateSections.tsx", "utf8");
     expect(sections).toContain("{linkedAnswer(item.a)}");
     expect(sections).toContain("<a href={CALL_PATH}");
   });

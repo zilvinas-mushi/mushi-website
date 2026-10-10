@@ -68,7 +68,7 @@ the DOM so they are crawlable, and toggle with CSS/details rather than fetching.
 CTA and the scarcity line.
 
 **Footer — desktop.** Pulled from Figma node **`4167:280`** ("Footer desktop",
-1920 × 425) on 2026-08-19 and implemented in `src/components/SiteFooter.tsx`.
+1920 × 425) on 2026-08-19 and implemented in `src/components/layout/SiteFooter.tsx`.
 Every number below is the export's own, so **this section replaces the earlier
 screenshot reading** — that pass was close but wrong in six places, listed at
 the end. COPY.md carries the strings.
@@ -356,7 +356,7 @@ copy is `display:none` and never reaches the a11y tree.
 
 Built 2026-09-02 from a supplied screenshot (see the Templates section of
 COPY.md), not from Figma. Components live in
-`src/components/TemplateSections.tsx`; the colour-burst background is
+`src/components/templates/TemplateSections.tsx`; the colour-burst background is
 `.tpl-bg` / `.tpl-burst` in globals.css.
 
 ```

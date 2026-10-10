@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { BoltGlyph, LinkMark, ShieldGlyph } from "./plan-sheet-glyphs";
-import { Money } from "./Money";
+import { BoltGlyph, LinkMark, ShieldGlyph } from "@/components/checkout/plan-sheet-glyphs";
+import { Money } from "@/components/shared/Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { STEP_OUT_MS, StripePay, preloadStripe } from "./StripePay";
+import { STEP_OUT_MS, StripePay, preloadStripe } from "@/components/checkout/StripePay";
 import { checkoutSession, dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import Link from "next/link";

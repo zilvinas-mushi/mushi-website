@@ -58,8 +58,8 @@ describe("checkoutUrl", () => {
 });
 
 describe("the plan sheet", () => {
-  const sheet = read("src/components/PlanSheet.tsx");
-  const pay = read("src/components/StripePay.tsx");
+  const sheet = read("src/components/checkout/PlanSheet.tsx");
+  const pay = read("src/components/checkout/StripePay.tsx");
   const css = read("src/app/globals.css");
 
   it("pays in place: step one leads to the payment step, which mounts Stripe's fields", () => {

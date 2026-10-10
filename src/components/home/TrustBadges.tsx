@@ -57,17 +57,17 @@ const BADGES: Badge[] = [
   {
     titleLines: ["Foreplay Best", "Ad Award"],
     meta: "Winner 2025",
-    logo: "/badges/firstpick.webp",
+    logo: "/images/home/badges/firstpick.webp",
   },
   {
     titleLines: ["Trustpilot", "Reviews"],
     meta: "Rated 4.9",
-    logo: "/badges/trustpilot.webp",
+    logo: "/images/home/badges/trustpilot.webp",
   },
   {
     titleLines: ["FirstPick's VC", "Mentors"],
     meta: "AI Accelerator",
-    logo: "/badges/foreplay.webp",
+    logo: "/images/home/badges/foreplay.webp",
   },
 ];
 

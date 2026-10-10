@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { Pill } from "@/components/Sections";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { Pill } from "@/components/shared/ArrowDisc";
 import { NOT_FOUND } from "@/lib/content";
 import { SHELL } from "@/lib/layout";
 import { BOOKING_URL } from "@/lib/site";

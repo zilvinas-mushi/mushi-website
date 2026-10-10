@@ -19,14 +19,15 @@ describe("links that open the calendar", () => {
 
   it("every anchor that can carry the booking URL spreads the helper", () => {
     const files = [
-      "src/components/Sections.tsx",
-      "src/components/SiteHeader.tsx",
-      "src/components/HeaderCtaSwap.tsx",
-      "src/components/MobileHeader.tsx",
-      "src/components/SiteFooter.tsx",
-      "src/components/CaseStudyDetail.tsx",
-      "src/components/CaseStudySections.tsx",
-      "src/components/TemplateSections.tsx",
+      "src/components/shared/ArrowDisc.tsx",
+      "src/components/home/HomeSections.tsx",
+      "src/components/layout/SiteHeader.tsx",
+      "src/components/layout/HeaderCtaSwap.tsx",
+      "src/components/layout/MobileHeader.tsx",
+      "src/components/layout/SiteFooter.tsx",
+      "src/components/case-studies/CaseStudyDetail.tsx",
+      "src/components/case-studies/CaseStudySections.tsx",
+      "src/components/templates/TemplateSections.tsx",
     ];
     for (const file of files) {
       const source = readFileSync(file, "utf8");
@@ -37,7 +38,7 @@ describe("links that open the calendar", () => {
       const risky = anchors.filter(([, href]) =>
         /BOOKING_URL|CALL_PATH|^(cta\??|to|from|drawer\.wide)\.href\b/.test(href.trim()) ||
         // The Pill's own href: the hero and the 404 hand it the booking URL.
-        (href.trim() === "href" && file === "src/components/Sections.tsx"),
+        (href.trim() === "href" && file === "src/components/shared/ArrowDisc.tsx"),
       );
       expect(risky.length, `${file} has no booking anchors to check`).toBeGreaterThan(0);
       for (const [whole, href, rest] of risky) {

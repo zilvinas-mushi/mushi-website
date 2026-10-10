@@ -16,7 +16,7 @@ All this does is map the flat we-interiors page into that transparent screen.
 
     python3 scripts/build-we-interiors-card.py
 
-Writes public/images/case-we-interiors-macbook.webp.
+Writes public/images/home/case-we-interiors-macbook.webp.
 """
 
 import cv2
@@ -26,9 +26,9 @@ from PIL import Image
 # Žilvinas's clean render, copied into the repo so this is reproducible.
 # NOT 12-macbook-pro-mockup-space-black1.webp, which is a different render at
 # a different angle and does not match the export.
-MOCKUP = "public/images/macbook-clean.webp"
-PAGE = "public/images/rectangle161125747.webp"
-OUT = "public/images/case-we-interiors-macbook.webp"
+MOCKUP = "public/images/home/macbook-clean.webp"
+PAGE = "public/images/home/rectangle161125747.webp"
+OUT = "public/images/home/case-we-interiors-macbook.webp"
 SIZE = 680  # match the export's canvas so the card is unchanged
 
 # The mockup canvas is 680x674 — six px shorter than the card — and its device

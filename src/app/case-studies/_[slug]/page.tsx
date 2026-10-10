@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { CaseStudyBody, CaseStudyHero } from "@/components/CaseStudyDetail";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { CaseStudyBody, CaseStudyHero } from "@/components/case-studies/CaseStudyDetail";
 import { CASE_STUDY_DETAILS, type CaseStudySlug } from "@/lib/content";
 import {
   BOOKING_URL,

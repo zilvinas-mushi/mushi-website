@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { HERO_PANELS, type HeroPanel } from "@/lib/content";
-import { Img } from "./Img";
+import { Img } from "@/components/shared/Img";
 
 /**
  * Stat panels drifting in from the hero's left and right edges.
@@ -232,7 +232,7 @@ function StatBody({ p }: { p: Extract<HeroPanel, { variant: "stat" }> }) {
                   className="block"
                   style={{ width: "calc(var(--k) * 0.35)", height: "calc(var(--k) * 0.35)" }}
                 >
-                  <Img src="emoji-sunglasses.png" alt="" width={35} className="h-full w-full" />
+                  <Img src="home/emoji-sunglasses.png" alt="" width={35} className="h-full w-full" />
                 </span>
               </span>
             ) : (

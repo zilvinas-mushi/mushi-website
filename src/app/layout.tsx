@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
-import { CanvasTint } from "@/components/CanvasTint";
-import { PaintGate } from "@/components/PaintGate";
+import { CanvasTint } from "@/components/layout/CanvasTint";
+import { PaintGate } from "@/components/layout/PaintGate";
 import { PAINT_GATE_SCRIPT } from "@/lib/paint-gate-script";
 import { LOGIN_SPECULATION_RULES } from "@/lib/prerender";
 import {

@@ -141,7 +141,7 @@ When in doubt use **15px**. Pills use **100px**.
 
 Measured off the Figma frame at its **1920** reference width (supplied by
 Žilvinas, 2026-08-10) — not derived from the 1440 scale used elsewhere on this
-page. Implemented in `src/components/SiteHeader.tsx`, which drives all of it
+page. Implemented in `src/components/layout/SiteHeader.tsx`, which drives all of it
 from one custom property `--u` that equals 100px at 1920.
 
 | Part | Size at 1920 | In `--u` |
@@ -194,7 +194,7 @@ this fill when their own Figma measurements arrive.
 The four "ads" cards drifting in from the hero's edges. **All four are the same
 card** — same fill, border, rule, icon and meter; only the copy and position
 change. Measured at 1920 (supplied by Žilvinas, 2026-08-10) and implemented in
-`src/components/HeroPanels.tsx`, driven from one custom property `--k` that
+`src/components/home/HeroPanels.tsx`, driven from one custom property `--k` that
 equals 100px at 1920.
 
 | Part | Size at 1920 | In `--k` |
@@ -512,7 +512,7 @@ tiles and the cards stay in proportion at every width.
 ## Final CTA card
 
 The closing panel. Measured at 1920 (supplied by Žilvinas, 2026-08-11) and
-implemented in `FinalCta` in `src/components/Sections.tsx`. **Desktop only** —
+implemented in `FinalCta` in `src/components/home/HomeSections.tsx`. **Desktop only** —
 the numbers below are the desktop design; the phone card keeps its own smaller
 treatment.
 

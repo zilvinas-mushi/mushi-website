@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { bookingTarget } from "@/lib/site";
-import { CTA_FILL, type HeaderCta } from "./headerCta";
+import { CTA_FILL, type HeaderCta } from "@/components/layout/headerCta";
 
 /**
  * The /templates header CTA: "Login" at the top of the page, "Buy Now" once
