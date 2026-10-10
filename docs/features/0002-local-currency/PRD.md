@@ -84,7 +84,12 @@ wrong:
 
 - **D1 — Which currencies.** EUR, for the euro area. GBP and CHF are one
   entry in `LOCAL_CURRENCIES`, one amount per plan, one pair of CSS lines
-  and one line in the head script's zone list each, when wanted.
+  and one line in the head script's zone list each, when wanted — and
+  wanted on 2026-10-10 ("it should be both chf and gbp"): £ for the UK and
+  the Crown dependencies, "CHF " for Switzerland and Liechtenstein, the
+  same numbers. Stripe test mode had been given both by hand on the 7th
+  and the catalog is now held to it; live takes them from
+  `npm run stripe:apply -- --live --yes`, run by a person.
 - **D2 — VAT.** €5 is €5: the EU price includes whatever VAT is due, so
   Mushi keeps less of a euro sale than of a dollar one. (Open risk in 0001
   still.)

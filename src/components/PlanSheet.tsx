@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, ShieldGlyph } from "./plan-sheet-glyphs";
 import { Money } from "./Money";
@@ -33,16 +33,21 @@ import { APP_URL } from "@/lib/site";
  * IT RISES FROM THE BOTTOM, see OPEN_MS, the backdrop fading with it.
  * Escape and the backdrop dismiss it, and the page behind it does not scroll.
  *
- * IT IS BUILT BEFORE IT IS ASKED FOR (Žilvinas 2026-10-05, on the hold
- * after Buy: "can we make it instant???"). The payment step needs a session
- * from the webapp, Stripe's own start-up call and Stripe's frames — a
- * second and a half however it is arranged, and a buyer who opens the sheet
- * and presses Buy does it in less. So the whole sheet is put in the DOM
- * off stage, inert and unseen, at the first sign of a person on the page
- * (see `prepared`), and its payment step loads there. Opening it is then
- * only the rise, and Buy only the step change. Before that first sign — a
- * crawler, a visitor who never moves — it is nothing in the DOM, and
- * nothing is fetched from Stripe.
+ * THE SHEET IS IN THE DOM BEFORE IT IS ASKED FOR (Žilvinas 2026-10-05, on
+ * the hold after Buy: "can we make it instant???"): put there off stage,
+ * inert and unseen, at the first sign of a person on the page (see
+ * `prepared`), so opening it is only the rise. Before that first sign — a
+ * crawler, a visitor who never moves — it is nothing in the DOM.
+ *
+ * NOTHING FROM STRIPE UNTIL IT IS OPENED (Žilvinas 2026-10-10, "templates
+ * page is super super slow ... dont preload all plans"). The payment steps
+ * used to be built off stage at that first sign too, all three of them:
+ * 13 iframes, 11 MB and close to five seconds of CPU, behind a page the
+ * visitor was merely reading. Now a step is built only once the sheet is
+ * open — the chosen plan's first, each step that is presentable starting
+ * the next, a pick jumping the queue (see `built`) — so by the time a buyer
+ * has read the plans every step is there and Buy is only the step change,
+ * while a reader who never opens the sheet is never asked to pay for it.
  *
  * STRIPE IS WIRED (2026-10-04). Step two pays in place: the card fields are
  * Stripe's own, mounted by StripePay from a session the webapp creates
@@ -63,6 +68,19 @@ const STALE_MS = 6 * 60 * 60_000;
 
 /** The address that opens the sheet on arrival: `/templates#buy`. The webapp links to it. */
 export const BUY_HASH = "#buy";
+
+/**
+ * THE QUEUE: the next plan whose payment step is to be built — once every
+ * step built so far has settled, presentable or given up, and in the order
+ * the plans are listed. One at a time, so the sheet never has three of
+ * Stripe's checkouts loading over each other, and never while the sheet is
+ * closed (the callers check): a buyer who left it is reading the page
+ * again, and nothing may load behind them.
+ */
+function nextToBuild(built: readonly PlanId[], steps: Record<string, { ready: boolean }>): PlanId | undefined {
+  if (built.some((id) => !steps[id]?.ready)) return undefined;
+  return TEMPLATES_PAGE.plans.options.map((o) => o.id as PlanId).find((id) => !built.includes(id));
+}
 
 /**
  * The struck-through old price, in the frame's red ramp: #DE8A8B at 0%,
@@ -140,6 +158,15 @@ export function PlanSheet() {
    * or has failed to load.
    */
   const pay = useRef<Record<string, { ready: boolean; failed: boolean }>>({});
+  /**
+   * THE PLANS WHOSE PAYMENT STEPS ARE BUILT, in the order they were asked
+   * for; empty until the sheet is first opened (see the note at the top).
+   * The chosen plan goes in at open(), a pick goes in at once, and the
+   * queue below adds the next plan each time every step so far has
+   * settled — one at a time, so the sheet never has three of Stripe's
+   * checkouts loading over each other.
+   */
+  const [built, setBuilt] = useState<PlanId[]>([]);
   const holdTimer = useRef(0);
   const [holding, setHolding] = useState(false);
   /** Buy has been pressed and is waiting for the chosen plan's step. */
@@ -151,10 +178,13 @@ export function PlanSheet() {
    */
   const [fit, setFit] = useState(1);
 
-  const open = () => {
+  // AN EFFECT EVENT, not a plain closure: it is called from listeners bound
+  // once, at mount, and this way it still reads the latest choice of plan
+  // and the steps built so far.
+  const open = useEffectEvent(() => {
     // The buyer has asked for the sheet. Stripe.js is usually here already
-    // (see the intent listener below); the payment step itself mounts with
-    // the sheet and loads behind the plan step.
+    // (see the intent listener below); the chosen plan's payment step is
+    // built from here and loads behind the plan step.
     preloadStripe();
     window.clearTimeout(closeTimer.current);
     // THE RISE STARTS FROM A FORCED LAYOUT, not from a frame or two of
@@ -177,12 +207,17 @@ export function PlanSheet() {
     if (stale || !preparedAt.current) preparedAt.current = Date.now();
     if (stale) pay.current = {};
     held.current = false;
+    // The first step, or all of them again: the chosen plan's. A sheet
+    // opened again carries on where its queue stopped.
+    const steps = stale || !built.length ? [planId as PlanId] : built;
+    const next = nextToBuild(steps, pay.current);
     flushSync(() => {
       setHolding(false);
       setStep("plan");
       setStepIn(true);
       setPrepared(true);
       if (stale) setAttempt((n) => n + 1);
+      setBuilt(next ? [...steps, next] : steps);
       setMounted(true);
     });
     if (panelRef.current) {
@@ -191,7 +226,7 @@ export function PlanSheet() {
     }
     void panelRef.current?.getBoundingClientRect();
     setShown(true);
-  };
+  });
   const goPay = () => {
     if (held.current) return;
     if (!pay.current[planId]?.ready) {
@@ -211,6 +246,8 @@ export function PlanSheet() {
       setHolding(false);
     }
     setPlanId(id);
+    // Its step starts now, ahead of the queue, in case Buy is next.
+    if (!built.includes(id as PlanId)) setBuilt([...built, id as PlanId]);
   };
   const showPay = () => {
     held.current = false;
@@ -390,9 +427,25 @@ export function PlanSheet() {
   // off screen, the whole time the sheet was open and snapped back the
   // instant the lock came off. Scrolling inside the sheet's own panel is
   // still allowed when it has somewhere to go (the phone).
+  //
+  // AND THE ROOT IS HELD STILL AS WELL (Žilvinas 2026-10-07, "you can scroll
+  // background with the popup?? what?"). Swallowing the events was not
+  // enough once the payment step was Stripe's: a wheel over its card fields
+  // lands in Stripe's iframe, which this document never hears about, and
+  // the scroll chains out of the frame into the page. So while the sheet is
+  // open <html> — the viewport's scroller, which sticky still answers to;
+  // the trouble above was overflow on BODY — is given overflow hidden, and
+  // a scroll that chains out of a frame finds nowhere to go. The scrollbar
+  // it takes away is paid for with padding, so nothing shifts. Touch has
+  // its own cure: touch-action on the frames' boxes (StripePay).
   useEffect(() => {
     if (!mounted) return;
     const panel = panelRef.current;
+    const root = document.documentElement;
+    const gutter = window.innerWidth - root.clientWidth;
+    const was = { overflowY: root.style.overflowY, paddingRight: document.body.style.paddingRight };
+    root.style.overflowY = "hidden";
+    if (gutter > 0) document.body.style.paddingRight = `${gutter}px`;
     const inPanel = (t: EventTarget | null) =>
       !!panel && t instanceof Node && panel.contains(t) && panel.scrollHeight > panel.clientHeight;
     const block = (e: Event) => {
@@ -413,6 +466,8 @@ export function PlanSheet() {
       document.removeEventListener("wheel", block);
       document.removeEventListener("touchmove", block);
       document.removeEventListener("keydown", onKey);
+      root.style.overflowY = was.overflowY;
+      document.body.style.paddingRight = was.paddingRight;
     };
   }, [mounted]);
 
@@ -568,7 +623,9 @@ export function PlanSheet() {
                         // pl/pb 1: optical centring (Žilvinas 2026-09-25, "should be centred
                         // both horizontally and vertically") — the box is centred to the
                         // sub-pixel, but Poppins' $ and 0 lean the word left and low.
-                        className="absolute -top-[7.5px] left-[41px] z-[1] flex h-[20px] w-[74px] items-center justify-center rounded-[5px] bg-white pb-[1px] pl-[1px] text-center text-[12px] font-semibold leading-none text-black"
+                        // 74 is the width for "SAVE $60"; "SAVE CHF 60" is wider, so
+                        // the pill grows from it rather than cutting the figure.
+                        className="absolute -top-[7.5px] left-[41px] z-[1] flex h-[20px] min-w-[74px] items-center justify-center whitespace-nowrap rounded-[5px] bg-white px-[6px] pb-[1px] pl-[7px] text-center text-[12px] font-semibold leading-none text-black"
                       >
                         <Money>{o.save}</Money>
                       </span>
@@ -660,11 +717,11 @@ export function PlanSheet() {
             the width it will have (the panel's on a phone, the 776 frame on
             a desktop), since Stripe arranges its fields by width.
 
-            EVERY PLAN'S, not only the chosen one's — see `pay`. A different
-            plan picked on step one builds nothing: its step has been
-            loading beside the others and is put on stage in the chosen
-            one's place. The webapp's endpoint only creates a Stripe
-            session, which costs nothing and expires. */}
+            EVERY PLAN'S IN TURN, not only the chosen one's — see `built`.
+            A different plan picked on step one is usually already loading
+            beside the first and is put on stage in its place; one that is
+            not starts the moment it is picked. The webapp's endpoint only
+            creates a Stripe session, which costs nothing and expires. */}
         <div
           className={step === "plan" ? "pointer-events-none absolute inset-0 overflow-hidden opacity-0" : undefined}
           inert={step === "plan"}
@@ -711,15 +768,17 @@ export function PlanSheet() {
             </div>
 
             {/* The card fields, the email and Submit: Stripe's own fields in
-                the sheet's clothes — see StripePay. ONE FOR EACH PLAN, each
-                paying for its own plan's session, and only the chosen plan's
-                on stage. The others stand under it exactly as the whole step
-                stands behind step one: out of flow, see-through and inert,
-                but at their full size, because Stripe will not draw into a
-                box that has none. They are never unmounted for a change of
-                plan — only `attempt` builds them again. */}
+                the sheet's clothes — see StripePay. ONE FOR EACH PLAN THAT
+                HAS BEEN ASKED FOR (`built`: the chosen plan at open, then
+                the rest one at a time), each paying for its own plan's
+                session, and only the chosen plan's on stage. The others
+                stand under it exactly as the whole step stands behind step
+                one: out of flow, see-through and inert, but at their full
+                size, because Stripe will not draw into a box that has none.
+                They are never unmounted for a change of plan — only
+                `attempt` builds them again. */}
             <div className="relative">
-              {c.options.map((o) => {
+              {c.options.filter((o) => built.includes(o.id as PlanId)).map((o) => {
                 const on = o.id === plan.id;
                 const hosted = checkoutUrl(o.id as PlanId);
                 return (
@@ -777,6 +836,10 @@ export function PlanSheet() {
                     }
                     onPresentable={(ok, state) => {
                       pay.current[o.id] = { ready: ok, failed: state === "unavailable" };
+                      // One settled: the queue takes the next plan — while
+                      // the sheet is up, not one that is closing or closed.
+                      const next = ok && shown ? nextToBuild(built, pay.current) : undefined;
+                      if (next) setBuilt([...built, next]);
                       // Buy was pressed and has been waiting for exactly this.
                       if (ok && on && held.current && step === "plan") showPay();
                     }}
