@@ -161,8 +161,17 @@ price in one place only and `npm test` goes red. PRD and plan:
   only reads the sheet's source — it stayed green while a buyer who changed
   plan waited for Stripe a second time (2026-10-05). A change to
   `PlanSheet.tsx`, `StripePay.tsx` or `lib/checkout.ts` is not done until this
-  passes. Each plan keeps its own `StripePay`, built off stage; never key one
-  by the chosen plan. `-- --url https://mushi.agency` checks the live site.
+  passes. Each plan keeps its own `StripePay`; never key one by the chosen
+  plan. `-- --url https://mushi.agency` checks the live site.
+- **Nothing from Stripe until the sheet is opened, and the gate checks that
+  too.** A reader who moves the pointer gets the sheet in the DOM off stage
+  and nothing else: no frame of Stripe's, no session. The three payment
+  steps are built once the sheet is open, one at a time — the chosen plan's
+  first, a pick jumping the queue — and the queue stops while it is closed.
+  Building all three at the first pointer move was 13 iframes, 11 MB and
+  close to five seconds of CPU behind a page the visitor was only reading
+  (2026-10-10, "templates page is super super slow"). Never prepare Stripe
+  for someone who has not asked to buy.
 
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.
