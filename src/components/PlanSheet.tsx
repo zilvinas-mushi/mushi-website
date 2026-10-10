@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, ShieldGlyph } from "./plan-sheet-glyphs";
 import { Money } from "./Money";
@@ -133,6 +133,86 @@ const VIOLET =
 const FIELD =
   "h-[45px] w-full bg-[#222222] px-4 text-[18px] text-white placeholder:text-white/50 outline-none [color-scheme:dark] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#8b6ad6] autofill:shadow-[inset_0_0_0_1000px_#222222] autofill:[-webkit-text-fill-color:#ffffff] md:h-[56px] md:px-[22px] md:text-[22px]";
 
+/**
+ * ONE PLAN'S PAYMENT STEP: StripePay in the sheet's clothes, on stage or
+ * standing under the chosen one. Its own component so that it holds still:
+ * its props are the plan, whether it is on, and one function that never
+ * changes (`report`), so the sheet's own state — a step change, a hold, the
+ * queue — re-renders nothing in here. Only a pick of this plan or another
+ * does, and that is a change of `on` alone.
+ */
+function PlanStep({
+  planId,
+  on,
+  onPresentable,
+}: {
+  planId: PlanId;
+  on: boolean;
+  onPresentable: (id: PlanId, ok: boolean, state?: "ready" | "unavailable") => void;
+}) {
+  const c = TEMPLATES_PAGE.plans;
+  const hosted = checkoutUrl(planId);
+  return (
+    <div
+      className={on ? undefined : "pointer-events-none absolute inset-x-0 top-0 opacity-0"}
+      inert={!on}
+      aria-hidden={on ? undefined : true}
+    >
+      <StripePay
+        planId={planId}
+        fallbackHref={(email) => checkoutUrl(planId, undefined, email || undefined)}
+        // Stripe Link, in its own green: this one opens the plan on
+        // Stripe's hosted page, and stands in until Stripe's own Link
+        // button (which opens Link in a small window) is ready.
+        linkFallback={
+          <a
+            href={hosted}
+            // IN ITS OWN SMALL WINDOW (Žilvinas 2026-10-04, as on
+            // Sintra's checkout), not by taking this page away: the
+            // sheet stays where it is behind it. A blocked popup falls
+            // through to the plain link. /thank-you hands the result
+            // back to this tab and closes the window.
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+              const w = 480;
+              const h = 760;
+              const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - w) / 2));
+              const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - h) / 2));
+              const popup = window.open(hosted, "mushi-checkout", `popup,width=${w},height=${h},left=${left},top=${top}`);
+              if (popup) e.preventDefault();
+            }}
+            className="flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90 md:h-[62px] md:gap-[8px] md:rounded-[15px] md:text-[25px]"
+          >
+            {/* Medium 18 and the client's 61 x 21 mark (Žilvinas 2026-09-25). */}
+            {c.pay.payWith}
+            <LinkMark className="h-[21px] w-[61px] md:h-[29px] md:w-[84px]" />
+          </a>
+        }
+        divider={
+          <>
+            {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
+            {/* 11 between the rules and the word (Žilvinas 2026-09-25, the 11 x 9 spacer; it was 13). */}
+            <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090] md:mt-[24px] md:h-[32px] md:gap-[16px] md:text-[24px]">
+              {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
+              <span className="h-[2px] flex-1 bg-white/25" />
+              {c.pay.or}
+              <span className="h-[2px] flex-1 bg-white/25" />
+            </div>
+
+            {/* Medium 20, 25 under the rule — the inspector's 14 x 25 spacer
+                (Žilvinas 2026-09-25; the message said 28, the spacer 25). */}
+            <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
+          </>
+        }
+        onPresentable={(ok, state) => onPresentable(planId, ok, state)}
+        labels={{ email: c.pay.email, submit: c.pay.submit }}
+        fieldClass={FIELD}
+        submitClass={VIOLET}
+      />
+    </div>
+  );
+}
+
 export function PlanSheet() {
   const c = TEMPLATES_PAGE.plans;
   const [mounted, setMounted] = useState(false);
@@ -193,6 +273,16 @@ export function PlanSheet() {
    * or has failed to load.
    */
   const pay = useRef<Record<string, { ready: boolean; failed: boolean }>>({});
+  /**
+   * A STEP'S WORD REACHES THE SHEET THROUGH ONE STABLE FUNCTION (2026-10-10):
+   * a callback made afresh each render was a new prop for every PlanStep on
+   * every state change, and so Buy — a change of `step` — re-rendered all
+   * three steps' forms, 100–150ms on a 4x CPU, under the step change. The
+   * handler below is kept current in an effect; the function the steps hold
+   * never changes, so a step re-renders only when its own plan is picked.
+   */
+  const presentable = useRef<(id: PlanId, ok: boolean, state?: "ready" | "unavailable") => void>(() => {});
+  const report = useCallback((id: PlanId, ok: boolean, state?: "ready" | "unavailable") => presentable.current(id, ok, state), []);
   /**
    * THE PLANS WHOSE PAYMENT STEPS ARE BUILT, in the order they were asked
    * for; empty until the sheet is first opened (see the note at the top).
@@ -575,6 +665,30 @@ export function PlanSheet() {
     };
   }, [mounted]);
 
+  useEffect(() => {
+    presentable.current = (id, ok, state) => {
+      pay.current[id] = { ready: ok, failed: state === "unavailable" };
+      // One settled: the queue takes the next plan — in the next quiet
+      // moment, and only while the sheet is up ON THE PLAN STEP, where
+      // another plan can still be picked. A buyer on the payment step is
+      // typing an email; mounting a step there (30–45ms of style and
+      // layout, more on a slow CPU) is a hitch under their hands for a plan
+      // they can no longer choose. A sheet closed and opened again picks
+      // the queue up.
+      if (ok && shown && step === "plan") {
+        whenQuiet(quietAt.current, () => {
+          if (!openRef.current) return;
+          setBuilt((b) => {
+            const next = nextToBuild(b, pay.current);
+            return next ? [...b, next] : b;
+          });
+        });
+      }
+      // Buy was pressed and has been waiting for exactly this.
+      if (ok && id === planId && held.current && step === "plan") showPay();
+    };
+  });
+
   if (!mounted && !prepared) return null;
 
   const plan = c.options.find((o) => o.id === planId) ?? c.options[0];
@@ -882,91 +996,9 @@ export function PlanSheet() {
                 They are never unmounted for a change of plan — only
                 `attempt` builds them again. */}
             <div className="relative">
-              {c.options.filter((o) => built.includes(o.id as PlanId)).map((o) => {
-                const on = o.id === plan.id;
-                const hosted = checkoutUrl(o.id as PlanId);
-                return (
-                  <div
-                    key={`${o.id}:${attempt}`}
-                    className={on ? undefined : "pointer-events-none absolute inset-x-0 top-0 opacity-0"}
-                    inert={!on}
-                    aria-hidden={on ? undefined : true}
-                  >
-                  <StripePay
-                    planId={o.id as PlanId}
-                    fallbackHref={(email) => checkoutUrl(o.id as PlanId, undefined, email || undefined)}
-                    // Stripe Link, in its own green: this one opens the plan on
-                    // Stripe's hosted page, and stands in until Stripe's own Link
-                    // button (which opens Link in a small window) is ready.
-                    linkFallback={
-                      <a
-                        href={hosted}
-                        // IN ITS OWN SMALL WINDOW (Žilvinas 2026-10-04, as on
-                        // Sintra's checkout), not by taking this page away: the
-                        // sheet stays where it is behind it. A blocked popup falls
-                        // through to the plain link. /thank-you hands the result
-                        // back to this tab and closes the window.
-                        onClick={(e) => {
-                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-                          const w = 480;
-                          const h = 760;
-                          const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - w) / 2));
-                          const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - h) / 2));
-                          const popup = window.open(hosted, "mushi-checkout", `popup,width=${w},height=${h},left=${left},top=${top}`);
-                          if (popup) e.preventDefault();
-                        }}
-                        className="flex h-[50px] w-full items-center justify-center gap-[6px] rounded-[10px] bg-[#00da62] text-[18px] font-medium leading-none text-black transition-opacity duration-150 hover:opacity-90 md:h-[62px] md:gap-[8px] md:rounded-[15px] md:text-[25px]"
-                      >
-                        {/* Medium 18 and the client's 61 x 21 mark (Žilvinas 2026-09-25). */}
-                        {c.pay.payWith}
-                        <LinkMark className="h-[21px] w-[61px] md:h-[29px] md:w-[84px]" />
-                      </a>
-                    }
-                    divider={
-                      <>
-                        {/* "or": Poppins Regular 20, #909090 (Žilvinas 2026-09-25). */}
-                        {/* 11 between the rules and the word (Žilvinas 2026-09-25, the 11 x 9 spacer; it was 13). */}
-                        <div className="mt-[20px] flex items-center gap-[11px] text-[20px] leading-none text-[#909090] md:mt-[24px] md:h-[32px] md:gap-[16px] md:text-[24px]">
-                          {/* 2 weight (Žilvinas 2026-09-25, the frame's 326 x 0 line). */}
-                          <span className="h-[2px] flex-1 bg-white/25" />
-                          {c.pay.or}
-                          <span className="h-[2px] flex-1 bg-white/25" />
-                        </div>
-      
-                        {/* Medium 20, 25 under the rule — the inspector's 14 x 25 spacer
-                            (Žilvinas 2026-09-25; the message said 28, the spacer 25). */}
-                        <p className="mt-[25px] text-[20px] font-medium leading-none text-white md:mt-[14px] md:text-[26px]">{c.pay.cardInfo}</p>
-                      </>
-                    }
-                    onPresentable={(ok, state) => {
-                      pay.current[o.id] = { ready: ok, failed: state === "unavailable" };
-                      // One settled: the queue takes the next plan — in the
-                      // next quiet moment, and only while the sheet is up ON
-                      // THE PLAN STEP, where another plan can still be
-                      // picked. A buyer on the payment step is typing an
-                      // email; mounting a step there (30–45ms of style and
-                      // layout, more on a slow CPU) is a hitch under their
-                      // hands for a plan they can no longer choose. A sheet
-                      // closed and opened again picks the queue up.
-                      if (ok && shown && step === "plan") {
-                        whenQuiet(quietAt.current, () => {
-                          if (!openRef.current) return;
-                          setBuilt((b) => {
-                            const next = nextToBuild(b, pay.current);
-                            return next ? [...b, next] : b;
-                          });
-                        });
-                      }
-                      // Buy was pressed and has been waiting for exactly this.
-                      if (ok && on && held.current && step === "plan") showPay();
-                    }}
-                    labels={{ email: c.pay.email, submit: c.pay.submit }}
-                    fieldClass={FIELD}
-                    submitClass={VIOLET}
-                  />
-                  </div>
-                );
-              })}
+              {c.options.filter((o) => built.includes(o.id as PlanId)).map((o) => (
+                <PlanStep key={`${o.id}:${attempt}`} planId={o.id as PlanId} on={o.id === plan.id} onPresentable={report} />
+              ))}
             </div>
 
             <p className="mt-[19px] flex items-center justify-center gap-[22px] text-[12px] leading-none text-white/60 md:mt-[16px] md:gap-[40px] md:text-[17px]">
