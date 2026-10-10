@@ -696,7 +696,7 @@ export function StripePay({
             ref={linkMount}
             // touch-none: a finger panning over Stripe's frame must not scroll
             // the page behind the sheet (PlanSheet, the lock).
-            className="min-h-[50px] touch-none md:w-[calc(100%/(1.24*var(--fit,1)))] md:origin-top-left md:[scale:calc(1.24*var(--fit,1))] md:[zoom:var(--unfit,1)]"
+            className="stripe-grow min-h-[50px] touch-none [--grow:1.24]"
           />
         </div>
       </div>
@@ -756,23 +756,24 @@ export function StripePay({
                 its top left corner, so Stripe sees a phone's width and lays
                 the fields out for one.
 
-                A TRANSFORM, NOT `zoom` (Žilvinas 2026-10-06, after the phone:
-                "did you fix it?" — of desktop Safari). It was md:[zoom:1.6].
-                WebKit draws what is inside an iframe at the zoom of the box
-                round it but lays it out at the UNZOOMED width, so in Safari —
-                and on every iPad, which gets this layout — Stripe saw 727px,
-                put the three fields in one row and drew that row 1.6x too
-                wide for its frame: the security code was off the edge.
-                A transform is the same in every browser.
-
-                So no zoom at all may reach Stripe's frames, and the sheet
-                itself is zoomed to fit a short window (`fit`, PlanSheet).
-                --unfit undoes that here and --fit goes into the scale
-                instead; both are 1 unless the window is short. */}
+                HOW IT IS GROWN IS THE BROWSER'S (.stripe-grow, globals.css):
+                `zoom` everywhere but WebKit, a transform there. Zoom lays the
+                frame out at the small width and DRAWS it at the large one,
+                so Stripe's vector icons and type are as sharp as the sheet's
+                — a transform scales a picture the frame drew at 1x, and the
+                card brands came out soft (Žilvinas 2026-10-10, "why these
+                icons look blurred?"). WebKit cannot have the zoom (Žilvinas
+                2026-10-06, "did you fix it?" — of desktop Safari): it draws
+                what is inside an iframe at the zoom of the box but lays it
+                out at the UNZOOMED width, so Stripe saw 727px, put the three
+                fields in one row and drew it 1.6x too wide — the security
+                code was off the edge. So there, and on every iPad, it stays
+                the transform, with the sheet's own fit zoom (`fit`,
+                PlanSheet) undone by --unfit and folded into the scale. */}
             <div
               ref={fields}
               // touch-none: see the Link slot.
-              className="relative flow-root touch-none bg-[#222222] md:w-[calc(100%/(1.6*var(--fit,1)))] md:origin-top-left md:[scale:calc(1.6*var(--fit,1))] md:[zoom:var(--unfit,1)]"
+              className="stripe-grow relative flow-root touch-none bg-[#222222] [--grow:1.6]"
             >
               {/* Out of the block by OVERSCAN on every side while the ring is
                   shaped — see the note there. A flow-root of its own, or its
