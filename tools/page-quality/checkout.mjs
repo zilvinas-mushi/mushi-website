@@ -13,6 +13,11 @@
  *   built at that first move — 13 iframes and 11 MB behind a page the
  *   visitor was reading.
  *
+ *   THE RISE IS SMOOTH (Žilvinas 2026-10-10, "a VERY VERY BUG when popup
+ *   was going upwards"): the sheet is opened on a CPU throttled 4x, and no
+ *   frame of its rise may take longer than RISE_FRAME_MS. The first Stripe
+ *   build used to start in the same breath, and stalled the rise for 200ms.
+ *
  *   BUY IS INSTANT ON EVERY PLAN. The visitor opens the sheet; its three
  *   payment steps are built in turn while it is up. Then, for each plan,
  *   at a laptop's width and a phone's: the sheet is opened, the plan is
@@ -81,6 +86,15 @@ const READER_MS = 4000;
  * runner is allowed to be many times slower than that.
  */
 const READER_CPU_MS = 1500;
+/**
+ * THE RISE'S BUDGET: the longest a frame may take while the sheet comes up
+ * (OPEN_MS, 560ms), on a CPU throttled 4x. A clean rise is 9–18ms a frame
+ * there; the stall this guards against was 170–200ms. Headless Chrome draws
+ * the desktop's backdrop blur in software, which costs it 40–50ms frames
+ * that a real GPU does not have, so the bar sits well above those.
+ */
+const RISE_FRAME_MS = 100;
+const RISE_MS = 600;
 /**
  * From the fields being in to the step calling itself presentable: 350ms for
  * Stripe's frame to stop moving and up to 1500 for the Link button's answer
@@ -275,8 +289,31 @@ async function buy(browser, window) {
     console.log(`  ${readerProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} a reader     ${readerProblems.length ? readerProblems.join("; ") : `nothing from Stripe, ${cpuMs}ms of CPU`}`);
     for (const problem of readerProblems) failures.push(`${window.name}, a reader who has moved but not opened the sheet: ${problem}`);
 
-    // The sheet is opened, and its three steps are built in turn while it is up.
-    await page.evaluate(() => document.querySelector("a[data-plan]").click());
+    // The sheet is opened — on a slow CPU, its rise's frames timed — and
+    // its three steps are built in turn while it is up.
+    await page.emulateCPUThrottling(4);
+    const rise = await page.evaluate(async (riseMs) => {
+      const frames = [];
+      const t0 = performance.now();
+      let last = t0;
+      let stop = false;
+      const tick = (t) => {
+        frames.push({ ms: t - last, at: t - t0 });
+        last = t;
+        if (!stop) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      document.querySelector("a[data-plan]").click();
+      await new Promise((done) => setTimeout(done, riseMs + 100));
+      stop = true;
+      const inRise = frames.filter((f) => f.at <= riseMs);
+      const worst = inRise.reduce((a, f) => (f.ms > a.ms ? f : a), { ms: 0, at: 0 });
+      return { frames: inRise.length, worst: Math.round(worst.ms), at: Math.round(worst.at) };
+    }, RISE_MS);
+    await page.emulateCPUThrottling(1);
+    const riseProblem = rise.worst > RISE_FRAME_MS ? `a ${rise.worst}ms frame ${rise.at}ms into the rise, over ${RISE_FRAME_MS}` : null;
+    console.log(`  ${riseProblem ? "FAIL" : "pass"}  ${window.name.padEnd(8)} the rise     ${riseProblem ?? `${rise.frames} frames, the longest ${rise.worst}ms`}`);
+    if (riseProblem) failures.push(`${window.name}, the sheet's rise on a 4x-throttled CPU: ${riseProblem}`);
     const deadline = Date.now() + LOAD_MS;
     let steps = [];
     while (Date.now() < deadline) {
@@ -447,7 +484,7 @@ const failures = [];
 try {
   console.log(`Checkout — ${remote ?? `the export in out/, served as ${ORIGIN}`}`);
   console.log(
-    `\nNothing from Stripe for a reader who has not opened the sheet. Buy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped — still shaped when the window changes width — and in euros when asked`,
+    `\nNothing from Stripe for a reader who has not opened the sheet, and a smooth rise on a slow CPU. Buy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped — still shaped when the window changes width — and in euros when asked`,
   );
   for (const window of WINDOWS) {
     try {
