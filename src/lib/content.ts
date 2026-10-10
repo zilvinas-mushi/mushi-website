@@ -1621,16 +1621,16 @@ export const CASE_STUDY_CALL = {
 
 /** The bottom bar's links, declared once and ordered per frame below. */
 /**
- * None of these documents exist yet, so every one carries `href: null` and the
- * footer renders it as text rather than as a link — see the note on NAV. The
- * hrefs they used to carry (#privacy, #terms, ...) pointed at anchors that are
- * nowhere on the page.
+ * The three documents live at /legal/<slug> (src/lib/legal.ts, one page
+ * rendering all three) since 2026-10-10. The Money-Back Guarantee is section
+ * 1 of the Refund Policy, so it goes there. Before that every entry carried
+ * `href: null` and the footer rendered it as text — see the note on NAV.
  */
 const LEGAL = {
-  privacy: { label: "Privacy Policy", href: null },
-  terms: { label: "Terms & Conditions", href: null },
-  refund: { label: "Refund Policy", href: null },
-  guarantee: { label: "Money-Back Guarantee", href: null },
+  privacy: { label: "Privacy Policy", href: "/legal/privacy-policy" },
+  terms: { label: "Terms & Conditions", href: "/legal/terms-and-conditions" },
+  refund: { label: "Refund Policy", href: "/legal/refund-policy" },
+  guarantee: { label: "Money-Back Guarantee", href: "/legal/refund-policy#section-1" },
 } as const;
 
 /**

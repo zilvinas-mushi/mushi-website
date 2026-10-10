@@ -14,6 +14,7 @@ by a future session, or by you.
 | [COPY.md](COPY.md) | Authoritative copy deck for the home page |
 | [ASSETS.md](ASSETS.md) | Inventory of all 92 exported assets |
 | [CASE-STUDIES.md](CASE-STUDIES.md) | The `/case-studies` page: nodes, every measurement, how its artwork was made |
+| [LEGAL.md](LEGAL.md) | The three `/legal/…` pages: nodes, measurements, the hero crops, the copy deviations |
 | `assets.json` | Machine-readable map: filename → original Figma layer |
 | `../public/images/` | The assets themselves (2.16 MB, WebP + SVG) |
 
@@ -41,6 +42,7 @@ by a future session, or by you.
 
 | `5293:73` | Case studies — desktop | 1920 × 4131 | 2026-10-04 |
 | `5293:74` | Case studies — mobile | 375 × 3769 | 2026-10-04 |
+| `3803:7658` | The "WEB: Legal" page; its six frames are in [LEGAL.md](LEGAL.md) | — | 2026-10-10 |
 
 The two footer nodes are in this same file. `4167:280`'s children are numbered `4134:6xx` — the
 band `4134:616`, the field `4134:619`, the button `4134:621`, the rule
@@ -57,8 +59,11 @@ Figma therefore emits absolute pixel positions, which cannot be shipped. See
 
 `http://127.0.0.1:3845/mcp` — Figma's desktop app, Dev Mode, with the file
 open — answered every call the Case Studies page needed on 2026-10-04 (two
-frames, a dozen loose nodes, some forty 1x screenshots). The 6-a-month cap
-above is the REMOTE server's. Three things about the local one worth knowing
+frames, a dozen loose nodes, some forty 1x screenshots) and the Legal pages'
+on 2026-10-10. The 6-a-month cap above is the REMOTE server's. Keep this URL:
+it is the way into the file. With nothing selected, `get_metadata` on `0:0`
+lists every page's canvas id; `get_design_context` on a frame returns its
+text verbatim, so a copy deck never has to be retyped. Three things about the local one worth knowing
 before relying on it:
 
 - It only reads what is in a frame cleanly. Loose layers and plain groups come
