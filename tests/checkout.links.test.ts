@@ -336,7 +336,7 @@ describe("the Thank You page", () => {
 
   it("tells the buyer the three things they need, and where to look if the email is missing", () => {
     expect(page).toContain("same email address you used when buying");
-    expect(page).toContain("6-digit access code");
+    expect(page).toContain("6-digit code");
     expect(page).toContain("Check your spam folder");
     expect(page).toContain("href={`${APP_URL}/login`}");
   });
