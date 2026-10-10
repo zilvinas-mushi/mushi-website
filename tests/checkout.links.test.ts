@@ -148,15 +148,23 @@ describe("the plan sheet", () => {
     expect(pay).toContain("padding: desktop ? `${6 + over}px ${14 + over}px` : `${8 + over}px ${16 + over}px`");
   });
 
-  it("draws Stripe's frames larger with a transform, and lets no zoom reach them", () => {
-    // WebKit lays out an iframe under CSS zoom at the unzoomed width: on a
-    // desktop Safari and every iPad the fields were one clipped row
-    // (2026-10-06).
-    // (In a class, that is; the notes still say what it used to be.)
-    expect(pay).not.toMatch(/className=.*\[zoom:\d/);
-    expect(pay.match(/md:\[zoom:var\(--unfit,1\)\]/g)).toHaveLength(2);
-    expect(pay).toContain("md:[scale:calc(1.6*var(--fit,1))]");
-    expect(pay).toContain("md:[scale:calc(1.24*var(--fit,1))]");
+  it("grows Stripe's frames with a zoom, and with a transform in WebKit only", () => {
+    // A transform scales the picture the frame drew at 1x, so Stripe's card
+    // icons came out soft (2026-10-10); a zoom lays the frame out small and
+    // draws it large. But WebKit lays out an iframe under CSS zoom at the
+    // unzoomed width: on a desktop Safari and every iPad the fields were one
+    // clipped row (2026-10-06). So the rule lives in one class, .stripe-grow,
+    // zoom by default and the transform under a WebKit-only @supports; the
+    // boxes in StripePay carry nothing but the class and their --grow.
+    const css = read("src/app/globals.css");
+    expect(pay).not.toMatch(/className=.*\[zoom:/);
+    expect(pay).not.toMatch(/className=.*\[scale:/);
+    expect(pay).toContain('className="stripe-grow relative flow-root touch-none bg-[#222222] [--grow:1.6]"');
+    expect(pay).toContain('className="stripe-grow min-h-[50px] touch-none [--grow:1.24]"');
+    const rule = css.slice(css.indexOf(".stripe-grow {"));
+    expect(rule).toMatch(/^\.stripe-grow \{[^}]*zoom: var\(--grow\);[^}]*width: 100%;/s);
+    const webkit = rule.slice(rule.indexOf("@supports (background: -webkit-named-image("));
+    expect(webkit).toMatch(/\.stripe-grow \{[^}]*zoom: var\(--unfit, 1\);[^}]*width: calc\(100% \/ \(var\(--grow\) \* var\(--fit, 1\)\)\);[^}]*transform-origin: top left;[^}]*scale: calc\(var\(--grow\) \* var\(--fit, 1\)\);/s);
     expect(sheet).toContain('style={{ zoom: fit, "--fit": fit, "--unfit": 1 / fit } as React.CSSProperties}');
   });
 
