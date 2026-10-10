@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { Logo } from "./Logo";
 import { NAV, navHref } from "@/lib/content";
-import { BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID, SITE_NAME } from "@/lib/site";
+import { BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID, SITE_NAME, bookingTarget } from "@/lib/site";
 import { prerenderLogin } from "@/lib/prerender";
 
 /**
@@ -564,6 +564,7 @@ export function MobileHeader({
         >
           <a
             href={cta.href}
+            {...bookingTarget(cta.href)}
             data-plan={cta.sheet ? "" : undefined}
             tabIndex={ctaOffered ? undefined : -1}
             style={{
@@ -644,12 +645,12 @@ export function MobileHeader({
                     {drawer.secondary.label}
                   </a>
                 </div>
-                <a href={drawer.wide.href} onClick={() => setOpen(false)} className={`${CTA_BOX} ${CALL_CTA}`}>
+                <a href={drawer.wide.href} {...bookingTarget(drawer.wide.href)} onClick={() => setOpen(false)} className={`${CTA_BOX} ${CALL_CTA}`}>
                   {drawer.wide.label}
                 </a>
               </>
             ) : (
-              <a href={BOOKING_URL} onClick={() => setOpen(false)} className={`${CTA_BOX} ${VIOLET_CTA}`}>
+              <a href={BOOKING_URL} {...bookingTarget(BOOKING_URL)} onClick={() => setOpen(false)} className={`${CTA_BOX} ${VIOLET_CTA}`}>
                 {PHONE_CTA}
               </a>
             )}

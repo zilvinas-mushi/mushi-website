@@ -6,6 +6,7 @@ import {
   NEWSLETTER_ACTION,
   SITE_NAME,
   SOCIALS,
+  bookingTarget,
 } from "@/lib/site";
 
 /**
@@ -359,7 +360,7 @@ export function SiteFooter() {
                   {FOOTER.emailCta}
                 </button>
               ) : (
-                <a href={BOOKING_URL} className={REDEEM}>
+                <a href={BOOKING_URL} {...bookingTarget(BOOKING_URL)} className={REDEEM}>
                   {FOOTER.emailCta}
                 </a>
               )}

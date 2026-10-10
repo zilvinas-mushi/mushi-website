@@ -9,7 +9,7 @@ import {
   TESTIMONIALS,
   FINAL_CTA,
 } from "@/lib/content";
-import { BOOKING_ANCHOR, BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID } from "@/lib/site";
+import { BOOKING_ANCHOR, BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID, bookingTarget } from "@/lib/site";
 import { LazyImg } from "./CreativeCard";
 import { SHELL } from "@/lib/layout";
 
@@ -175,7 +175,7 @@ export function Pill({
       : // white bg / black text  ->  black bg / white text
         "bg-[linear-gradient(147deg,#ececec_0%,#ececec_100%)] text-black hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white active:bg-[linear-gradient(147deg,#000_0%,#000_100%)] active:text-white";
   return (
-    <a href={href} className={`${base} ${style}`}>
+    <a href={href} {...bookingTarget(href)} className={`${base} ${style}`}>
       {children}
     </a>
   );
@@ -631,6 +631,7 @@ export function Creatives() {
           */}
           <a
             href={BOOKING_URL}
+            {...bookingTarget(BOOKING_URL)}
             // Watched by the phone header — passing this pill is what reveals
             // its Schedule a Call button. See CREATIVES_CTA_ID in site.ts.
             id={CREATIVES_CTA_ID}
@@ -1341,6 +1342,7 @@ export function FinalCta() {
             */}
             <a
               href={BOOKING_URL}
+              {...bookingTarget(BOOKING_URL)}
               // Watched by the phone header, which slides its own Schedule a
               // Call button back up behind the bar once this one is on screen.
               // See FINAL_CTA_ID in site.ts.
