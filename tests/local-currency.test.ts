@@ -31,15 +31,19 @@ describe("the catalog", () => {
     }
   });
 
-  it("has a symbol for every currency it sells in", () => {
-    for (const currency of [CURRENCY, ...LOCAL_CURRENCIES] as const) expect(SYMBOL[currency]).toMatch(/^\S$/);
+  it("has a symbol for every currency it sells in — a sign, or a code with the space that follows it", () => {
+    for (const currency of [CURRENCY, ...LOCAL_CURRENCIES] as const) expect(SYMBOL[currency]).toMatch(/^(\S|[A-Z]{3} )$/);
+    expect(SYMBOL).toEqual({ usd: "$", eur: "€", gbp: "£", chf: "CHF " });
   });
 
   it("writes a figure the way content.ts does", () => {
     expect(money(1000)).toBe("$10");
     expect(money(750)).toBe("$7.50");
     expect(money(6000, "eur")).toBe("€60");
+    expect(money(6000, "gbp")).toBe("£60");
+    expect(money(6000, "chf")).toBe("CHF 60");
     expect(inCurrency("SAVE $60", "eur")).toBe("SAVE €60");
+    expect(inCurrency("$24 total", "chf")).toBe("CHF 24 total");
     expect(inCurrency("$24 total", "usd")).toBe("$24 total");
   });
 });
@@ -55,15 +59,23 @@ describe("the head script", () => {
     expect(PAINT_GATE_SCRIPT).toContain("ss.getItem('currency')");
     expect(PAINT_GATE_SCRIPT).toContain("Intl.DateTimeFormat().resolvedOptions().timeZone");
     expect(PAINT_GATE_SCRIPT).toContain("root.setAttribute('data-currency',c)");
-    // The euro area, with its slashes escaped inside the regex literal.
+    // The currency areas, with their slashes escaped inside the regex literals.
     expect(PAINT_GATE_SCRIPT).toContain("Europe\\/(");
     expect(PAINT_GATE_SCRIPT).not.toMatch(/Europe\/\(/);
-    expect(PAINT_GATE_SCRIPT).not.toContain("Vaduz");
+    // Each zone list reaches its own currency and no other: Liechtenstein is
+    // on the franc, London on the pound, Gibraltar on neither.
+    expect(PAINT_GATE_SCRIPT).toMatch(/\?'eur':\/\^\(Europe\\\/\(London\|Guernsey\|Jersey\|Isle_of_Man\)\)\$\/\.test\(tz\)\?'gbp':\/\^\(Europe\\\/\(Zurich\|Vaduz\)\)\$\/\.test\(tz\)\?'chf':'usd'/);
+    expect(PAINT_GATE_SCRIPT).not.toMatch(/\|Vaduz[^)]*\)[^']*'eur'/);
+    expect(PAINT_GATE_SCRIPT).not.toContain("Gibraltar");
   });
 });
 
 describe("the page", () => {
   const css = read("src/app/globals.css");
+
+  it("sets a currency code smaller than its figure, so the plan rows keep their shape in francs", () => {
+    expect(css).toContain(".money-code {\n  display: inline-block;\n  font-size: max(0.6em, 11px);\n}");
+  });
 
   it("shows one figure and hides the others, by the currency on <html>", () => {
     expect(css).toContain('[data-money]:not([data-money="usd"]) {\n  display: none;\n}');
@@ -75,7 +87,9 @@ describe("the page", () => {
 
   it("renders a figure in every currency, the dollar one first", () => {
     const html = renderToStaticMarkup(createElement(Money, null, "SAVE $60"));
-    expect(html).toBe('<span data-money="usd">SAVE $60</span><span data-money="eur">SAVE €60</span>');
+    expect(html).toBe(
+      '<span data-money="usd">SAVE $60</span><span data-money="eur">SAVE €60</span><span data-money="gbp">SAVE £60</span><span data-money="chf">SAVE <span class="money-code">CHF</span>\u00a060</span>',
+    );
   });
 
   it("sends every plan figure through <Money>", () => {
