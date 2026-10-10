@@ -17,18 +17,25 @@
  *   "a VERY VERY BUG when popup was going upwards", then "when you open a
  *   popup and try to quickly do the actions"): the sheet is opened on a CPU
  *   throttled 4x, a row is picked at 300, 700 and 1100ms and Buy pressed at
- *   1500. Under a buyer's hand — the rise, and the step change after Buy —
- *   no frame may take longer than RISE_FRAME_MS. Between those, a frame of
- *   the site's own script may not either; a frame of style and layout
- *   alone — a payment step's frames being mounted, in an idle moment — may
- *   take up to MOUNT_FRAME_MS; and Stripe.js's one evaluation is not held
- *   to a number at all, because Chrome's own attribution names it and it
- *   costs what the machine's compiler costs (130ms on this laptop at 4x,
- *   650 on a CI runner), which no budget in milliseconds holds across
- *   machines.
- *   The first Stripe build used to start in the same breath as the rise, and
- *   a pick during the rise used to start that plan's at once; both stalled
- *   the sheet for 160–200ms under a buyer's hand.
+ *   1500. The rise is the compositor's, and is held to the compositor's
+ *   own frames, taken by screencast: no gap between two over RISE_GAP_MS
+ *   (the chosen plan's step is mounted under it — PlanSheet's open, since
+ *   2026-10-11, "there was loading after the first step" — and that
+ *   mount gets MOUNT_FRAME_MS on the main thread there). Under the step
+ *   change after Buy no frame may take longer than RISE_FRAME_MS. Between
+ *   those, a frame of the site's own script may not either; a frame of
+ *   style and layout alone — a payment step's frames being mounted, in an
+ *   idle moment — may take up to MOUNT_FRAME_MS; and Stripe.js's one
+ *   evaluation is not held to a number at all, because Chrome's own
+ *   attribution names it and it costs what the machine's compiler costs
+ *   (130ms on this laptop at 4x, 650 on a CI runner), which no budget in
+ *   milliseconds holds across machines.
+ *   A pick during the rise used to start that plan's build at once, which
+ *   stalled the sheet for 160–200ms under a buyer's hand; it waits for the
+ *   rise to end.
+ *
+ *   ON THE PHONE THE PAGE IS PINNED under the sheet, and lands back where
+ *   it was (see pinned).
  *
  *   BUY IS INSTANT ON A FRESH OPEN, FOR A MOUSE (Žilvinas 2026-10-10, "when
  *   pressing buy now (first screen) there is loading"): on a laptop, a fresh
@@ -106,13 +113,23 @@ const READER_MS = 4000;
  */
 const READER_CPU_MS = 1500;
 /**
- * THE RISE'S BUDGET: the longest a frame may take while the sheet comes up
- * (OPEN_MS, 560ms), on a CPU throttled 4x. A clean rise is 9–18ms a frame
- * there; the stall this guards against was 170–200ms. Headless Chrome draws
- * the desktop's backdrop blur in software, which costs it 40–50ms frames
- * that a real GPU does not have, so the bar sits well above those.
+ * THE RISE IS JUDGED BY THE COMPOSITOR (2026-10-11): the sheet's rise is a
+ * transition of translate and opacity with will-change set, which the
+ * compositor runs by itself, so the main thread's frames are not what the
+ * eye sees there — and the chosen plan's step is now mounted UNDER the rise
+ * (PlanSheet's open), a 150ms main-thread frame at 4x that the compositor,
+ * screencast-measured, rides through with no gap over 35ms. So the rise is
+ * held to the compositor's own frames, taken by screencast: no gap between
+ * two of them over RISE_GAP_MS. Headless Chrome's screencast jitters to
+ * 50–80ms on its own; a rise that stalled would gap by the whole of the
+ * blocking task, 150ms and up. The main thread under the rise is held to
+ * the mount's own budget (MOUNT_FRAME_MS) instead of the hand's.
+ * RISE_FRAME_MS remains the hand's budget for the step change after Buy,
+ * which IS the main thread's — the height runs on the panel and the step
+ * fades on it, both of them laid out — where nothing of Stripe's may start.
  */
 const RISE_FRAME_MS = 100;
+const RISE_GAP_MS = 120;
 const RISE_MS = 600;
 /** How long a buyer's first actions in the sheet are watched, when Buy is pressed, and how long the step change after it takes. */
 const ACT_MS = 2600;
@@ -348,10 +365,19 @@ async function buy(browser, window) {
     });
     const scale = Math.max(1, machine / REF_MS);
     const budget = (ms) => Math.round(ms * scale);
+    // The compositor's frames, for the rise: see RISE_GAP_MS.
+    const cdp = await page.createCDPSession();
+    const drawn = [];
+    cdp.on("Page.screencastFrame", (frame) => {
+      drawn.push(frame.metadata.timestamp * 1000);
+      void cdp.send("Page.screencastFrameAck", { sessionId: frame.sessionId }).catch(() => {});
+    });
+    await cdp.send("Page.startScreencast", { format: "jpeg", quality: 20, everyNthFrame: 1, maxWidth: 200, maxHeight: 400 });
     const act = await page.evaluate(
       async ({ riseMs, actMs, slowMs, buyAtMs, stepChangeMs, mountMs, scriptMs }) => {
         const frames = [];
         const t0 = performance.now();
+        const epoch0 = Date.now();
         let last = t0;
         let stop = false;
         const tick = (t) => {
@@ -409,28 +435,39 @@ async function buy(browser, window) {
         // hand (the rise, the step change) any over the budget; elsewhere,
         // the site's script over its budget, and style and layout alone
         // over the mount's.
-        const underHand = (l) => l.at <= riseMs || (l.at >= buyAtMs && l.at <= buyAtMs + stepChangeMs);
-        const ours = long.filter((l) => (underHand(l) ? l.ours > slowMs : l.what === "style/layout" ? l.ours > mountMs : l.ours > scriptMs));
+        // The rise is the compositor's (judged outside, by screencast); on
+        // the main thread under it the chosen step is mounted, which gets
+        // the mount's budget. The step change after Buy is the hand's.
+        const underHand = (l) => l.at >= buyAtMs && l.at <= buyAtMs + stepChangeMs;
+        const ours = long.filter((l) => (underHand(l) ? l.ours > slowMs : l.what === "style/layout" || l.at <= riseMs ? l.ours > mountMs : l.ours > scriptMs));
         const change = longest(frames.filter((f) => f.at >= buyAtMs && f.at <= buyAtMs + stepChangeMs && notStripe(f)));
-        return { frames: frames.length, rise: Math.round(rise.ms), riseAt: Math.round(rise.at), change: Math.round(change.ms), changeAt: Math.round(change.at), worst: Math.round(all.ms), worstAt: Math.round(all.at), ours, stripe: long.filter((l) => l.stripe).map((l) => `${l.ms}ms@${l.at}`) };
+        return { epoch0, frames: frames.length, rise: Math.round(rise.ms), riseAt: Math.round(rise.at), change: Math.round(change.ms), changeAt: Math.round(change.at), worst: Math.round(all.ms), worstAt: Math.round(all.at), ours, stripe: long.filter((l) => l.stripe).map((l) => `${l.ms}ms@${l.at}`) };
       },
       { riseMs: RISE_MS, actMs: ACT_MS, slowMs: budget(RISE_FRAME_MS), buyAtMs: BUY_AT_MS, stepChangeMs: STEP_CHANGE_MS, mountMs: budget(MOUNT_FRAME_MS), scriptMs: budget(SCRIPT_FRAME_MS) },
     );
+    await cdp.send("Page.stopScreencast").catch(() => {});
+    await cdp.detach().catch(() => {});
     await page.emulateCPUThrottling(1);
+    // The compositor's frames inside the rise, and the longest gap between two of them.
+    const inRise = drawn.map((t) => t - act.epoch0).filter((t) => t >= 0 && t <= RISE_MS).sort((a, b) => a - b);
+    let gap = { ms: 0, at: 0 };
+    for (let i = 1; i < inRise.length; i++) if (inRise[i] - inRise[i - 1] > gap.ms) gap = { ms: Math.round(inRise[i] - inRise[i - 1]), at: Math.round(inRise[i - 1]) };
     // The sheet is on the payment step, or holding for it: back to the top.
     await page.keyboard.press("Escape");
     await pause(SHEET_MS);
     await page.evaluate(() => document.querySelector("a[data-plan]").click());
     const actProblems = [];
-    if (act.rise > budget(RISE_FRAME_MS)) actProblems.push(`a ${act.rise}ms frame ${act.riseAt}ms into the rise, over ${budget(RISE_FRAME_MS)}`);
+    if (inRise.length < 10) actProblems.push(`the compositor drew only ${inRise.length} frame(s) during the rise`);
+    if (gap.ms > budget(RISE_GAP_MS)) actProblems.push(`the compositor drew nothing for ${gap.ms}ms from ${gap.at}ms into the rise, over ${budget(RISE_GAP_MS)}`);
+    if (act.rise > budget(MOUNT_FRAME_MS)) actProblems.push(`a ${act.rise}ms main-thread frame ${act.riseAt}ms into the rise, over ${budget(MOUNT_FRAME_MS)}`);
     if (act.change > budget(RISE_FRAME_MS)) actProblems.push(`a ${act.change}ms frame at ${act.changeAt}ms, during the step change after Buy, over ${budget(RISE_FRAME_MS)}`);
     for (const l of act.ours) {
-      const hand = l.at <= RISE_MS || (l.at >= BUY_AT_MS && l.at <= BUY_AT_MS + STEP_CHANGE_MS);
-      actProblems.push(`a ${l.ms}ms frame at ${l.at}ms, ${l.ours}ms of it the site's own (${l.what}), over ${hand ? budget(RISE_FRAME_MS) : l.what === "style/layout" ? budget(MOUNT_FRAME_MS) : budget(SCRIPT_FRAME_MS)}`);
+      const hand = l.at >= BUY_AT_MS && l.at <= BUY_AT_MS + STEP_CHANGE_MS;
+      actProblems.push(`a ${l.ms}ms frame at ${l.at}ms, ${l.ours}ms of it the site's own (${l.what}), over ${hand ? budget(RISE_FRAME_MS) : l.what === "style/layout" || l.at <= RISE_MS ? budget(MOUNT_FRAME_MS) : budget(SCRIPT_FRAME_MS)}`);
     }
     const machineNote = scale > 1 ? ` (this machine is ${scale.toFixed(1)}x slower than the laptop the budget was set on; budget scaled)` : "";
     const stripeNote = act.stripe.length ? `, Stripe.js's evaluation ${act.stripe.join(" ")}` : "";
-    console.log(`  ${actProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} acting fast  ${actProblems.length ? actProblems.join("; ") : `${act.frames} frames, the rise's longest ${act.rise}ms, the step change's ${act.change}ms, the longest ${act.worst}ms at ${act.worstAt}ms${stripeNote}`}${machineNote}`);
+    console.log(`  ${actProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} acting fast  ${actProblems.length ? actProblems.join("; ") : `${act.frames} frames; the compositor drew ${inRise.length} in the rise, its longest gap ${gap.ms}ms; the main thread's longest there ${act.rise}ms, the step change's ${act.change}ms, the longest ${act.worst}ms at ${act.worstAt}ms${stripeNote}`}${machineNote}`);
     for (const problem of actProblems) failures.push(`${window.name}, opening the sheet and acting at once on a 4x-throttled CPU: ${problem}`);
     const deadline = Date.now() + LOAD_MS;
     let steps = [];
@@ -553,6 +590,79 @@ async function hoverThenBuy(browser, window) {
   return failures;
 }
 
+/* -------------------------------------------------------------- pinned --- */
+
+/**
+ * THE PAGE DOES NOT MOVE UNDER THE SHEET ON THE PHONE (Žilvinas 2026-10-10,
+ * from his phone: "you can still scroll while you are in popup"). iOS
+ * scrolls the page from a touch that began inside Stripe's frame, whatever
+ * the page's overflow says, so below md the sheet pins the body where it
+ * was scrolled to and puts it back as it falls. Chrome cannot play iOS,
+ * but it can hold the mechanism to its word: with the page scrolled, the
+ * sheet open and its fields in, a finger dragged up the sheet — over
+ * Stripe's frame — moves nothing, the body is fixed at the old offset, and
+ * closing the sheet lands the page exactly where it was.
+ */
+async function pinned(browser, window) {
+  const failures = [];
+  const context = await browser.createBrowserContext();
+  const page = await context.newPage();
+  const SCROLLED = 240;
+  try {
+    await page.setViewport(window);
+    if (!remote) {
+      await page.setRequestInterception(true);
+      page.on("request", (request) => {
+        const url = new URL(request.url());
+        if (url.origin === ORIGIN) void request.respond(fromExport(url.pathname)).catch(() => {});
+        else void request.continue().catch(() => {});
+      });
+    }
+    await page.goto(`${remote ?? ORIGIN}${PAGE}`, { waitUntil: "load", timeout: 60_000 });
+    await page.waitForFunction(() => document.documentElement.hasAttribute("data-ready"), { timeout: 30_000 });
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), SCROLLED);
+    await pause(300);
+    await page.evaluate(() => document.querySelector("a[data-plan]").click());
+    const deadline = Date.now() + LOAD_MS;
+    let steps = [];
+    while (Date.now() < deadline) {
+      steps = await page.evaluate(paymentSteps);
+      if (steps[0] && steps[0] !== "loading") break;
+      await pause(100);
+    }
+    await page.evaluate(pickAndBuy, 0, 6000);
+    await pause(SHEET_MS);
+    const before = await page.evaluate(() => ({ y: window.scrollY, body: document.body.style.position, top: document.body.style.top }));
+    // A finger lands on the card fields and drags up the sheet.
+    const field = await page.evaluate(() => {
+      const r = document.querySelector('[role="dialog"] iframe[src*="elements-inner-payment"]')?.getBoundingClientRect();
+      return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
+    });
+    const from = field ?? { x: window.width / 2, y: window.height * 0.7 };
+    const cdp = await page.createCDPSession();
+    const touch = (type, y) => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: type === "touchEnd" ? [] : [{ x: from.x, y }] });
+    await touch("touchStart", from.y);
+    for (let i = 1; i <= 8; i++) await touch("touchMove", from.y - i * 40);
+    await touch("touchEnd", 0);
+    await pause(400);
+    const after = await page.evaluate(() => ({ y: window.scrollY, body: document.body.style.position, top: document.body.style.top }));
+    await page.keyboard.press("Escape");
+    await pause(SHEET_MS);
+    const closed = await page.evaluate(() => ({ y: window.scrollY, body: document.body.style.position, top: document.body.style.top }));
+    const problems = [];
+    if (!steps[0] || steps[0] === "loading") problems.push("the payment step did not load, so the drag was not over Stripe's fields");
+    if (before.body !== "fixed" || before.top !== `-${SCROLLED}px`) problems.push(`with the sheet open the body is ${before.body || "not fixed"}${before.top ? ` at ${before.top}` : ""}, not fixed at -${SCROLLED}px`);
+    if (after.y !== before.y || after.body !== "fixed") problems.push(`a drag over the fields moved the page (scrollY ${before.y} → ${after.y}, body ${after.body || "not fixed"})`);
+    if (closed.body || closed.top) problems.push(`the body is still ${closed.body} at ${closed.top} after the sheet closed`);
+    if (closed.y !== SCROLLED) problems.push(`the page came back at ${closed.y}, not the ${SCROLLED} it was scrolled to`);
+    console.log(`  ${problems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} pinned       ${problems.length ? problems.join("; ") : `the body is fixed at -${SCROLLED}px while the sheet is up, a drag over the fields moves nothing, and the page is back at ${closed.y} after`}`);
+    for (const problem of problems) failures.push(`${window.name}, the page under the sheet: ${problem}`);
+    return failures;
+  } finally {
+    await context.close().catch(() => {});
+  }
+}
+
 /* --------------------------------------------------------------- euros --- */
 
 /** In the page: every plan figure that is on screen, and whether a dollar one is among them. */
@@ -652,6 +762,7 @@ try {
     try {
       failures.push(...(await buy(browser, window)));
       if (!window.isMobile) failures.push(...(await hoverThenBuy(browser, window)));
+      if (window.isMobile) failures.push(...(await pinned(browser, window)));
       failures.push(...(await inEuros(browser, window)));
     } catch (reason) {
       failures.push(`${window.name}: the check itself broke — ${reason instanceof Error ? reason.message : String(reason)}`);

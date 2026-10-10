@@ -94,9 +94,11 @@ describe("the plan sheet", () => {
     expect(pay).toContain('import("@stripe/stripe-js")');
     expect(pay).not.toMatch(/^import \{[^}]*loadStripe[^}]*\} from "@stripe\/stripe-js"/m);
     expect(sheet).not.toContain("@stripe/stripe-js");
-    // The preload hangs on the sheet's open() — after the rise, with the
-    // first step's build (2026-10-10, the hitch a third of the way up)...
-    expect(sheet).toMatch(/whenQuiet\(quietAt\.current, \(\) => \{\s+if \(!openRef\.current\) return;\s+scheduled\.current = true;\s+preloadStripe\(\);\s+setBuilt\(/);
+    // The preload hangs on the sheet's open() — with the first step's
+    // build, in the first idle moment as the sheet rises (2026-10-10, on a
+    // phone: "there was loading after the first step"); the rise is the
+    // compositor's and does not feel it...
+    expect(sheet).toMatch(/whenQuiet\(Date\.now\(\), \(\) => \{\s+if \(!openRef\.current\) return;\s+scheduled\.current = true;\s+preloadStripe\(\);\s+setBuilt\(/);
     expect(sheet).toContain('quietAt.current = Date.now() + (window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : OPEN_MS);');
     // ...and on intent only for a mouse, whose hover comes well before the
     // click — with the chosen plan's step, so Buy is instant on a fresh open
@@ -110,6 +112,41 @@ describe("the plan sheet", () => {
     expect(sheet).toContain('const signs = ["pointermove", "pointerdown", "touchstart", "keydown", "wheel"] as const;');
     expect(sheet).toContain("if (!mounted && !prepared) return null;");
     expect(sheet).not.toMatch(/const signs = \[[^\]]*"(scroll|load)"/);
+  });
+
+  it("fetches Stripe.js's bytes on a touch and under the rise, and runs it only after", () => {
+    // A finger gets no hover (2026-10-10, on a phone: "there was loading
+    // after the first step"): the tap fetches the script and the session,
+    // two downloads the rise never feels, and the evaluation keeps to the
+    // quiet moment after it.
+    expect(sheet).toMatch(/if \(e\.type === "touchstart"\) \{\s+fetchStripeJs\(\);\s+checkoutSession\(planRef\.current\)\.catch\(\(\) => \{\}\);\s+\}/);
+    expect(sheet).toMatch(/scheduled\.current = false;\s+fetchStripeJs\(\);\s+checkoutSession\(planRef\.current\)\.catch\(\(\) => \{\}\);\s+whenQuiet\(Date\.now\(\)/);
+    expect(pay).toContain('link.rel = rel;');
+    expect(pay).toMatch(/\["preload", STRIPE_JS_SRC, "script"\]/);
+    expect(pay).not.toMatch(/fetchStripeJs[^]*?getStripe\(\)[^]*?\n\}\nexport function preloadStripe/);
+    // The preloaded address IS the loader's: a release train that moves
+    // under us would preload one file and run another.
+    const loader = read("node_modules/@stripe/stripe-js/dist/index.mjs");
+    const train = /var RELEASE_TRAIN = '([a-z]+)';/.exec(loader)?.[1];
+    expect(train).toBeTruthy();
+    expect(pay).toContain(`export const STRIPE_JS_SRC = "https://js.stripe.com/${train}/stripe.js";`);
+    expect(loader).toContain('var STRIPE_JS_URL = "".concat(ORIGIN, "/").concat(RELEASE_TRAIN, "/stripe.js");');
+  });
+
+  it("pins the page on the phone while it is up, and is black above the sheet there", () => {
+    // iOS scrolls the page from a touch that began in Stripe's frame,
+    // whatever <html>'s overflow says (2026-10-10, "you can still scroll
+    // while you are in popup"): below md the body is fixed where it was
+    // scrolled to, and put back, scroll and all, as the sheet falls.
+    expect(sheet).toContain('const phone = !window.matchMedia("(min-width: 768px)").matches;');
+    expect(sheet).toMatch(/if \(phone\) \{\s+body\.style\.position = "fixed";\s+body\.style\.top = `\$\{-y\}px`;\s+body\.style\.width = "100%";\s+\}/);
+    expect(sheet).toMatch(/body\.style\.width = bodyWas\.width;[^]*?window\.scrollTo\(\{ top: y, behavior: "instant" \}\);/);
+    expect(sheet).toContain("  }, [shown]);");
+    expect(sheet).not.toContain("  }, [mounted]);");
+    // The band of page above the sheet is black on the phone, the page
+    // blurred through it from md ("gap from the menu and it looks odd -
+    // black colour?").
+    expect(sheet).toContain("bg-black md:bg-black/60 md:backdrop-blur-[9px]");
   });
 
   it("is inert and unannounced while it waits off stage", () => {
