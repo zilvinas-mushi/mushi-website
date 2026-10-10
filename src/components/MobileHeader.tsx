@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 
 import { Logo } from "./Logo";
 import { NAV, navHref } from "@/lib/content";
 import { BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID, SITE_NAME } from "@/lib/site";
+import { prerenderLogin } from "@/lib/prerender";
 
 /**
  * The phone's CTA label, which is NOT the desktop bar's "Book a Call" — the
@@ -500,7 +501,12 @@ export function MobileHeader({
 
           <button
             type="button"
-            onClick={() => setOpen((o) => !o)}
+            onClick={() => {
+              // The drawer holds Login: its page is rendered now, ahead of
+              // the tap (src/lib/prerender.ts).
+              if (!open) prerenderLogin();
+              setOpen((o) => !o);
+            }}
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
