@@ -171,7 +171,12 @@ price in one place only and `npm test` goes red. PRD and plan:
   Building all three at the first pointer move was 13 iframes, 11 MB and
   close to five seconds of CPU behind a page the visitor was only reading
   (2026-10-10, "templates page is super super slow"). Never prepare Stripe
-  for someone who has not asked to buy.
+  for someone who has not asked to buy. A mouse resting on a Buy button IS
+  asking: the chosen plan's step (one, not three) is built then, in an
+  idle moment and never while the page scrolls, so Buy on a fresh open is
+  instant; a finger gets no warning before its tap, so on touch the first
+  step follows the rise. Nothing of Stripe's ever starts under an
+  animation of the sheet (`whenQuiet`).
 
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.
