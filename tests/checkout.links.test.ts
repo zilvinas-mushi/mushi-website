@@ -95,8 +95,8 @@ describe("the plan sheet", () => {
     expect(sheet).not.toContain("@stripe/stripe-js");
     // The preload hangs on the sheet's open() — after the rise, with the
     // first step's build (2026-10-10, the hitch a third of the way up)...
-    expect(sheet).toMatch(/const afterRise = \(\) => \{\s+preloadStripe\(\);\s+setBuilt\(/);
-    expect(sheet).toContain("else riseTimer.current = window.setTimeout(afterRise, OPEN_MS);");
+    expect(sheet).toMatch(/whenQuiet\(quietAt\.current, \(\) => \{\s+if \(!openRef\.current\) return;\s+scheduled\.current = true;\s+preloadStripe\(\);\s+setBuilt\(/);
+    expect(sheet).toContain('quietAt.current = Date.now() + (window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : OPEN_MS);');
     // ...and on intent only for a mouse, whose hover comes well before the click.
     expect(sheet).toContain('if (e.type === "pointerover" && (e as PointerEvent).pointerType === "mouse") preloadStripe();');
     // ...and the sheet is otherwise built only at real input: a page that
@@ -205,13 +205,18 @@ describe("the plan sheet", () => {
     expect(sheet).toContain("const [built, setBuilt] = useState<PlanId[]>([]);");
     expect(sheet).toMatch(/\{c\.options\.filter\(\(o\) => built\.includes\(o\.id as PlanId\)\)\.map\(\(o\) => \{\s+const on = o\.id === plan\.id;/);
     // ...the chosen plan's goes in when the sheet opens, never before...
-    expect(sheet).toContain("const steps = b.length ? b : [chosen];");
+    expect(sheet).toContain("const steps = b.length ? b : [planRef.current];");
     expect(sheet).not.toMatch(/setBuilt\([^)]*\)[^\n]*\n[^\n]*setPrepared\(true\);\s*\}/);
     // ...a pick builds its plan's step at once...
-    expect(sheet).toContain("if (!built.includes(id as PlanId)) setBuilt([...built, id as PlanId]);");
+    expect(sheet).toContain("whenQuiet(quietAt.current, () => setBuilt((b) => (b.includes(id as PlanId) ? b : [...b, id as PlanId])));");
     // ...and each step that settles starts the next, one at a time, while
     // the sheet is up — never behind a page the buyer has gone back to.
-    expect(sheet).toContain("const next = ok && shown ? nextToBuild(built, pay.current) : undefined;");
+    expect(sheet).toMatch(/if \(ok && shown\) \{\s+whenQuiet\(quietAt\.current, \(\) => \{/);
+    // ...and never under an animation: the rise, or the step change.
+    expect(sheet).toContain("quietAt.current = Date.now() + STEP_OUT_MS + 500;");
+    expect(sheet).toContain('window.requestIdleCallback(() => fn(), { timeout: IDLE_MS });');
+    // Stripe's two mounts are two tasks, not one.
+    expect(pay).toMatch(/element\.mount\(mount\.current\);[\s\S]{0,400}await yieldToMain\(\);/);
     expect(sheet).toContain("if (built.some((id) => !steps[id]?.ready)) return undefined;");
   });
 

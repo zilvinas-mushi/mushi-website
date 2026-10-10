@@ -13,10 +13,16 @@
  *   built at that first move — 13 iframes and 11 MB behind a page the
  *   visitor was reading.
  *
- *   THE RISE IS SMOOTH (Žilvinas 2026-10-10, "a VERY VERY BUG when popup
- *   was going upwards"): the sheet is opened on a CPU throttled 4x, and no
- *   frame of its rise may take longer than RISE_FRAME_MS. The first Stripe
- *   build used to start in the same breath, and stalled the rise for 200ms.
+ *   THE RISE IS SMOOTH, AND SO ARE THE FIRST SECONDS (Žilvinas 2026-10-10,
+ *   "a VERY VERY BUG when popup was going upwards", then "when you open a
+ *   popup and try to quickly do the actions"): the sheet is opened on a CPU
+ *   throttled 4x, a row is picked at 300, 700 and 1100ms and Buy pressed at
+ *   1500, and no frame of the rise may take longer than RISE_FRAME_MS, no
+ *   frame of the whole sequence longer than ACT_FRAME_MS, and at most one
+ *   over RISE_FRAME_MS — Stripe.js being evaluated, once, in an idle moment.
+ *   The first Stripe build used to start in the same breath as the rise, and
+ *   a pick during the rise used to start that plan's at once; both stalled
+ *   the sheet for 160–200ms under a buyer's hand.
  *
  *   BUY IS INSTANT ON EVERY PLAN. The visitor opens the sheet; its three
  *   payment steps are built in turn while it is up. Then, for each plan,
@@ -95,6 +101,9 @@ const READER_CPU_MS = 1500;
  */
 const RISE_FRAME_MS = 100;
 const RISE_MS = 600;
+/** The longest any frame may take while a buyer acts in the first seconds, and how long that is watched. */
+const ACT_FRAME_MS = 250;
+const ACT_MS = 2600;
 /**
  * From the fields being in to the step calling itself presentable: 350ms for
  * Stripe's frame to stop moving and up to 1500 for the Link button's answer
@@ -289,31 +298,50 @@ async function buy(browser, window) {
     console.log(`  ${readerProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} a reader     ${readerProblems.length ? readerProblems.join("; ") : `nothing from Stripe, ${cpuMs}ms of CPU`}`);
     for (const problem of readerProblems) failures.push(`${window.name}, a reader who has moved but not opened the sheet: ${problem}`);
 
-    // The sheet is opened — on a slow CPU, its rise's frames timed — and
-    // its three steps are built in turn while it is up.
+    // The sheet is opened on a slow CPU and a buyer acts at once, every
+    // frame timed; then it is opened again and its three steps are built
+    // in turn while it is up.
     await page.emulateCPUThrottling(4);
-    const rise = await page.evaluate(async (riseMs) => {
-      const frames = [];
-      const t0 = performance.now();
-      let last = t0;
-      let stop = false;
-      const tick = (t) => {
-        frames.push({ ms: t - last, at: t - t0 });
-        last = t;
-        if (!stop) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-      document.querySelector("a[data-plan]").click();
-      await new Promise((done) => setTimeout(done, riseMs + 100));
-      stop = true;
-      const inRise = frames.filter((f) => f.at <= riseMs);
-      const worst = inRise.reduce((a, f) => (f.ms > a.ms ? f : a), { ms: 0, at: 0 });
-      return { frames: inRise.length, worst: Math.round(worst.ms), at: Math.round(worst.at) };
-    }, RISE_MS);
+    const act = await page.evaluate(
+      async ({ riseMs, actMs }) => {
+        const frames = [];
+        const t0 = performance.now();
+        let last = t0;
+        let stop = false;
+        const tick = (t) => {
+          frames.push({ ms: t - last, at: t - t0 });
+          last = t;
+          if (!stop) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        const at = (ms) => new Promise((done) => setTimeout(done, Math.max(0, ms - (performance.now() - t0))));
+        const dialog = () => document.querySelector('[role="dialog"]');
+        document.querySelector("a[data-plan]").click();
+        // A buyer in a hurry: three rows, then Buy.
+        await at(300); dialog().querySelectorAll('[role="radio"]')[0].click();
+        await at(700); dialog().querySelectorAll('[role="radio"]')[1].click();
+        await at(1100); dialog().querySelectorAll('[role="radio"]')[2].click();
+        await at(1500); dialog().querySelector('[role="radiogroup"] + button').click();
+        await at(actMs);
+        stop = true;
+        const longest = (list) => list.reduce((a, f) => (f.ms > a.ms ? f : a), { ms: 0, at: 0 });
+        const rise = longest(frames.filter((f) => f.at <= riseMs));
+        const all = longest(frames);
+        return { frames: frames.length, rise: Math.round(rise.ms), riseAt: Math.round(rise.at), worst: Math.round(all.ms), worstAt: Math.round(all.at), slow: frames.filter((f) => f.ms > 100).length };
+      },
+      { riseMs: RISE_MS, actMs: ACT_MS },
+    );
     await page.emulateCPUThrottling(1);
-    const riseProblem = rise.worst > RISE_FRAME_MS ? `a ${rise.worst}ms frame ${rise.at}ms into the rise, over ${RISE_FRAME_MS}` : null;
-    console.log(`  ${riseProblem ? "FAIL" : "pass"}  ${window.name.padEnd(8)} the rise     ${riseProblem ?? `${rise.frames} frames, the longest ${rise.worst}ms`}`);
-    if (riseProblem) failures.push(`${window.name}, the sheet's rise on a 4x-throttled CPU: ${riseProblem}`);
+    // The sheet is on the payment step, or holding for it: back to the top.
+    await page.keyboard.press("Escape");
+    await pause(SHEET_MS);
+    await page.evaluate(() => document.querySelector("a[data-plan]").click());
+    const actProblems = [];
+    if (act.rise > RISE_FRAME_MS) actProblems.push(`a ${act.rise}ms frame ${act.riseAt}ms into the rise, over ${RISE_FRAME_MS}`);
+    if (act.worst > ACT_FRAME_MS) actProblems.push(`a ${act.worst}ms frame at ${act.worstAt}ms, over ${ACT_FRAME_MS}`);
+    if (act.slow > 1) actProblems.push(`${act.slow} frames over ${RISE_FRAME_MS}ms in the first ${ACT_MS}ms, more than Stripe.js's one`);
+    console.log(`  ${actProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} acting fast  ${actProblems.length ? actProblems.join("; ") : `${act.frames} frames, the rise's longest ${act.rise}ms, the longest ${act.worst}ms at ${act.worstAt}ms`}`);
+    for (const problem of actProblems) failures.push(`${window.name}, opening the sheet and acting at once on a 4x-throttled CPU: ${problem}`);
     const deadline = Date.now() + LOAD_MS;
     let steps = [];
     while (Date.now() < deadline) {
