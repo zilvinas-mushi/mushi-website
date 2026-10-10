@@ -43,6 +43,9 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
     const items = [...list.querySelectorAll<HTMLLIElement>("li")];
     const dots = items.map((li) => li.querySelector<HTMLElement>("[data-dot]")!);
     if (headings.length < 2 || dots.length !== headings.length) return;
+    // The sticky sidebar (LegalPage). Taller than the window, it is slid up
+    // by exactly its overflow as the reader goes down — see below.
+    const aside = list.closest<HTMLElement>("aside");
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let target = 0; // the fill's end, in rail px
@@ -75,6 +78,39 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
         const reached = ys[k] - ys[0] <= shown + 0.5;
         li.dataset.state = k === i ? "current" : reached ? "done" : "next";
       });
+      // THE LIST IS NEVER CUT OFF (Žilvinas 2026-10-10, "shouldn't be hidden
+      // if you are in the below sections"): a sidebar taller than the window
+      // is pinned at its sticky top with its foot clipped — Terms' rows lost
+      // their last six on a laptop once the reader was in them. So it slides
+      // UP, by exactly the overflow and no more, in step with the reader's
+      // way through the page: at the top none of it, at the end all of it,
+      // and the current row is always on screen whatever the pace. A
+      // sidebar that fits does not move.
+      if (aside) {
+        const stickyTop = parseFloat(getComputedStyle(aside).top) || 0;
+        const room = window.innerHeight - stickyTop - aside.offsetHeight;
+        if (room < 0) {
+          // Its way through: the sidebar sticks from where the text column
+          // starts to where it ends (the grid row the two share), and is
+          // paid out across exactly that stretch.
+          const text = aside.nextElementSibling?.getBoundingClientRect();
+          const start = (text?.top ?? 0) + window.scrollY - stickyTop;
+          const end = (text?.bottom ?? 0) + window.scrollY - stickyTop - aside.offsetHeight;
+          const through = end > start ? Math.min(1, Math.max(0, (window.scrollY - start) / (end - start))) : 0;
+          let slide = room * through;
+          const slideNow = new DOMMatrixReadOnly(getComputedStyle(aside).transform).f;
+          // The current row, kept between the sticky top and the window's foot.
+          const row = items[i].getBoundingClientRect();
+          const asideTop = aside.getBoundingClientRect().top;
+          const rowTop = Math.max(stickyTop, asideTop - slideNow) + (row.top - asideTop) + slide;
+          const rowBottom = rowTop + row.height;
+          if (rowBottom > window.innerHeight) slide -= rowBottom - window.innerHeight;
+          else if (rowTop < stickyTop) slide += stickyTop - rowTop;
+          aside.style.transform = `translateY(${Math.round(Math.max(room, Math.min(0, slide)))}px)`;
+        } else {
+          aside.style.transform = "";
+        }
+      }
     };
 
     const draw = () => {
@@ -101,6 +137,7 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       if (frame) cancelAnimationFrame(frame);
+      if (aside) aside.style.transform = "";
     };
   }, [titles]);
 

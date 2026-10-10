@@ -186,9 +186,9 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
             way down (Žilvinas 2026-10-10). It pins 24 under the floating
             header; self-start, because a grid item stretched to the row's
             height has nowhere to stick. On a window shorter than the
-            sidebar the top stays and the foot is clipped until the text
-            runs out — the longest sidebar, Privacy's fifteen rows, fits a
-            laptop at 860 high (745 at that width) and a 1080 at 1920. */}
+            sidebar (Terms' twenty rows on a laptop at 860) LegalToc slides
+            it up by its overflow as the reader goes down, so no row is
+            ever cut off. */}
         <aside
           className="sticky top-[calc(var(--header-h)+1.5rem)] hidden self-start lg:block"
           aria-label="Legal documents"
