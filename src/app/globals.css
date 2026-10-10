@@ -2554,3 +2554,34 @@ html[data-sheet] .tile-marquee-track {
     zoom: 0.8;
   }
 }
+
+/* THE STRIPE BOXES ARE GROWN BY THE BROWSER'S OWN MEANS (StripePay.tsx, the
+   scaled box). From md up each of Stripe's frames is laid out at a phone's
+   width and shown --grow times larger: 1.6 for the card fields, 1.24 for
+   Link. `zoom` is the way to do it — the frame is laid out small and DRAWN
+   large, so Stripe's vector icons and type are as sharp as the sheet's own
+   — and it composes with the sheet's fit zoom (PlanSheet) on its own.
+
+   WebKit is the exception, and it is told apart by -webkit-named-image(),
+   a function only WebKit has: there a zoom lays the frame out at the
+   UNZOOMED width and Stripe puts the three fields in one row, off the edge
+   (2026-10-06). So Safari, and every iPad, keeps the transform: a scale of
+   --grow times the sheet's fit, with the sheet's zoom undone (--unfit) so
+   none of it reaches the frame. Its icons stay as soft as a scaled picture;
+   nothing sharper is to be had there. */
+@media (width >= 48rem) {
+  .stripe-grow {
+    /* A zoomed box's own px are the small ones: 100% of its parent is
+       already the parent's width over --grow. */
+    zoom: var(--grow);
+    width: 100%;
+  }
+  @supports (background: -webkit-named-image(apple-pay-logo-black)) {
+    .stripe-grow {
+      zoom: var(--unfit, 1);
+      width: calc(100% / (var(--grow) * var(--fit, 1)));
+      transform-origin: top left;
+      scale: calc(var(--grow) * var(--fit, 1));
+    }
+  }
+}
