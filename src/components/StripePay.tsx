@@ -425,7 +425,10 @@ export function StripePay({
         layout: "tabs",
         terms: { card: "never" },
         fields: { billingDetails: { address: { country: where ? "never" : "auto" } } },
-        wallets: { link: "never" },
+        // No wallets either (2026-10-10): left on "auto", the fields probed
+        // Google Pay for every plan — a frame and 1.5 MB of pay.google.com
+        // each — to decide whether to show a tab the sheet has no room for.
+        wallets: { link: "never", applePay: "never", googlePay: "never" },
       });
       // THE MASKS ARE ONLY RIGHT IF STRIPE LAID THE FIELDS OUT AS EXPECTED:
       // the number over the expiry and the security code, in rows of the

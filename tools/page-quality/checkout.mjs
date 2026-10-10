@@ -6,9 +6,17 @@
  * `npm test` reads the sheet's SOURCE, and the source read fine while a
  * buyer who picked another plan waited for Stripe to be built again.
  *
- *   BUY IS INSTANT ON EVERY PLAN. A visitor arrives on /templates, moves,
- *   opens the sheet, picks a plan and presses Buy. For each plan, at a
- *   laptop's width and a phone's:
+ *   NOTHING FROM STRIPE FOR A READER (Žilvinas 2026-10-10, "templates page
+ *   is super super slow"): a visitor arrives on /templates and moves, and
+ *   for the next few seconds no frame of Stripe's is in the page and no
+ *   session is asked of the webapp. Every plan's payment step used to be
+ *   built at that first move — 13 iframes and 11 MB behind a page the
+ *   visitor was reading.
+ *
+ *   BUY IS INSTANT ON EVERY PLAN. The visitor opens the sheet; its three
+ *   payment steps are built in turn while it is up. Then, for each plan,
+ *   at a laptop's width and a phone's: the sheet is opened, the plan is
+ *   picked and Buy is pressed, and
  *     - the payment step is up within MAX_MS of the press;
  *     - Buy never held for it (no spinner);
  *     - the step on stage is that plan's own;
@@ -59,8 +67,10 @@ const PAGE = "/templates";
  * first takes 600ms and up.
  */
 const MAX_MS = 400;
-/** How long the three payment steps may take to load, off stage, after the first input. */
+/** How long the three payment steps may take to load, in turn, once the sheet is open. */
 const LOAD_MS = 25_000;
+/** How long a reader's pointer move is watched for anything of Stripe's. */
+const READER_MS = 4000;
 /**
  * From the fields being in to the step calling itself presentable: 350ms for
  * Stripe's frame to stop moving and up to 1500 for the Link button's answer
@@ -207,27 +217,48 @@ async function buy(browser, window) {
     await page.goto(`${remote ?? ORIGIN}${PAGE}`, { waitUntil: "load", timeout: 60_000 });
     await page.waitForFunction(() => document.documentElement.hasAttribute("data-ready"), { timeout: 30_000 });
 
-    // The first sign of a person: the sheet is built off stage from here.
+    // The first sign of a person: the sheet is put in the DOM off stage from
+    // here — and nothing of Stripe's with it.
+    const sessionsAsked = [];
+    page.on("request", (request) => {
+      if (request.method() === "POST" && new URL(request.url()).pathname.endsWith("/checkout/session")) sessionsAsked.push(request.url());
+    });
     await page.mouse.move(200, 200);
     await page.mouse.move(230, 260, { steps: 4 });
     await page.keyboard.press("Shift");
+    await pause(READER_MS);
+    const forReader = await page.evaluate(() => ({
+      frames: [...document.querySelectorAll("iframe")].map((frame) => new URL(frame.src || "about:blank", location.href).host).filter((host) => /stripe/.test(host)),
+      steps: document.querySelectorAll('[role="dialog"] form').length,
+    }));
+    const readerProblems = [];
+    if (forReader.frames.length) readerProblems.push(`${forReader.frames.length} frame(s) of Stripe's in the page (${[...new Set(forReader.frames)].join(", ")})`);
+    if (forReader.steps) readerProblems.push(`${forReader.steps} payment step(s) built`);
+    if (sessionsAsked.length) readerProblems.push(`${sessionsAsked.length} session(s) asked of the webapp`);
+    console.log(`  ${readerProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} a reader     ${readerProblems.length ? readerProblems.join("; ") : "nothing from Stripe"}`);
+    for (const problem of readerProblems) failures.push(`${window.name}, a reader who has moved but not opened the sheet: ${problem}`);
 
+    // The sheet is opened, and its three steps are built in turn while it is up.
+    await page.evaluate(() => document.querySelector("a[data-plan]").click());
     const deadline = Date.now() + LOAD_MS;
     let steps = [];
     while (Date.now() < deadline) {
       steps = await page.evaluate(paymentSteps);
-      if (steps.length && steps.every((step) => step !== "loading")) break;
+      if (steps.length === 3 && steps.every((step) => step !== "loading")) break;
       await pause(100);
     }
     if (!steps.length) {
-      return [`${window.name}: the sheet was not built off stage after a pointer moved — nothing was checked`];
+      return [...failures, `${window.name}: no payment step was built once the sheet was opened — nothing was checked`];
     }
-    if (steps.some((step) => step !== "ready")) {
+    if (steps.length < 3 || steps.some((step) => step !== "ready")) {
       return [
+        ...failures,
         `${window.name}: the payment steps did not load (${steps.join(", ")}) — the webapp or Stripe did not answer, so nothing was checked`,
       ];
     }
     await pause(PRESENTABLE_MS);
+    await page.keyboard.press("Escape");
+    await pause(SHEET_MS);
     // Every form is marked; one that is built again comes back without it.
     await page.evaluate(() => {
       for (const form of document.querySelectorAll('[role="dialog"] form')) form.dataset.kept = "1";
@@ -317,15 +348,15 @@ async function inEuros(browser, window) {
     const onPage = await page.evaluate(figuresOnScreen);
     await page.mouse.move(200, 200);
     await page.mouse.move(230, 260, { steps: 4 });
+    await page.evaluate(() => document.querySelector("a[data-plan]").click());
+    // The steps are built once the sheet is open; every plan's session is asked for then.
     const deadline = Date.now() + LOAD_MS;
     let steps = [];
     while (Date.now() < deadline) {
       steps = await page.evaluate(paymentSteps);
-      if (steps.length && steps.every((step) => step !== "loading")) break;
+      if (steps.length === 3 && steps.every((step) => step !== "loading")) break;
       await pause(100);
     }
-    await page.evaluate(() => document.querySelector("a[data-plan]").click());
-    await pause(SHEET_MS);
     const inSheet = await page.evaluate(figuresOnScreen);
     await page.evaluate(pickAndBuy, 0, 6000);
     await pause(SHEET_MS);
@@ -379,7 +410,7 @@ const failures = [];
 try {
   console.log(`Checkout — ${remote ?? `the export in out/, served as ${ORIGIN}`}`);
   console.log(
-    `\nBuy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped — still shaped when the window changes width — and in euros when asked`,
+    `\nNothing from Stripe for a reader who has not opened the sheet. Buy: the payment step within ${MAX_MS}ms of the press on every plan, nothing held, nothing built again, the ring shaped — still shaped when the window changes width — and in euros when asked`,
   );
   for (const window of WINDOWS) {
     try {

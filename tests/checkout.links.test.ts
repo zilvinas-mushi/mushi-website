@@ -94,7 +94,7 @@ describe("the plan sheet", () => {
     expect(pay).not.toMatch(/^import \{[^}]*loadStripe[^}]*\} from "@stripe\/stripe-js"/m);
     expect(sheet).not.toContain("@stripe/stripe-js");
     // The preload still hangs on the sheet's open()...
-    expect(sheet).toMatch(/const open = \(\) => \{[\s\S]{0,260}preloadStripe\(\);/);
+    expect(sheet).toMatch(/const open = useEffectEvent\(\(\) => \{[\s\S]{0,260}preloadStripe\(\);/);
     // ...and the sheet is otherwise built only at real input: a page that
     // has merely loaded, or been scrolled by a script, prepares nothing.
     expect(sheet).toContain('const signs = ["pointermove", "pointerdown", "touchstart", "keydown", "wheel"] as const;');
@@ -194,9 +194,25 @@ describe("the plan sheet", () => {
     expect(pay).toContain('if (next === "ready" && wantsFocus.current) element?.focus();');
   });
 
-  it("keeps a payment step for every plan: picking another plan builds nothing again", () => {
-    // One StripePay per plan, each paying for its own plan...
-    expect(sheet).toMatch(/\{c\.options\.map\(\(o\) => \{\s+const on = o\.id === plan\.id;/);
+  it("builds nothing from Stripe until the sheet is opened, then one plan's step at a time", () => {
+    // 2026-10-10: all three steps built at the first pointer move were 13
+    // iframes, 11 MB and close to five seconds of CPU behind a page the
+    // visitor was merely reading. Only the plans in `built` have a step...
+    expect(sheet).toContain("const [built, setBuilt] = useState<PlanId[]>([]);");
+    expect(sheet).toMatch(/\{c\.options\.filter\(\(o\) => built\.includes\(o\.id as PlanId\)\)\.map\(\(o\) => \{\s+const on = o\.id === plan\.id;/);
+    // ...the chosen plan's goes in when the sheet opens, never before...
+    expect(sheet).toContain("const steps = stale || !built.length ? [planId as PlanId] : built;");
+    expect(sheet).not.toMatch(/setBuilt\([^)]*\)[^\n]*\n[^\n]*setPrepared\(true\);\s*\}/);
+    // ...a pick builds its plan's step at once...
+    expect(sheet).toContain("if (!built.includes(id as PlanId)) setBuilt([...built, id as PlanId]);");
+    // ...and each step that settles starts the next, one at a time, while
+    // the sheet is up — never behind a page the buyer has gone back to.
+    expect(sheet).toContain("const next = ok && shown ? nextToBuild(built, pay.current) : undefined;");
+    expect(sheet).toContain("if (built.some((id) => !steps[id]?.ready)) return undefined;");
+  });
+
+  it("keeps a payment step for every plan it has built: picking another plan builds nothing again", () => {
+    // One StripePay per built plan, each paying for its own plan...
     expect(sheet).toContain("planId={o.id as PlanId}");
     // ...and none of them keyed by the CHOSEN plan, which is what threw the
     // finished step away each time the choice changed.
@@ -219,7 +235,7 @@ describe("the plan sheet", () => {
   it("shows three card fields and nothing else: no country selector, mandate line or Link sign-up", () => {
     expect(pay).toContain('terms: { card: "never" }');
     expect(pay).toContain('fields: { billingDetails: { address: { country: where ? "never" : "auto" } } }');
-    expect(pay).toContain('wallets: { link: "never" }');
+    expect(pay).toContain('wallets: { link: "never", applePay: "never", googlePay: "never" }');
   });
 
   it("supplies the billing country itself, from Cloudflare's report of where the visitor is", () => {
