@@ -164,7 +164,7 @@ describe("the plan sheet", () => {
     const rule = css.slice(css.indexOf(".stripe-grow {"));
     expect(rule).toMatch(/^\.stripe-grow \{[^}]*zoom: var\(--grow\);[^}]*width: 100%;/);
     const webkit = rule.slice(rule.indexOf("@supports (background: -webkit-named-image("));
-    expect(webkit).toMatch(/\.stripe-grow \{[^}]*zoom: var\(--unfit, 1\);[^}]*width: calc\(100% \/ \(var\(--grow\) \* var\(--fit, 1\)\)\);[^}]*transform-origin: top left;[^}]*scale: calc\(var\(--grow\) \* var\(--fit, 1\)\);/s);
+    expect(webkit).toMatch(/\.stripe-grow \{[^}]*zoom: var\(--unfit, 1\);[^}]*width: calc\(100% \/ \(var\(--grow\) \* var\(--fit, 1\)\)\);[^}]*transform-origin: top left;[^}]*scale: calc\(var\(--grow\) \* var\(--fit, 1\)\);/);
     expect(sheet).toContain('style={{ zoom: fit, "--fit": fit, "--unfit": 1 / fit } as React.CSSProperties}');
   });
 
