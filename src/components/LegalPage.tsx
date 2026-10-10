@@ -189,7 +189,17 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
           left edge at 732, the text 905 wide. Below lg the sidebar is off and
           the text takes the phone's single column. */}
       <div className="mx-auto grid w-full max-w-[calc(86.375rem+2*var(--gutter))] grid-cols-1 px-[var(--gutter)] pt-[92px] pb-[60px] max-md:pl-[35px] max-md:pr-[15px] md:pt-[5.75rem] md:pb-[9.375rem] lg:grid-cols-[28.9375rem_minmax(0,56.5625rem)]">
-        <aside className="hidden lg:block" aria-label="Legal documents">
+        {/* STICKY, so the nav and the rail ride beside the text the whole
+            way down (Žilvinas 2026-10-10). It pins 24 under the floating
+            header; self-start, because a grid item stretched to the row's
+            height has nowhere to stick. On a window shorter than the
+            sidebar the top stays and the foot is clipped until the text
+            runs out — the longest sidebar, Privacy's fifteen rows, fits a
+            laptop at 860 high (745 at that width) and a 1080 at 1920. */}
+        <aside
+          className="sticky top-[calc(var(--header-h)+1.5rem)] hidden self-start lg:block"
+          aria-label="Legal documents"
+        >
           {/* "Legal", SemiBold 28, 3 up from the text column's top (481
               against 484); the pills 15 under it. */}
           <h2 className="-mt-[0.1875rem] text-[1.75rem] font-semibold leading-[2.625rem] text-white">
