@@ -391,7 +391,13 @@ async function buy(browser, window) {
         stop = true;
         await new Promise((done) => setTimeout(done, 100));
         const longest = (list) => list.reduce((a, f) => (f.ms > a.ms ? f : a), { ms: 0, at: 0 });
-        const rise = longest(frames.filter((f) => f.at <= riseMs));
+        // A frame gap that is Stripe.js's evaluation is Stripe's wherever
+        // it falls: on a slow runner the script arrives late and is
+        // evaluated inside the step change, where nothing of the site's
+        // may be — but that is the network's timing, not the sheet's.
+        const stripeAt = long.filter((l) => l.stripe);
+        const notStripe = (f) => !stripeAt.some((l) => f.at - f.ms <= l.at + l.ms && f.at >= l.at);
+        const rise = longest(frames.filter((f) => f.at <= riseMs && notStripe(f)));
         const all = longest(frames);
         // Long frames that were not Stripe.js's evaluation: under the
         // buyer's hand (the rise, the step change) any over the budget;
@@ -400,7 +406,7 @@ async function buy(browser, window) {
         const underHand = (l) => l.at <= riseMs || (l.at >= buyAtMs && l.at <= buyAtMs + stepChangeMs);
         // Which budget a frame was held to, for the report.
         const ours = long.filter((l) => !l.stripe && (underHand(l) ? l.ms > slowMs : l.what === "style/layout" ? l.ms > mountMs : l.ms > scriptMs));
-        const change = longest(frames.filter((f) => f.at >= buyAtMs && f.at <= buyAtMs + stepChangeMs));
+        const change = longest(frames.filter((f) => f.at >= buyAtMs && f.at <= buyAtMs + stepChangeMs && notStripe(f)));
         return { frames: frames.length, rise: Math.round(rise.ms), riseAt: Math.round(rise.at), change: Math.round(change.ms), changeAt: Math.round(change.at), worst: Math.round(all.ms), worstAt: Math.round(all.at), ours, stripe: long.filter((l) => l.stripe).map((l) => `${l.ms}ms@${l.at}`) };
       },
       { riseMs: RISE_MS, actMs: ACT_MS, slowMs: budget(RISE_FRAME_MS), buyAtMs: BUY_AT_MS, stepChangeMs: STEP_CHANGE_MS, mountMs: budget(MOUNT_FRAME_MS), scriptMs: budget(SCRIPT_FRAME_MS) },
