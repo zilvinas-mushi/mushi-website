@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { bookingTarget } from "@/lib/site";
 import { CTA_FILL, type HeaderCta } from "./headerCta";
 
 /**
@@ -130,6 +131,7 @@ export function HeaderCtaSwap({
       >
         <a
           href={to.href}
+          {...bookingTarget(to.href)}
           data-plan={to.sheet ? "" : undefined}
           aria-hidden={!showingTo}
           tabIndex={showingTo ? 0 : -1}
@@ -139,6 +141,7 @@ export function HeaderCtaSwap({
         </a>
         <a
           href={from.href}
+          {...bookingTarget(from.href)}
           data-plan={from.sheet ? "" : undefined}
           aria-hidden={showingTo}
           tabIndex={showingTo ? -1 : 0}

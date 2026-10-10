@@ -3,7 +3,7 @@ import { CaseGallery } from "./CaseGallery";
 import { Broken } from "./CaseStudySections";
 import { ArrowDisc } from "./Sections";
 import { CASE_STUDY_CALL, CASE_STUDY_DETAILS, type CaseStudySlug } from "@/lib/content";
-import { BOOKING_URL, CASE_STUDY_CALL_ID, CASE_STUDY_HERO_CTA_ID } from "@/lib/site";
+import { BOOKING_URL, CASE_STUDY_CALL_ID, CASE_STUDY_HERO_CTA_ID, bookingTarget } from "@/lib/site";
 
 /**
  * /case-studies/<slug>, section by section. design/CASE-STUDIES.md ("Detail
@@ -103,6 +103,7 @@ export function CaseStudyHero({ slug }: { slug: CaseStudySlug }) {
       {/* Phone only — the desktop's Book a Call is the card beside the story. */}
       <a
         href={BOOKING_URL}
+        {...bookingTarget(BOOKING_URL)}
         // Watched by the phone header: this leaving is what brings its
         // Schedule a Call out. See CASE_STUDY_HERO_CTA_ID.
         id={CASE_STUDY_HERO_CTA_ID}
@@ -148,6 +149,7 @@ function CallCard() {
         />
         <a
           href={BOOKING_URL}
+          {...bookingTarget(BOOKING_URL)}
           // The other end of the phone header's contract.
           id={CASE_STUDY_CALL_ID}
           className={`${BOOK} absolute left-[45px] top-[190px] h-[44px] w-[255px] rounded-[10px] pt-[2px] text-[18px] md:left-[3.125rem] md:top-[13.6875rem] md:h-[3.5625rem] md:w-[17.6875rem] md:rounded-[0.9375rem] md:pt-[0.125rem] md:text-[1.625rem]`}

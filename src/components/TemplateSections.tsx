@@ -3,7 +3,7 @@ import { BgFallback, Img } from "./Img";
 import { Logo } from "./Logo";
 import { Money } from "./Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { APP_URL, BOOKING_URL, CALL_ADDRESS, CALL_PATH, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID } from "@/lib/site";
+import { APP_URL, BOOKING_URL, CALL_ADDRESS, CALL_PATH, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, bookingTarget } from "@/lib/site";
 
 // 15 either side on the phone (artboard 2026-09-06: the cards measure
 // 345 inside a 375 frame); the desktop reference keeps its 20.
@@ -637,7 +637,7 @@ function linkedAnswer(answer: string): React.ReactNode {
   return (
     <>
       {answer.slice(0, at)}
-      <a href={CALL_PATH} className="text-white underline underline-offset-[3px] transition-colors duration-150 hover:text-[#a08ade]">
+      <a href={CALL_PATH} {...bookingTarget(CALL_PATH)} className="text-white underline underline-offset-[3px] transition-colors duration-150 hover:text-[#a08ade]">
         {CALL_ADDRESS}
       </a>
       {answer.slice(at + CALL_ADDRESS.length)}
@@ -1694,6 +1694,7 @@ export function TemplatesAccess() {
           </div>
           <a
             href={BOOKING_URL}
+            {...bookingTarget(BOOKING_URL)}
             // #000, not the #100d16 it had — a purple-black that read blue
             // against the banner (Žilvinas 2026-09-11; Figma fill 000000).
             // 305 x 50 on the phone, i.e. the banner's full content width.

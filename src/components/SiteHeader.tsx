@@ -5,7 +5,7 @@ import { MobileHeader, type MobileCtaConfig, type MobileDrawerActions } from "./
 import { HeaderCtaSwap } from "./HeaderCtaSwap";
 import { CTA_FILL, type HeaderCta } from "./headerCta";
 import { NAV, navHref } from "@/lib/content";
-import { BOOKING_URL, SITE_NAME } from "@/lib/site";
+import { BOOKING_URL, SITE_NAME, bookingTarget } from "@/lib/site";
 
 /**
  * Floating rounded header bar.
@@ -302,6 +302,7 @@ export function SiteHeader({
           ) : (
             <a
               href={cta?.href ?? BOOKING_URL}
+              {...bookingTarget(cta?.href ?? BOOKING_URL)}
               className={`mr-[calc(var(--u)*0.15)] inline-flex shrink-0 items-center justify-center rounded-[calc(var(--u)*0.15)] font-semibold leading-none transition-all duration-300 ease-out ${CTA_FILL[cta?.variant ?? "purple"]}`}
               style={{
                 width: "calc(var(--u) * 2.42)",

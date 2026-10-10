@@ -4,7 +4,7 @@ import { LazyImg } from "./CreativeCard";
 import { CoverflowRail } from "./CoverflowRail";
 import { ArrowDisc } from "./Sections";
 import { CASE_STUDIES_PAGE } from "@/lib/content";
-import { BOOKING_URL, CASE_STUDIES_CALL_ID, CASE_STUDIES_RAILS_ID } from "@/lib/site";
+import { BOOKING_URL, CASE_STUDIES_CALL_ID, CASE_STUDIES_RAILS_ID, bookingTarget } from "@/lib/site";
 
 /**
  * /case-studies, section by section. design/CASE-STUDIES.md is the spec and
@@ -495,6 +495,7 @@ export function ReadyToScale() {
           </h3>
           <a
             href={BOOKING_URL}
+            {...bookingTarget(BOOKING_URL)}
             // Watched by the phone header: this pill arriving is what puts
             // its Schedule a Call button away. See CASE_STUDIES_CALL_ID.
             id={CASE_STUDIES_CALL_ID}
