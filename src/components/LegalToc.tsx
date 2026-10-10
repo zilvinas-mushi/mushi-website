@@ -63,30 +63,6 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
     if (headings.length < 2 || dots.length !== headings.length) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // THE LIST IS NEVER CUT OFF (Žilvinas 2026-10-10, "shouldn't be hidden
-    // if you are in the below sections"): the sidebar is sticky at its top
-    // (LegalPage), so one taller than the window had its foot clipped — on
-    // a laptop Terms' twenty rows lost their last six exactly when the
-    // reader was in them. Now the sidebar slides UP, by its overflow and no
-    // more, in step with the reader's way from the first heading to the
-    // last: a reader at the start sees its head, a reader at the end its
-    // foot, the current row always on screen. A sidebar that fits does not
-    // move. Above the sidebar's own top is only the floating header, which
-    // is translucent; what slides under it is the "Legal" nav, already used.
-    const aside = list.closest<HTMLElement>("aside");
-    const headerH = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 0;
-    const slide = (line: number, tops: number[]) => {
-      if (!aside) return;
-      const room = window.innerHeight - (headerH() + 24) - aside.offsetHeight;
-      if (room >= 0) {
-        aside.style.transform = "";
-        return;
-      }
-      const first = tops[0];
-      const last = tops[tops.length - 1];
-      const through = last > first ? Math.min(1, Math.max(0, (line - first) / (last - first))) : 0;
-      aside.style.transform = `translateY(${Math.round(room * through)}px)`;
-    };
     let target = 0; // the fill's end, in rail px
     let shown = 0; // where the fill is drawn right now
     let frame = 0;
@@ -109,7 +85,6 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
       while (i < tops.length - 1 && tops[i + 1] <= line) i++;
       const span = i < tops.length - 1 ? tops[i + 1] - tops[i] : 0;
       const t = span > 0 ? Math.min(1, Math.max(0, (line - tops[i]) / span)) : 0;
-      slide(line, tops);
       const ys = dotY();
       const to = i < ys.length - 1 ? ys[i + 1] : ys[i];
       target = ys[i] + (to - ys[i]) * t - ys[0];
@@ -170,22 +145,46 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
       ride = requestAnimationFrame(step);
     };
 
+    // EVERY ENTRY FITS THE WINDOW, so each can be pressed (Žilvinas
+    // 2026-10-10, Terms' twenty rows running off the foot of a laptop).
+    // The rail's gap is the frame's 26 where there is room, and shrinks —
+    // never below 6 — until the whole sticky block (heading, rail) fits
+    // between its pin under the header and 24 off the window's foot.
+    const sticky = list.closest<HTMLElement>("[data-toc-sticky]");
+    const fit = () => {
+      if (!sticky) return;
+      list.style.gap = "";
+      const pin = parseFloat(getComputedStyle(sticky).top) || 0;
+      const room = window.innerHeight - pin - 24;
+      const over = sticky.offsetHeight - room;
+      if (over <= 0) return;
+      const gap = parseFloat(getComputedStyle(list).gap) || 0;
+      const n = items.length - 1;
+      if (n <= 0) return;
+      list.style.gap = `${Math.max(6, gap - over / n)}px`;
+    };
+    const onResize = () => {
+      fit();
+      schedule();
+    };
+
     // First placement is immediate: a reload mid-page must not start the
     // fill at the top and send it gliding down.
+    fit();
     read();
     shown = target;
     fill.style.height = `${Math.max(0, shown)}px`;
     read();
     list.addEventListener("click", onClick);
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", onResize);
     return () => {
+      list.style.gap = "";
       list.removeEventListener("click", onClick);
       window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", onResize);
       if (frame) cancelAnimationFrame(frame);
       if (ride) cancelAnimationFrame(ride);
-      if (aside) aside.style.transform = "";
     };
   }, [titles]);
 
