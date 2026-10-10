@@ -1271,8 +1271,12 @@ export function TemplatesComparison() {
             // 164 x 54.5 (Žilvinas 2026-09-26): the height is the artboard's
             // 60.6 at the page's 0.9, the width its 164.13 as is — at 148
             // the 25px label left the sides looking pinched ("a bit larger,
-            // it seems narrow from the sides"). Sat 31 off the card's bottom.
-            className="z-10 col-start-2 hidden h-[54.5px] w-[164px] items-center justify-center self-end justify-self-center whitespace-nowrap rounded-full mb-[31px] md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] text-[25px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white"
+            // it seems narrow from the sides"). 25 off the card's bottom: it
+            // sat 31, and the team asked for "a tiny bit" less under it
+            // (2026-10-07, off a live screenshot) — the gap above it to the
+            // last row is 30, so the pill now sits a touch low rather than
+            // dead centre, which is how the artboard has it.
+            className="z-10 col-start-2 hidden h-[54.5px] w-[164px] items-center justify-center self-end justify-self-center whitespace-nowrap rounded-full mb-[25px] md:inline-flex bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] text-[25px] font-semibold leading-none text-black transition-all duration-150 hover:bg-[linear-gradient(147deg,#000_0%,#000_100%)] hover:text-white"
             style={{ gridRowStart: lastRow }}
           >
             {/* LIVE TYPE (Žilvinas 2026-09-19, "looks distorted"): the label
