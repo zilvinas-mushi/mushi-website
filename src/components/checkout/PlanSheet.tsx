@@ -160,6 +160,7 @@ function PlanStep({
     >
       <StripePay
         planId={planId}
+        on={on}
         fallbackHref={(email) => checkoutUrl(planId, undefined, email || undefined)}
         // Stripe Link, in its own green: this one opens the plan on
         // Stripe's hosted page, and stands in until Stripe's own Link
