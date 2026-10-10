@@ -37,64 +37,80 @@ const REQUIRE_SESSION = `if(!/[?&]session_id=cs_[A-Za-z0-9_]+/.test(location.sea
  */
 const RETURN_TO_OPENER = `try{if(window.name==="mushi-checkout"&&window.opener&&!window.opener.closed){window.opener.location.href=location.href;window.close()}}catch(e){}`;
 
-// The site's violet button (Figma 5411:1102: 157.18deg, #a08ade 8% → #7c54b5
-// 42% → #6e54b5 93%). It inverts to white with violet text on hover and on
-// tap (CLAUDE.md, Interaction rules), cross-fading through the gradient.
+// The site's violet button (Figma 5411:1102 / 5344:174: #a08ade 8% → #7c54b5
+// 42% → #6e54b5 93%, at 157.18° on the phone and 167° on the desktop). It
+// inverts to white with violet text on hover and on tap (CLAUDE.md,
+// Interaction rules), cross-fading through the gradient.
 const VIOLET =
-  "bg-[linear-gradient(157.18deg,#a08ade_8.06%,#7c54b5_42.01%,#6e54b5_93.22%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(157.18deg,#fff_8.06%,#fff_42.01%,#fff_93.22%)] hover:text-[#6e54b5] active:bg-[linear-gradient(157.18deg,#fff_8.06%,#fff_42.01%,#fff_93.22%)] active:text-[#6e54b5]";
+  "[--ty-angle:157.18deg] md:[--ty-angle:167deg] bg-[linear-gradient(var(--ty-angle),#a08ade_8.06%,#7c54b5_42.01%,#6e54b5_93.22%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(var(--ty-angle),#fff_8.06%,#fff_42.01%,#fff_93.22%)] hover:text-[#6e54b5] active:bg-[linear-gradient(var(--ty-angle),#fff_8.06%,#fff_42.01%,#fff_93.22%)] active:text-[#6e54b5]";
 
-const STEPS = [
+// Step 3 is worded per frame: "and" on the phone (5411:1098), "&" on the
+// desktop (5344:173).
+const STEPS: React.ReactNode[] = [
   "Press the button below to open the login page.",
   "Enter the same email address you used when buying.",
-  "We\u2019ll email you a 6-digit code to type in and access the platform.",
+  <>
+    We’ll email you a 6-digit code to type in <span className="md:hidden">and</span>
+    <span className="hidden md:inline">&amp;</span> access the platform.
+  </>,
 ];
 
 /**
- * BUILT 1:1 FROM FIGMA "Thank you page mobile" (5545:73, 375 × 654,
- * 2026-10-10). Every size and gap below is that frame's, read off the
- * node metadata; the desktop frame is still to come. The page is the
- * frame's own #181818 (the artwork under it is covered by a solid fill),
+ * BUILT 1:1 FROM TWO FIGMA FRAMES (2026-10-10): "Thank you page mobile"
+ * (5545:73, 375 × 654) below md, "Thank you page desktop" (5545:72,
+ * 1920 × 1080) from md up. Every size and gap is the frame's own, read off
+ * the node metadata. The phone's are px, as the phone frame is not scaled;
+ * the desktop's are rem — the root font-size is the 1920 scale (globals.css),
+ * so a 1920 value ÷ 16 holds its proportion at every width. The page is the
+ * frames' own #181818 (the artwork under each is covered by a solid fill),
  * so it is not the site black.
  */
 export default function ThankYouPage() {
   return (
-    <main className="flex flex-1 flex-col items-center bg-[#181818] px-[15px] pt-[24px] pb-[30px] text-center">
+    <main className="flex flex-1 flex-col items-center bg-[#181818] px-[15px] pt-[24px] pb-[30px] text-center md:px-0 md:pt-[2.875rem] md:pb-[10.3125rem]">
       <script dangerouslySetInnerHTML={{ __html: `${REQUIRE_SESSION};${RETURN_TO_OPENER}` }} />
       {/* The wordmark is TYPE (Logo.tsx), sized so its ink fills the frame's
-          66 × 20 logo slot (5409:1069). */}
-      <div className="flex h-[20px] items-center justify-center">
-        <Logo className="text-[25.5px]" />
+          logo slot: 66 × 20 on the phone (5409:1069), 150 × 45 on the desktop
+          (5507:268). */}
+      <div className="flex h-[20px] items-center justify-center md:h-[2.8125rem]">
+        <Logo className="text-[25.5px] md:text-[3.625rem]" />
       </div>
-      <h1 className="mt-[25px] w-[337px] text-[28px] font-semibold leading-[31px] text-white">
+      <h1 className="mt-[25px] w-[337px] text-[28px] font-semibold leading-[31px] text-white md:mt-[8.3125rem] md:w-auto md:text-[4rem] md:leading-[3.9375rem]">
         Thank you!
         <br />
         Your account is ready.
       </h1>
-      <p className="mt-[13px] w-[345px] text-[16px] leading-[21px] text-[#969696]">
+      <p className="mt-[13px] w-[345px] text-[16px] leading-[21px] text-[#969696] md:mt-[1.375rem] md:w-[31.6875rem] md:text-[1.625rem] md:leading-[2.0625rem]">
         Your payment went through.
         <br />
         Here is how to get to your templates.
       </p>
-      <ol className="mt-[20px] flex w-[345px] flex-col gap-[10px] text-left">
+      <ol className="mt-[20px] flex w-[345px] flex-col gap-[10px] text-left md:mt-[1.625rem] md:w-[48.75rem] md:gap-[0.8125rem]">
         {STEPS.map((step, i) => (
-          <li key={step} className="relative flex h-[72px] items-center rounded-[15px] bg-[#222222] pl-[52px] pr-[25px]">
-            <span className="absolute left-[11px] top-[21px] grid size-[30px] place-items-center rounded-full bg-[#181818] text-[20px] font-medium leading-none text-white" aria-hidden="true">
+          <li
+            key={i}
+            className="relative flex h-[72px] items-center rounded-[15px] bg-[#222222] pl-[52px] pr-[25px] md:h-[4.25rem] md:rounded-[1.25rem] md:pl-[4.625rem] md:pr-[1.3125rem]"
+          >
+            <span
+              className="absolute left-[11px] top-[21px] grid size-[30px] place-items-center rounded-full bg-[#181818] text-[20px] font-medium leading-none text-white md:left-[0.6875rem] md:top-[0.6875rem] md:size-[2.875rem] md:text-[1.75rem]"
+              aria-hidden="true"
+            >
               {i + 1}
             </span>
-            <span className="text-[16px] leading-[21px] tracking-[-0.8px] text-white">{step}</span>
+            <span className="text-[16px] leading-[21px] tracking-[-0.8px] text-white md:text-[1.5rem] md:leading-[2.25rem] md:tracking-[-0.075rem]">{step}</span>
           </li>
         ))}
       </ol>
-      <p className="mt-[10px] w-[207px] text-[15px] leading-[21px] text-[#969696]">
+      <p className="mt-[10px] w-[207px] text-[15px] leading-[21px] text-[#969696] md:mt-[1.1875rem] md:w-[47.875rem] md:text-[1.5rem] md:leading-[2.25rem] md:tracking-[-0.015rem]">
         (Check your spam folder if you do not see the email.)
       </p>
       <a
         href={`${APP_URL}/login`}
-        className={`mt-[13px] flex h-[50px] w-[345px] items-center justify-center rounded-[10px] text-[18px] font-medium uppercase ${VIOLET}`}
+        className={`mt-[13px] flex h-[50px] w-[345px] items-center justify-center rounded-[10px] text-[18px] font-medium uppercase md:mt-[1.5625rem] md:h-[3.875rem] md:w-[48.75rem] md:rounded-[0.9375rem] md:text-[1.5rem] ${VIOLET}`}
       >
         Go to login page
       </a>
-      <p className="mt-[13px] w-[345px] text-[14px] leading-[18px] tracking-[-0.14px] text-[#797979]">
+      <p className="mt-[13px] w-[345px] text-[14px] leading-[18px] tracking-[-0.14px] text-[#797979] md:mt-[1.4375rem] md:w-[43.25rem] md:text-[1.25rem] md:leading-[1.75rem] md:tracking-[-0.0125rem]">
         If the login page does not recognise your email yet, give it a few minutes and try again, or write to{" "}
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </p>
