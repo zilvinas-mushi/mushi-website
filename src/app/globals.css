@@ -2558,30 +2558,41 @@ html[data-sheet] .tile-marquee-track {
 /* THE STRIPE BOXES ARE GROWN BY THE BROWSER'S OWN MEANS (StripePay.tsx, the
    scaled box). From md up each of Stripe's frames is laid out at a phone's
    width and shown --grow times larger: 1.6 for the card fields, 1.24 for
-   Link. `zoom` is the way to do it — the frame is laid out small and DRAWN
-   large, so Stripe's vector icons and type are as sharp as the sheet's own
-   — and it composes with the sheet's fit zoom (PlanSheet) on its own.
+   Link. There are two ways to do it, and no engine takes both:
 
-   WebKit is the exception, and it is told apart by -webkit-named-image(),
-   a function only WebKit has: there a zoom lays the frame out at the
-   UNZOOMED width and Stripe puts the three fields in one row, off the edge
-   (2026-10-06). So Safari, and every iPad, keeps the transform: a scale of
-   --grow times the sheet's fit, with the sheet's zoom undone (--unfit) so
-   none of it reaches the frame. Its icons stay as soft as a scaled picture;
-   nothing sharper is to be had there. */
+   - a transform: a scale of --grow times the sheet's fit zoom (PlanSheet),
+     with the sheet's zoom undone on the box (--unfit) so none of it reaches
+     the frame. Laid out right in every engine. But Chrome draws a
+     cross-origin frame in a process of its own, at the screen's resolution,
+     and the transform stretches that picture by --grow: every card brand and
+     the CVC mark came out soft (Žilvinas 2026-10-10, "why these popup
+     buttons are all blurred out?"). Firefox composes the frame's own
+     drawing, so there it is sharp under the transform.
+   - `zoom`: the frame is laid out small and DRAWN large, at --grow times the
+     resolution, so in Chrome its vectors are as sharp as the sheet's own
+     type; it composes with the sheet's fit zoom by itself. But WebKit lays
+     the frame out at the UNZOOMED width while drawing it zoomed, and Stripe
+     puts the three fields in one row, off the edge (2026-10-06, desktop
+     Safari and every iPad); and Firefox lays a zoomed frame out 6px wide of
+     its box, so the fields hang 10px out of the block.
+
+   So the transform everywhere, and the zoom in Blink alone — told apart by
+   -webkit-app-region, a property only it has. Should Blink ever drop it,
+   Chrome falls back to the transform: soft icons, nothing broken. */
 @media (width >= 48rem) {
   .stripe-grow {
-    /* A zoomed box's own px are the small ones: 100% of its parent is
-       already the parent's width over --grow. */
-    zoom: var(--grow);
-    width: 100%;
+    zoom: var(--unfit, 1);
+    width: calc(100% / (var(--grow) * var(--fit, 1)));
+    transform-origin: top left;
+    scale: calc(var(--grow) * var(--fit, 1));
   }
-  @supports (background: -webkit-named-image(apple-pay-logo-black)) {
+  @supports (-webkit-app-region: no-drag) {
     .stripe-grow {
-      zoom: var(--unfit, 1);
-      width: calc(100% / (var(--grow) * var(--fit, 1)));
-      transform-origin: top left;
-      scale: calc(var(--grow) * var(--fit, 1));
+      /* A zoomed box's own px are the small ones: 100% of its parent is
+         already the parent's width over --grow. */
+      zoom: var(--grow);
+      width: 100%;
+      scale: none;
     }
   }
 }

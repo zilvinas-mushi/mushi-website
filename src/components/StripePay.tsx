@@ -757,19 +757,22 @@ export function StripePay({
                 the fields out for one.
 
                 HOW IT IS GROWN IS THE BROWSER'S (.stripe-grow, globals.css):
-                `zoom` everywhere but WebKit, a transform there. Zoom lays the
+                `zoom` in Chrome, a transform everywhere else. Zoom lays the
                 frame out at the small width and DRAWS it at the large one,
                 so Stripe's vector icons and type are as sharp as the sheet's
-                — a transform scales a picture the frame drew at 1x, and the
-                card brands came out soft (Žilvinas 2026-10-10, "why these
-                icons look blurred?"). WebKit cannot have the zoom (Žilvinas
+                — a transform stretches the picture Chrome's frame drew at
+                the screen's resolution, and the card brands came out soft
+                (Žilvinas 2026-10-10, "why these popup buttons are all
+                blurred out?"). WebKit cannot have the zoom (Žilvinas
                 2026-10-06, "did you fix it?" — of desktop Safari): it draws
                 what is inside an iframe at the zoom of the box but lays it
                 out at the UNZOOMED width, so Stripe saw 727px, put the three
                 fields in one row and drew it 1.6x too wide — the security
-                code was off the edge. So there, and on every iPad, it stays
-                the transform, with the sheet's own fit zoom (`fit`,
-                PlanSheet) undone by --unfit and folded into the scale. */}
+                code was off the edge. Firefox lays a zoomed frame out 6px
+                wide of its box, and is sharp under a transform anyway. So
+                both keep the transform, with the sheet's own fit zoom
+                (`fit`, PlanSheet) undone by --unfit and folded into the
+                scale. */}
             <div
               ref={fields}
               // touch-none: see the Link slot.
