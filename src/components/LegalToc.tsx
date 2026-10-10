@@ -23,13 +23,19 @@ import { sectionId } from "@/lib/legal";
  * remaining distance each frame — so a flick of the wheel reads as a glide,
  * not a snap, the way Apple's scroll-driven marks move.
  *
- * A CLICK ON AN ENTRY scrolls the page there itself, on one ease-in-out
- * curve over 0.6 to 1.1 seconds by distance, and for that ride the fill is
- * pinned to the page's position frame for frame — no lag behind the
- * browser's own smooth scroll, which was quick and linear and left the
- * rail catching up ("the animation must be much much smoother", same day).
- * The hash still goes into the address bar, without the jump a hash
- * navigation would make. Reduced motion jumps, as the browser would.
+ * A CLICK ON AN ENTRY scrolls the page there itself, on the platform's own
+ * settle — cubic-bezier(0.32, 0.72, 0, 1), the curve the plan sheet rises
+ * on — over 0.65 to 1.3 seconds by distance: it is moving on the first
+ * frame and spends the second half easing in to land. The first cut used a
+ * symmetric ease-in-out, which held still for a beat after the press and
+ * then lunged ("this should still have smoother on click animation. as
+ * smooth as the others in the platform!", Žilvinas 2026-10-10). For the
+ * ride the fill is pinned to the page frame for frame, from geometry
+ * measured once at the press — no layout read per frame, and nothing
+ * written to the DOM unless it changes — so the main thread has the frame
+ * to itself and the scroll does not skip. The hash still goes into the
+ * address bar, without the jump a hash navigation would make. Reduced
+ * motion jumps, as the browser would.
  *
  * Server-rendered state is the finished state: fill 0, first dot current.
  * Driven by a scroll listener and direct style writes, no React state —
@@ -45,7 +51,30 @@ function headingTop(el: HTMLElement) {
   return el.getBoundingClientRect().top + window.scrollY - margin;
 }
 
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+/** A CSS cubic-bezier(x1, y1, x2, y2) timing function, solved for y at
+    time t by bisection on x: the one way to run the sheet's settle curve on
+    a scroll position, which CSS cannot animate. */
+function bezier(x1: number, y1: number, x2: number, y2: number) {
+  const at = (a: number, b: number, t: number) =>
+    3 * a * t * (1 - t) * (1 - t) + 3 * b * t * t * (1 - t) + t * t * t;
+  return (t: number) => {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    let lo = 0;
+    let hi = 1;
+    let u = t;
+    for (let i = 0; i < 24; i++) {
+      const x = at(x1, x2, u);
+      if (Math.abs(x - t) < 1e-4) break;
+      if (x < t) lo = u;
+      else hi = u;
+      u = (lo + hi) / 2;
+    }
+    return at(y1, y2, u);
+  };
+}
+/** The platform's settle: the plan sheet's rise and the iOS sheet's. */
+const settle = bezier(0.32, 0.72, 0, 1);
 
 export function LegalToc({ titles }: { titles: readonly string[] }) {
   const listRef = useRef<HTMLOListElement>(null);
@@ -68,31 +97,36 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
     let frame = 0;
     let ride = 0; // the click-scroll's own frame, while one runs
 
-    // The dots' rail offsets, measured from the list so the sticky
-    // sidebar's own travel cannot feed back in.
-    const dotY = () => {
+    // Geometry: the headings' page tops and the dots' rail offsets (measured
+    // from the list, so the sticky block's own travel cannot feed back in).
+    // Read fresh for a wheel scroll; frozen for a click's ride, whose frames
+    // must not be spent in layout.
+    let tops: number[] = [];
+    let ys: number[] = [];
+    const measure = () => {
+      tops = headings.map((el) => el.getBoundingClientRect().top + window.scrollY);
       const top = list.getBoundingClientRect().top;
-      return dots.map((d) => {
+      ys = dots.map((d) => {
         const r = d.getBoundingClientRect();
         return r.top - top + r.height / 2;
       });
     };
 
     const read = () => {
+      if (!ride) measure();
       const line = window.scrollY + window.innerHeight / 3;
-      const tops = headings.map((el) => el.getBoundingClientRect().top + window.scrollY);
       let i = 0;
       while (i < tops.length - 1 && tops[i + 1] <= line) i++;
       const span = i < tops.length - 1 ? tops[i + 1] - tops[i] : 0;
       const t = span > 0 ? Math.min(1, Math.max(0, (line - tops[i]) / span)) : 0;
-      const ys = dotY();
       const to = i < ys.length - 1 ? ys[i + 1] : ys[i];
       target = ys[i] + (to - ys[i]) * t - ys[0];
       // The dot being read is the one the fill has last passed; the fill
       // itself is where the eye is, so states follow the drawn fill.
       items.forEach((li, k) => {
         const reached = ys[k] - ys[0] <= shown + 0.5;
-        li.dataset.state = k === i ? "current" : reached ? "done" : "next";
+        const state = k === i ? "current" : reached ? "done" : "next";
+        if (li.dataset.state !== state) li.dataset.state = state;
       });
     };
 
@@ -102,7 +136,8 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
       // Pinned to the page during a click's ride: the page is already
       // moving on a curve, and a second ease on top would trail it.
       shown = reduced || ride || Math.abs(gap) < 0.5 ? target : shown + gap * 0.2;
-      fill.style.height = `${Math.max(0, shown)}px`;
+      const h = `${Math.max(0, shown)}px`;
+      if (fill.style.height !== h) fill.style.height = h;
       read();
       if (Math.abs(target - shown) >= 0.5) frame = requestAnimationFrame(draw);
     };
@@ -130,17 +165,18 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
       }
       const from = window.scrollY;
       const distance = Math.abs(to - from);
-      // 0.6s for a hop to the next section, 1.1s across the whole page.
-      const duration = Math.min(1100, Math.max(600, 400 + distance * 0.12));
+      // 0.65s for a hop to the next section, 1.3s across the whole page.
+      const duration = Math.min(1300, Math.max(650, 500 + distance * 0.13));
       const start = performance.now();
       if (ride) cancelAnimationFrame(ride);
+      measure();
       const step = (now: number) => {
         const p = Math.min(1, (now - start) / duration);
         // "instant", or the page's own `scroll-behavior: smooth` would
         // re-ease every frame of this ride: a crawl, then a lunge.
-        window.scrollTo({ top: from + (to - from) * easeInOut(p), behavior: "instant" });
-        schedule();
+        window.scrollTo({ top: from + (to - from) * settle(p), behavior: "instant" });
         ride = p < 1 ? requestAnimationFrame(step) : 0;
+        schedule();
       };
       ride = requestAnimationFrame(step);
     };
