@@ -72,6 +72,16 @@ const LOAD_MS = 25_000;
 /** How long a reader's pointer move is watched for anything of Stripe's. */
 const READER_MS = 4000;
 /**
+ * THE SPEED BUDGET FOR A READER (Žilvinas 2026-10-10, "add in the pipeline
+ * the speed"): in those seconds after the pointer moves, the page may talk
+ * to nothing but its own origin and the webapp's wake call, and every
+ * renderer process together — the page's and any frame's — may be busy for
+ * at most this long. The three Stripe checkouts that used to be built there
+ * were 4.7s of CPU on a laptop; the page by itself is under 50ms, and a CI
+ * runner is allowed to be many times slower than that.
+ */
+const READER_CPU_MS = 1500;
+/**
  * From the fields being in to the step calling itself presentable: 350ms for
  * Stripe's frame to stop moving and up to 1500 for the Link button's answer
  * (StripePay.tsx).
@@ -145,6 +155,24 @@ function chromePath() {
 }
 
 /* ----------------------------------------------------------------- buy --- */
+
+/**
+ * Main-thread busy time, in ms, summed over EVERY renderer process in a
+ * trace — the page's and each cross-origin frame's. The page's own process
+ * is not the measure: a desktop browser runs Stripe's frames out of
+ * process, and the page looked idle while three of them were loading.
+ */
+function busyMs({ traceEvents }) {
+  const threads = new Map();
+  for (const event of traceEvents) if (event.ph === "M" && event.name === "thread_name") threads.set(`${event.pid}:${event.tid}`, event.args.name);
+  let total = 0;
+  for (const event of traceEvents) {
+    if (event.ph !== "X" || !event.dur || threads.get(`${event.pid}:${event.tid}`) !== "CrRendererMain") continue;
+    if (event.name !== "ThreadControllerImpl::RunTask" && event.name !== "RunTask") continue;
+    total += event.dur / 1000;
+  }
+  return Math.round(total);
+}
 
 const pause = (ms) => new Promise((done) => setTimeout(done, ms));
 
@@ -223,10 +251,17 @@ async function buy(browser, window) {
     page.on("request", (request) => {
       if (request.method() === "POST" && new URL(request.url()).pathname.endsWith("/checkout/session")) sessionsAsked.push(request.url());
     });
+    const strangers = [];
+    page.on("request", (request) => {
+      const url = new URL(request.url());
+      if (url.origin !== ORIGIN && !url.pathname.endsWith("/checkout/session")) strangers.push(url.host);
+    });
+    await page.tracing.start({ categories: ["toplevel"] });
     await page.mouse.move(200, 200);
     await page.mouse.move(230, 260, { steps: 4 });
     await page.keyboard.press("Shift");
     await pause(READER_MS);
+    const cpuMs = busyMs(JSON.parse(Buffer.from(await page.tracing.stop()).toString("utf8")));
     const forReader = await page.evaluate(() => ({
       frames: [...document.querySelectorAll("iframe")].map((frame) => new URL(frame.src || "about:blank", location.href).host).filter((host) => /stripe/.test(host)),
       steps: document.querySelectorAll('[role="dialog"] form').length,
@@ -235,7 +270,9 @@ async function buy(browser, window) {
     if (forReader.frames.length) readerProblems.push(`${forReader.frames.length} frame(s) of Stripe's in the page (${[...new Set(forReader.frames)].join(", ")})`);
     if (forReader.steps) readerProblems.push(`${forReader.steps} payment step(s) built`);
     if (sessionsAsked.length) readerProblems.push(`${sessionsAsked.length} session(s) asked of the webapp`);
-    console.log(`  ${readerProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} a reader     ${readerProblems.length ? readerProblems.join("; ") : "nothing from Stripe"}`);
+    if (strangers.length) readerProblems.push(`${strangers.length} request(s) to ${[...new Set(strangers)].join(", ")}`);
+    if (cpuMs > READER_CPU_MS) readerProblems.push(`${cpuMs}ms of CPU across every renderer process, over ${READER_CPU_MS}`);
+    console.log(`  ${readerProblems.length ? "FAIL" : "pass"}  ${window.name.padEnd(8)} a reader     ${readerProblems.length ? readerProblems.join("; ") : `nothing from Stripe, ${cpuMs}ms of CPU`}`);
     for (const problem of readerProblems) failures.push(`${window.name}, a reader who has moved but not opened the sheet: ${problem}`);
 
     // The sheet is opened, and its three steps are built in turn while it is up.

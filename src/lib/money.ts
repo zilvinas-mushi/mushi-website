@@ -19,14 +19,19 @@
  */
 import { CURRENCY, LOCAL_CURRENCIES, type Currency } from "@/lib/pricing";
 
-export const SYMBOL: Record<Currency, string> = { usd: "$", eur: "€" };
+/**
+ * What stands where the dollar sign stood. The franc has no sign of its own:
+ * "CHF 10" is how Switzerland writes it, Stripe's receipts included, so its
+ * "symbol" carries the space that puts the figure after it.
+ */
+export const SYMBOL: Record<Currency, string> = { usd: "$", eur: "€", gbp: "£", chf: "CHF " };
 
 /** A dollar string from content.ts ("$24 total", "SAVE $60") in another currency. */
 export function inCurrency(text: string, currency: Currency): string {
   return text.replace(/\$/g, SYMBOL[currency]);
 }
 
-/** "$10", or "$7.50" when the cents are not zero; "€10" in euros. */
+/** "$10", or "$7.50" when the cents are not zero; "€10" in euros, "CHF 10" in francs. */
 export function money(minor: number, currency: Currency = CURRENCY): string {
   const figure = minor % 100 === 0 ? String(minor / 100) : (minor / 100).toFixed(2);
   return `${SYMBOL[currency]}${figure}`;

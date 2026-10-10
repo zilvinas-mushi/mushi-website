@@ -605,7 +605,9 @@ export function PlanSheet() {
                         // pl/pb 1: optical centring (Žilvinas 2026-09-25, "should be centred
                         // both horizontally and vertically") — the box is centred to the
                         // sub-pixel, but Poppins' $ and 0 lean the word left and low.
-                        className="absolute -top-[7.5px] left-[41px] z-[1] flex h-[20px] w-[74px] items-center justify-center rounded-[5px] bg-white pb-[1px] pl-[1px] text-center text-[12px] font-semibold leading-none text-black"
+                        // 74 is the width for "SAVE $60"; "SAVE CHF 60" is wider, so
+                        // the pill grows from it rather than cutting the figure.
+                        className="absolute -top-[7.5px] left-[41px] z-[1] flex h-[20px] min-w-[74px] items-center justify-center whitespace-nowrap rounded-[5px] bg-white px-[6px] pb-[1px] pl-[7px] text-center text-[12px] font-semibold leading-none text-black"
                       >
                         <Money>{o.save}</Money>
                       </span>

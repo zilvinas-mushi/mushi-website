@@ -462,6 +462,27 @@ html[data-currency="eur"] [data-money="usd"] {
 html[data-currency="eur"] [data-money="eur"] {
   display: inline;
 }
+html[data-currency="gbp"] [data-money="usd"] {
+  display: none;
+}
+html[data-currency="gbp"] [data-money="gbp"] {
+  display: inline;
+}
+html[data-currency="chf"] [data-money="usd"] {
+  display: none;
+}
+html[data-currency="chf"] [data-money="chf"] {
+  display: inline;
+}
+/* A currency code before its figure, at the figure's foot — see Money.tsx.
+   inline-block: a struck price's line is drawn per inline box at each box's
+   own height, which under the small code looked like an underline. An
+   inline-block takes no decoration from its parent, so the figure is struck
+   and the code stands. */
+.money-code {
+  display: inline-block;
+  font-size: max(0.6em, 11px);
+}
 
 /*
   A DEFERRED IMAGE SHOWS NOTHING UNTIL IT HAS ITS URL. Below the fold every
