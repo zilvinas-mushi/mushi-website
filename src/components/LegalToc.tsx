@@ -23,12 +23,30 @@ import { sectionId } from "@/lib/legal";
  * remaining distance each frame — so a flick of the wheel reads as a glide,
  * not a snap, the way Apple's scroll-driven marks move.
  *
+ * A CLICK ON AN ENTRY scrolls the page there itself, on one ease-in-out
+ * curve over 0.6 to 1.1 seconds by distance, and for that ride the fill is
+ * pinned to the page's position frame for frame — no lag behind the
+ * browser's own smooth scroll, which was quick and linear and left the
+ * rail catching up ("the animation must be much much smoother", same day).
+ * The hash still goes into the address bar, without the jump a hash
+ * navigation would make. Reduced motion jumps, as the browser would.
+ *
  * Server-rendered state is the finished state: fill 0, first dot current.
  * Driven by a scroll listener and direct style writes, no React state —
  * one re-render per scrolled pixel would be the expensive way to move a
  * line. Numbers in rem: 16 design px to the rem at the 1920 frame. The
  * rail is desktop-only, as the phone frames have no sidebar.
  */
+
+/** Where a section's heading lands when scrolled to: under the floating
+    header by the same margin the heading's scroll-margin keeps. */
+function headingTop(el: HTMLElement) {
+  const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+  return el.getBoundingClientRect().top + window.scrollY - margin;
+}
+
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
 export function LegalToc({ titles }: { titles: readonly string[] }) {
   const listRef = useRef<HTMLOListElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
@@ -48,6 +66,7 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
     let target = 0; // the fill's end, in rail px
     let shown = 0; // where the fill is drawn right now
     let frame = 0;
+    let ride = 0; // the click-scroll's own frame, while one runs
 
     // The dots' rail offsets, measured from the list so the sticky
     // sidebar's own travel cannot feed back in.
@@ -80,7 +99,9 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
     const draw = () => {
       frame = 0;
       const gap = target - shown;
-      shown = reduced || Math.abs(gap) < 0.5 ? target : shown + gap * 0.2;
+      // Pinned to the page during a click's ride: the page is already
+      // moving on a curve, and a second ease on top would trail it.
+      shown = reduced || ride || Math.abs(gap) < 0.5 ? target : shown + gap * 0.2;
       fill.style.height = `${Math.max(0, shown)}px`;
       read();
       if (Math.abs(target - shown) >= 0.5) frame = requestAnimationFrame(draw);
@@ -89,18 +110,56 @@ export function LegalToc({ titles }: { titles: readonly string[] }) {
       read();
       if (!frame) frame = requestAnimationFrame(draw);
     };
+
+    // A click rides the page to the heading on one curve, and leaves the
+    // hash in the address bar without the jump a hash change would make.
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement).closest("a");
+      if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      const k = items.findIndex((li) => li.contains(a));
+      if (k < 0) return;
+      e.preventDefault();
+      const el = headings[k];
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const to = Math.min(max, Math.max(0, headingTop(el)));
+      history.pushState(null, "", `#${el.id}`);
+      if (reduced) {
+        window.scrollTo({ top: to, behavior: "instant" });
+        schedule();
+        return;
+      }
+      const from = window.scrollY;
+      const distance = Math.abs(to - from);
+      // 0.6s for a hop to the next section, 1.1s across the whole page.
+      const duration = Math.min(1100, Math.max(600, 400 + distance * 0.12));
+      const start = performance.now();
+      if (ride) cancelAnimationFrame(ride);
+      const step = (now: number) => {
+        const p = Math.min(1, (now - start) / duration);
+        // "instant", or the page's own `scroll-behavior: smooth` would
+        // re-ease every frame of this ride: a crawl, then a lunge.
+        window.scrollTo({ top: from + (to - from) * easeInOut(p), behavior: "instant" });
+        schedule();
+        ride = p < 1 ? requestAnimationFrame(step) : 0;
+      };
+      ride = requestAnimationFrame(step);
+    };
+
     // First placement is immediate: a reload mid-page must not start the
     // fill at the top and send it gliding down.
     read();
     shown = target;
     fill.style.height = `${Math.max(0, shown)}px`;
     read();
+    list.addEventListener("click", onClick);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
+      list.removeEventListener("click", onClick);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       if (frame) cancelAnimationFrame(frame);
+      if (ride) cancelAnimationFrame(ride);
     };
   }, [titles]);
 
