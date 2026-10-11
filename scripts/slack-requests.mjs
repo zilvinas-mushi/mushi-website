@@ -19,16 +19,29 @@ if (!token) fail("SLACK_MUSHI_TOKEN is not set");
 const [cmd, channelArg, ...rest] = process.argv.slice(2);
 if (!cmd || !channelArg) fail("usage: list|react|reply <#channel> …");
 
+// Form-encoded, not JSON: some methods (chat.getPermalink) take only that.
+// A call with no arguments goes without a body: Slack sits on an empty form
+// POST until it times out (408 after three minutes).
 const api = async (method, params = {}) => {
+  const body = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) if (v !== undefined) body.set(k, String(v));
+  const t0 = Date.now();
   const res = await fetch(`https://slack.com/api/${method}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json; charset=utf-8",
+      ...(body.size ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
     },
-    body: JSON.stringify(params),
+    ...(body.size ? { body: body.toString() } : {}),
   });
-  const json = await res.json();
+  const text = await res.text();
+  if (process.env.SLACK_DEBUG) console.error(`${method} ${res.status} ${Date.now() - t0}ms ${text.slice(0, 60)}`);
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    fail(`${method}: ${res.status} ${text.slice(0, 200)}`);
+  }
   if (!json.ok) fail(`${method}: ${json.error}`);
   return json;
 };
