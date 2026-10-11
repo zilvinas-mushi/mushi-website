@@ -1,15 +1,30 @@
 # Routine: Slack requests → production
 
 A scheduled Claude Code routine (claude.ai/code/routines) runs this every
-morning. It reads one Slack channel in the Mushi workspace, builds whatever
+morning. It reads one Slack conversation in the Mushi workspace (a channel, or the
+direct messages with one person), builds whatever
 site change was asked for, opens a pull request with auto-merge, and reports
 back in the thread. CI (`.github/workflows/ci.yml`) is the only thing that
 puts it on `main`, and `main` is what Cloudflare deploys.
+
+## Setup
+
+The routine talks to Slack through `scripts/slack-requests.mjs` and a user
+token, not a connector: Slack's MCP server would not take a connection from
+an app of our own (2026-10-11), and a token cannot expire mid-run. The token
+is the **User OAuth Token** of the "Claude" app in the Mushi workspace
+(api.slack.com/apps/A0C8EAS6GN5 → Install App). It lives in the routine's
+cloud environment as `SLACK_MUSHI_TOKEN`, and the environment's network
+access allows `slack.com`. It is never committed.
 
 The routine's prompt on claude.ai is one line:
 
 > Follow docs/routines/slack-requests.md in this repository. The channel is
 > #CHANNEL.
+
+or, for direct messages, `The channel is @name.` Wherever `#CHANNEL`
+appears below, the prompt's value goes, `@name` included: the script takes
+both.
 
 Everything else is here, so it is versioned and reviewed like code.
 
@@ -41,13 +56,19 @@ The routine has no memory between runs. Reactions are the ledger:
 
 Every run:
 
-1. Read the channel for the last 7 days (`slack_read_channel`). Also read the
-   threads of messages marked :question: in that window: an answer in the
-   thread turns the question into a request.
+1. `node scripts/slack-requests.mjs list "#CHANNEL" 7` prints the last 7
+   days as JSON: every message with its reactions, its thread replies and
+   its permalink, and `me`, the token's own user id. In a DM only the
+   other person's messages are requests; anything from `me` is a reply. An
+   answer in the thread of a :question: message turns the question into a
+   request.
 2. A message that already carries any reaction from the table is done. Skip
    it. Only unreacted messages, and :question: ones with a new answer, are
    work.
-3. React :eyes: before starting a request so a second run cannot pick it up.
+3. `node scripts/slack-requests.mjs react "#CHANNEL" <ts> eyes` before
+   starting a request, so a second run cannot pick it up. Every reaction
+   and reply below goes through the same script:
+   `react "#CHANNEL" <ts> <emoji>` and `reply "#CHANNEL" <ts> <text>`.
 
 ## Building a request
 
