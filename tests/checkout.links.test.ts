@@ -236,7 +236,9 @@ describe("the plan sheet", () => {
 
   it("loads the payment step behind the plan step, and leaves nothing dead while it does", () => {
     // Rendered with the sheet, not when Buy is pressed: hidden, inert, sized.
-    expect(sheet).toContain('{step === "plan" && (');
+    // The plan step is the one that comes and goes — and stays for its fade
+    // out over the payment step (2026-10-11, "it has to be instant").
+    expect(sheet).toContain('{(step === "plan" || leaving) && (');
     expect(sheet).toContain('inert={step === "plan"}');
     // Submit is never disabled for loading — it holds the press instead.
     expect(pay).toContain("disabled={busy}");
@@ -266,7 +268,7 @@ describe("the plan sheet", () => {
     // the sheet is up — never behind a page the buyer has gone back to.
     expect(sheet).toMatch(/if \(ok && shown && step === "plan"\) \{\s+whenQuiet\(quietAt\.current, \(\) => \{/);
     // ...and never under an animation: the rise, or the step change.
-    expect(sheet).toContain("quietAt.current = Date.now() + STEP_OUT_MS + 500;");
+    expect(sheet).toContain("quietAt.current = Date.now() + STEP_MS + 100;");
     expect(sheet).toContain('window.requestIdleCallback(() => fn(), { timeout: IDLE_MS });');
     // Stripe's two mounts are two tasks, not one.
     expect(pay).toMatch(/element\.mount\(mount\.current\);[\s\S]{0,400}await yieldToMain\(\);/);

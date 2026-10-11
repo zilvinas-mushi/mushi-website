@@ -5,7 +5,7 @@ import { flushSync } from "react-dom";
 import { BoltGlyph, LinkMark, ShieldGlyph } from "@/components/checkout/plan-sheet-glyphs";
 import { Money } from "@/components/shared/Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
-import { STEP_OUT_MS, StripePay, fetchStripeJs, preloadStripe } from "@/components/checkout/StripePay";
+import { StripePay, fetchStripeJs, preloadStripe } from "@/components/checkout/StripePay";
 import { checkoutSession, dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import Link from "next/link";
@@ -61,6 +61,21 @@ import Link from "next/link";
  * 2026-09-25, "smoother"). The backdrop fades on the same clock.
  */
 const OPEN_MS = 560;
+/**
+ * STEP ONE TO STEP TWO (Žilvinas 2026-10-11, twice from his phone: "to the
+ * second step of the popup buy - it has to be instant", then "from first
+ * step to another is not instant. why?"). It was a hand-off: the plan step
+ * slid out for 170ms, THEN the payment step was swapped in and faded up
+ * over 380ms, with the panel gliding for 560 — a third of a second of
+ * nothing much before the fields read as there. Now both run from the
+ * press: the payment step is on stage in the same frame, fading up over
+ * STEP_IN_MS with its 14px slide, the plan step fading out over it for
+ * STEP_OUT_MS, and the panel's edge gliding for STEP_MS on the sheet
+ * curve. Nothing waits for anything.
+ */
+const STEP_MS = 400;
+const STEP_IN_MS = 220;
+const STEP_OUT_MS = 150;
 /** How long Buy may hold for the payment step before showing it as it is. */
 const HOLD_MS = 4000;
 /** How old a prepared payment step may be before opening the sheet builds it again. */
@@ -242,15 +257,17 @@ export function PlanSheet() {
   const lastScroll = useRef(0);
   const panelRef = useRef<HTMLDivElement>(null);
   /**
-   * STEP ONE TO STEP TWO IS A HAND-OFF, NOT A CUT (Žilvinas 2026-09-26,
-   * "after the first step, going to buy should properly do a transition"):
-   * the plan step slides out to the left as it fades (260ms), the panel's
-   * height glides to the payment step's on the sheet curve, and the
-   * payment step slides in from the right. stepIn is false while a step
-   * is off stage; the direction comes from which step is current.
+   * STEP ONE TO STEP TWO IS A CROSS-FADE, NOT A CUT (Žilvinas 2026-09-26,
+   * "after the first step, going to buy should properly do a transition"
+   * — and 2026-10-11, "it has to be instant": see STEP_MS). stepIn is
+   * false for the one frame the payment step stands off stage, 14px to
+   * the right; `leaving` keeps the plan step rendered, out of flow over
+   * the payment step, while it fades out.
    */
   const [stepIn, setStepIn] = useState(true);
+  const [leaving, setLeaving] = useState(false);
   const stepTimer = useRef(0);
+  const leaveTimer = useRef(0);
   /**
    * THE PAYMENT STEP IS SHOWN ONCE, FINISHED (Žilvinas 2026-10-04, the card
    * fields swapping in after the step was already up: "no reloads, just one
@@ -298,11 +315,15 @@ export function PlanSheet() {
   /** Buy has been pressed and is waiting for the chosen plan's step. */
   const held = useRef(false);
   /**
-   * Desktop only: the step's frame (650 for the plan, 763 for payment)
+   * Desktop only: each step's frame (650 for the plan, 763 for payment)
    * zoomed down just enough to clear the viewport, 1 whenever it fits.
-   * Zoom rather than transform so the layout box shrinks with it.
+   * Zoom rather than transform so the layout box shrinks with it. Both are
+   * kept so a change of step renders at its own zoom in the same commit —
+   * the panel is measured right after, and a zoom that arrived a render
+   * later would have put the glide's sums off.
    */
-  const [fit, setFit] = useState(1);
+  const [fits, setFits] = useState({ plan: 1, pay: 1 });
+  const fit = fits[step];
 
   // A MOUSE RESTING ON A BUY BUTTON IS A BUYER (Žilvinas 2026-10-10, on the
   // first screen: "when pressing buy now there is loading"). With every
@@ -340,6 +361,7 @@ export function PlanSheet() {
     // this before, and on iOS they were not always two frames apart, which
     // left the sheet snapping into place.
     window.clearTimeout(stepTimer.current);
+    window.clearTimeout(leaveTimer.current);
     window.clearTimeout(holdTimer.current);
     // The steps' word is NOT reset here any more: they were prepared before
     // this, and their word that they are presentable may already have come.
@@ -356,6 +378,7 @@ export function PlanSheet() {
       setHolding(false);
       setStep("plan");
       setStepIn(true);
+      setLeaving(false);
       setPrepared(true);
       if (stale) {
         setAttempt((n) => n + 1);
@@ -396,8 +419,7 @@ export function PlanSheet() {
       });
     });
     if (panelRef.current) {
-      panelRef.current.style.paddingBottom = "";
-      panelRef.current.style.marginBottom = "";
+      panelRef.current.style.boxShadow = "";
       panelRef.current.style.translate = "";
       panelRef.current.style.transition = "";
     }
@@ -440,56 +462,66 @@ export function PlanSheet() {
       setStep("pay");
       return;
     }
-    setStepIn(false);
-    // The step change — the slide out, the height, the slide in — is an
-    // animation on the main thread; nothing of Stripe's starts under it.
-    quietAt.current = Date.now() + STEP_OUT_MS + 500;
     window.clearTimeout(stepTimer.current);
+    window.clearTimeout(leaveTimer.current);
+    // The step change is an animation on the main thread for as long as
+    // the two steps fade; nothing of Stripe's starts under it.
+    quietAt.current = Date.now() + STEP_MS + 100;
+    // The payment step is put on stage NOW — in flow, still see-through and
+    // 14px to the right — and the plan step is taken out of flow over it,
+    // where it will fade. The panel takes its new height at once; what
+    // glides is its `translate`, from where its top edge was to where it
+    // now is, with the two fades over it.
+    //
+    // TRANSLATE, NOT HEIGHT (Žilvinas 2026-10-11, from his phone: "to the
+    // second step of the popup - it has to be instant"): the height used
+    // to be transitioned, 480ms of laying the whole panel out again every
+    // frame — Stripe's frames in it, which on iOS share this thread —
+    // and that is the main thread's work, felt as a stutter under a
+    // finger. A translate is the compositor's. The panel is anchored to
+    // the bottom, so a taller panel's top edge is higher by the growth
+    // `d`: it starts translated down by `d` — its top edge exactly where
+    // the plan step's was, its foot below the bottom edge where nothing
+    // shows — and glides to 0. A SHORTER panel's top edge is lower by |d|
+    // and it starts translated UP by |d|, which lifts its foot off the
+    // bottom edge and would show the backdrop under it for the length of
+    // the glide. So its own colour is painted |d| below it, as a hard
+    // box-shadow offset straight down — nothing of the box, so nothing of
+    // the layout (for a taller panel it is simply below the edge, unseen;
+    // the one offset serves both). The foot used to be real: |d| of padding under the step
+    // and |d| of negative margin to hide it, which put the box past its
+    // max-height on a laptop, where the glide then ended 38px short of the
+    // panel's place and the whole thing JUMPED there as the padding came
+    // off (Žilvinas 2026-10-11, "visually for like 0.1s bugged in one
+    // place when going to the second screen").
+    const h0 = panel.offsetHeight;
+    flushSync(() => {
+      setStep("pay");
+      setStepIn(false);
+      setLeaving(true);
+    });
+    const d = panel.offsetHeight - h0;
+    if (d !== 0) {
+      const shadow = getComputedStyle(panel).boxShadow;
+      panel.style.boxShadow = `0 ${Math.abs(d)}px 0 0 #181818${shadow === "none" ? "" : `, ${shadow}`}`;
+      panel.style.transition = "none";
+      panel.style.translate = `0 ${d}px`;
+      void panel.offsetHeight;
+      panel.style.transition = `translate ${STEP_MS}ms cubic-bezier(0.32, 0.72, 0, 1)`;
+      panel.style.translate = "0 0";
+    }
+    setStepIn(true);
+    leaveTimer.current = window.setTimeout(() => setLeaving(false), STEP_OUT_MS + 40);
     stepTimer.current = window.setTimeout(() => {
-      // The plan step is off stage. Swap the step in (still off stage, to
-      // the right) and let the panel take its new height AT ONCE; what
-      // glides is the panel's `translate`, from where its top edge was to
-      // where it now is, on the sheet's own transition, with the step's
-      // fade and slide over it.
-      //
-      // TRANSLATE, NOT HEIGHT (Žilvinas 2026-10-11, from his phone: "to the
-      // second step of the popup - it has to be instant"): the height used
-      // to be transitioned, 480ms of laying the whole panel out again every
-      // frame — Stripe's frames in it, which on iOS share this thread —
-      // and that is the main thread's work, felt as a stutter under a
-      // finger. A translate is the compositor's. The panel is anchored to
-      // the bottom, so a taller panel's top edge is higher by the growth
-      // `d`: the panel is given `d` more padding at its foot and `-d` of
-      // margin there, so its box reaches `d` past the bottom edge (off
-      // screen, under the overhang) while its top is already final, and
-      // it starts translated down by `d` — its top edge exactly where the
-      // plan step's was — and glides to 0. A shorter panel runs the same
-      // sums with `d` negative. At the end the extra foot is taken away,
-      // below the edge where nothing shows.
-      const h0 = panel.offsetHeight;
-      flushSync(() => setStep("pay"));
-      const d = panel.offsetHeight - h0;
-      if (d !== 0) {
-        const foot = parseFloat(getComputedStyle(panel).paddingBottom) || 0;
-        panel.style.paddingBottom = `${foot + Math.abs(d)}px`;
-        panel.style.marginBottom = `${-Math.abs(d)}px`;
-        panel.style.transition = "none";
-        panel.style.translate = `0 ${d}px`;
-        void panel.offsetHeight;
-        panel.style.transition = "";
-        panel.style.translate = "0 0";
-      }
-      setStepIn(true);
-      stepTimer.current = window.setTimeout(() => {
-        panel.style.paddingBottom = "";
-        panel.style.marginBottom = "";
-        panel.style.translate = "";
-      }, OPEN_MS + 40);
-    }, STEP_OUT_MS);
+      panel.style.boxShadow = "";
+      panel.style.translate = "";
+      panel.style.transition = "";
+    }, STEP_MS + 40);
   };
   const close = () => {
     openRef.current = false;
     window.clearTimeout(stepTimer.current);
+    window.clearTimeout(leaveTimer.current);
     window.clearTimeout(holdTimer.current);
     held.current = false;
     setHolding(false);
@@ -636,8 +668,8 @@ export function PlanSheet() {
     if (!mounted && !prepared) return;
     const size = () => {
       const desktop = window.matchMedia("(min-width: 768px)").matches;
-      const frame = step === "plan" ? 650 : 763;
-      setFit(desktop ? Math.min(1, (window.innerHeight - 24) / frame) : 1);
+      const fitTo = (frame: number) => (desktop ? Math.min(1, (window.innerHeight - 24) / frame) : 1);
+      setFits({ plan: fitTo(650), pay: fitTo(763) });
     };
     size();
     window.addEventListener("resize", size);
@@ -645,7 +677,7 @@ export function PlanSheet() {
     // Sized off stage as well: Stripe lays its fields out by the width it
     // is given, and a zoom that changed as the sheet opened would have it
     // lay them out twice.
-  }, [mounted, prepared, step]);
+  }, [mounted, prepared]);
 
   // THE PAGE BEHIND DOES NOT SCROLL — by swallowing the wheel, touch and
   // key scrolling, NOT overflow:hidden on the body (Žilvinas 2026-09-25,
@@ -846,25 +878,28 @@ export function PlanSheet() {
         style={{ zoom: fit, "--fit": fit, "--unfit": 1 / fit } as React.CSSProperties}
         ref={panelRef}
       >
-        <div
-          // Out is quick and small — 170ms, 6px, easing in — and in is
-          // calm and a little longer — 380ms, 14px, on the sheet curve
-          // (Žilvinas 2026-09-26, "premium and subtle, a little more").
-          className={`relative motion-reduce:transition-none ${
-            stepIn
-              ? "translate-x-0 opacity-100 transition-[opacity,translate] duration-[380ms] ease-[cubic-bezier(0.32,0.72,0,1)]"
-              : step === "plan"
-                ? "-translate-x-[6px] opacity-0 transition-[opacity,translate] duration-[170ms] ease-in"
-                : "translate-x-[14px] opacity-0"
-          }`}
-        >
-        {step === "plan" && (
+        <div className="relative">
+        {(step === "plan" || leaving) && (
           // 24 from the sheet's top to the title and 24 from the title to
           // the first row; 15 between rows (Žilvinas 2026-09-25, off the
           // artboard's spacers).
-          <div className="px-6 pt-6 md:pb-[16px] md:[zoom:1.4586]">
+          //
+          // LEAVING: out of flow at the panel's top, at its own width and
+          // its own zoom (the panel is already at the payment step's), inert,
+          // fading out — quick and small, STEP_OUT_MS and 6px, easing in
+          // (Žilvinas 2026-09-26, "premium and subtle, a little more").
+          <div
+            className={`px-6 pt-6 md:pb-[16px] md:[zoom:1.4586] motion-reduce:transition-none ${
+              leaving
+                ? "pointer-events-none absolute inset-x-0 top-0 -translate-x-[6px] opacity-0 transition-[opacity,translate] ease-in md:mx-auto md:w-[547px]"
+                : ""
+            }`}
+            style={leaving ? { zoom: fits.plan / fits.pay, transitionDuration: `${STEP_OUT_MS}ms` } : undefined}
+            inert={leaving}
+            aria-hidden={leaving ? true : undefined}
+          >
             {/* SemiBold 20 off the inspector (Žilvinas 2026-09-25). */}
-            <h2 id="plan-sheet-title" className="text-center text-[20px] font-semibold leading-none text-white">
+            <h2 id={leaving ? undefined : "plan-sheet-title"} className="text-center text-[20px] font-semibold leading-none text-white">
               {c.title}
             </h2>
 
@@ -1021,7 +1056,16 @@ export function PlanSheet() {
             not starts the moment it is picked. The webapp's endpoint only
             creates a Stripe session, which costs nothing and expires. */}
         <div
-          className={step === "plan" ? "pointer-events-none absolute inset-0 overflow-hidden opacity-0" : undefined}
+          // ON STAGE it fades up over STEP_IN_MS with a 14px slide, on the
+          // sheet curve, from the same frame the plan step starts to fade.
+          className={
+            step === "plan"
+              ? "pointer-events-none absolute inset-0 overflow-hidden opacity-0"
+              : `transition-[opacity,translate] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
+                  stepIn ? "translate-x-0 opacity-100" : "translate-x-[14px] opacity-0"
+                }`
+          }
+          style={step === "plan" ? undefined : { transitionDuration: `${STEP_IN_MS}ms` }}
           inert={step === "plan"}
           aria-hidden={step === "plan" ? true : undefined}
         >
