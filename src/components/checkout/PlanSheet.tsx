@@ -396,7 +396,9 @@ export function PlanSheet() {
       });
     });
     if (panelRef.current) {
-      panelRef.current.style.height = "";
+      panelRef.current.style.paddingBottom = "";
+      panelRef.current.style.marginBottom = "";
+      panelRef.current.style.translate = "";
       panelRef.current.style.transition = "";
     }
     void panelRef.current?.getBoundingClientRect();
@@ -444,24 +446,45 @@ export function PlanSheet() {
     quietAt.current = Date.now() + STEP_OUT_MS + 500;
     window.clearTimeout(stepTimer.current);
     stepTimer.current = window.setTimeout(() => {
-      // The plan step is off stage. Pin the panel at its height, swap the
-      // step in (still off stage, to the right), measure where the height
-      // wants to be, then let both run: the height on the sheet curve, the
-      // step's own fade and slide on the step's transition.
+      // The plan step is off stage. Swap the step in (still off stage, to
+      // the right) and let the panel take its new height AT ONCE; what
+      // glides is the panel's `translate`, from where its top edge was to
+      // where it now is, on the sheet's own transition, with the step's
+      // fade and slide over it.
+      //
+      // TRANSLATE, NOT HEIGHT (Žilvinas 2026-10-11, from his phone: "to the
+      // second step of the popup - it has to be instant"): the height used
+      // to be transitioned, 480ms of laying the whole panel out again every
+      // frame — Stripe's frames in it, which on iOS share this thread —
+      // and that is the main thread's work, felt as a stutter under a
+      // finger. A translate is the compositor's. The panel is anchored to
+      // the bottom, so a taller panel's top edge is higher by the growth
+      // `d`: the panel is given `d` more padding at its foot and `-d` of
+      // margin there, so its box reaches `d` past the bottom edge (off
+      // screen, under the overhang) while its top is already final, and
+      // it starts translated down by `d` — its top edge exactly where the
+      // plan step's was — and glides to 0. A shorter panel runs the same
+      // sums with `d` negative. At the end the extra foot is taken away,
+      // below the edge where nothing shows.
       const h0 = panel.offsetHeight;
-      panel.style.height = `${h0}px`;
       flushSync(() => setStep("pay"));
-      panel.style.height = "";
-      const h1 = panel.offsetHeight;
-      panel.style.height = `${h0}px`;
-      void panel.offsetHeight;
-      panel.style.transition = "height 480ms cubic-bezier(0.32, 0.72, 0, 1)";
-      panel.style.height = `${h1}px`;
+      const d = panel.offsetHeight - h0;
+      if (d !== 0) {
+        const foot = parseFloat(getComputedStyle(panel).paddingBottom) || 0;
+        panel.style.paddingBottom = `${foot + Math.abs(d)}px`;
+        panel.style.marginBottom = `${-Math.abs(d)}px`;
+        panel.style.transition = "none";
+        panel.style.translate = `0 ${d}px`;
+        void panel.offsetHeight;
+        panel.style.transition = "";
+        panel.style.translate = "0 0";
+      }
       setStepIn(true);
       stepTimer.current = window.setTimeout(() => {
-        panel.style.height = "";
-        panel.style.transition = "";
-      }, 500);
+        panel.style.paddingBottom = "";
+        panel.style.marginBottom = "";
+        panel.style.translate = "";
+      }, OPEN_MS + 40);
     }, STEP_OUT_MS);
   };
   const close = () => {
