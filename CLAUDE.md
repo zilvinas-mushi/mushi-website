@@ -108,6 +108,14 @@ once, and CI runs it on every push:
 - **No unloaded picture on screen, ever**: each page is scrolled top to bottom
   from the instant it is revealed, on a throttled line, at a laptop's width
   and a phone's.
+- **The case-study rails glide on the compositor**: each is swiped twice on
+  a 4x phone, no main-thread frame over 100ms, no compositor gap over 150ms
+  (screencast). The cards move by translate and scale from one laid-out
+  box, never by left/top/width/height ("it has to be smooth", 2026-10-11).
+- **The case-study rails glide on the compositor**: each is swiped twice on
+  a 4x phone, no main-thread frame over 100ms, no compositor gap over 150ms
+  (screencast). The cards move by translate and scale from one laid-out
+  box, never by left/top/width/height ("it has to be smooth", 2026-10-11).
 
 They pull against each other — fetch less and the score rises, fetch late and
 pictures pop in — so a change to images, loading or the paint gate is not

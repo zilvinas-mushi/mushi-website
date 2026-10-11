@@ -16,12 +16,24 @@
  *               fully loaded or not shown at all. Afterwards nothing may
  *               still be held back.
  *
- * They pull against each other — fetch less and the score rises, fetch late
- * and the pictures pop in — which is why they are checked together.
+ *   3. SMOOTH   The case-study rails glide on the compositor (Žilvinas
+ *               2026-10-11, from his phone: "scrolling through the videos in
+ *               case study causes jitter or lag. it has to be smooth"). On
+ *               the phone, on a CPU throttled 4x, each rail is swiped twice:
+ *               no frame of the main thread's over SWIPE_FRAME_MS, and no
+ *               gap between two of the compositor's frames — taken by
+ *               screencast, which is what the eye sees — over SWIPE_GAP_MS.
+ *               The cards used to glide by left, top, width and height — a
+ *               layout and a re-raster of every card on every frame, 155ms
+ *               a frame and a 200ms stall of the compositor at 4x.
+ *
+ * The first two pull against each other — fetch less and the score rises,
+ * fetch late and the pictures pop in — which is why they are checked
+ * together.
  *
  *   npm run pages:check                         build first: reads ./out
  *   npm run pages:check -- --url https://mushi.agency     the live site
- *   npm run pages:check -- --only speed         or: --only pictures
+ *   npm run pages:check -- --only speed         or: --only pictures, --only smooth
  *
  * ITS DEPENDENCIES ARE ITS OWN (this folder's package.json), installed with
  * `npm ci --prefix tools/page-quality`. Lighthouse brings ~180 MB and two
@@ -58,6 +70,16 @@ const WINDOWS = [
 const LINE = { offline: false, latency: 60, downloadThroughput: (10 * 1e6) / 8, uploadThroughput: (5 * 1e6) / 8 };
 /** How long everything may take to finish arriving once the bottom is reached. */
 const SETTLE_MS = 30_000;
+/**
+ * A swipe's budgets, on a 4x CPU: the main thread's longest frame (a clean
+ * swipe is 17ms — React's re-render of the rail's cards with their new
+ * slots; the layout-driven glide was 155) and the compositor's longest gap
+ * (headless Chrome's screencast jitters to 60–80ms by itself; a stall is
+ * the whole of the blocking frame, 180 and up).
+ */
+const SWIPE_FRAME_MS = 100;
+const SWIPE_GAP_MS = 150;
+const RAILS = ["video", "landing", "static"];
 
 const ROOT = resolve(fileURLToPath(new URL("../..", import.meta.url)));
 const OUT = join(ROOT, "out");
@@ -69,8 +91,8 @@ const flag = (name) => {
 };
 const only = flag("--only");
 const remote = flag("--url")?.replace(/\/$/, "");
-if (only && only !== "speed" && only !== "pictures") {
-  console.error(`--only takes "speed" or "pictures", not "${only}"`);
+if (only && only !== "speed" && only !== "pictures" && only !== "smooth") {
+  console.error(`--only takes "speed", "pictures" or "smooth", not "${only}"`);
   process.exit(2);
 }
 
@@ -335,6 +357,102 @@ async function pictures(browser, base) {
   return failures;
 }
 
+/* -------------------------------------------------------------- smooth --- */
+
+async function smooth(browser, base) {
+  const failures = [];
+  const win = WINDOWS.find((w) => w.isMobile);
+  const page = await browser.newPage();
+  try {
+    await page.setViewport(win);
+    await page.goto(`${base}/case-studies`, { waitUntil: "load", timeout: 60_000 });
+    await page.waitForFunction(() => document.documentElement?.hasAttribute("data-ready"), { timeout: 30_000 });
+    const cdp = await page.createCDPSession();
+    for (const kind of RAILS) {
+      const rail = await page.evaluate((kind) => {
+        const el = document.querySelector(`section.cf-${kind}`);
+        if (!el) return null;
+        el.scrollIntoView({ block: "center", behavior: "instant" });
+        const r = el.getBoundingClientRect();
+        return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) };
+      }, kind);
+      if (!rail) {
+        failures.push(`/case-studies (phone): no ${kind} rail on the page`);
+        continue;
+      }
+      // The rail's pictures and the centre film arrive first; the swipe is
+      // judged on its own.
+      await new Promise((r) => setTimeout(r, 2500));
+      await page.emulateCPUThrottling(4);
+      const drawn = [];
+      const onFrame = (frame) => {
+        drawn.push(frame.metadata.timestamp * 1000);
+        void cdp.send("Page.screencastFrameAck", { sessionId: frame.sessionId }).catch(() => {});
+      };
+      cdp.on("Page.screencastFrame", onFrame);
+      await cdp.send("Page.startScreencast", { format: "jpeg", quality: 20, everyNthFrame: 1, maxWidth: 200, maxHeight: 400 });
+      const swipes = [];
+      for (let n = 0; n < 2; n++) {
+        const watching = page.evaluate(
+          (ms) =>
+            new Promise((done) => {
+              const epoch0 = Date.now();
+              const T = performance.now();
+              const long = [];
+              let po;
+              try {
+                po = new PerformanceObserver((list) => {
+                  for (const e of list.getEntries()) long.push(`${Math.round(e.duration)}ms@${Math.round(e.startTime - T)}`);
+                });
+                po.observe({ type: "long-animation-frame" });
+              } catch {
+                // No long-animation-frame API: the rAF gaps below still judge it.
+              }
+              let last = T;
+              let longest = 0;
+              const tick = (t) => {
+                longest = Math.max(longest, t - last);
+                last = t;
+                if (t - T < ms) requestAnimationFrame(tick);
+                else {
+                  po?.disconnect();
+                  done({ epoch0, longest: Math.round(longest), long });
+                }
+              };
+              requestAnimationFrame(tick);
+            }),
+          900,
+        );
+        // A finger: 120px leftwards, in one movement.
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: rail.x + 60, y: rail.y }] });
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: rail.x - 60, y: rail.y }] });
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+        const seen = await watching;
+        const frames = drawn.map((t) => t - seen.epoch0).filter((t) => t >= 0 && t <= 900).sort((a, b) => a - b);
+        let gap = 0;
+        for (let i = 1; i < frames.length; i++) gap = Math.max(gap, frames[i] - frames[i - 1]);
+        swipes.push({ ...seen, drawn: frames.length, gap: Math.round(gap) });
+        await new Promise((r) => setTimeout(r, 300));
+      }
+      await cdp.send("Page.stopScreencast").catch(() => {});
+      cdp.off("Page.screencastFrame", onFrame);
+      await page.emulateCPUThrottling(1);
+      const problems = [];
+      swipes.forEach((s, i) => {
+        if (s.longest > SWIPE_FRAME_MS) problems.push(`swipe ${i + 1}: a ${s.longest}ms frame on the main thread (${s.long.join(" ") || "no attribution"}), over ${SWIPE_FRAME_MS}`);
+        if (s.drawn < 10) problems.push(`swipe ${i + 1}: the compositor drew only ${s.drawn} frame(s)`);
+        else if (s.gap > SWIPE_GAP_MS) problems.push(`swipe ${i + 1}: the compositor drew nothing for ${s.gap}ms, over ${SWIPE_GAP_MS}`);
+      });
+      const label = `/case-studies ${kind} rail (phone, 4x)`;
+      console.log(`  ${problems.length ? "FAIL" : "pass"}  ${label.padEnd(34)} ${swipes.map((s) => `${s.longest}ms main, ${s.drawn} drawn, gap ${s.gap}ms`).join("; ")}`);
+      for (const problem of problems) failures.push(`${label}: ${problem}`);
+    }
+  } finally {
+    await page.close().catch(() => {});
+  }
+  return failures;
+}
+
 /* ----------------------------------------------------------------- run --- */
 
 let puppeteer;
@@ -367,13 +485,17 @@ const browser = await puppeteer.launch({
 const failures = [];
 try {
   console.log(`Page quality — ${remote ?? "the export in out/"}`);
-  if (only !== "pictures") {
+  if (only !== "pictures" && only !== "smooth") {
     console.log(`\nSpeed: Lighthouse mobile performance above ${MIN_SCORE}, median of ${RUNS}`);
     failures.push(...(await speed(browser, lighthouse, base)));
   }
-  if (only !== "speed") {
+  if (only !== "speed" && only !== "smooth") {
     console.log("\nPictures: nothing unloaded on screen while scrolling straight down a 10 Mbit/s line");
     failures.push(...(await pictures(browser, base)));
+  }
+  if (only !== "speed" && only !== "pictures") {
+    console.log(`\nSmooth: the case-study rails swiped on a 4x phone — no main-thread frame over ${SWIPE_FRAME_MS}ms, no compositor gap over ${SWIPE_GAP_MS}ms`);
+    failures.push(...(await smooth(browser, base)));
   }
 } finally {
   await browser.close().catch(() => {});

@@ -201,22 +201,52 @@ function slotAt(spec: RailSpec, d: number): { slot: Slot; shown: boolean } {
   return pair ? { slot: pair[side], shown: true } : { slot: spec.hidden[side], shown: false };
 }
 
-/** One breakpoint's custom properties for a card; `k` is the prefix, `u` the unit. */
-function slotVars(k: "d" | "p", u: (n: number) => string, s: Slot, shown: boolean) {
+/**
+ * EVERY CARD IS THE CENTRE CARD'S BOX, MOVED AND SCALED INTO ITS SLOT
+ * (Žilvinas 2026-10-11, from his phone: "scrolling through the videos in
+ * case study causes jitter or lag. it has to be smooth"). The cards used
+ * to glide by transitioning left, top, width, height, padding and
+ * box-shadow — a layout of every card, and a re-raster of its picture or
+ * film at a new size, on every frame of the 600ms, which on a 4x CPU was
+ * a 155ms frame and a 200ms stall of the compositor at each swipe. Now a
+ * card is laid out ONCE, in the centre slot's box (`--Xc*`, set on the
+ * section), and reaches its slot by `translate` and a `scale` of
+ * (w / centre w, h / centre h) from its top-left corner — two properties
+ * the compositor animates by itself. The slots are not a uniform
+ * progression (311 x 506 beside 311 x 508), so the scale is taken per axis
+ * and the frame's own rectangles still come out to the pixel; the inset
+ * and the radius scale with the card, a fraction of a pixel off the
+ * frame's, which is beneath seeing. The shadow is not transitioned: it is
+ * swapped at the move, one repaint of that card.
+ *
+ * One breakpoint's custom properties for a card; `k` is the prefix, `u`
+ * the unit, `c` the centre slot.
+ */
+function slotVars(k: "d" | "p", u: (n: number) => string, s: Slot, c: Slot, shown: boolean) {
   return {
-    [`--${k}x`]: u(s.x),
-    [`--${k}y`]: u(s.y),
-    [`--${k}w`]: u(s.w),
-    [`--${k}h`]: u(s.h),
-    [`--${k}p`]: `${u(s.p[0])} ${u(s.p[1])}`,
-    // The same inset again, split: the film is a replaced element, so it
-    // needs a width and height spelled out rather than an `inset`.
-    [`--${k}py`]: u(s.p[0]),
-    [`--${k}px`]: u(s.p[1]),
+    [`--${k}x`]: u(s.x - c.x),
+    [`--${k}y`]: u(s.y - c.y),
+    [`--${k}sx`]: s.w / c.w,
+    [`--${k}sy`]: s.h / c.h,
     [`--${k}o`]: s.o,
     [`--${k}s`]: s.s,
     [`--${k}v`]: shown ? 1 : 0,
-    ...(s.b ? { [`--${k}bs`]: u(s.b[0]), [`--${k}bi`]: u(s.b[1]) } : {}),
+  };
+}
+
+/** The centre slot's box, once per breakpoint on the section: where every card is laid out. */
+function centreVars(k: "d" | "p", u: (n: number) => string, c: Slot) {
+  return {
+    [`--${k}cx`]: u(c.x),
+    [`--${k}cy`]: u(c.y),
+    [`--${k}cw`]: u(c.w),
+    [`--${k}ch`]: u(c.h),
+    [`--${k}cp`]: `${u(c.p[0])} ${u(c.p[1])}`,
+    // The same inset again, split: the film is a replaced element, so it
+    // needs a width and height spelled out rather than an `inset`.
+    [`--${k}cpy`]: u(c.p[0]),
+    [`--${k}cpx`]: u(c.p[1]),
+    ...(c.b ? { [`--${k}bs`]: u(c.b[0]), [`--${k}bi`]: u(c.b[1]) } : {}),
   };
 }
 
@@ -376,6 +406,8 @@ export function CoverflowRail({
           "--dplate": rem(desktop.plate),
           "--parrows": px(phone.arrows),
           "--darrows": rem(desktop.arrows),
+          ...centreVars("p", px, phone.centre),
+          ...centreVars("d", rem, desktop.centre),
         } as CSSProperties
       }
       onTouchStart={(e) => {
@@ -412,8 +444,8 @@ export function CoverflowRail({
               data-side={d === 0 ? undefined : ""}
               style={
                 {
-                  ...slotVars("d", rem, D.slot, D.shown),
-                  ...slotVars("p", px, P.slot, P.shown),
+                  ...slotVars("d", rem, D.slot, desktop.centre, D.shown),
+                  ...slotVars("p", px, P.slot, phone.centre, P.shown),
                   zIndex: 10 - Math.min(Math.abs(d), 9),
                 } as CSSProperties
               }
