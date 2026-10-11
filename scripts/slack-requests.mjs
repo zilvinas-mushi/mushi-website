@@ -5,6 +5,7 @@
 //   node scripts/slack-requests.mjs list  <where> [days]   messages + reactions + thread replies, as JSON
 //   node scripts/slack-requests.mjs react <where> <ts> <emoji>
 //   node scripts/slack-requests.mjs reply <where> <ts> <text…>
+//   node scripts/slack-requests.mjs notify <text…>                 a DM to the token's own user
 //
 // <where> is "#channel", or "@name" for the direct messages with that person
 // (their Slack handle or display name; the DM is opened if it does not exist
@@ -17,7 +18,7 @@ const token = process.env.SLACK_MUSHI_TOKEN;
 if (!token) fail("SLACK_MUSHI_TOKEN is not set");
 
 const [cmd, channelArg, ...rest] = process.argv.slice(2);
-if (!cmd || !channelArg) fail("usage: list|react|reply <#channel> …");
+if (!cmd || !channelArg) fail("usage: list|react|reply <#channel> … | notify <text>");
 
 // Form-encoded, not JSON: some methods (chat.getPermalink) take only that.
 // A call with no arguments goes without a body: Slack sits on an empty form
@@ -82,6 +83,14 @@ const channelId = async (name) => {
   } while (cursor);
   fail(`no channel named #${wanted} (is the token's user a member?)`);
 };
+
+if (cmd === "notify") {
+  const text = [channelArg, ...rest].join(" ");
+  const me = (await api("auth.test")).user_id;
+  const dm = (await api("conversations.open", { users: me })).channel.id;
+  await api("chat.postMessage", { channel: dm, text, unfurl_links: false });
+  process.exit(0);
+}
 
 const channel = await channelId(channelArg);
 
