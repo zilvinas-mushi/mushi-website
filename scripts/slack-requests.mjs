@@ -2,10 +2,14 @@
 // The routine's only way into Slack: a user token for the Mushi workspace in
 // SLACK_MUSHI_TOKEN. No MCP, no connector, nothing that can expire mid-run.
 //
-//   node scripts/slack-requests.mjs list  <#channel> [days]   messages + reactions + thread replies, as JSON
-//   node scripts/slack-requests.mjs react <#channel> <ts> <emoji>
-//   node scripts/slack-requests.mjs reply <#channel> <ts> <text…>
+//   node scripts/slack-requests.mjs list  <where> [days]   messages + reactions + thread replies, as JSON
+//   node scripts/slack-requests.mjs react <where> <ts> <emoji>
+//   node scripts/slack-requests.mjs reply <where> <ts> <text…>
 //
+// <where> is "#channel", or "@name" for the direct messages with that person
+// (their Slack handle or display name; the DM is opened if it does not exist
+// yet). `list` prints "me", the token's own user id, so a DM's requests (the
+// other person's messages) can be told from the replies.
 // <ts> is a message's "ts" from `list`. <emoji> is a name without colons,
 // e.g. white_check_mark, eyes, question, x, arrow_right, no_entry.
 
@@ -29,8 +33,27 @@ const api = async (method, params = {}) => {
   return json;
 };
 
+const dmWith = async (handle) => {
+  const wanted = handle.replace(/^@/, "").toLowerCase();
+  let cursor;
+  do {
+    const page = await api("users.list", { limit: 200, cursor });
+    const hit = page.members.find(
+      (u) =>
+        !u.deleted &&
+        [u.name, u.real_name, u.profile?.display_name]
+          .filter(Boolean)
+          .some((n) => n.toLowerCase() === wanted),
+    );
+    if (hit) return (await api("conversations.open", { users: hit.id })).channel.id;
+    cursor = page.response_metadata?.next_cursor || undefined;
+  } while (cursor);
+  fail(`no one called ${handle} in this workspace`);
+};
+
 const channelId = async (name) => {
-  if (/^[CG][A-Z0-9]+$/.test(name)) return name;
+  if (/^[CGD][A-Z0-9]+$/.test(name)) return name;
+  if (name.startsWith("@")) return dmWith(name);
   const wanted = name.replace(/^#/, "");
   let cursor;
   do {
@@ -75,7 +98,8 @@ if (cmd === "list") {
     cursor = page.response_metadata?.next_cursor || undefined;
   } while (cursor);
   out.sort((a, b) => Number(a.ts) - Number(b.ts));
-  console.log(JSON.stringify(out, null, 2));
+  const me = (await api("auth.test")).user_id;
+  console.log(JSON.stringify({ me, messages: out }, null, 2));
 } else if (cmd === "react") {
   const [timestamp, name] = rest;
   if (!timestamp || !name) fail("react <#channel> <ts> <emoji>");
