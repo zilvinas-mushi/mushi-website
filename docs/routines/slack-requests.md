@@ -51,7 +51,7 @@ Every run:
 
 ## Building a request
 
-One request is one branch, one PR, one thread reply. Several requests in one
+One request is one branch, one PR, one green check mark. Several requests in one
 morning are several PRs, built one after another from a fresh `main`.
 
 1. `git checkout -b claude/slack-<short-slug>` from `origin/main`.
@@ -76,8 +76,8 @@ morning are several PRs, built one after another from a fresh `main`.
    ```
    CI takes about five minutes. It merges itself when green and Cloudflare
    deploys `main`. Do not wait for it.
-7. Reply in the thread: what was done in one or two sentences, the PR link,
-   and that it goes live when checks pass. React :white_check_mark:.
+7. React :white_check_mark: on the message. That is the signal; the thread
+   gets one line, the PR link, nothing more.
 
 If CI goes red on a PR from an earlier run (check `gh pr list --author @me`
 first thing), fix it on that branch before taking new work; the routine in
