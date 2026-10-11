@@ -270,9 +270,6 @@ const LOAD_LIMIT_MS = 12_000;
  * fields.
  */
 const LINK_WAIT_MS = 1500;
-/** How long the plan step takes to slide out before the payment step is on stage. */
-export const STEP_OUT_MS = 170;
-
 /** Let the main thread draw a frame and answer input before carrying on. */
 function yieldToMain(): Promise<void> {
   const s = (window as Window & { scheduler?: { yield?: () => Promise<void> } }).scheduler;
@@ -404,12 +401,11 @@ export function StripePay({
             if (!gone) presentable.current?.(true, "ready");
           });
         },
-        // 350 is how long the frame takes to stop moving. A held press does
-        // not show the step for another STEP_OUT_MS — the plan step slides
-        // out first (PlanSheet's showPay) — so the word is given that much
-        // sooner and the step still arrives on the 350. With reduced motion
-        // there is no slide, and the whole 350 is waited here.
-        next === "ready" ? 350 - (window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : STEP_OUT_MS) : 0,
+        // 350 is how long the frame takes to stop moving. A held press
+        // shows the step the moment this word comes (PlanSheet's showPay,
+        // the two steps cross-fading from that frame), so the whole 350 is
+        // waited here.
+        next === "ready" ? 350 : 0,
       );
     };
     const limit = window.setTimeout(() => {

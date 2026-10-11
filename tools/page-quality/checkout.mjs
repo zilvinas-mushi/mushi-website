@@ -93,9 +93,10 @@ import { fileURLToPath } from "node:url";
 const ORIGIN = "https://mushi.agency";
 const PAGE = "/templates";
 /**
- * The plan step takes 170ms to slide out (STEP_OUT_MS) and the payment step
- * is swapped in behind it — 172-184ms measured. A step that has to be built
- * first takes 600ms and up.
+ * The payment step is on stage in the frame after the press, the plan step
+ * fading out over it for 150ms (PlanSheet's STEP_OUT_MS) — which is when
+ * the plan step leaves the DOM, and what is measured here. A step that has
+ * to be built first takes 600ms and up.
  */
 const MAX_MS = 400;
 /** How long the three payment steps may take to load, in turn, once the sheet is open. */
