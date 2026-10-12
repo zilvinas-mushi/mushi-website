@@ -17,6 +17,16 @@ is the **User OAuth Token** of the "Claude" app in the Mushi workspace
 cloud environment as `SLACK_MUSHI_TOKEN`, and the environment's network
 access allows `slack.com`. It is never committed.
 
+A request is often a video. The script watches them itself, for free:
+`media` downloads the message's files and, for each video or voice note,
+writes a transcript with timestamps and a dozen frames
+(`tools/slack-media/watch.mjs`: ffmpeg and Whisper, on the CPU, no key).
+For that the token needs the `files:read` scope, the environment's network
+access allows `files.slack.com` and `huggingface.co` (the model, ~250 MB,
+fetched once and cached), and the run starts with
+`npm ci --prefix tools/slack-media`. Chrome's own speech recognition is no
+use here: it needs a live microphone and cannot take a file.
+
 The routine's prompt on claude.ai is one line:
 
 > Follow docs/routines/slack-requests.md in this repository. The channel is
@@ -32,7 +42,10 @@ Everything else is here, so it is versioned and reviewed like code.
 
 A message in the channel, or a thread reply, that asks for a change to the
 marketing site (mushi.agency): copy, layout, a new section, an image swap, a
-bug, a performance complaint. Anything else is left alone:
+bug, a performance complaint. It may be typed, or it may be a screen
+recording, a voice note or a screenshot with a line of text: those are
+requests too, and the words in them count as much as typed ones. Anything
+else is left alone:
 
 - questions and chatter: no reaction, nothing;
 - a request for the webapp (app.mushi.agency, accounts, login, the
@@ -64,6 +77,14 @@ Every run:
 2. A message that already carries any reaction from the table is done. Skip
    it. Only unreacted messages, and :question: ones with a new answer, are
    work.
+   A message with `files` on it (or on a reply) is read with
+   `node scripts/slack-requests.mjs media "#CHANNEL" <ts>` before deciding
+   anything: it prints, per file, where it was saved and, for a video, its
+   transcript and frames. Read the transcript and look at every frame and
+   screenshot (the Read tool shows an image) — the request is usually in
+   the pictures as much as in the words, and the frames show which page and
+   which element is meant. A video of the webapp (app.mushi.agency) is the
+   webapp's, as below.
 3. `node scripts/slack-requests.mjs react "#CHANNEL" <ts> eyes` before
    starting a request, so a second run cannot pick it up. Everything the
    routine says goes to Žilvinas, in his own DM, through the same script:

@@ -1,0 +1,10 @@
+{
+  "name": "mushi-slack-media",
+  "private": true,
+  "type": "module",
+  "description": "What the Slack routine needs to watch a video: ffmpeg for frames and audio, Whisper (on the CPU, no key, no fee) for the words — see scripts/slack-requests.mjs media.",
+  "dependencies": {
+    "@huggingface/transformers": "3.8.1",
+    "ffmpeg-static": "5.2.0"
+  }
+}
