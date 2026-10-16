@@ -282,8 +282,11 @@ function RailVideo({
   sound,
   onBlocked,
   onThrough,
+  slot,
 }: {
   file: string;
+  /** This card's distance from the centre, handed back with onThrough. */
+  slot: number;
   /** The poster's moment, where playback starts and returns to. */
   at?: number;
   on: boolean;
@@ -292,7 +295,7 @@ function RailVideo({
   /** The browser refused to play with sound; the rail drops back to muted. */
   onBlocked: () => void;
   /** This film has buffered enough to play through — the rail's cue to fetch the next one. */
-  onThrough: () => void;
+  onThrough: (slot: number) => void;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -312,7 +315,7 @@ function RailVideo({
     // A film fetched on an earlier visit is through already and will not
     // say so again — the rail asks each time it is centre or warm, so the
     // chain of downloads moves on past it.
-    if ((on || warm) && v.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) onThrough();
+    if ((on || warm) && v.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) onThrough(slot);
     if (!on) {
       v.pause();
       v.muted = true;
@@ -328,7 +331,7 @@ function RailVideo({
         void v.play().catch(() => {});
       }
     });
-  }, [on, warm, sound, file, at, onBlocked]);
+  }, [on, warm, sound, file, at, onBlocked, onThrough, slot]);
 
   return (
     <video
@@ -347,7 +350,7 @@ function RailVideo({
         if (v) v.currentTime = at;
       }}
       // The word that the next film in the line may start downloading.
-      onCanPlayThrough={onThrough}
+      onCanPlayThrough={() => onThrough(slot)}
       className={`cf-film ${playing ? "opacity-100" : "opacity-0"}`}
     />
   );
@@ -389,15 +392,6 @@ export function CoverflowRail({
     const k = d === 0 ? 0 : WARM_ORDER.indexOf(d) + 1;
     if (k >= 0) setStage((s) => Math.max(s, k + 1));
   }, []);
-  const throughHandlers = useRef(new Map<number, () => void>());
-  const throughFor = (d: number) => {
-    let h = throughHandlers.current.get(d);
-    if (!h) {
-      h = () => onThrough(d);
-      throughHandlers.current.set(d, h);
-    }
-    return h;
-  };
   const go = (by: number) => {
     setStage(0);
     setActive((a) => (((a + by) % n) + n) % n);
@@ -549,9 +543,8 @@ export function CoverflowRail({
                     warm={live && WARM_ORDER.indexOf(d) !== -1 && WARM_ORDER.indexOf(d) < stage}
                     sound={d === 0 && sound}
                     onBlocked={blocked}
-                    // Bound to this card's distance, so the rail knows which
-                    // film is through; the handler is stable per d.
-                    onThrough={throughFor(d)}
+                    onThrough={onThrough}
+                    slot={d}
                   />
                   {d === 0 ? (
                     // The whole centre card is the sound toggle, as on the
