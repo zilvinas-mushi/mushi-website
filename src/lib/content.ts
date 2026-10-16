@@ -1499,18 +1499,20 @@ export const CASE_STUDIES_PAGE = {
     // supplied on 2026-10-04 run on either side of them. Hey Bud is the
     // centre because it sits at floor(n / 2): with Hismile and the Sintra
     // clothing ad gone (Žilvinas 2026-10-17, "remove this ad"), the inbox
-    // one moved from the left end to the right so that it still does.
+    // one moved from the left end to the right so that it still does. Viktor
+    // and the towels ad then traded places (Žilvinas 2026-10-17, "this ad
+    // should change order with this one").
     static: {
       title: "Static Ads",
       items: [
         { src: "case-studies/static-moerie.webp", alt: "Moerie static ad: your hair growth timeline" },
-        { src: "case-studies/static-viktor.webp", alt: "Viktor static ad: stop searching for perfect AI models" },
+        { src: "case-studies/static-towels.webp", alt: "Towel brand static ad with a customer review" },
         { src: "case-studies/static-beast.webp", alt: "Beast blender static ad" },
         { src: "case-studies/static-spacegoods.webp", alt: "Spacegoods static ad: goals for 2026" },
         { src: "case-studies/static-bluechew.webp", alt: "Bluechew static ad" },
         { src: "case-studies/static-heybud.webp", alt: "Hey Bud static ad: best seller for a reason" },
         { src: "case-studies/static-luckytime.webp", alt: "Lucky Fours static ad: luxury style without the luxury bill" },
-        { src: "case-studies/static-towels.webp", alt: "Towel brand static ad with a customer review" },
+        { src: "case-studies/static-viktor.webp", alt: "Viktor static ad: stop searching for perfect AI models" },
         { src: "case-studies/static-fieldy.webp", alt: "Fieldy static ad: this isn't a necklace, it's your second brain" },
         { src: "case-studies/static-sintra-restaurant.webp", alt: "Sintra static ad: same food, different Tuesday" },
         { src: "case-studies/static-inbox.webp", alt: "Inbox organizer static ad: built for people who live in their inbox" },
