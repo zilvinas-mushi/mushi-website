@@ -176,7 +176,7 @@ and each frame renders its own (`src/lib/content.ts`):
 | | Phone `4167:278` | Desktop `4167:280` |
 | --- | --- | --- |
 | First column head | PRODUCT | **PRODUCTS** (node `4134:627`) |
-| Legal order | Money-Back · Terms · Refund · Privacy | Privacy · Terms · Refund · Money-Back |
+| Legal order | Terms · Refund · Privacy | Privacy · Terms · Refund — both frames also draw Money-Back Guarantee first/last; dropped 2026-10-17 (section 1 of the Refund Policy) |
 | Copyright | "Copyright 2026, All Rights Reserved" | "Copyright © 2026 All Rights Reserved" |
 | Address colour | `#8E8E8E` | `#808080` |
 
@@ -271,7 +271,7 @@ that scale, which is what makes the others trustworthy.
 | Social glyphs | all **white** |
 | Link groups | **left-aligned**, and each is TWO columns. The second starts at **215** of the 345 — the same stop for every group, so it is a tab stop, not the width of what happens to sit left of it. |
 | Group order | PRODUCT · **LEGAL** · COMPANY · CONTACT — legal moves up between the first two |
-| Legal fill | column-major: Money-Back / Terms down the left, Refund / Privacy down the right. `FOOTER.legal` is already in that order. |
+| Legal fill | column-major: Terms / Refund down the left, Privacy on the right (the frame's Money-Back is dropped). `FOOTER.legal` is already in that order. |
 | Type | the white heads are Poppins **Medium 18**; ALL the small grey type — column links and the address alike — is Poppins **Regular 15**. The address was 18 on the earlier frame. |
 | Trustpilot row | "Trustpilot" **16 Regular**, the score **22 SemiBold**, all three CENTRED on one axis rather than sharing a baseline (the frame's score box is 35 x 17 at an 80% line height — a 22 cap band centred in a 17 box; sharing a baseline instead lifts the number 2 and the star reads low beside it), and **5** between all three boxes — star → word → score. The frame's star-plus-word group measures **106.42** = 22.66 star + 5 + the word, which is what proves the 5 is box-to-box. It was 10 and 15. |
 | Copyright | Poppins **Regular 14**, centred, **20** under the social tiles |
