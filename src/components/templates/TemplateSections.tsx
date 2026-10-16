@@ -2717,7 +2717,19 @@ function AppWindow() {
           edge to edge. The row is a size container now and the box's
           width is min(its width, its height x 2400/1503), which every
           engine computes the same. */}
-      <div className="md:relative md:mx-auto md:aspect-[2400/1503] md:w-[min(100cqw,calc(100cqh*2400/1503))]">
+      <div className="relative md:mx-auto md:aspect-[2400/1503] md:w-[min(100cqw,calc(100cqh*2400/1503))]">
+        {/* THE PHONE'S BORDER (Žilvinas 2026-10-17, "this phone with border
+            should be full"): the templates-mobile frame draws the device as
+            "Whole iphone with border" (node 4564:77) — the 269-wide phone
+            render inside a 279 x 487 rounded rect (r35) with a 7px #8F9B99
+            stroke and a white glow (drop shadow 0 0 25 at 50%), 5 outside
+            the phone on each side and ending at 487 where the phone runs
+            on to the fold. The phone image covers the stroke's inner 2px,
+            so 5 of it shows. Phone only; the MacBook has its own frame. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-[-5px] z-0 h-[487px] w-[279px] -translate-x-1/2 rounded-[35px] border-[7px] border-[#8f9b99] [filter:drop-shadow(0_0_25px_rgba(255,255,255,0.5))] md:hidden"
+        />
       <CategoryTiles />
       <PhoneTiles />
 

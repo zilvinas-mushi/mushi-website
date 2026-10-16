@@ -278,6 +278,7 @@ function RailVideo({
   warm,
   sound,
   onBlocked,
+  onThrough,
 }: {
   file: string;
   /** The poster's moment, where playback starts and returns to. */
@@ -287,6 +288,8 @@ function RailVideo({
   sound: boolean;
   /** The browser refused to play with sound; the rail drops back to muted. */
   onBlocked: () => void;
+  /** The centre film has buffered enough to play through: the neighbours may fetch now. */
+  onThrough: () => void;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -336,6 +339,9 @@ function RailVideo({
         const v = ref.current;
         if (v) v.currentTime = at;
       }}
+      // The word that the neighbours may start downloading. Only the
+      // centre's counts (see warm in the rail); a side card's is ignored.
+      onCanPlayThrough={() => on && onThrough()}
       className={`cf-film ${playing ? "opacity-100" : "opacity-0"}`}
     />
   );
@@ -361,7 +367,18 @@ export function CoverflowRail({
   // The design's centre card is the middle of the supplied list.
   const [active, setActive] = useState(Math.floor(items.length / 2));
   const touchX = useRef<number | null>(null);
-  const go = (by: number) => setActive((a) => (((a + by) % n) + n) % n);
+  // THE PLAYING FILM COMES FIRST ON THE LINE (Žilvinas 2026-10-17, from a
+  // phone: "the ads just sometimes gets stuck"): the neighbours' files are
+  // fetched only once the centre has buffered enough to play through —
+  // three films downloading at once on a phone's line starved the one
+  // that was playing, and it froze mid-frame. Reset on every move, so each
+  // new centre gets the line to itself first.
+  const [through, setThrough] = useState(false);
+  const onThrough = useCallback(() => setThrough(true), []);
+  const go = (by: number) => {
+    setThrough(false);
+    setActive((a) => (((a + by) % n) + n) % n);
+  };
 
   // The films: `live` is "the rail is on screen and may play".
   const root = useRef<HTMLElement>(null);
@@ -397,7 +414,18 @@ export function CoverflowRail({
     return () => io.disconnect();
   }, [kind]);
   const blocked = useCallback(() => setSound(false), []);
-  const press = () => {
+  const press = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // The film is told to play HERE, inside the tap, not from the effect
+    // that follows the state change: a browser that will only start media
+    // on a gesture (iOS, Low Power Mode) accepts a play() in the handler
+    // and may not accept one a render later — which left a film that had
+    // never started showing its poster, i.e. its own first frame, stuck.
+    const v = e.currentTarget.parentElement?.querySelector("video");
+    const wantSound = !live || !sound;
+    if (v) {
+      v.muted = !wantSound;
+      void v.play().catch(() => {});
+    }
     // Autoplay off: the first press starts the film, with its sound — an
     // explicit press means they want the ad. After that it toggles sound.
     if (!live) {
@@ -495,9 +523,10 @@ export function CoverflowRail({
                     file={item.video}
                     at={item.at}
                     on={d === 0 && live}
-                    warm={Math.abs(d) === 1 && live}
+                    warm={Math.abs(d) === 1 && live && through}
                     sound={d === 0 && sound}
                     onBlocked={blocked}
+                    onThrough={onThrough}
                   />
                   {d === 0 ? (
                     // The whole centre card is the sound toggle, as on the

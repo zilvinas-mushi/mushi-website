@@ -24,17 +24,13 @@
 import { BOOKING_ANCHOR } from "@/lib/site";
 
 export const NAV = [
-  // CASE STUDIES IS HELD BACK, ON BOTH SURFACES (Žilvinas 2026-10-04:
-  // "disable case studies and templates as well in the menu. leave it in a
-  // path", then "you haven't disabled agency and case studies"). It stays in
-  // the bar and the drawer, but is a link on no page; it is still lit on its
-  // own page. The page itself is untouched and answers at its URL, and the
-  // footer still links to it. Empty lists mean "a link on no page" — see
-  // navHref. To bring an entry back, delete its two keys: Templates and
-  // Agency came back on 2026-10-10 ("enable templates page! it should be
-  // live", "enable agency as well in upper menu").
+  // Every entry is a link on every page since 2026-10-17 ("unhide also case
+  // studies"). Case Studies had been held back on both surfaces from
+  // 2026-10-04 (`liveOn: [], phoneLiveOn: []` — a link on no page, still
+  // lit on its own); Templates and Agency came back on 2026-10-10. The
+  // mechanism (navHref, below) stays for the next page that is not ready.
   { label: "Agency", href: "/" },
-  { label: "Case Studies", href: "/case-studies", liveOn: [], phoneLiveOn: [] },
+  { label: "Case Studies", href: "/case-studies" },
   { label: "Templates", href: "/templates" },
 ] as const;
 
