@@ -415,12 +415,15 @@ export function ReadyToScale() {
       </h2>
 
       <div className="cs-scale-pair mt-[21px] flex flex-col items-center gap-[15px] md:mt-[2.40625rem] md:flex-row md:justify-center md:gap-[1.625rem]">
-        {/* 500+ templates → the Pick-your-plan sheet, in place (Žilvinas
-            2026-10-04: "buy now should lead to the same popup as in
-            templates"). data-plan is what PlanSheet listens for — the page
-            mounts it. The href is where a modified click or a browser
-            without JavaScript goes: /templates#buy, which opens the same
-            sheet on arrival. It went to the webapp before. */}
+        {/* 500+ templates → /templates with the Pick-your-plan sheet open
+            on arrival (Žilvinas 2026-10-17: "in case studies buy button
+            should redirect to templates with the buy popup open"). NOT
+            data-plan: with it the sheet opened here when the page had
+            hydrated and the link was followed when it had not, so the same
+            button did two different things ("sometimes redirects"). One
+            path now, and PlanSheet warms Stripe the moment it sees #buy, so
+            Buy is instant there too. It opened in place 2026-10-04 to
+            2026-10-17, and went to the webapp before that. */}
         <article className={CARD}>
           <Img
             src="case-studies/scale-templates.webp"
@@ -435,7 +438,6 @@ export function ReadyToScale() {
           </h3>
           <a
             href="/templates#buy"
-            data-plan
             // white fill / black label  ->  black fill / white label
             className={`${CARD_BUTTON} top-[calc(var(--cu)*106)] w-[calc(var(--cu)*147)] md:left-[2.75rem] bg-[linear-gradient(#fff,#fff)] text-black hover:bg-[linear-gradient(#000,#000)] hover:text-white active:bg-[linear-gradient(#000,#000)] active:text-white md:w-[12.75rem]`}
           >
@@ -455,21 +457,40 @@ export function ReadyToScale() {
             {templates.items.map((item) => (
               <li
                 key={item.label}
-                className="flex h-[calc(var(--cu)*16)] items-center gap-[calc(var(--cu)*8)] text-[length:calc(var(--cu)*16)] font-normal leading-none text-white md:h-[1.5625rem] md:gap-[var(--gap)] md:text-[1.25rem]"
-                style={{ "--w": r(item.w), "--gap": r(item.gap) } as CSSProperties}
+                // The text sits in one column on every row — Figma's +49 on
+                // the phone, +78 on the desktop — so the icon lives in a slot
+                // of that width (24 / 34) and its own box inside it, at the
+                // slot's left edge. Each icon's box is Figma's for THAT
+                // breakpoint: the phone draws the headset 17 x 15, not 16
+                // square, and the tools 15.
+                className="flex h-[calc(var(--cu)*16)] items-center text-[length:calc(var(--cu)*16)] font-normal leading-none text-white md:h-[1.5625rem] md:text-[1.25rem]"
+                style={
+                  {
+                    "--pw": `calc(var(--cu) * ${item.phone[0]})`,
+                    "--ph": `calc(var(--cu) * ${item.phone[1]})`,
+                    "--dw": r(item.desktop[0]),
+                    "--dh": r(item.desktop[1]),
+                  } as CSSProperties
+                }
               >
-                {/* The svg is drawn to the outside of its stroke, a twentieth
-                    wider than the box Figma reports for it — hence the
-                    negative margin: the BOX is what the layout uses. */}
-                <span className="grid h-[calc(var(--cu)*16)] w-[calc(var(--cu)*16)] shrink-0 place-items-center md:h-[1.5625rem] md:w-[var(--w)]">
-                  <LazyImg
-                    src={`/images/case-studies/${item.icon}.svg`}
-                    alt=""
-                    width={28}
-                    height={28}
-                    ariaHidden
-                    className="h-[110%] w-[110%] max-w-none"
-                  />
+                <span className="flex w-[calc(var(--cu)*24)] shrink-0 items-center md:w-[2.125rem]">
+                  {/* The svg is drawn to the OUTSIDE of its 2.5 stroke, so
+                      the file is a tenth larger than the icon box Figma
+                      reports (27.5 for a 25 box) and is sized so — by its
+                      width only, and it keeps its own proportions: the
+                      files carried preserveAspectRatio="none" and were
+                      being pulled to a box of another shape (Žilvinas
+                      2026-10-17, "icons now are stretched"). */}
+                  <span className="grid h-[var(--ph)] w-[var(--pw)] shrink-0 place-items-center md:h-[var(--dh)] md:w-[var(--dw)]">
+                    <LazyImg
+                      src={`/images/case-studies/${item.icon}.svg`}
+                      alt=""
+                      width={28}
+                      height={28}
+                      ariaHidden
+                      className="h-auto w-[110%] max-w-none"
+                    />
+                  </span>
                 </span>
                 {item.label}
               </li>
@@ -513,8 +534,51 @@ export function ReadyToScale() {
               tone="black"
             />
           </a>
+          {/* THE TEAM, five faces in dark rings, each ring a little over the
+              next (the leftmost on top), as the updated frame draws them
+              (Žilvinas 2026-10-17, "the design was changed a bit"): rings
+              of 44.707 x 44.545 (phone 27.009 x 26.937), the photo 38.32
+              (23.15) inside at 3.19 (1.93), and the frame's own uneven
+              pitches — Figma nodes 4814:83 and 4933:2340. The rings used to
+              be baked into the card's artwork at 60 (35) on a 39 (23) pitch;
+              they are live now, and the artwork has had that row painted
+              out. The ring is #181818 with the file's 1px #222222 inside
+              stroke. The photos are the frame's own 100px fills. Left edge
+              on the text column (+43 / +25); bottom edge where the old row's
+              was. */}
+          <ul
+            role="list"
+            aria-label="The Mushi team"
+            className="absolute left-[calc(var(--cu)*25)] top-[calc(var(--cu)*229)] h-[calc(var(--cu)*26.937)] w-[calc(var(--cu)*109.5)] md:left-[2.6875rem] md:top-[24.8rem] md:h-[2.784rem] md:w-[11.328rem]"
+          >
+            {agency.team.map((face, i) => (
+              <li
+                key={face.src}
+                // Both lefts come through variables: an inline `left` would
+                // win over the md: class at every width and stack the five
+                // on the phone's spot on the desktop.
+                className="absolute left-[calc(var(--cu)*var(--px))] top-0 grid size-[calc(var(--cu)*27.009)] place-items-center rounded-full bg-[#181818] shadow-[inset_0_0_0_calc(var(--cu)*1)_#222222] md:left-[var(--dx)] md:h-[2.784rem] md:w-[2.794rem] md:shadow-[inset_0_0_0_1px_#222222]"
+                style={{ zIndex: 5 - i, "--px": face.phoneX, "--dx": r(face.desktopX) } as CSSProperties}
+              >
+                <Img
+                  src={`case-studies/${face.src}`}
+                  alt={face.alt}
+                  className="size-[calc(var(--cu)*23.15)] rounded-full md:size-[2.395rem]"
+                />
+              </li>
+            ))}
+          </ul>
+          {/* The row keeps the frame's box (10 / 15 tall, text at +49 /
+              +78) while the dot inside it is a little smaller than the
+              frame draws — 9 / 13 for 10 / 15 (Žilvinas 2026-10-17, "maybe
+              a little bit smaller, just a little bit") — and PULSES like a
+              live indicator (same note: "this green small dot should be
+              pulsing"): .live-dot in globals.css, a ring breathing out of
+              it. Centred in the frame's box so the text does not move. */}
           <p className="absolute left-[calc(var(--cu)*25)] top-[calc(var(--cu)*269)] flex h-[calc(var(--cu)*10)] items-center gap-[calc(var(--cu)*8)] whitespace-nowrap text-[length:calc(var(--cu)*16)] font-normal leading-none text-white md:left-[2.6875rem] md:top-[28.8125rem] md:h-[0.9375rem] md:gap-[0.5625rem] md:text-[1.25rem]">
-            <span className="size-[calc(var(--cu)*10)] shrink-0 rounded-full bg-[#248a2d] md:size-[0.9375rem]" />
+            <span className="grid size-[calc(var(--cu)*10)] shrink-0 place-items-center md:size-[0.9375rem]">
+              <span aria-hidden="true" className="live-dot size-[calc(var(--cu)*9)] rounded-full bg-[#248a2d] md:size-[0.8125rem]" />
+            </span>
             {agency.status}
           </p>
         </article>

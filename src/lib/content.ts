@@ -1521,21 +1521,37 @@ export const CASE_STUDIES_PAGE = {
   },
   scale: {
     heading: "Ready To Scale?",
+    // (agency.team below: the five faces of the right card's row.)
     templates: {
       titleLines: ["500+ High-ROAS", "Static Templates"],
       cta: "Buy Now",
       // `w` is the icon's own width on desktop — the headset is 28 where the
       // other two are 25, and each label starts 9 (6 for the headset) past it.
       items: [
-        { icon: "icon-sparkles", label: "50+ new templates monthly", w: 25, gap: 9 },
-        { icon: "icon-headset", label: "24/7 customer support", w: 28, gap: 8 },
-        { icon: "icon-tools", label: "Editable in Canva", w: 25, gap: 8 },
+        // Each icon's box as the frames draw it, [w, h] — phone (nodes
+        // 4626:450 / 449 / 451) and desktop. The text column is fixed
+        // (+49 / +78), so there is no per-row gap any more.
+        { icon: "icon-sparkles", label: "50+ new templates monthly", phone: [16, 16], desktop: [25, 25] },
+        { icon: "icon-headset", label: "24/7 customer support", phone: [17, 15], desktop: [28, 25] },
+        { icon: "icon-tools", label: "Editable in Canva", phone: [15, 15], desktop: [25, 25] },
       ],
     },
     agency: {
       titleLines: ["Premium Static", "& Video Ads"],
       cta: "Book a Call",
       status: "Now Booking New Projects",
+      /**
+       * The row of faces, left to right, with each ring's left edge from the
+       * row's own left (Figma 4814:83 desktop / 4933:2340 phone — the
+       * pitches are the frame's, uneven on purpose).
+       */
+      team: [
+        { src: "team-1.webp", alt: "Mushi team member", phoneX: 0, desktopX: 0 },
+        { src: "team-2.webp", alt: "Mushi team member", phoneX: 21.49, desktopX: 35.58 },
+        { src: "team-3.webp", alt: "Mushi team member", phoneX: 43.99, desktopX: 72.82 },
+        { src: "team-4.webp", alt: "Mushi team member", phoneX: 61.49, desktopX: 101.78 },
+        { src: "team-5.webp", alt: "Mushi team member", phoneX: 82.49, desktopX: 136.54 },
+      ],
     },
   },
 } as const;
