@@ -18,6 +18,7 @@ import { TEMPLATES_PAGE } from "@/lib/content";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { APP_URL, BOOKING_URL, OG_IMAGE, SITE_NAME, SITE_TAGLINE, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, abs } from "@/lib/site";
+import { PHONE_CTA_HEIGHT_PX, PHONE_CTA_RADIUS_PX } from "@/components/shared/violetCta";
 
 /**
  * hero-burst-phone.webp, read at BUILD time — this is a server component in
@@ -175,9 +176,12 @@ export default function Templates() {
         }}
         // The phone bar's sliding offer. It rides out as the hero's own CTA
         // goes under the bar, and back up as the "Ad creation from scratch"
-        // card reaches it. Home's 52 box, with no stroke (Žilvinas
-        // 2026-09-11) — the design's 45 read as a different button from the
-        // Schedule a Call it stands in for. 20px label per the design.
+        // card reaches it. No stroke (Žilvinas 2026-09-11) — the design's
+        // 45 read as a different button from the Schedule a Call it stands
+        // in for. 20px label per the design. THE PLAN SHEET'S BOX — 47.35
+        // tall, a 10 corner — since 2026-10-17 (Noah: one size for every
+        // violet CTA on the phone, shared/violetCta.ts); it was home's 52
+        // with a 5 corner.
         mobileCta={{
           label: TEMPLATES_PAGE.mobileCta,
           href: APP_URL,
@@ -189,7 +193,8 @@ export default function Templates() {
           // TemplateSections — rename one, rename both.
           againId: "team-heading",
           labelPx: 20,
-          radiusPx: 5,
+          heightPx: PHONE_CTA_HEIGHT_PX,
+          radiusPx: PHONE_CTA_RADIUS_PX,
           sheet: true,
         }}
         // The phone DRAWER, /templates only (Žilvinas 2026-09-25): under the

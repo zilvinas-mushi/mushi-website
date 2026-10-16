@@ -9,6 +9,7 @@ import { StripePay, fetchStripeJs, preloadStripe } from "@/components/checkout/S
 import { checkoutSession, dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
 import { checkoutUrl, type PlanId } from "@/lib/pricing";
 import Link from "next/link";
+import { VIOLET_FILL } from "@/components/shared/violetCta";
 
 /**
  * The purchase sheet (Žilvinas 2026-09-25, from the two supplied frames;
@@ -131,13 +132,8 @@ function nextToBuild(built: readonly PlanId[], steps: Record<string, { ready: bo
 const WAS =
   "bg-[linear-gradient(120deg,#de8a8b_0%,#b55456_40%,#b55456_100%)] bg-clip-text text-transparent line-through decoration-[#c9666a]";
 
-/**
- * The violet button, inverting to white on hover like every button — and on
- * TAP (Žilvinas 2026-09-25, "inversion on click"): a phone has no hover, so
- * the same swap rides on :active, the way the bar's CTA already does.
- */
-const VIOLET =
-  "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] active:text-[#6e54b5]";
+/** The violet button — the one fill every violet CTA wears (shared/violetCta.ts). */
+const VIOLET = VIOLET_FILL;
 
 /**
  * A payment field: 45 tall, #222222, Regular 18, placeholder at 50% white.
@@ -1004,6 +1000,8 @@ export function PlanSheet() {
               // an opacity rather than a colour so it still inverts with the
               // button on hover.
               aria-busy={holding || undefined}
+              // 47.35 tall, a 10 corner — the box the page's other violet CTAs are
+              // matched to (shared/violetCta.ts); change it there and here together.
               className={`mt-5 flex h-[47.35px] w-full items-center justify-center rounded-[10px] text-[18px] font-medium ${VIOLET} ${holding ? "cursor-wait" : ""}`}
             >
               {/* One inline run: as separate items of this flex row the
