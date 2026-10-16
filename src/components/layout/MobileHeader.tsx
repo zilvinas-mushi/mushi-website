@@ -6,6 +6,7 @@ import { Logo } from "@/components/shared/Logo";
 import { NAV, navHref } from "@/lib/content";
 import { BOOKING_URL, CREATIVES_CTA_ID, FINAL_CTA_ID, SITE_NAME, bookingTarget } from "@/lib/site";
 import { prerenderLogin } from "@/lib/prerender";
+import { VIOLET_FILL } from "@/components/shared/violetCta";
 
 /**
  * The phone's CTA label, which is NOT the desktop bar's "Book a Call" — the
@@ -52,7 +53,7 @@ export type MobileCtaConfig = {
   /** Box height and label size in px at the design's phone width. */
   heightPx?: number;
   labelPx?: number;
-  /** Corner radius in px — home's 7, /templates' 5. */
+  /** Corner radius in px — home's 7, /templates' 10 (the plan sheet's; see shared/violetCta.ts). */
   radiusPx?: number;
   /** Optional 1px INSIDE stroke. Nothing sets one since /templates dropped its #7C54B5 ring. */
   strokeColor?: string;
@@ -67,20 +68,8 @@ const HOME_CTA: MobileCtaConfig = {
   untilId: FINAL_CTA_ID,
 };
 
-/**
- * The violet fill, and the white it inverts to.
- *
- * The header CTA's three Figma stops verbatim. At 117.51deg the gradient line
- * across a 345 x 52 box is 330 long and almost entirely horizontal, so the
- * light pools at the LEFT edge and the last third sits flat at #6E54B5 —
- * which is what the artboard shows for both of these buttons.
- *
- * Per CLAUDE.md the hover state repeats all THREE stop positions in white
- * rather than being a flat colour: a 2-stop hover against a 3-stop rest cannot
- * interpolate, so the fill would snap instead of cross-fading.
- */
-const VIOLET_CTA =
-  "bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] active:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] active:text-[#6e54b5]";
+/** The violet fill, and the white it inverts to — shared with every violet CTA (shared/violetCta.ts). */
+const VIOLET_CTA = VIOLET_FILL;
 
 /**
  * The drawer's two dark buttons (Žilvinas 2026-09-25, off the phone artboard):
@@ -554,7 +543,7 @@ export function MobileHeader({
             // The box height, and the travel derived from it: the whole box
             // plus the 0.5rem gap it stands below the bar, so at 0 the button
             // sits exactly inside the bar's own footprint whatever height the
-            // page asked for. 52 on both pages today.
+            // page asked for. Home's 52; /templates' 47.35, the plan sheet's.
             "--cta-h": `${cta.heightPx ?? 52}px`,
             translate: "0 calc((var(--cta-out, 0) - 1) * (var(--cta-h) + 0.5rem))",
           } as CSSProperties}

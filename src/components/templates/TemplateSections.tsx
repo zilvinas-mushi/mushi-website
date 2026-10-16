@@ -4,6 +4,7 @@ import { Logo } from "@/components/shared/Logo";
 import { Money } from "@/components/shared/Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { APP_URL, BOOKING_URL, CALL_ADDRESS, CALL_PATH, TEMPLATES_HERO_CTA_ID, TEMPLATES_SCRATCH_CARD_ID, bookingTarget } from "@/lib/site";
+import { PHONE_CTA_BOX, VIOLET_FILL } from "@/components/shared/violetCta";
 
 // 15 either side on the phone (artboard 2026-09-06: the cards measure
 // 345 inside a 375 frame); the desktop reference keeps its 20.
@@ -1288,15 +1289,17 @@ export function TemplatesComparison() {
           </a>
         </div>
 
-        {/* The phone's own CTA: 345 x 57, violet, full width under the
-            table. 45 below the grid, which is 26 below the PURPLE COLUMN —
-            the column hangs 19 past the last row, and that overhang is what
-            the artboard measures from. It inverts like every other button (CLAUDE.md), with all
-            three stops repeated in white so the fill cross-fades. */}
+        {/* The phone's own CTA, violet, full width under the table. 45
+            below the grid, which is 26 below the PURPLE COLUMN — the column
+            hangs 19 past the last row, and that overhang is what the
+            artboard measures from. The artboard's 345 x 57 with a 15 corner
+            became the plan sheet's 47.35 x 10 on 2026-10-17 (Noah: one size
+            for every violet CTA on the phone, shared/violetCta.ts); the 20
+            SemiBold label stayed. */}
         <a
           href={APP_URL}
           data-plan
-          className="mt-[45px] flex h-[57px] w-full items-center justify-center rounded-[15px] bg-[linear-gradient(117.51deg,#a08ade_10.47%,#7c54b5_45.54%,#6e54b5_98.13%)] text-[20px] font-semibold text-white transition-all duration-300 ease-out hover:bg-[linear-gradient(117.51deg,#fff_10.47%,#fff_45.54%,#fff_98.13%)] hover:text-[#6e54b5] md:hidden"
+          className={`mt-[45px] ${PHONE_CTA_BOX} ${VIOLET_FILL} text-[20px] font-semibold md:hidden`}
         >
           {/* Set type here, not the masked label artwork the desktop pill
               uses: the phone's is Poppins SemiBold 20 (artboard 2026-09-06),
@@ -1639,8 +1642,13 @@ export function TemplatesAccess() {
             <a
               href={APP_URL}
               data-plan
-              className="mt-6 flex h-[60px] w-full items-center justify-center rounded-[15px] md:h-[93px] bg-[image:var(--bg,none)] bg-cover text-[20px] font-semibold uppercase tracking-normal text-white transition-all duration-150 hover:bg-[linear-gradient(147deg,#fff_0%,#fff_100%)] hover:text-[#6e54b5] md:mt-8 md:rounded-[12px] md:text-[35px] md:tracking-normal"
-              data-bg="url(/images/templates/access-btn-purple.webp)"
+              // The plan sheet's box and the shared violet gradient on the
+              // phone (Noah 2026-10-17, one size for every violet CTA there;
+              // shared/violetCta.ts). It was 60 tall with a 15 corner on a
+              // raster, access-btn-purple.webp — a flat #7B54B6, i.e. the
+              // gradient's middle stop — so the desktop takes the gradient
+              // too and the file is gone. The 20 SemiBold caps label stayed.
+              className={`mt-6 ${PHONE_CTA_BOX} ${VIOLET_FILL} text-[20px] font-semibold uppercase tracking-normal md:mt-8 md:h-[93px] md:rounded-[12px] md:text-[35px] md:tracking-normal`}
             >
               {a.templates.cta}
             </a>
@@ -3118,7 +3126,6 @@ export function TemplatesBgFallbacks() {
     "access-card-dark-v2.webp",
     "access-btn-dark.webp",
     "access-card-purple-v2.webp",
-    "access-btn-purple.webp",
     "access-banner-phone.webp",
     "diff-card-dark-v2.webp",
     "reviews-card.svg",
