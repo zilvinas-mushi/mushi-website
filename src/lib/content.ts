@@ -1446,23 +1446,27 @@ export const CASE_STUDIES_PAGE = {
   ],
   rails: {
     // Posters are frames of the films themselves, cut from the 1080 masters
-    // at the moment the design's still shows (design/ASSETS.md has the
-    // timestamps). The design's seven sit in the middle of the list in its
-    // order, Holo in the centre; the four it does not draw are at the ends.
+    // at the moment the design's still shows, and `at` is that moment in
+    // seconds (design/ASSETS.md): the film STARTS there, so it takes over
+    // from its poster without a jump (Žilvinas 2026-10-17, "this ad doesn't
+    // play" — red-x opens on 2.5 s of a still infographic nothing like its
+    // poster, so the card looked broken). The design's seven sit in the
+    // middle of the list in its order, Holo in the centre; the four it does
+    // not draw are at the ends.
     video: {
       title: "Video Ads",
       items: [
-        { src: "case-studies/video-shadow.webp", video: "case-studies/shadow.mp4", alt: "Shadow video ad: a founder's story" },
-        { src: "case-studies/video-skin-signs.webp", video: "case-studies/skin-signs.mp4", alt: "Skincare video ad: 4 warning signs your skin is aging" },
-        { src: "case-studies/video-red-x.webp", video: "case-studies/red-x.mp4", alt: "Video ad opening on a struck-through figure" },
-        { src: "case-studies/video-bride.webp", video: "case-studies/bride.mp4", alt: "Breezit video ad: a bride calls the venue at 10pm" },
-        { src: "case-studies/video-dog.webp", video: "case-studies/dog.mp4", alt: "Pet care video ad showing real customer results" },
-        { src: "case-studies/video-holo.webp", video: "case-studies/holo.mp4", alt: "Holo video ad: meet Holo" },
-        { src: "case-studies/video-office.webp", video: "case-studies/office.mp4", alt: "Video ad: in 15 minutes, a team at work" },
-        { src: "case-studies/video-celemi.webp", video: "case-studies/celemi.mp4", alt: "Celemi skincare video ad" },
-        { src: "case-studies/video-overpaying.webp", video: "case-studies/overpaying.mp4", alt: "Finance video ad: overpaying" },
-        { src: "case-studies/video-postpartum.webp", video: "case-studies/postpartum.mp4", alt: "Post-partum bra video ad, creator to camera" },
-        { src: "case-studies/video-tattoo.webp", video: "case-studies/tattoo.mp4", alt: "Sintra video ad: a tattoo studio owner" },
+        { src: "case-studies/video-shadow.webp", video: "case-studies/shadow.mp4", at: 1.5, alt: "Shadow video ad: a founder's story" },
+        { src: "case-studies/video-skin-signs.webp", video: "case-studies/skin-signs.mp4", at: 0.2, alt: "Skincare video ad: 4 warning signs your skin is aging" },
+        { src: "case-studies/video-red-x.webp", video: "case-studies/red-x.mp4", at: 6.733, alt: "Video ad opening on a struck-through figure" },
+        { src: "case-studies/video-bride.webp", video: "case-studies/bride.mp4", at: 1.7, alt: "Breezit video ad: a bride calls the venue at 10pm" },
+        { src: "case-studies/video-dog.webp", video: "case-studies/dog.mp4", at: 15.667, alt: "Pet care video ad showing real customer results" },
+        { src: "case-studies/video-holo.webp", video: "case-studies/holo.mp4", at: 0.533, alt: "Holo video ad: meet Holo" },
+        { src: "case-studies/video-office.webp", video: "case-studies/office.mp4", at: 4.833, alt: "Video ad: in 15 minutes, a team at work" },
+        { src: "case-studies/video-celemi.webp", video: "case-studies/celemi.mp4", at: 17.448, alt: "Celemi skincare video ad" },
+        { src: "case-studies/video-overpaying.webp", video: "case-studies/overpaying.mp4", at: 6.8, alt: "Finance video ad: overpaying" },
+        { src: "case-studies/video-postpartum.webp", video: "case-studies/postpartum.mp4", at: 3.0, alt: "Post-partum bra video ad, creator to camera" },
+        { src: "case-studies/video-tattoo.webp", video: "case-studies/tattoo.mp4", at: 0.2, alt: "Sintra video ad: a tattoo studio owner" },
       ],
     },
     landing: {

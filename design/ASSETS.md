@@ -408,7 +408,9 @@ centre card here is 342 wide rather than 300: **720 × 1280, H.264 CRF 25,
 30 fps, AAC 96k, `+faststart`** — 69 MB across the eleven.
 
 Each poster is a frame of its own film, cut from the master at the timestamp
-below. For the seven the design draws, that timestamp was FOUND by matching
+below — and since 2026-10-17 the film STARTS at that timestamp (`at` in
+`CASE_STUDIES_PAGE.rails.video`, CoverflowRail), so it takes over from its
+poster on the same picture. For the seven the design draws, that timestamp was FOUND by matching
 the design's still against every frame of every master — not read off the
 file names, which do not say which ad is which.
 
