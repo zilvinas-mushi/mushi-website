@@ -34,7 +34,7 @@ import { Img } from "@/components/shared/Img";
  * list twice puts a run of HIDDEN slots behind each end, so the wrap happens
  * between two invisible positions and what the visitor sees is one card
  * fading out at an edge and another fading in. A list with at least two
- * cards to spare (11 films, 13 statics) already has that run and is rendered
+ * cards to spare (11 films, 11 statics) already has that run and is rendered
  * once.
  *
  * ## The films
