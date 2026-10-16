@@ -1383,12 +1383,15 @@ export const TEMPLATES_PAGE = {
 export const CASE_STUDIES_PAGE = {
   heading: "Case Studies",
   storyCta: "Read full story",
-  /** The same line on all four cards in the design — placeholder copy. */
-  body: "Capturing demand from day 1 and helping scale Holo into the largest AI content tool.",
+  /**
+   * `body` is each card's own line since 2026-10-17 (Žilvinas, off the
+   * updated frame). The file had carried Holo's on all four as a placeholder.
+   */
   cards: [
     {
       brand: "Holo",
       result: "From $0k/month to $117k/month in 7 months.",
+      body: "Capturing demand from day 1 and helping scale Holo into the largest AI content tool.",
       // Where the frames break the result: two lines on desktop, three on the
       // phone. AUTHORED, not left to the box width — Figma and the browser
       // disagree by about 1% on how wide Poppins Medium sets, and eany's
@@ -1410,6 +1413,7 @@ export const CASE_STUDIES_PAGE = {
     {
       brand: "Breezit",
       result: "Generated 700 sales calls & 1500 leads in 8 months.",
+      body: "Introducing the company’s new AI product to the US, with leads that buy, not just book.",
       lines: { desktop: [4, 5], phone: [2, 4, 3] },
       tag: "AI FOR SALES",
       tagW: 171,
@@ -1422,6 +1426,7 @@ export const CASE_STUDIES_PAGE = {
     {
       brand: "eany",
       result: "Helped find 3 evergreen ads for 8 figure company.",
+      body: "Turning wholesale sourcing into banger video ads that resellers stop scrolling for.",
       lines: { desktop: [4, 5], phone: [3, 3, 3] },
       tag: "B2B MARKETPLACE",
       tagW: 231,
@@ -1434,6 +1439,7 @@ export const CASE_STUDIES_PAGE = {
     {
       brand: "we interiors",
       result: "From $13k/month to $75k/month in 3 months.",
+      body: "Growing the DTC side of a supplier whose furniture already sells at John Lewis and NEXT.",
       lines: { desktop: [3, 4], phone: [2, 2, 3] },
       tag: "FURNITURE RETAIL",
       tagW: 221,

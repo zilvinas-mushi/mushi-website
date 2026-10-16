@@ -394,8 +394,16 @@ Four cards, in this order on both breakpoints. Line breaks are the frames':
 | eany | Helped find 3 evergreen / ads for 8 figure company. | Helped find 3 / evergreen ads for / 8 figure company. | B2B MARKETPLACE |
 | we interiors | From $13k/month to / $75k/month in 3 months. | From $13k/month / to $75k/month / in 3 months. | FURNITURE RETAIL |
 
-- Body, **the same line on all four cards in the file** (placeholder): Capturing
-  demand from day 1 and helping scale Holo into the largest AI content tool.
+- Body, one line per card (updated frame, 2026-10-17 — the file had carried
+  Holo's on all four as a placeholder):
+  - Holo: Capturing demand from day 1 and helping scale Holo into the largest
+    AI content tool.
+  - Breezit: Introducing the company’s new AI product to the US, with leads
+    that buy, not just book.
+  - eany: Turning wholesale sourcing into banger video ads that resellers stop
+    scrolling for.
+  - we interiors: Growing the DTC side of a supplier whose furniture already
+    sells at John Lewis and NEXT.
 - Button: Read full story
 
 ## Rails
