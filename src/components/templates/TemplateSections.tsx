@@ -2720,15 +2720,22 @@ function AppWindow() {
       <div className="relative md:mx-auto md:aspect-[2400/1503] md:w-[min(100cqw,calc(100cqh*2400/1503))]">
         {/* THE PHONE'S BORDER (Žilvinas 2026-10-17, "this phone with border
             should be full"): the templates-mobile frame draws the device as
-            "Whole iphone with border" (node 4564:77) — the 269-wide phone
-            render inside a 279 x 487 rounded rect (r35) with a 7px #8F9B99
-            stroke and a white glow (drop shadow 0 0 25 at 50%), 5 outside
-            the phone on each side and ending at 487 where the phone runs
-            on to the fold. The phone image covers the stroke's inner 2px,
-            so 5 of it shows. Phone only; the MacBook has its own frame. */}
+            "Whole iphone with border" (node 4564:77) — the 269 x 564 black
+            phone body (r28) inside a 279 x 487 rounded rect with a 7px
+            #8F9B99 stroke (r35, so its inner edge is the phone's own) and a
+            white glow (drop shadow 0 0 25 at 50%): 5 of the stroke shows on
+            each side, and it ends at 487 while the phone runs on to the
+            fold. Here the ring is the 5 that shows, drawn OUTSIDE the phone
+            raster and hugging its corners — the raster's corner is ~25, not
+            the frame's 28, so the ring's inner radius is 25 (outer 30) or a
+            sliver of the tiles behind would show in each corner. The raster
+            used to carry 13 rows of this border's top edge baked in, which
+            doubled up with the ring as a thick grey band ("wtf this phone");
+            those rows are cropped off (hero-phone*.webp, 2026-10-17). Phone
+            only; the MacBook has its own frame. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-[-5px] z-0 h-[487px] w-[279px] -translate-x-1/2 rounded-[35px] border-[7px] border-[#8f9b99] [filter:drop-shadow(0_0_25px_rgba(255,255,255,0.5))] md:hidden"
+          className="pointer-events-none absolute left-1/2 top-[-5px] z-0 h-[487px] w-[279px] -translate-x-1/2 rounded-[30px] border-[5px] border-[#8f9b99] [filter:drop-shadow(0_0_25px_rgba(255,255,255,0.5))] md:hidden"
         />
       <CategoryTiles />
       <PhoneTiles />
@@ -2833,7 +2840,13 @@ function AppWindow() {
         // No drop-shadow on the MacBook (Žilvinas 2026-09-19, via the
         // client): the 140px blur reached up over the CTA and read as a
         // smudge sitting on the button.
-        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full md:mb-0 md:h-full md:w-full md:max-w-none"
+        // rounded-[25px] on the phone: the raster's corners are opaque
+        // black, not transparent, and over the coloured tiles the square
+        // showed around the bezel's own ~25 corner (the frame's phone body
+        // is r28 on the tiles with nothing square behind it). The clip is
+        // the bezel's own radius, so it takes nothing visible away. Off
+        // from md: the MacBook keeps its edges (2026-09-05, "no corners").
+        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full rounded-[25px] md:mb-0 md:h-full md:w-full md:max-w-none md:rounded-none"
         priority
       />
       </div>

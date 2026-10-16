@@ -2349,7 +2349,12 @@ html[data-sheet] .tile-marquee-track {
 }
 /* A card's film: over its poster, inside the frame's inset (the card's
    padding is not a containing-block edge, hence the explicit box), and
-   invisible until it is actually playing. */
+   invisible until it is actually playing. NO CROSS-FADE (Žilvinas
+   2026-10-17, "don't do any second from picture static to video —
+   immediately play video"): the film starts on the very frame the poster
+   shows, so the swap is invisible when it is instant, while a 500ms fade
+   blended the moving film with the still poster and read as a frozen
+   half-second. */
 .cf-film {
   position: absolute;
   left: var(--pcpx);
@@ -2358,7 +2363,6 @@ html[data-sheet] .tile-marquee-track {
   height: calc(100% - 2 * var(--pcpy));
   border-radius: 17px;
   object-fit: cover;
-  transition: opacity 500ms ease-out;
   pointer-events: none;
 }
 /* The frame draws the mute badge on desktop only. A phone still needs to see

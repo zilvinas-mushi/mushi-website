@@ -257,6 +257,9 @@ function centreVars(k: "d" | "p", u: (n: number) => string, c: Slot) {
   };
 }
 
+/** The order the films beyond the centre are fetched in, by distance from it. */
+const WARM_ORDER: readonly number[] = [1, -1, 2, -2];
+
 export type RailItem = {
   src: string;
   phoneSrc?: string;
@@ -288,7 +291,7 @@ function RailVideo({
   sound: boolean;
   /** The browser refused to play with sound; the rail drops back to muted. */
   onBlocked: () => void;
-  /** The centre film has buffered enough to play through: the neighbours may fetch now. */
+  /** This film has buffered enough to play through — the rail's cue to fetch the next one. */
   onThrough: () => void;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -306,6 +309,10 @@ function RailVideo({
       // play() waits for the seek, so frame 0 is never painted.
       if (at > 0) v.addEventListener("loadedmetadata", () => { v.currentTime = at; }, { once: true });
     }
+    // A film fetched on an earlier visit is through already and will not
+    // say so again — the rail asks each time it is centre or warm, so the
+    // chain of downloads moves on past it.
+    if ((on || warm) && v.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) onThrough();
     if (!on) {
       v.pause();
       v.muted = true;
@@ -339,9 +346,8 @@ function RailVideo({
         const v = ref.current;
         if (v) v.currentTime = at;
       }}
-      // The word that the neighbours may start downloading. Only the
-      // centre's counts (see warm in the rail); a side card's is ignored.
-      onCanPlayThrough={() => on && onThrough()}
+      // The word that the next film in the line may start downloading.
+      onCanPlayThrough={onThrough}
       className={`cf-film ${playing ? "opacity-100" : "opacity-0"}`}
     />
   );
@@ -367,16 +373,33 @@ export function CoverflowRail({
   // The design's centre card is the middle of the supplied list.
   const [active, setActive] = useState(Math.floor(items.length / 2));
   const touchX = useRef<number | null>(null);
-  // THE PLAYING FILM COMES FIRST ON THE LINE (Žilvinas 2026-10-17, from a
-  // phone: "the ads just sometimes gets stuck"): the neighbours' files are
-  // fetched only once the centre has buffered enough to play through —
-  // three films downloading at once on a phone's line starved the one
-  // that was playing, and it froze mid-frame. Reset on every move, so each
-  // new centre gets the line to itself first.
-  const [through, setThrough] = useState(false);
-  const onThrough = useCallback(() => setThrough(true), []);
+  // THE FILMS ARE FETCHED ONE AT A TIME, THE PLAYING ONE FIRST (Žilvinas
+  // 2026-10-17, from a phone: "the ads just sometimes gets stuck", then
+  // "don't do any second from picture static to video — immediately play
+  // video"). The centre downloads alone until it can play through — three
+  // films at once on a phone's line starved the one playing and froze it
+  // mid-frame — then the next card to the right, then the left, then the
+  // two beyond, each once the one before is through (WARM_ORDER). So an
+  // arrow pressed a moment later lands on a film that is already in hand
+  // and starts on the spot. `stage` is how far down that list the line has
+  // got; it starts over on every move, and a film fetched earlier reports
+  // itself through at once (RailVideo), so the chain skips it.
+  const [stage, setStage] = useState(0);
+  const onThrough = useCallback((d: number) => {
+    const k = d === 0 ? 0 : WARM_ORDER.indexOf(d) + 1;
+    if (k >= 0) setStage((s) => Math.max(s, k + 1));
+  }, []);
+  const throughHandlers = useRef(new Map<number, () => void>());
+  const throughFor = (d: number) => {
+    let h = throughHandlers.current.get(d);
+    if (!h) {
+      h = () => onThrough(d);
+      throughHandlers.current.set(d, h);
+    }
+    return h;
+  };
   const go = (by: number) => {
-    setThrough(false);
+    setStage(0);
     setActive((a) => (((a + by) % n) + n) % n);
   };
 
@@ -523,10 +546,12 @@ export function CoverflowRail({
                     file={item.video}
                     at={item.at}
                     on={d === 0 && live}
-                    warm={Math.abs(d) === 1 && live && through}
+                    warm={live && WARM_ORDER.indexOf(d) !== -1 && WARM_ORDER.indexOf(d) < stage}
                     sound={d === 0 && sound}
                     onBlocked={blocked}
-                    onThrough={onThrough}
+                    // Bound to this card's distance, so the rail knows which
+                    // film is through; the handler is stable per d.
+                    onThrough={throughFor(d)}
                   />
                   {d === 0 ? (
                     // The whole centre card is the sound toggle, as on the
