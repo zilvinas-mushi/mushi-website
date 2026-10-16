@@ -2517,6 +2517,40 @@ html[data-sheet] .tile-marquee-track {
   }
 }
 
+/* The "Now Booking" dot breathes like a live indicator (Žilvinas
+   2026-10-17): a ring of its own green leaves it every 1.8s and fades as it
+   grows, while the dot itself swells a touch. Compositor-only (transform and
+   opacity), and still for anyone who asked for less motion. */
+.live-dot {
+  position: relative;
+  animation: live-dot-breathe 1.8s ease-in-out infinite;
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: live-dot-ring 1.8s ease-out infinite;
+}
+@keyframes live-dot-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+@keyframes live-dot-ring {
+  0% { transform: scale(1); opacity: 0.55; }
+  70%, 100% { transform: scale(2.4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot,
+  .live-dot::after {
+    animation: none;
+  }
+  .live-dot::after {
+    display: none;
+  }
+}
+
 /* ----------------------------------------------- case study detail page --- */
 
 /* /case-studies/<slug>'s hero field: the frame's lit violet image and its dot

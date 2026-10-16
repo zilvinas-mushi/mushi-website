@@ -599,6 +599,21 @@ export function PlanSheet() {
   // never over the veil; the gate's own 4s limit bounds the wait.
   useEffect(() => {
     if (window.location.hash !== BUY_HASH) return;
+    // SOMEONE ARRIVING AT #buy HAS ASKED TO BUY (CLAUDE.md: never prepare
+    // Stripe for someone who has not), so Stripe is woken NOW, with the
+    // page, not when the sheet has risen: the webapp, Stripe.js's bytes,
+    // the chosen plan's session and its step — what a mouse resting on a
+    // Buy button gets. Without it the step was built after the rise and
+    // Buy held for it (Žilvinas 2026-10-17, from /case-studies' Buy Now:
+    // "the checkout is not instant. it should be instant").
+    // On a timer rather than in the effect's own body, which may not set
+    // state (react-hooks/set-state-in-effect): hover() marks the sheet
+    // prepared.
+    const warm = window.setTimeout(() => {
+      wakeCheckout();
+      preloadStripe();
+      hover();
+    }, 0);
     const root = document.documentElement;
     let opened = false;
     const whenReady = () => {
@@ -619,6 +634,7 @@ export function PlanSheet() {
     // this effect's own body.
     const frame = requestAnimationFrame(whenReady);
     return () => {
+      window.clearTimeout(warm);
       seen.disconnect();
       cancelAnimationFrame(frame);
     };

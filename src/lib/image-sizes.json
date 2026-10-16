@@ -1098,5 +1098,25 @@
   "untitled2.webp": {
     "w": 1600,
     "h": 1600
+  },
+  "case-studies/team-1.webp": {
+    "w": 100,
+    "h": 100
+  },
+  "case-studies/team-2.webp": {
+    "w": 100,
+    "h": 100
+  },
+  "case-studies/team-3.webp": {
+    "w": 100,
+    "h": 100
+  },
+  "case-studies/team-4.webp": {
+    "w": 100,
+    "h": 100
+  },
+  "case-studies/team-5.webp": {
+    "w": 100,
+    "h": 100
   }
 }

@@ -217,12 +217,21 @@ rising from its bottom edge, around the artwork (r20 / r17).
 
 Desktop: title Poppins Medium 50/50 at +44, +59; button h 57 r30 at +44, +180
 (204 / 246 wide), label SemiBold 24, disc 45 inset 6; feature rows at +376,
-+416, +456 (icon 25, text Regular 20 at +78); avatars 60 at +380, pitch 39;
-dot 15 + text Regular 20 at +461.
++416, +456 (icon boxes 25 / 28 x 25 / 25, text Regular 20 at +78); the team
+row (2026-10-17, Figma `4814:83`): rings 44.707 x 44.545, photo 38.32 at
+3.19 in, left edges at +43 + 0 / 35.58 / 72.82 / 101.78 / 136.54, top +396.8
+(bottom on the old row's line; the leftmost ring on top), ring #181818 with
+a 1px #222222 inside stroke, photos the file's 100px fills (`team-*.webp`);
+dot 15 in the frame, drawn 13 and pulsing (`.live-dot`), text Regular 20 at
++461. Until 2026-10-17 the row was 60 at +380 on a 39 pitch, baked into the
+card artwork — that row has been painted out of `scale-agency*.webp`.
 
 Phone: title Medium 24/26 at +25, +35; button h 42 (147 / 178 wide), label
-SemiBold 18, disc 32; rows at +213, +239, +264 (text Regular 16 at +49);
-avatars 35, pitch 23, at +221; dot 10 + text 16 at +269.
+SemiBold 18, disc 32; rows at +213, +239, +264 (icon boxes 16 / 17 x 15 / 15
+— nodes `4626:450/449/451` — text Regular 16 at +49); team row (`4933:2340`)
+rings 27.009 x 26.937, photo 23.15 at 1.93 in, left edges at +25 + 0 / 21.49
+/ 43.99 / 61.49 / 82.49, top +229; dot 10 in the frame, drawn 9 and pulsing,
+text 16 at +269. (Was: avatars 35, pitch 23, at +221.)
 
 Feature rows: 50+ new templates monthly · 24/7 customer support · Editable in
 Canva.
