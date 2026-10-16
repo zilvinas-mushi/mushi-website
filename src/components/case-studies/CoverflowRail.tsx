@@ -34,17 +34,24 @@ import { Img } from "@/components/shared/Img";
  * list twice puts a run of HIDDEN slots behind each end, so the wrap happens
  * between two invisible positions and what the visitor sees is one card
  * fading out at an edge and another fading in. A list with at least two
- * cards to spare (11 films, 13 statics) already has that run and is rendered
+ * cards to spare (11 films, 11 statics) already has that run and is rendered
  * once.
  *
  * ## The films
  *
  * Only the CENTRE card plays, and only while the rail is on screen: muted,
- * looping, from the top, fading in over its poster — the home rail's
- * behaviour (CreativeVideo) on one card at a time. Nothing is fetched until
- * the rail is in view; the playing card then hands a head start to the next
- * one along. A card that leaves the centre goes back to its poster. The
- * centre card is the sound toggle, and the frame's mute badge is its state.
+ * looping, fading in over its poster — the home rail's behaviour
+ * (CreativeVideo) on one card at a time. It starts AT THE POSTER'S FRAME
+ * (`at`, content.ts), not at 0: the poster is a still from later in the
+ * film, and a film that opened on a different picture looked like a card
+ * that had broken (Žilvinas 2026-10-17, red-x: 2.5 s of a beige infographic
+ * where the poster was a red cross). Now the first frame that fades in is
+ * the one already there, and the loop runs on from it through the hook.
+ * Nothing is fetched until the rail is in view; the playing card then hands
+ * a head start to BOTH its neighbours, since an arrow goes either way and a
+ * film fetched only on arrival started late on a real line. A card that
+ * leaves the centre goes back to its poster. The centre card is the sound
+ * toggle, and the frame's mute badge is its state.
  *
  * ## It starts finished
  *
@@ -250,7 +257,14 @@ function centreVars(k: "d" | "p", u: (n: number) => string, c: Slot) {
   };
 }
 
-export type RailItem = { src: string; phoneSrc?: string; alt: string; video?: string };
+export type RailItem = {
+  src: string;
+  phoneSrc?: string;
+  alt: string;
+  video?: string;
+  /** Where the film starts, in seconds: the moment its poster was cut from. */
+  at?: number;
+};
 
 /**
  * One card's film. `on` plays it, `warm` only starts its download. Everything
@@ -259,12 +273,15 @@ export type RailItem = { src: string; phoneSrc?: string; alt: string; video?: st
  */
 function RailVideo({
   file,
+  at = 0,
   on,
   warm,
   sound,
   onBlocked,
 }: {
   file: string;
+  /** The poster's moment, where playback starts and returns to. */
+  at?: number;
   on: boolean;
   warm: boolean;
   sound: boolean;
@@ -281,6 +298,10 @@ function RailVideo({
       v.setAttribute("src", `/videos/${file}`);
       v.preload = "auto";
       v.load();
+      // To the poster's frame as soon as the file can be seeked, so the
+      // first frame drawn is the one the poster already shows. A pending
+      // play() waits for the seek, so frame 0 is never painted.
+      if (at > 0) v.addEventListener("loadedmetadata", () => { v.currentTime = at; }, { once: true });
     }
     if (!on) {
       v.pause();
@@ -297,7 +318,7 @@ function RailVideo({
         void v.play().catch(() => {});
       }
     });
-  }, [on, warm, sound, file, onBlocked]);
+  }, [on, warm, sound, file, at, onBlocked]);
 
   return (
     <video
@@ -310,9 +331,10 @@ function RailVideo({
       onPlaying={() => setPlaying(true)}
       onPause={() => {
         setPlaying(false);
-        // Back to the top, so the next visit starts the ad from its hook.
+        // Back to the poster's frame, so the next visit fades in on the
+        // picture that is already there.
         const v = ref.current;
-        if (v) v.currentTime = 0;
+        if (v) v.currentTime = at;
       }}
       className={`cf-film ${playing ? "opacity-100" : "opacity-0"}`}
     />
@@ -471,8 +493,9 @@ export function CoverflowRail({
                 <>
                   <RailVideo
                     file={item.video}
+                    at={item.at}
                     on={d === 0 && live}
-                    warm={d === 1 && live}
+                    warm={Math.abs(d) === 1 && live}
                     sound={d === 0 && sound}
                     onBlocked={blocked}
                   />

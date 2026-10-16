@@ -189,7 +189,7 @@ card tops +35; arrow tops 1957 / 2514 / 2914. No mute badge.
 muted, looping, fading in over its poster; the centre card is the sound
 toggle and the mute badge is its state (`CoverflowRail.tsx`). Films and the
 extra statics were supplied 2026-10-04 — see ASSETS.md. The rails hold more
-than the frame draws (11 films, 13 statics); the frame's own cards sit in the
+than the frame draws (11 films, 11 statics — 13 until Hismile and the Sintra clothing ad were pulled 2026-10-17); the frame's own cards sit in the
 middle in its order, so the rest state is still the frame.
 
 Rail order as drawn, left to right (centre in bold):

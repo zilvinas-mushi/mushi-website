@@ -1383,12 +1383,15 @@ export const TEMPLATES_PAGE = {
 export const CASE_STUDIES_PAGE = {
   heading: "Case Studies",
   storyCta: "Read full story",
-  /** The same line on all four cards in the design — placeholder copy. */
-  body: "Capturing demand from day 1 and helping scale Holo into the largest AI content tool.",
+  /**
+   * `body` is each card's own line since 2026-10-17 (Žilvinas, off the
+   * updated frame). The file had carried Holo's on all four as a placeholder.
+   */
   cards: [
     {
       brand: "Holo",
       result: "From $0k/month to $117k/month in 7 months.",
+      body: "Capturing demand from day 1 and helping scale Holo into the largest AI content tool.",
       // Where the frames break the result: two lines on desktop, three on the
       // phone. AUTHORED, not left to the box width — Figma and the browser
       // disagree by about 1% on how wide Poppins Medium sets, and eany's
@@ -1410,6 +1413,7 @@ export const CASE_STUDIES_PAGE = {
     {
       brand: "Breezit",
       result: "Generated 700 sales calls & 1500 leads in 8 months.",
+      body: "Introducing the company’s new AI product to the US, with leads that buy, not just book.",
       lines: { desktop: [4, 5], phone: [2, 4, 3] },
       tag: "AI FOR SALES",
       tagW: 171,
@@ -1422,6 +1426,7 @@ export const CASE_STUDIES_PAGE = {
     {
       brand: "eany",
       result: "Helped find 3 evergreen ads for 8 figure company.",
+      body: "Turning wholesale sourcing into banger video ads that resellers stop scrolling for.",
       lines: { desktop: [4, 5], phone: [3, 3, 3] },
       tag: "B2B MARKETPLACE",
       tagW: 231,
@@ -1434,6 +1439,7 @@ export const CASE_STUDIES_PAGE = {
     {
       brand: "we interiors",
       result: "From $13k/month to $75k/month in 3 months.",
+      body: "Growing the DTC side of a supplier whose furniture already sells at John Lewis and NEXT.",
       lines: { desktop: [3, 4], phone: [2, 2, 3] },
       tag: "FURNITURE RETAIL",
       tagW: 221,
@@ -1446,23 +1452,27 @@ export const CASE_STUDIES_PAGE = {
   ],
   rails: {
     // Posters are frames of the films themselves, cut from the 1080 masters
-    // at the moment the design's still shows (design/ASSETS.md has the
-    // timestamps). The design's seven sit in the middle of the list in its
-    // order, Holo in the centre; the four it does not draw are at the ends.
+    // at the moment the design's still shows, and `at` is that moment in
+    // seconds (design/ASSETS.md): the film STARTS there, so it takes over
+    // from its poster without a jump (Žilvinas 2026-10-17, "this ad doesn't
+    // play" — red-x opens on 2.5 s of a still infographic nothing like its
+    // poster, so the card looked broken). The design's seven sit in the
+    // middle of the list in its order, Holo in the centre; the four it does
+    // not draw are at the ends.
     video: {
       title: "Video Ads",
       items: [
-        { src: "case-studies/video-shadow.webp", video: "case-studies/shadow.mp4", alt: "Shadow video ad: a founder's story" },
-        { src: "case-studies/video-skin-signs.webp", video: "case-studies/skin-signs.mp4", alt: "Skincare video ad: 4 warning signs your skin is aging" },
-        { src: "case-studies/video-red-x.webp", video: "case-studies/red-x.mp4", alt: "Video ad opening on a struck-through figure" },
-        { src: "case-studies/video-bride.webp", video: "case-studies/bride.mp4", alt: "Breezit video ad: a bride calls the venue at 10pm" },
-        { src: "case-studies/video-dog.webp", video: "case-studies/dog.mp4", alt: "Pet care video ad showing real customer results" },
-        { src: "case-studies/video-holo.webp", video: "case-studies/holo.mp4", alt: "Holo video ad: meet Holo" },
-        { src: "case-studies/video-office.webp", video: "case-studies/office.mp4", alt: "Video ad: in 15 minutes, a team at work" },
-        { src: "case-studies/video-celemi.webp", video: "case-studies/celemi.mp4", alt: "Celemi skincare video ad" },
-        { src: "case-studies/video-overpaying.webp", video: "case-studies/overpaying.mp4", alt: "Finance video ad: overpaying" },
-        { src: "case-studies/video-postpartum.webp", video: "case-studies/postpartum.mp4", alt: "Post-partum bra video ad, creator to camera" },
-        { src: "case-studies/video-tattoo.webp", video: "case-studies/tattoo.mp4", alt: "Sintra video ad: a tattoo studio owner" },
+        { src: "case-studies/video-shadow.webp", video: "case-studies/shadow.mp4", at: 1.5, alt: "Shadow video ad: a founder's story" },
+        { src: "case-studies/video-skin-signs.webp", video: "case-studies/skin-signs.mp4", at: 0.2, alt: "Skincare video ad: 4 warning signs your skin is aging" },
+        { src: "case-studies/video-red-x.webp", video: "case-studies/red-x.mp4", at: 6.733, alt: "Video ad opening on a struck-through figure" },
+        { src: "case-studies/video-bride.webp", video: "case-studies/bride.mp4", at: 1.7, alt: "Breezit video ad: a bride calls the venue at 10pm" },
+        { src: "case-studies/video-dog.webp", video: "case-studies/dog.mp4", at: 15.667, alt: "Pet care video ad showing real customer results" },
+        { src: "case-studies/video-holo.webp", video: "case-studies/holo.mp4", at: 0.533, alt: "Holo video ad: meet Holo" },
+        { src: "case-studies/video-office.webp", video: "case-studies/office.mp4", at: 4.833, alt: "Video ad: in 15 minutes, a team at work" },
+        { src: "case-studies/video-celemi.webp", video: "case-studies/celemi.mp4", at: 17.448, alt: "Celemi skincare video ad" },
+        { src: "case-studies/video-overpaying.webp", video: "case-studies/overpaying.mp4", at: 6.8, alt: "Finance video ad: overpaying" },
+        { src: "case-studies/video-postpartum.webp", video: "case-studies/postpartum.mp4", at: 3.0, alt: "Post-partum bra video ad, creator to camera" },
+        { src: "case-studies/video-tattoo.webp", video: "case-studies/tattoo.mp4", at: 0.2, alt: "Sintra video ad: a tattoo studio owner" },
       ],
     },
     landing: {
@@ -1485,24 +1495,27 @@ export const CASE_STUDIES_PAGE = {
         },
       ],
     },
-    // The design's five in its order around Hey Bud; the eight further
-    // statics supplied on 2026-10-04 run on either side of them.
+    // The design's five in its order around Hey Bud; the further statics
+    // supplied on 2026-10-04 run on either side of them. Hey Bud is the
+    // centre because it sits at floor(n / 2): with Hismile and the Sintra
+    // clothing ad gone (Žilvinas 2026-10-17, "remove this ad"), the inbox
+    // one moved from the left end to the right so that it still does. Viktor
+    // and the towels ad then traded places (Žilvinas 2026-10-17, "this ad
+    // should change order with this one").
     static: {
       title: "Static Ads",
       items: [
-        { src: "case-studies/static-inbox.webp", alt: "Inbox organizer static ad: built for people who live in their inbox" },
         { src: "case-studies/static-moerie.webp", alt: "Moerie static ad: your hair growth timeline" },
-        { src: "case-studies/static-viktor.webp", alt: "Viktor static ad: stop searching for perfect AI models" },
+        { src: "case-studies/static-towels.webp", alt: "Towel brand static ad with a customer review" },
         { src: "case-studies/static-beast.webp", alt: "Beast blender static ad" },
         { src: "case-studies/static-spacegoods.webp", alt: "Spacegoods static ad: goals for 2026" },
         { src: "case-studies/static-bluechew.webp", alt: "Bluechew static ad" },
         { src: "case-studies/static-heybud.webp", alt: "Hey Bud static ad: best seller for a reason" },
         { src: "case-studies/static-luckytime.webp", alt: "Lucky Fours static ad: luxury style without the luxury bill" },
-        { src: "case-studies/static-towels.webp", alt: "Towel brand static ad with a customer review" },
-        { src: "case-studies/static-hismile.webp", alt: "Hismile static ad: buy 3, get 2 free" },
+        { src: "case-studies/static-viktor.webp", alt: "Viktor static ad: stop searching for perfect AI models" },
         { src: "case-studies/static-fieldy.webp", alt: "Fieldy static ad: this isn't a necklace, it's your second brain" },
         { src: "case-studies/static-sintra-restaurant.webp", alt: "Sintra static ad: same food, different Tuesday" },
-        { src: "case-studies/static-sintra-clothing.webp", alt: "Sintra static ad: you style the pieces, Sintra styles the content" },
+        { src: "case-studies/static-inbox.webp", alt: "Inbox organizer static ad: built for people who live in their inbox" },
       ],
     },
   },

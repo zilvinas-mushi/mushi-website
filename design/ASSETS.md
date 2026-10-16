@@ -390,7 +390,7 @@ files needed what, is in [CASE-STUDIES.md](CASE-STUDIES.md).
 | `art-<brand>.webp`, `art-<brand>-phone.webp` | case-card artwork: gradient tile + device, breaking out of the tile | ~300 × 350, ~130–183 × 285 | 3x |
 | `video-*.webp` (+ `-sm`) | Video Ads posters (11) — frames of the films, see below | up to 342 × 564 | 900 / 540 wide |
 | `landing-*.webp`, `landing-*-phone.webp` | Landing Pages (3), cropped from the top of the page | 738 × 413, 240 × 398 | source, 1240 / 728 wide |
-| `static-*.webp` (+ `-sm`) | Static Ads (13) — from the 6000px masters supplied 2026-10-04; the two Sintra ones were supplied at 1080, and `towels` is still the Figma file's 1080 | up to 484 | 1452 (3x) / 726 |
+| `static-*.webp` (+ `-sm`) | Static Ads (11; Hismile and the Sintra clothing ad were pulled 2026-10-17) — from the 6000px masters supplied 2026-10-04; the two Sintra ones were supplied at 1080, and `towels` is still the Figma file's 1080 | up to 484 | 1452 (3x) / 726 |
 | `scale-templates*.webp`, `scale-agency*.webp` | Ready To Scale card artwork | 585 × 525, 345 × 309 | 2x / 3x |
 | `detail-field.webp`, `detail-field-phone.webp` | the detail page's hero field (image at 88% / 97% + dots) | 1920 × 617, 375 × 598 | 2x / 3x |
 | `detail-call.webp`, `detail-call-phone.webp` | the call card's panel, phone and fade | 327 × 318, 306 × 278 | 3x |
@@ -408,7 +408,9 @@ centre card here is 342 wide rather than 300: **720 × 1280, H.264 CRF 25,
 30 fps, AAC 96k, `+faststart`** — 69 MB across the eleven.
 
 Each poster is a frame of its own film, cut from the master at the timestamp
-below. For the seven the design draws, that timestamp was FOUND by matching
+below — and since 2026-10-17 the film STARTS at that timestamp (`at` in
+`CASE_STUDIES_PAGE.rails.video`, CoverflowRail), so it takes over from its
+poster on the same picture. For the seven the design draws, that timestamp was FOUND by matching
 the design's still against every frame of every master — not read off the
 file names, which do not say which ad is which.
 

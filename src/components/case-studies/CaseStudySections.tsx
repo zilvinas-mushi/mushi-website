@@ -213,7 +213,7 @@ export function Broken({
 }
 
 export function CaseStudiesHero() {
-  const { heading, body, cards } = CASE_STUDIES_PAGE;
+  const { heading, cards } = CASE_STUDIES_PAGE;
   return (
     <section
       aria-labelledby="cs-heading"
@@ -330,7 +330,7 @@ export function CaseStudiesHero() {
                   <Broken text={card.result} lines={card.lines} />
                 </h2>
                 <p className="mt-[9.5px] w-[174px] text-[14px] font-normal leading-[20px] text-white/50 md:mt-[0.9375rem] md:w-[35.5rem] md:text-[1.5rem] md:leading-[2rem]">
-                  {body}
+                  {card.body}
                 </p>
                 {/* 23.5, not the frame's 24.5: the body above is seated 1px low so
                     its ink lands on Figma's, and this takes that pixel back so
