@@ -156,7 +156,7 @@ function FooterLink({
  *
  * TWO COLUMNS ON THE PHONE, ONE FROM md UP. The 2026-08-28 artboard sets the
  * links in a pair of columns under each head — "500+ Static Templates" beside
- * "Agency Services", "Money-Back Guarantee" beside "Refund Policy" — where the
+ * "Agency Services", "Terms & Conditions" beside "Privacy Policy" — where the
  * earlier one ran a single centred list.
  *
  * The second column's stop is 213 of the 345 content column, measured off the
@@ -167,12 +167,14 @@ function FooterLink({
  * is the window's below 375.
  *
  * COLUMN-MAJOR, which is what makes the order right without a second array.
- * The artboard reads Money-Back / Terms down the left and Refund / Privacy
- * down the right, and FOOTER.legal is already in that order (it is the phone's
- * own sequence — desktop has its own). Row-major would interleave the two and
- * put Terms opposite Money-Back. `grid-flow-col` with the row count pinned to
- * ceil(n / 2) fills down-then-across for any length: 2 links land side by
- * side, 4 land as two rows of two, 1 sits alone.
+ * The artboard read Money-Back / Terms down the left and Refund / Privacy
+ * down the right; with Money-Back gone (content.ts, LEGAL) the same fill puts
+ * Terms / Refund down the left and Privacy alone on the right, and
+ * FOOTER.legal is already in that order (it is the phone's own sequence —
+ * desktop has its own). Row-major would interleave the two. `grid-flow-col`
+ * with the row count pinned to ceil(n / 2) fills down-then-across for any
+ * length: 2 links land side by side, 3 land as two left and one right, 1 sits
+ * alone.
  *
  * The row template is an inline style because it is computed per group. It is
  * inert from md up, where the list is `display: block` and spaced by
@@ -544,8 +546,8 @@ export function SiteFooter() {
               copyright on the column's left edge and the legal cluster running
               from the PRODUCTS stop (599) to the right edge (1380), i.e. 781
               wide. Splitting it that way is what lets `justify-between` hold
-              BOTH of the design's alignments at once — the four labels are set
-              in type, which does not compress with the column, so a fixed 48
+              BOTH of the design's alignments at once — the labels are set in
+              type, which does not compress with the column, so a fixed 48
               gap can only keep one end flush. Here the gaps absorb it. */}
           <div className="flex flex-col gap-5 text-center text-[0.875rem] md:grid md:grid-cols-[599fr_781fr] md:items-center md:gap-0 md:text-left md:text-[1.125rem]">
             <p className="leading-none text-white/50 md:leading-none">
@@ -555,11 +557,12 @@ export function SiteFooter() {
               <span className="md:hidden">{FOOTER.copyright}</span>
               <span className="hidden md:inline">{FOOTER.copyrightDesktop}</span>
             </p>
-            {/* Right-aligned cluster with a 48 gap — the export's four x
-                positions difference to 48 / 48 / 49, and its last label ends
-                at 1650, the column's right edge, which is what right alignment
-                reproduces. The cluster's left edge then lands on 599, i.e.
-                under PRODUCTS, exactly as the design has it. */}
+            {/* The export's x positions difference to 48 / 48 / 49, its
+                fourth label ended at 1650, the column's right edge, and the
+                cluster's left edge lands on 599, i.e. under PRODUCTS, exactly
+                as the design has it. The fourth label (Money-Back Guarantee)
+                is gone — see content.ts, LEGAL — so the row now ends after
+                Refund Policy; the three that remain have not moved. */}
             {/* Desktop only. On the phone the same links are a LEGAL group up
                 with the other columns, which is where the artboard puts them —
                 rendered as a second node rather than reordered with CSS
@@ -569,13 +572,15 @@ export function SiteFooter() {
               {/* leading-none on the LIST, not just on the links: an <li>'s own
                   strut sets its line box, so links set solo still sat in 27
                   tall rows and pushed the bar's centre 4.7 low. */}
-              {/* The export's four stops — 599 / 770 / 994 / 1164 from the
-                  content edge, so widths 171 / 224 / 170 / 216 inside this
-                  781-wide region. Positioning each label rather than spacing
-                  them is what makes the row exact: rendered advances are a
-                  few px narrower than Figma's text boxes, so any single gap
-                  value lands one end right and the other end wrong. */}
-              <ul className="grid grid-cols-[171fr_224fr_170fr_216fr] leading-none">
+              {/* The export's stops — 599 / 770 / 994 from the content edge,
+                  so widths 171 / 224 inside this 781-wide region, and the
+                  last track takes the rest (170 + the dropped fourth's 216 =
+                  386) so Refund stays on its measured stop with nothing after
+                  it. Positioning each label rather than spacing them is what
+                  makes the row exact: rendered advances are a few px narrower
+                  than Figma's text boxes, so any single gap value lands one
+                  end right and the other end wrong. */}
+              <ul className="grid grid-cols-[171fr_224fr_386fr] leading-none">
                 {FOOTER.legalDesktop.map((link) => (
                   <li key={link.label}>
                     {/* leading-none, so the bar is exactly its own 18 tall.
@@ -583,10 +588,10 @@ export function SiteFooter() {
                         both this row's centre and the footer's bottom edge 9
                         below the design's 353.5 and 425.
 
-                        nowrap because the last stop is the tightest: 216 of
-                        track for a label that sets 214.9. A wrap there is not
-                        a small error — it doubles the row and takes the whole
-                        footer to 443. */}
+                        nowrap because the stops are tight: 171 of track for
+                        a label that sets ~165. A wrap there is not a small
+                        error — it doubles the row and takes the whole footer
+                        to 443. */}
                     <FooterLink
                       href={link.href}
                       className="whitespace-nowrap leading-none"

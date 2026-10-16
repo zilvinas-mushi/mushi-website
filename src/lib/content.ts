@@ -1623,15 +1623,17 @@ export const CASE_STUDY_CALL = {
 /** The bottom bar's links, declared once and ordered per frame below. */
 /**
  * The three documents live at /legal/<slug> (src/lib/legal.ts, one page
- * rendering all three) since 2026-10-10. The Money-Back Guarantee is section
- * 1 of the Refund Policy, so it goes there. Before that every entry carried
+ * rendering all three) since 2026-10-10. Before that every entry carried
  * `href: null` and the footer rendered it as text — see the note on NAV.
+ *
+ * There is no "Money-Back Guarantee" entry any more (Žilvinas 2026-10-17):
+ * the frames drew it as a fourth document, but the guarantee turned out to
+ * be section 1 of the Refund Policy, and one link to that policy is enough.
  */
 const LEGAL = {
   privacy: { label: "Privacy Policy", href: "/legal/privacy-policy" },
   terms: { label: "Terms & Conditions", href: "/legal/terms-and-conditions" },
   refund: { label: "Refund Policy", href: "/legal/refund-policy" },
-  guarantee: { label: "Money-Back Guarantee", href: "/legal/refund-policy#section-1" },
 } as const;
 
 /**
@@ -1683,19 +1685,21 @@ export const FOOTER = {
   /** 4.9 is the score the awards row already carries — see TrustBadges. */
   trustpilot: { label: "Trustpilot", score: "4.9" },
   /**
-   * The bottom bar's four links. The two frames list them in DIFFERENT orders,
-   * so the sequence cannot be shared even though the entries are:
+   * The bottom bar's three links. The two frames list them in DIFFERENT
+   * orders, so the sequence cannot be shared even though the entries are:
    *
-   *   phone  (node `4167:278`)  Money-Back · Terms · Refund · Privacy
-   *   desktop (node `4167:280`) Privacy · Terms · Refund · Money-Back
+   *   phone  (node `4167:278`)  [Money-Back] · Terms · Refund · Privacy
+   *   desktop (node `4167:280`) Privacy · Terms · Refund · [Money-Back]
    *
    * The desktop order is not an assumption — it is that node's own x positions,
-   * 869 / 1040 / 1264 / 1434, and the reference screenshot reads the same way.
-   * Both arrays hold the SAME objects, so a copy or href change lands in both
-   * and the two can never drift into being different links.
+   * 869 / 1040 / 1264 (and 1434 for the dropped fourth), and the reference
+   * screenshot reads the same way. Money-Back is gone from both (see LEGAL);
+   * the three that remain keep the frames' order and positions. Both arrays
+   * hold the SAME objects, so a copy or href change lands in both and the two
+   * can never drift into being different links.
    */
-  legal: [LEGAL.guarantee, LEGAL.terms, LEGAL.refund, LEGAL.privacy],
-  legalDesktop: [LEGAL.privacy, LEGAL.terms, LEGAL.refund, LEGAL.guarantee],
+  legal: [LEGAL.terms, LEGAL.refund, LEGAL.privacy],
+  legalDesktop: [LEGAL.privacy, LEGAL.terms, LEGAL.refund],
   /**
    * Also per frame: the phone artboard sets a comma and no symbol, the desktop
    * node `4134:633` sets "Copyright © 2026 All Rights Reserved". Verbatim from

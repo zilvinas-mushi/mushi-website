@@ -176,7 +176,8 @@ the awards row.
 - CONTACT: support@mushi.agency, then the social row — Instagram · LinkedIn ·
   TikTok · Facebook, in that left-to-right order
 - Bottom bar: Copyright © 2026 All Rights Reserved · Privacy Policy ·
-  Terms & Conditions · Refund Policy · Money-Back Guarantee
+  Terms & Conditions · Refund Policy *(the frame's fourth link, Money-Back
+  Guarantee, was dropped 2026-10-17 — it is section 1 of the Refund Policy)*
 
 ---
 
@@ -354,8 +355,8 @@ Source: ninth supplied screenshot, 2026-09-03. Replaces the earlier footer deck.
 - CONTACT: support@mushi.agency · socials as icon discs (IG · LinkedIn ·
   TikTok · FB)
 - Legal bar: Copyright © 2026 All Rights Reserved · Privacy Policy · Terms &
-  Conditions · Refund Policy · Money-Back Guarantee *(targets are placeholder
-  anchors until the legal pages exist)*
+  Conditions · Refund Policy *(the frame also draws Money-Back Guarantee;
+  dropped 2026-10-17, it is section 1 of the Refund Policy)*
 
 ## Section — FAQ
 
