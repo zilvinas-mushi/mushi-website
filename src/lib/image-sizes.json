@@ -163,11 +163,35 @@
     "w": 1264,
     "h": 709
   },
-  "case-studies/scale-agency-phone.webp": {
+  "case-studies/landing-sintra-quiz-phone.webp": {
+    "w": 728,
+    "h": 1188
+  },
+  "case-studies/landing-sintra-quiz.webp": {
+    "w": 1264,
+    "h": 705
+  },
+  "case-studies/landing-sintra-salons-phone.webp": {
+    "w": 728,
+    "h": 1188
+  },
+  "case-studies/landing-sintra-salons.webp": {
+    "w": 1264,
+    "h": 706
+  },
+  "case-studies/landing-trendy-phone.webp": {
+    "w": 728,
+    "h": 1188
+  },
+  "case-studies/landing-trendy.webp": {
+    "w": 1264,
+    "h": 706
+  },
+  "case-studies/scale-agency-phone-v2.webp": {
     "w": 1035,
     "h": 927
   },
-  "case-studies/scale-agency.webp": {
+  "case-studies/scale-agency-v2.webp": {
     "w": 1755,
     "h": 1575
   },
@@ -270,6 +294,26 @@
   "case-studies/static-viktor.webp": {
     "w": 1452,
     "h": 1452
+  },
+  "case-studies/team-1.webp": {
+    "w": 100,
+    "h": 100
+  },
+  "case-studies/team-2.webp": {
+    "w": 100,
+    "h": 100
+  },
+  "case-studies/team-3.webp": {
+    "w": 100,
+    "h": 100
+  },
+  "case-studies/team-4.webp": {
+    "w": 100,
+    "h": 100
+  },
+  "case-studies/team-5.webp": {
+    "w": 100,
+    "h": 100
   },
   "case-studies/video-bride-sm.webp": {
     "w": 540,
@@ -907,11 +951,11 @@
     "w": 2400,
     "h": 1503
   },
-  "templates/hero-phone-sm.webp": {
+  "templates/hero-phone-v2-sm.webp": {
     "w": 726,
     "h": 956
   },
-  "templates/hero-phone.webp": {
+  "templates/hero-phone-v2.webp": {
     "w": 1089,
     "h": 1434
   },
@@ -1098,49 +1142,5 @@
   "untitled2.webp": {
     "w": 1600,
     "h": 1600
-  },
-  "case-studies/team-1.webp": {
-    "w": 100,
-    "h": 100
-  },
-  "case-studies/team-2.webp": {
-    "w": 100,
-    "h": 100
-  },
-  "case-studies/team-3.webp": {
-    "w": 100,
-    "h": 100
-  },
-  "case-studies/team-4.webp": {
-    "w": 100,
-    "h": 100
-  },
-  "case-studies/team-5.webp": {
-    "w": 100,
-    "h": 100
-  },
-  "case-studies/landing-trendy.webp": {
-    "w": 1264,
-    "h": 706
-  },
-  "case-studies/landing-sintra-quiz.webp": {
-    "w": 1264,
-    "h": 705
-  },
-  "case-studies/landing-sintra-salons.webp": {
-    "w": 1264,
-    "h": 706
-  },
-  "case-studies/landing-trendy-phone.webp": {
-    "w": 728,
-    "h": 1188
-  },
-  "case-studies/landing-sintra-salons-phone.webp": {
-    "w": 728,
-    "h": 1188
-  },
-  "case-studies/landing-sintra-quiz-phone.webp": {
-    "w": 728,
-    "h": 1188
   }
 }

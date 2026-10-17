@@ -2720,7 +2720,7 @@ function AppWindow() {
       <div className="relative md:mx-auto md:aspect-[2400/1503] md:w-[min(100cqw,calc(100cqh*2400/1503))]">
         {/* THE PHONE WITH ITS BORDER AND GLOW IS THE RASTER ITSELF (Žilvinas
             2026-10-17, "use this if you couldn't replicate one to one"):
-            hero-phone*.webp are cut from his export of the frame's "Whole
+            hero-phone-v2*.webp are cut from his export of the frame's "Whole
             iphone with border" (node 4564:77) — the 279-wide bordered body,
             the white glow around it (~43 each side) and transparent corners,
             at 3x and 2x. Nothing is drawn around it in CSS any more; a ring
@@ -2814,15 +2814,17 @@ function AppWindow() {
           and a positioned element paints over in-flow content whatever the
           order, so the device has to be positioned to stay on top of it. */}
       <Img
-        src="templates/hero-phone.webp"
+        // -v2: a new name for the new cut, so no cache serves the old phone
+        // (Cloudflare keeps an image 4h under its URL).
+        src="templates/hero-phone-v2.webp"
         alt="The Mushi template library: ad templates with industry and sort filters"
         // 363 wide: the 279 bordered body plus the glow either side. The
         // glow above the body (43.6) is pulled back with a negative top
         // margin, so the border's top edge sits exactly where the old
         // raster's did and the block below does not move.
         width={363}
-        // TWO CUTS OF THE PHONE (2026-09-25): hero-phone-sm.webp is the same
-        // render at 2x, hero-phone.webp at 3x. With `sizes` at the drawn
+        // TWO CUTS OF THE PHONE (2026-09-25): hero-phone-v2-sm.webp is the
+        // same render at 2x, hero-phone-v2.webp at 3x. With `sizes` at the drawn
         // width, a 3x iPhone takes the 3x and a 2x phone — or PageSpeed's
         // 1.75x Moto — takes the 2x and fewer KB on the one request the
         // first screen waits for. Img emits the srcset from the -sm name;

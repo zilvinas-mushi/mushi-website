@@ -391,7 +391,7 @@ files needed what, is in [CASE-STUDIES.md](CASE-STUDIES.md).
 | `video-*.webp` (+ `-sm`) | Video Ads posters (11) — frames of the films, see below | up to 342 × 564 | 900 / 540 wide |
 | `landing-*.webp`, `landing-*-phone.webp` | Landing Pages (3), cropped from the top of the page | 738 × 413, 240 × 398 | source, 1240 / 728 wide |
 | `static-*.webp` (+ `-sm`) | Static Ads (11; Hismile and the Sintra clothing ad were pulled 2026-10-17) — from the 6000px masters supplied 2026-10-04; the two Sintra ones were supplied at 1080, and `towels` is still the Figma file's 1080 | up to 484 | 1452 (3x) / 726 |
-| `scale-templates*.webp`, `scale-agency*.webp` | Ready To Scale card artwork | 585 × 525, 345 × 309 | 2x / 3x |
+| `scale-templates*.webp`, `scale-agency*-v2.webp` | Ready To Scale card artwork | 585 × 525, 345 × 309 | 2x / 3x |
 | `detail-field.webp`, `detail-field-phone.webp` | the detail page's hero field (image at 88% / 97% + dots) | 1920 × 617, 375 × 598 | 2x / 3x |
 | `detail-call.webp`, `detail-call-phone.webp` | the call card's panel, phone and fade | 327 × 318, 306 × 278 | 3x |
 | `detail-holo-thumb.webp` | Holo's hero still | 680 × 383 | source, 1229 wide |

@@ -224,7 +224,7 @@ row (2026-10-17, Figma `4814:83`): rings 44.707 x 44.545, photo 38.32 at
 a 1px #222222 inside stroke, photos the file's 100px fills (`team-*.webp`);
 dot 15 in the frame, drawn 13 and pulsing (`.live-dot`), text Regular 20 at
 +461. Until 2026-10-17 the row was 60 at +380 on a 39 pitch, baked into the
-card artwork — that row has been painted out of `scale-agency*.webp`.
+card artwork — that row has been painted out of `scale-agency*-v2.webp` (renamed on the change so Cloudflare's 4h cache could not keep serving the old bytes).
 
 Phone: title Medium 24/26 at +25, +35; button h 42 (147 / 178 wide), label
 SemiBold 18, disc 32; rows at +213, +239, +264 (icon boxes 16 / 17 x 15 / 15
