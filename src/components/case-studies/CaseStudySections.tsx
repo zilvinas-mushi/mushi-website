@@ -545,15 +545,16 @@ export function ReadyToScale() {
           {/* THE TEAM, five faces in dark rings, each ring a little over the
               next (the leftmost on top), as the updated frame draws them
               (Žilvinas 2026-10-17, "the design was changed a bit"): rings
-              of 44.707 x 44.545 (phone 27.009 x 26.937), the photo 38.32
-              (23.15) inside at 3.19 (1.93), and the frame's own uneven
-              pitches — Figma nodes 4814:83 and 4933:2340. The rings used to
-              be baked into the card's artwork at 60 (35) on a 39 (23) pitch;
-              they are live now, and the artwork has had that row painted
-              out. The ring is #181818 with the file's 1px #222222 inside
-              stroke. The photos are the frame's own 100px fills. Left edge
-              on the text column (+43 / +25); bottom edge where the old row's
-              was. */}
+              of 44.707 x 44.545 (phone 27.009 x 26.937) on the frame's own
+              uneven pitches — Figma nodes 4814:83 and 4933:2340. Each ring
+              is ONE PICTURE, his export of the frame's ring with the photo,
+              halo and stroke in it (team-*-v2.webp, 360px for a 45 box —
+              "they must be highest quality"): the file's own fills for this
+              row come out of the MCP as 100px stock placeholders, so the
+              export is the only true source. The rings used to be baked
+              into the card's artwork at 60 (35) on a 39 (23) pitch; that
+              row is painted out. Left edge on the text column (+43 / +25);
+              bottom edge where the old row's was. */}
           <ul
             role="list"
             aria-label="The Mushi team"
@@ -565,13 +566,13 @@ export function ReadyToScale() {
                 // Both lefts come through variables: an inline `left` would
                 // win over the md: class at every width and stack the five
                 // on the phone's spot on the desktop.
-                className="absolute left-[calc(var(--cu)*var(--px))] top-0 grid size-[calc(var(--cu)*27.009)] place-items-center rounded-full bg-[#181818] shadow-[inset_0_0_0_calc(var(--cu)*1)_#222222] md:left-[var(--dx)] md:h-[2.784rem] md:w-[2.794rem] md:shadow-[inset_0_0_0_1px_#222222]"
+                className="absolute left-[calc(var(--cu)*var(--px))] top-0 size-[calc(var(--cu)*27.009)] md:left-[var(--dx)] md:h-[2.784rem] md:w-[2.794rem]"
                 style={{ zIndex: 5 - i, "--px": face.phoneX, "--dx": r(face.desktopX) } as CSSProperties}
               >
                 <Img
                   src={`case-studies/${face.src}`}
                   alt={face.alt}
-                  className="size-[calc(var(--cu)*23.15)] rounded-full md:size-[2.395rem]"
+                  className="size-full"
                 />
               </li>
             ))}
