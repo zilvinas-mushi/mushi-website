@@ -409,7 +409,8 @@ Four cards, in this order on both breakpoints. Line breaks are the frames':
 ## Rails
 
 - H2: Video Ads
-- H2: Landing Pages
+- H2: Landing Pages — six cards since 2026-10-17: Trendy AI News · Sintra
+  plan · Sintra for salons · Sintra home (centre) · Axiometa · Sintra quiz
 - H2: Static Ads
 
 ## Ready To Scale?

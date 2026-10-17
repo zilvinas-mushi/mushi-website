@@ -1473,11 +1473,29 @@ export const CASE_STUDIES_PAGE = {
     },
     landing: {
       title: "Landing Pages",
+      // Six since 2026-10-17 (Žilvinas: "add additional landing pages"):
+      // the three new ones — Trendy AI News, Sintra for salons, the Sintra
+      // quiz — are the Figma file's own fills (Mask groups 5614:19 / 38 /
+      // 26), cut to the card's 618 x 345 from the top. The file has no
+      // phone versions of them, so their -phone cuts are portrait crops of
+      // the same band, each centred on its headline (Trendy 33%, salons
+      // 42%, quiz 50% across) rather than the middle of the shot. Sintra
+      // home stays the centre card: floor(6 / 2) is the fourth entry.
       items: [
+        {
+          src: "case-studies/landing-trendy.webp",
+          phoneSrc: "case-studies/landing-trendy-phone.webp",
+          alt: "Trendy AI News: the best AI tools for businesses in 2026",
+        },
         {
           src: "case-studies/landing-sintra-plan.webp",
           phoneSrc: "case-studies/landing-sintra-plan-phone.webp",
           alt: "Sintra pricing landing page",
+        },
+        {
+          src: "case-studies/landing-sintra-salons.webp",
+          phoneSrc: "case-studies/landing-sintra-salons-phone.webp",
+          alt: "Sintra for beauty salons: automate social media and get new clients",
         },
         {
           src: "case-studies/landing-sintra-home.webp",
@@ -1488,6 +1506,11 @@ export const CASE_STUDIES_PAGE = {
           src: "case-studies/landing-axiometa.webp",
           phoneSrc: "case-studies/landing-axiometa-phone.webp",
           alt: "Axiometa product landing page",
+        },
+        {
+          src: "case-studies/landing-sintra-quiz.webp",
+          phoneSrc: "case-studies/landing-sintra-quiz-phone.webp",
+          alt: "Sintra quiz: Claude is for hobbies, Sintra is for business",
         },
       ],
     },

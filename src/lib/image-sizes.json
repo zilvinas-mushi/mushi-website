@@ -1118,5 +1118,29 @@
   "case-studies/team-5.webp": {
     "w": 100,
     "h": 100
+  },
+  "case-studies/landing-trendy.webp": {
+    "w": 1264,
+    "h": 706
+  },
+  "case-studies/landing-sintra-quiz.webp": {
+    "w": 1264,
+    "h": 705
+  },
+  "case-studies/landing-sintra-salons.webp": {
+    "w": 1264,
+    "h": 706
+  },
+  "case-studies/landing-trendy-phone.webp": {
+    "w": 728,
+    "h": 1188
+  },
+  "case-studies/landing-sintra-salons-phone.webp": {
+    "w": 728,
+    "h": 1188
+  },
+  "case-studies/landing-sintra-quiz-phone.webp": {
+    "w": 728,
+    "h": 1188
   }
 }

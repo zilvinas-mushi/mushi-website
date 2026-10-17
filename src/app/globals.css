@@ -2405,7 +2405,17 @@ html[data-sheet] .tile-marquee-track {
     background 300ms ease-out,
     color 300ms ease-out;
 }
-.cf-arrow:hover {
+/* The inversion is for a pointer that can hover. On a touch screen :hover
+   is set by the tap and stays until the next tap somewhere else, which left
+   a pressed arrow stuck white (Žilvinas 2026-10-17, "once you pressed gets
+   inverted stuck"); a finger gets the inversion only while it is down. */
+@media (hover: hover) {
+  .cf-arrow:hover {
+    background: linear-gradient(#fff, #fff);
+    color: #343434;
+  }
+}
+.cf-arrow:active {
   background: linear-gradient(#fff, #fff);
   color: #343434;
 }
