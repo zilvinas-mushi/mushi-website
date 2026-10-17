@@ -504,9 +504,13 @@ export function ReadyToScale() {
 
         {/* Done-for-you → the call. */}
         <article className={CARD}>
+          {/* -v2 (2026-10-17): the files changed under their old names when
+              the avatar row was painted out, and Cloudflare kept serving the
+              old bytes for its 4h — the new live row sat over the baked one
+              ("now two"). A changed picture gets a new name. */}
           <Img
-            src="case-studies/scale-agency.webp"
-            alternate={{ src: "case-studies/scale-agency-phone.webp", media: "(max-width: 767px)" }}
+            src="case-studies/scale-agency-v2.webp"
+            alternate={{ src: "case-studies/scale-agency-phone-v2.webp", media: "(max-width: 767px)" }}
             alt=""
             className="absolute inset-0 size-full"
           />
