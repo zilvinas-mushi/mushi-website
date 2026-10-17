@@ -260,6 +260,22 @@ function centreVars(k: "d" | "p", u: (n: number) => string, c: Slot) {
 /** The order the films beyond the centre are fetched in, by distance from it. */
 const WARM_ORDER: readonly number[] = [1, -1, 2, -2];
 
+/**
+ * Gives a card's <video> its file, once, and seeks it to its poster's frame
+ * as soon as it can be seeked — so the first frame drawn is the one already
+ * on screen. Called from the effect that plays a card AND from inside a tap
+ * or an arrow press (see go/press): a browser that only starts media on a
+ * gesture needs the file in place within that gesture.
+ */
+function prime(v: HTMLVideoElement): void {
+  if (v.getAttribute("src")) return;
+  v.setAttribute("src", `/videos/${v.dataset.file}`);
+  v.preload = "auto";
+  v.load();
+  const at = Number(v.dataset.at ?? 0);
+  if (at > 0) v.addEventListener("loadedmetadata", () => { v.currentTime = at; }, { once: true });
+}
+
 export type RailItem = {
   src: string;
   phoneSrc?: string;
@@ -282,7 +298,9 @@ function RailVideo({
   sound,
   onBlocked,
   onThrough,
+  onRefused,
   slot,
+  index,
 }: {
   file: string;
   /** This card's distance from the centre, handed back with onThrough. */
@@ -296,6 +314,10 @@ function RailVideo({
   onBlocked: () => void;
   /** This film has buffered enough to play through — the rail's cue to fetch the next one. */
   onThrough: (slot: number) => void;
+  /** The browser would not play this film at all, even muted: the rail hands the start to a tap. */
+  onRefused: () => void;
+  /** The card's index in the ring, for the rail to find this film inside a gesture. */
+  index?: number;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -303,15 +325,7 @@ function RailVideo({
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if ((on || warm) && !v.getAttribute("src")) {
-      v.setAttribute("src", `/videos/${file}`);
-      v.preload = "auto";
-      v.load();
-      // To the poster's frame as soon as the file can be seeked, so the
-      // first frame drawn is the one the poster already shows. A pending
-      // play() waits for the seek, so frame 0 is never painted.
-      if (at > 0) v.addEventListener("loadedmetadata", () => { v.currentTime = at; }, { once: true });
-    }
+    if (on || warm) prime(v);
     // A film fetched on an earlier visit is through already and will not
     // say so again — the rail asks each time it is centre or warm, so the
     // chain of downloads moves on past it.
@@ -322,16 +336,31 @@ function RailVideo({
       return;
     }
     v.muted = !sound;
-    void v.play().catch((err: DOMException) => {
-      // Sound without a gesture the browser will accept (Safari, after the
-      // rail has moved on its own): keep the film, lose the sound.
-      if (err?.name === "NotAllowedError" && !v.muted) {
-        v.muted = true;
-        onBlocked();
-        void v.play().catch(() => {});
-      }
-    });
-  }, [on, warm, sound, file, at, onBlocked, onThrough, slot]);
+    // EVERY REFUSAL IS ANSWERED (Žilvinas 2026-10-18, "why this video still
+    // sometimes doesn't play"): a play() the browser turns down used to be
+    // handled only when it was unmuted — the muted retry, and a muted film
+    // refused outright (iOS Low Power Mode, a card that arrived while the
+    // page was being scrolled), were swallowed, and the film sat on its
+    // poster looking stuck. Now: refused with sound → muted, told, retried;
+    // refused muted → the rail is told, the badge becomes Play, and the
+    // next tap starts it inside the gesture. An AbortError is not a
+    // refusal — another change of state took the element over — and is
+    // left alone.
+    void v
+      .play()
+      .catch((err: DOMException) => {
+        if (err?.name === "AbortError") return;
+        if (!v.muted) {
+          v.muted = true;
+          onBlocked();
+          return v.play();
+        }
+        throw err;
+      })
+      .catch((err: DOMException) => {
+        if (err?.name !== "AbortError") onRefused();
+      });
+  }, [on, warm, sound, file, at, onBlocked, onThrough, onRefused, slot]);
 
   return (
     <video
@@ -353,6 +382,9 @@ function RailVideo({
       }}
       // The word that the next film in the line may start downloading.
       onCanPlayThrough={() => onThrough(slot)}
+      data-file={file}
+      data-at={at || undefined}
+      data-rail-film={index}
       data-playing={playing || undefined}
       className="cf-film"
     />
@@ -397,7 +429,19 @@ export function CoverflowRail({
   }, []);
   const go = (by: number) => {
     setStage(0);
-    setActive((a) => (((a + by) % n) + n) % n);
+    const next = (((active + by) % n) + n) % n;
+    // The film that is about to be centre is started HERE, inside the
+    // press — with its file set if it has none yet — for the browsers that
+    // only start media within a gesture (iOS, Low Power Mode). The effect
+    // that follows the state change plays it too; a second play() on a
+    // playing film is a no-op.
+    const v = root.current?.querySelector<HTMLVideoElement>(`video[data-rail-film="${next}"]`);
+    if (v && live) {
+      prime(v);
+      v.muted = !sound;
+      void v.play().catch(() => {});
+    }
+    setActive(next);
   };
 
   // The films: `live` is "the rail is on screen and may play".
@@ -434,6 +478,13 @@ export function CoverflowRail({
     return () => io.disconnect();
   }, [kind]);
   const blocked = useCallback(() => setSound(false), []);
+  // The browser would not play the centre film even muted: the rail steps
+  // back to "not playing", so the badge reads Play and the tap that follows
+  // starts the film inside its own gesture (press).
+  const refused = useCallback(() => {
+    setLive(false);
+    setSound(false);
+  }, []);
   const press = (e: React.MouseEvent<HTMLButtonElement>) => {
     // The film is told to play HERE, inside the tap, not from the effect
     // that follows the state change: a browser that will only start media
@@ -443,6 +494,7 @@ export function CoverflowRail({
     const v = e.currentTarget.parentElement?.querySelector("video");
     const wantSound = !live || !sound;
     if (v) {
+      prime(v);
       v.muted = !wantSound;
       void v.play().catch(() => {});
     }
@@ -547,7 +599,9 @@ export function CoverflowRail({
                     sound={d === 0 && sound}
                     onBlocked={blocked}
                     onThrough={onThrough}
+                    onRefused={refused}
                     slot={d}
+                    index={clone ? undefined : i}
                   />
                   {d === 0 ? (
                     // The whole centre card is the sound toggle, as on the
