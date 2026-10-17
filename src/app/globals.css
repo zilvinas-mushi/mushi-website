@@ -2349,12 +2349,16 @@ html[data-sheet] .tile-marquee-track {
 }
 /* A card's film: over its poster, inside the frame's inset (the card's
    padding is not a containing-block edge, hence the explicit box), and
-   invisible until it is actually playing. NO CROSS-FADE (Žilvinas
-   2026-10-17, "don't do any second from picture static to video —
-   immediately play video"): the film starts on the very frame the poster
-   shows, so the swap is invisible when it is instant, while a 500ms fade
-   blended the moving film with the still poster and read as a frozen
-   half-second. */
+   invisible until it is actually playing.
+
+   IN AT ONCE, OUT ON A FADE (Žilvinas 2026-10-17). In: "don't do any
+   second from picture static to video" — the film starts on the very frame
+   the poster shows, so an instant swap is invisible, while the old 500ms
+   fade blended the moving film with the still poster and read as a frozen
+   half-second. Out: "that switch left and right looks glitchy" — a card
+   leaving the centre is mid-film, and cutting it to its poster snapped the
+   picture back to the start as the card slid; it fades back over 400ms
+   now, and its seek to the start waits until it is hidden (RailVideo). */
 .cf-film {
   position: absolute;
   left: var(--pcpx);
@@ -2363,7 +2367,13 @@ html[data-sheet] .tile-marquee-track {
   height: calc(100% - 2 * var(--pcpy));
   border-radius: 17px;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 400ms ease-out;
   pointer-events: none;
+}
+.cf-film[data-playing] {
+  opacity: 1;
+  transition: none;
 }
 /* The frame draws the mute badge on desktop only. A phone still needs to see
    that the film has sound to turn on, so the CENTRE card carries the home

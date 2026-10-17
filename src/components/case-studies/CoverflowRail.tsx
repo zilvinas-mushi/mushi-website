@@ -344,14 +344,17 @@ function RailVideo({
       onPlaying={() => setPlaying(true)}
       onPause={() => {
         setPlaying(false);
-        // Back to the poster's frame, so the next visit fades in on the
-        // picture that is already there.
+        // Back to the poster's frame, so the next visit swaps in on the
+        // picture that is already there — but only once the film has faded
+        // out (400ms, globals.css): seeking while it is still showing
+        // snapped the picture to the start as the card slid away.
         const v = ref.current;
-        if (v) v.currentTime = at;
+        if (v) window.setTimeout(() => { if (v.paused) v.currentTime = at; }, 450);
       }}
       // The word that the next film in the line may start downloading.
       onCanPlayThrough={() => onThrough(slot)}
-      className={`cf-film ${playing ? "opacity-100" : "opacity-0"}`}
+      data-playing={playing || undefined}
+      className="cf-film"
     />
   );
 }
