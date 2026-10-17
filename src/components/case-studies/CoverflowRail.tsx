@@ -257,6 +257,9 @@ function centreVars(k: "d" | "p", u: (n: number) => string, c: Slot) {
   };
 }
 
+/** The order the films beyond the centre are fetched in, by distance from it. */
+const WARM_ORDER: readonly number[] = [1, -1, 2, -2];
+
 export type RailItem = {
   src: string;
   phoneSrc?: string;
@@ -278,8 +281,12 @@ function RailVideo({
   warm,
   sound,
   onBlocked,
+  onThrough,
+  slot,
 }: {
   file: string;
+  /** This card's distance from the centre, handed back with onThrough. */
+  slot: number;
   /** The poster's moment, where playback starts and returns to. */
   at?: number;
   on: boolean;
@@ -287,6 +294,8 @@ function RailVideo({
   sound: boolean;
   /** The browser refused to play with sound; the rail drops back to muted. */
   onBlocked: () => void;
+  /** This film has buffered enough to play through — the rail's cue to fetch the next one. */
+  onThrough: (slot: number) => void;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -303,6 +312,10 @@ function RailVideo({
       // play() waits for the seek, so frame 0 is never painted.
       if (at > 0) v.addEventListener("loadedmetadata", () => { v.currentTime = at; }, { once: true });
     }
+    // A film fetched on an earlier visit is through already and will not
+    // say so again — the rail asks each time it is centre or warm, so the
+    // chain of downloads moves on past it.
+    if ((on || warm) && v.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) onThrough(slot);
     if (!on) {
       v.pause();
       v.muted = true;
@@ -318,7 +331,7 @@ function RailVideo({
         void v.play().catch(() => {});
       }
     });
-  }, [on, warm, sound, file, at, onBlocked]);
+  }, [on, warm, sound, file, at, onBlocked, onThrough, slot]);
 
   return (
     <video
@@ -331,12 +344,17 @@ function RailVideo({
       onPlaying={() => setPlaying(true)}
       onPause={() => {
         setPlaying(false);
-        // Back to the poster's frame, so the next visit fades in on the
-        // picture that is already there.
+        // Back to the poster's frame, so the next visit swaps in on the
+        // picture that is already there — but only once the film has faded
+        // out (400ms, globals.css): seeking while it is still showing
+        // snapped the picture to the start as the card slid away.
         const v = ref.current;
-        if (v) v.currentTime = at;
+        if (v) window.setTimeout(() => { if (v.paused) v.currentTime = at; }, 450);
       }}
-      className={`cf-film ${playing ? "opacity-100" : "opacity-0"}`}
+      // The word that the next film in the line may start downloading.
+      onCanPlayThrough={() => onThrough(slot)}
+      data-playing={playing || undefined}
+      className="cf-film"
     />
   );
 }
@@ -361,7 +379,26 @@ export function CoverflowRail({
   // The design's centre card is the middle of the supplied list.
   const [active, setActive] = useState(Math.floor(items.length / 2));
   const touchX = useRef<number | null>(null);
-  const go = (by: number) => setActive((a) => (((a + by) % n) + n) % n);
+  // THE FILMS ARE FETCHED ONE AT A TIME, THE PLAYING ONE FIRST (Žilvinas
+  // 2026-10-17, from a phone: "the ads just sometimes gets stuck", then
+  // "don't do any second from picture static to video — immediately play
+  // video"). The centre downloads alone until it can play through — three
+  // films at once on a phone's line starved the one playing and froze it
+  // mid-frame — then the next card to the right, then the left, then the
+  // two beyond, each once the one before is through (WARM_ORDER). So an
+  // arrow pressed a moment later lands on a film that is already in hand
+  // and starts on the spot. `stage` is how far down that list the line has
+  // got; it starts over on every move, and a film fetched earlier reports
+  // itself through at once (RailVideo), so the chain skips it.
+  const [stage, setStage] = useState(0);
+  const onThrough = useCallback((d: number) => {
+    const k = d === 0 ? 0 : WARM_ORDER.indexOf(d) + 1;
+    if (k >= 0) setStage((s) => Math.max(s, k + 1));
+  }, []);
+  const go = (by: number) => {
+    setStage(0);
+    setActive((a) => (((a + by) % n) + n) % n);
+  };
 
   // The films: `live` is "the rail is on screen and may play".
   const root = useRef<HTMLElement>(null);
@@ -397,7 +434,18 @@ export function CoverflowRail({
     return () => io.disconnect();
   }, [kind]);
   const blocked = useCallback(() => setSound(false), []);
-  const press = () => {
+  const press = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // The film is told to play HERE, inside the tap, not from the effect
+    // that follows the state change: a browser that will only start media
+    // on a gesture (iOS, Low Power Mode) accepts a play() in the handler
+    // and may not accept one a render later — which left a film that had
+    // never started showing its poster, i.e. its own first frame, stuck.
+    const v = e.currentTarget.parentElement?.querySelector("video");
+    const wantSound = !live || !sound;
+    if (v) {
+      v.muted = !wantSound;
+      void v.play().catch(() => {});
+    }
     // Autoplay off: the first press starts the film, with its sound — an
     // explicit press means they want the ad. After that it toggles sound.
     if (!live) {
@@ -495,9 +543,11 @@ export function CoverflowRail({
                     file={item.video}
                     at={item.at}
                     on={d === 0 && live}
-                    warm={Math.abs(d) === 1 && live}
+                    warm={live && WARM_ORDER.indexOf(d) !== -1 && WARM_ORDER.indexOf(d) < stage}
                     sound={d === 0 && sound}
                     onBlocked={blocked}
+                    onThrough={onThrough}
+                    slot={d}
                   />
                   {d === 0 ? (
                     // The whole centre card is the sound toggle, as on the

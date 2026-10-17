@@ -141,8 +141,8 @@ export default function Templates() {
       <link
         rel="preload"
         as="image"
-        imageSrcSet="/images/templates/hero-phone-sm.webp 538w, /images/templates/hero-phone.webp 807w"
-        imageSizes="269px"
+        imageSrcSet="/images/templates/hero-phone-sm.webp 726w, /images/templates/hero-phone.webp 1089w"
+        imageSizes="363px"
         media="(max-width: 767px)"
         fetchPriority="high"
       />

@@ -21,20 +21,15 @@
  * Agency is this page, so it goes to the site root rather than to #agency: the
  * section it used to target IS the top of the home page.
  */
-import { BOOKING_ANCHOR } from "@/lib/site";
 
 export const NAV = [
-  // CASE STUDIES IS HELD BACK, ON BOTH SURFACES (Žilvinas 2026-10-04:
-  // "disable case studies and templates as well in the menu. leave it in a
-  // path", then "you haven't disabled agency and case studies"). It stays in
-  // the bar and the drawer, but is a link on no page; it is still lit on its
-  // own page. The page itself is untouched and answers at its URL, and the
-  // footer still links to it. Empty lists mean "a link on no page" — see
-  // navHref. To bring an entry back, delete its two keys: Templates and
-  // Agency came back on 2026-10-10 ("enable templates page! it should be
-  // live", "enable agency as well in upper menu").
+  // Every entry is a link on every page since 2026-10-17 ("unhide also case
+  // studies"). Case Studies had been held back on both surfaces from
+  // 2026-10-04 (`liveOn: [], phoneLiveOn: []` — a link on no page, still
+  // lit on its own); Templates and Agency came back on 2026-10-10. The
+  // mechanism (navHref, below) stays for the next page that is not ready.
   { label: "Agency", href: "/" },
-  { label: "Case Studies", href: "/case-studies", liveOn: [], phoneLiveOn: [] },
+  { label: "Case Studies", href: "/case-studies" },
   { label: "Templates", href: "/templates" },
 ] as const;
 
@@ -1477,11 +1472,29 @@ export const CASE_STUDIES_PAGE = {
     },
     landing: {
       title: "Landing Pages",
+      // Six since 2026-10-17 (Žilvinas: "add additional landing pages"):
+      // the three new ones — Trendy AI News, Sintra for salons, the Sintra
+      // quiz — are the Figma file's own fills (Mask groups 5614:19 / 38 /
+      // 26), cut to the card's 618 x 345 from the top. The file has no
+      // phone versions of them, so their -phone cuts are portrait crops of
+      // the same band, each centred on its headline (Trendy 33%, salons
+      // 42%, quiz 50% across) rather than the middle of the shot. Sintra
+      // home stays the centre card: floor(6 / 2) is the fourth entry.
       items: [
+        {
+          src: "case-studies/landing-trendy.webp",
+          phoneSrc: "case-studies/landing-trendy-phone.webp",
+          alt: "Trendy AI News: the best AI tools for businesses in 2026",
+        },
         {
           src: "case-studies/landing-sintra-plan.webp",
           phoneSrc: "case-studies/landing-sintra-plan-phone.webp",
           alt: "Sintra pricing landing page",
+        },
+        {
+          src: "case-studies/landing-sintra-salons.webp",
+          phoneSrc: "case-studies/landing-sintra-salons-phone.webp",
+          alt: "Sintra for beauty salons: automate social media and get new clients",
         },
         {
           src: "case-studies/landing-sintra-home.webp",
@@ -1492,6 +1505,11 @@ export const CASE_STUDIES_PAGE = {
           src: "case-studies/landing-axiometa.webp",
           phoneSrc: "case-studies/landing-axiometa-phone.webp",
           alt: "Axiometa product landing page",
+        },
+        {
+          src: "case-studies/landing-sintra-quiz.webp",
+          phoneSrc: "case-studies/landing-sintra-quiz-phone.webp",
+          alt: "Sintra quiz: Claude is for hobbies, Sintra is for business",
         },
       ],
     },
@@ -1694,14 +1712,13 @@ export const FOOTER = {
       title: "Product",
       titleDesktop: "Products",
       links: [
-        { label: "500+ Static Templates", href: null },
-        /**
-         * Agency Services IS this page, so from here it goes to the final
-         * card — the "You scrolled so far" one — rather than nowhere. From any
-         * other page it will simply load the home page, which is the same
-         * behaviour by another name.
-         */
-        { label: "Agency Services", href: `#${BOOKING_ANCHOR}` },
+        // Both are real pages now (Žilvinas 2026-10-17, "footer not always
+        // works"): the templates line had no link at all, and Agency
+        // Services pointed at the home page's booking anchor — a bare hash
+        // that went nowhere from any other page. Agency Services is the home
+        // page (the "Agency" of the menu), so it goes there.
+        { label: "500+ Static Templates", href: "/templates" },
+        { label: "Agency Services", href: "/" },
       ],
     },
     {

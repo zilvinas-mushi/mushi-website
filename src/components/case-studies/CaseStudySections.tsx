@@ -488,7 +488,11 @@ export function ReadyToScale() {
                       width={28}
                       height={28}
                       ariaHidden
-                      className="h-auto w-[110%] max-w-none"
+                      // md:-translate-y-[2px]: against Figma's render of the
+                      // card the desktop icons' ink sat 2px below the frame's
+                      // (375/415/455 there, 377/417/457 here) while the text
+                      // matched to the pixel; the phone matched as it was.
+                      className="h-auto w-[110%] max-w-none md:-translate-y-[2px]"
                     />
                   </span>
                 </span>

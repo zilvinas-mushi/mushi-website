@@ -8,8 +8,9 @@ import {
   CaseStudiesRails,
   ReadyToScale,
 } from "@/components/case-studies/CaseStudySections";
-import { CASE_STUDIES_PAGE } from "@/lib/content";
+import { CASE_STUDIES_PAGE, TEMPLATES_PAGE } from "@/lib/content";
 import {
+  APP_URL,
   BOOKING_URL,
   CASE_STUDIES_CALL_ID,
   CASE_STUDIES_RAILS_ID,
@@ -124,6 +125,16 @@ export default function CaseStudies() {
           href: BOOKING_URL,
           fromId: CASE_STUDIES_RAILS_ID,
           untilId: CASE_STUDIES_CALL_ID,
+        }}
+        // THE SAME DRAWER AS /templates (Žilvinas 2026-10-17, "the menu
+        // items in case-studies should be the same as in templates, for
+        // mobile"): a half-and-half Buy Now / Login, then a full-width Book
+        // an Agency Call. Buy Now goes to /templates with the sheet open on
+        // arrival — this page's Buy goes there too, never in place.
+        mobileDrawer={{
+          primary: { label: TEMPLATES_PAGE.access.templates.cta, href: "/templates#buy" },
+          secondary: { label: TEMPLATES_PAGE.login, href: APP_URL },
+          wide: { label: TEMPLATES_PAGE.agencyCall, href: BOOKING_URL },
         }}
       />
       <main className="flex-1 bg-black">

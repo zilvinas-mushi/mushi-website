@@ -908,12 +908,12 @@
     "h": 1503
   },
   "templates/hero-phone-sm.webp": {
-    "w": 538,
-    "h": 869
+    "w": 726,
+    "h": 956
   },
   "templates/hero-phone.webp": {
-    "w": 807,
-    "h": 1304
+    "w": 1089,
+    "h": 1434
   },
   "templates/icon-card.webp": {
     "w": 48,
@@ -1118,5 +1118,29 @@
   "case-studies/team-5.webp": {
     "w": 100,
     "h": 100
+  },
+  "case-studies/landing-trendy.webp": {
+    "w": 1264,
+    "h": 706
+  },
+  "case-studies/landing-sintra-quiz.webp": {
+    "w": 1264,
+    "h": 705
+  },
+  "case-studies/landing-sintra-salons.webp": {
+    "w": 1264,
+    "h": 706
+  },
+  "case-studies/landing-trendy-phone.webp": {
+    "w": 728,
+    "h": 1188
+  },
+  "case-studies/landing-sintra-salons-phone.webp": {
+    "w": 728,
+    "h": 1188
+  },
+  "case-studies/landing-sintra-quiz-phone.webp": {
+    "w": 728,
+    "h": 1188
   }
 }
