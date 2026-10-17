@@ -1564,11 +1564,11 @@ export const CASE_STUDIES_PAGE = {
        * pitches are the frame's, uneven on purpose).
        */
       team: [
-        { src: "team-1.webp", alt: "Mushi team member", phoneX: 0, desktopX: 0 },
-        { src: "team-2.webp", alt: "Mushi team member", phoneX: 21.49, desktopX: 35.58 },
-        { src: "team-3.webp", alt: "Mushi team member", phoneX: 43.99, desktopX: 72.82 },
-        { src: "team-4.webp", alt: "Mushi team member", phoneX: 61.49, desktopX: 101.78 },
-        { src: "team-5.webp", alt: "Mushi team member", phoneX: 82.49, desktopX: 136.54 },
+        { src: "team-1-v2.webp", alt: "Mushi team member", phoneX: 0, desktopX: 0 },
+        { src: "team-2-v2.webp", alt: "Mushi team member", phoneX: 21.49, desktopX: 35.58 },
+        { src: "team-3-v2.webp", alt: "Mushi team member", phoneX: 43.99, desktopX: 72.82 },
+        { src: "team-4-v2.webp", alt: "Mushi team member", phoneX: 61.49, desktopX: 101.78 },
+        { src: "team-5-v2.webp", alt: "Mushi team member", phoneX: 82.49, desktopX: 136.54 },
       ],
     },
   },
