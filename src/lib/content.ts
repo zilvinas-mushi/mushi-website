@@ -21,7 +21,6 @@
  * Agency is this page, so it goes to the site root rather than to #agency: the
  * section it used to target IS the top of the home page.
  */
-import { BOOKING_ANCHOR } from "@/lib/site";
 
 export const NAV = [
   // Every entry is a link on every page since 2026-10-17 ("unhide also case
@@ -1713,14 +1712,13 @@ export const FOOTER = {
       title: "Product",
       titleDesktop: "Products",
       links: [
-        { label: "500+ Static Templates", href: null },
-        /**
-         * Agency Services IS this page, so from here it goes to the final
-         * card — the "You scrolled so far" one — rather than nowhere. From any
-         * other page it will simply load the home page, which is the same
-         * behaviour by another name.
-         */
-        { label: "Agency Services", href: `#${BOOKING_ANCHOR}` },
+        // Both are real pages now (Žilvinas 2026-10-17, "footer not always
+        // works"): the templates line had no link at all, and Agency
+        // Services pointed at the home page's booking anchor — a bare hash
+        // that went nowhere from any other page. Agency Services is the home
+        // page (the "Agency" of the menu), so it goes there.
+        { label: "500+ Static Templates", href: "/templates" },
+        { label: "Agency Services", href: "/" },
       ],
     },
     {
