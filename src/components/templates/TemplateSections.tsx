@@ -2699,7 +2699,7 @@ function AppWindow() {
     // under it. The row is a column that packs to its end now, so the spare
     // goes between the button and the device, and the mac's cut edge is the
     // hero's last line on every window.
-    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 md:mt-[36px] md:flex md:min-h-0 md:flex-[0_1_calc(var(--hero-w)*6.513)] md:max-w-[calc(var(--hero-w)*10.4+2rem)] md:flex-col md:justify-end md:[container-type:size]">
+    <div className="relative z-[1] mx-auto mt-[30px] w-full max-w-[1010px] px-4 max-md:overflow-x-clip md:mt-[36px] md:flex md:min-h-0 md:flex-[0_1_calc(var(--hero-w)*6.513)] md:max-w-[calc(var(--hero-w)*10.4+2rem)] md:flex-col md:justify-end md:[container-type:size]">
       {/* The device box. The tile field is inset-y-0 INSIDE it (Žilvinas
           2026-09-25, closing the day: "now it is 86 and 81, make the same"
           — measured against the MAC's edges, which is what the eye
@@ -2718,25 +2718,13 @@ function AppWindow() {
           width is min(its width, its height x 2400/1503), which every
           engine computes the same. */}
       <div className="relative md:mx-auto md:aspect-[2400/1503] md:w-[min(100cqw,calc(100cqh*2400/1503))]">
-        {/* THE PHONE'S BORDER (Žilvinas 2026-10-17, "this phone with border
-            should be full"): the templates-mobile frame draws the device as
-            "Whole iphone with border" (node 4564:77) — the 269 x 564 black
-            phone body (r28) inside a 279 x 487 rounded rect with a 7px
-            #8F9B99 stroke (r35, so its inner edge is the phone's own) and a
-            white glow (drop shadow 0 0 25 at 50%): 5 of the stroke shows on
-            each side, and it ends at 487 while the phone runs on to the
-            fold. Here the ring is the 5 that shows, drawn OUTSIDE the phone
-            raster and hugging its corners — the raster's corner is ~25, not
-            the frame's 28, so the ring's inner radius is 25 (outer 30) or a
-            sliver of the tiles behind would show in each corner. The raster
-            used to carry 13 rows of this border's top edge baked in, which
-            doubled up with the ring as a thick grey band ("wtf this phone");
-            those rows are cropped off (hero-phone*.webp, 2026-10-17). Phone
-            only; the MacBook has its own frame. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-[-5px] z-0 h-[487px] w-[279px] -translate-x-1/2 rounded-[30px] border-[5px] border-[#8f9b99] [filter:drop-shadow(0_0_25px_rgba(255,255,255,0.5))] md:hidden"
-        />
+        {/* THE PHONE WITH ITS BORDER AND GLOW IS THE RASTER ITSELF (Žilvinas
+            2026-10-17, "use this if you couldn't replicate one to one"):
+            hero-phone*.webp are cut from his export of the frame's "Whole
+            iphone with border" (node 4564:77) — the 279-wide bordered body,
+            the white glow around it (~43 each side) and transparent corners,
+            at 3x and 2x. Nothing is drawn around it in CSS any more; a ring
+            built here doubled up with the border the old raster carried. */}
       <CategoryTiles />
       <PhoneTiles />
 
@@ -2828,14 +2816,18 @@ function AppWindow() {
       <Img
         src="templates/hero-phone.webp"
         alt="The Mushi template library: ad templates with industry and sort filters"
-        width={269}
+        // 363 wide: the 279 bordered body plus the glow either side. The
+        // glow above the body (43.6) is pulled back with a negative top
+        // margin, so the border's top edge sits exactly where the old
+        // raster's did and the block below does not move.
+        width={363}
         // TWO CUTS OF THE PHONE (2026-09-25): hero-phone-sm.webp is the same
-        // render at 2x (538), hero-phone.webp at 3x (807). With `sizes` at
-        // the drawn 269, a 3x iPhone takes the 807 and a 2x phone — or
-        // PageSpeed's 1.75x Moto — takes the 538 and 52 fewer KB on the one
-        // request the first screen waits for. Img emits the srcset from the
-        // -sm name; the preload in page.tsx carries the same pair.
-        sizes="269px"
+        // render at 2x, hero-phone.webp at 3x. With `sizes` at the drawn
+        // width, a 3x iPhone takes the 3x and a 2x phone — or PageSpeed's
+        // 1.75x Moto — takes the 2x and fewer KB on the one request the
+        // first screen waits for. Img emits the srcset from the -sm name;
+        // the preload in page.tsx carries the same pair.
+        sizes="363px"
         alternate={{ src: "templates/hero-macbook.webp", media: "(min-width: 768px)" }}
         // No drop-shadow on the MacBook (Žilvinas 2026-09-19, via the
         // client): the 140px blur reached up over the CTA and read as a
@@ -2846,7 +2838,11 @@ function AppWindow() {
         // is r28 on the tiles with nothing square behind it). The clip is
         // the bezel's own radius, so it takes nothing visible away. Off
         // from md: the MacBook keeps its edges (2026-09-05, "no corners").
-        className="relative z-[1] mx-auto -mb-px w-[269px] max-w-full rounded-[25px] md:mb-0 md:h-full md:w-full md:max-w-none md:rounded-none"
+        // Centred by translate, not mx-auto: wider than its column by the
+        // glow, a block with auto margins sits at the column's left edge.
+        // The full-width wrapper clips the glow's overhang sideways
+        // (max-md:overflow-x-clip) so the page does not widen.
+        className="relative left-1/2 z-[1] -mt-[43.6px] -mb-px w-[363px] max-w-none -translate-x-1/2 md:left-0 md:mt-0 md:mb-0 md:h-full md:w-full md:translate-x-0"
         priority
       />
       </div>
