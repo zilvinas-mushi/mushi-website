@@ -196,8 +196,12 @@ Rail order as drawn, left to right (centre in bold):
 
 - Video: red-X, bride POV, dog "Real results", **Holo**, "In 15 minutes",
   Celemi mask, "Overpaying"
-- Landing: Sintra pick-your-plan, **Sintra home**, Axiometa — each has a
-  desktop and a phone screenshot
+- Landing: Axiometa "Modular Electronics Made Easy" (image 404, `4503:2357`,
+  fill 2812 × 1860 cropped to its top 1570 rows), **Sintra home** (image 402),
+  Axiometa Genesis Mini (image 405) — read again 2026-10-23, when the
+  Sintra pick-your-plan page that used to be on the left had been taken out
+  of the file. The three loose cards left of the frame (`5614:19` Trendy,
+  `5614:38` salons, `5614:26` quiz) are the rail's other three.
 - Static: Spacegoods, Bluechew, **Hey Bud**, Lucky Time, towels
 
 ## Ready To Scale?

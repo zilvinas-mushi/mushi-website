@@ -1457,17 +1457,17 @@ export const CASE_STUDIES_PAGE = {
     video: {
       title: "Video Ads",
       items: [
-        { src: "case-studies/video-shadow.webp", video: "case-studies/shadow.mp4", at: 1.5, alt: "Shadow video ad: a founder's story" },
-        { src: "case-studies/video-skin-signs.webp", video: "case-studies/skin-signs.mp4", at: 0.2, alt: "Skincare video ad: 4 warning signs your skin is aging" },
-        { src: "case-studies/video-red-x.webp", video: "case-studies/red-x.mp4", at: 6.733, alt: "Video ad opening on a struck-through figure" },
-        { src: "case-studies/video-bride.webp", video: "case-studies/bride.mp4", at: 1.7, alt: "Breezit video ad: a bride calls the venue at 10pm" },
-        { src: "case-studies/video-dog.webp", video: "case-studies/dog.mp4", at: 15.667, alt: "Pet care video ad showing real customer results" },
-        { src: "case-studies/video-holo.webp", video: "case-studies/holo.mp4", at: 0.533, alt: "Holo video ad: meet Holo" },
-        { src: "case-studies/video-office.webp", video: "case-studies/office.mp4", at: 4.833, alt: "Video ad: in 15 minutes, a team at work" },
-        { src: "case-studies/video-celemi.webp", video: "case-studies/celemi.mp4", at: 17.448, alt: "Celemi skincare video ad" },
-        { src: "case-studies/video-overpaying.webp", video: "case-studies/overpaying.mp4", at: 6.8, alt: "Finance video ad: overpaying" },
-        { src: "case-studies/video-postpartum.webp", video: "case-studies/postpartum.mp4", at: 3.0, alt: "Post-partum bra video ad, creator to camera" },
-        { src: "case-studies/video-tattoo.webp", video: "case-studies/tattoo.mp4", at: 0.2, alt: "Sintra video ad: a tattoo studio owner" },
+        { src: "case-studies/video-shadow.webp", video: "case-studies/shadow.mp4", alt: "Shadow video ad: a founder's story" },
+        { src: "case-studies/video-skin-signs.webp", video: "case-studies/skin-signs.mp4", alt: "Skincare video ad: 4 warning signs your skin is aging" },
+        { src: "case-studies/video-red-x.webp", video: "case-studies/red-x.mp4", alt: "Video ad opening on a struck-through figure" },
+        { src: "case-studies/video-bride.webp", video: "case-studies/bride.mp4", alt: "Breezit video ad: a bride calls the venue at 10pm" },
+        { src: "case-studies/video-dog.webp", video: "case-studies/dog.mp4", alt: "Pet care video ad showing real customer results" },
+        { src: "case-studies/video-holo.webp", video: "case-studies/holo.mp4", alt: "Holo video ad: meet Holo" },
+        { src: "case-studies/video-office.webp", video: "case-studies/office.mp4", alt: "Video ad: in 15 minutes, a team at work" },
+        { src: "case-studies/video-celemi.webp", video: "case-studies/celemi.mp4", alt: "Celemi skincare video ad" },
+        { src: "case-studies/video-overpaying.webp", video: "case-studies/overpaying.mp4", alt: "Finance video ad: overpaying" },
+        { src: "case-studies/video-postpartum.webp", video: "case-studies/postpartum.mp4", alt: "Post-partum bra video ad, creator to camera" },
+        { src: "case-studies/video-tattoo.webp", video: "case-studies/tattoo.mp4", alt: "Sintra video ad: a tattoo studio owner" },
       ],
     },
     landing: {
@@ -1478,8 +1478,17 @@ export const CASE_STUDIES_PAGE = {
       // 26), cut to the card's 618 x 345 from the top. The file has no
       // phone versions of them, so their -phone cuts are portrait crops of
       // the same band, each centred on its headline (Trendy 33%, salons
-      // 42%, quiz 50% across) rather than the middle of the shot. Sintra
-      // home stays the centre card: floor(6 / 2) is the fourth entry.
+      // 42%, quiz 50% across) rather than the middle of the shot.
+      // THE FRAME'S OWN THREE ARE AXIOMETA / SINTRA HOME / AXIOMETA (Noah
+      // 2026-10-20, "nėra Axiometa page'o antro ... įdėjai Sintra pricing
+      // page, kurio nereikia, išėmėm"): the rail in `5293:73` (image 404 /
+      // 402 / 405) has Axiometa's "Modular Electronics Made Easy" home on
+      // the left, Sintra home in the centre and Axiometa's Genesis Mini
+      // product page on the right. The Sintra pricing page is gone. The
+      // Modular cut is image 404's own fill (2812 x 1860), the top 1570
+      // rows to the card's aspect; its phone cut is the full height, centred.
+      // Sintra home stays the centre card: floor(6 / 2) is the fourth entry,
+      // with Modular to its left and Genesis to its right, as the frame.
       items: [
         {
           src: "case-studies/landing-trendy.webp",
@@ -1487,14 +1496,14 @@ export const CASE_STUDIES_PAGE = {
           alt: "Trendy AI News: the best AI tools for businesses in 2026",
         },
         {
-          src: "case-studies/landing-sintra-plan.webp",
-          phoneSrc: "case-studies/landing-sintra-plan-phone.webp",
-          alt: "Sintra pricing landing page",
-        },
-        {
           src: "case-studies/landing-sintra-salons.webp",
           phoneSrc: "case-studies/landing-sintra-salons-phone.webp",
           alt: "Sintra for beauty salons: automate social media and get new clients",
+        },
+        {
+          src: "case-studies/landing-axiometa-modular.webp",
+          phoneSrc: "case-studies/landing-axiometa-modular-phone.webp",
+          alt: "Axiometa landing page: modular electronics made easy",
         },
         {
           src: "case-studies/landing-sintra-home.webp",
@@ -1504,7 +1513,7 @@ export const CASE_STUDIES_PAGE = {
         {
           src: "case-studies/landing-axiometa.webp",
           phoneSrc: "case-studies/landing-axiometa-phone.webp",
-          alt: "Axiometa product landing page",
+          alt: "Axiometa product page: Genesis Mini starter kit",
         },
         {
           src: "case-studies/landing-sintra-quiz.webp",

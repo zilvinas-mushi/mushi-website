@@ -1,17 +1,18 @@
 /**
- * EVERY LINK THAT OPENS THE CALENDAR OPENS A NEW TAB (Žilvinas 2026-10-10).
- * The scheduler is Calendly's page, not ours; a reader who books keeps the
- * site behind it. Held two ways: the helper decides from the href, and every
- * anchor that can carry the booking URL spreads it.
+ * EVERY LINK OPENS IN THE TAB IT WAS PRESSED IN (Noah 2026-10-20). The
+ * calendar links opened a new tab from 2026-10-10 to 2026-10-23; the helper
+ * that decided it stays spread on every anchor that can carry the booking
+ * URL, so the decision is one line in site.ts either way. Held two ways: the
+ * helper opens nothing in a new tab, and every such anchor still spreads it.
  */
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { BOOKING_URL, CALL_PATH, bookingTarget } from "@/lib/site";
 
 describe("links that open the calendar", () => {
-  it("open a new tab, and nothing else does", () => {
-    expect(bookingTarget(BOOKING_URL)).toEqual({ target: "_blank", rel: "noopener" });
-    expect(bookingTarget(CALL_PATH)).toEqual({ target: "_blank", rel: "noopener" });
+  it("open in the same tab, like every other link", () => {
+    expect(bookingTarget(BOOKING_URL)).toEqual({});
+    expect(bookingTarget(CALL_PATH)).toEqual({});
     expect(bookingTarget("/")).toEqual({});
     expect(bookingTarget("/templates")).toEqual({});
     expect(bookingTarget(undefined)).toEqual({});
