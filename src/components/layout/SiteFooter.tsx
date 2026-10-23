@@ -497,8 +497,6 @@ export function SiteFooter() {
                 <li key={s.label}>
                   <a
                     href={s.href}
-                    rel="noopener noreferrer"
-                    target="_blank"
                     aria-label={`${SITE_NAME} on ${s.label}`}
                     className="tile-ring flex size-[3.125rem] items-center justify-center rounded-[0.75rem] bg-[#222222] text-white transition-colors duration-300 ease-out [--tile:#222222] hover:bg-white hover:text-[#222222] hover:[--tile:#fff] md:size-[2.875rem] md:rounded-[0.625rem] md:[&::before]:hidden"
                   >
@@ -557,12 +555,15 @@ export function SiteFooter() {
               <span className="md:hidden">{FOOTER.copyright}</span>
               <span className="hidden md:inline">{FOOTER.copyrightDesktop}</span>
             </p>
-            {/* The export's x positions difference to 48 / 48 / 49, its
-                fourth label ended at 1650, the column's right edge, and the
-                cluster's left edge lands on 599, i.e. under PRODUCTS, exactly
-                as the design has it. The fourth label (Money-Back Guarantee)
-                is gone — see content.ts, LEGAL — so the row now ends after
-                Refund Policy; the three that remain have not moved. */}
+            {/* FLUSH RIGHT (Noah 2026-10-20, "lygiuotė ... būtų prie šono,
+                same kaip Copyright text'as yra kairėje šone"): the three
+                labels run from the column's right edge, 1650, the way the
+                copyright runs from its left, 270 — the footer frame
+                (`5510:985`) sets Refund's box to end at 1641 and the labels
+                55 apart (Privacy 1111–1234, Terms 1289–1465, Refund
+                1520–1641). They used to be positioned on the frame's left
+                stops instead, which left the row's right end loose once
+                the fourth label went. */}
             {/* Desktop only. On the phone the same links are a LEGAL group up
                 with the other columns, which is where the artboard puts them —
                 rendered as a second node rather than reordered with CSS
@@ -572,26 +573,15 @@ export function SiteFooter() {
               {/* leading-none on the LIST, not just on the links: an <li>'s own
                   strut sets its line box, so links set solo still sat in 27
                   tall rows and pushed the bar's centre 4.7 low. */}
-              {/* The export's stops — 599 / 770 / 994 from the content edge,
-                  so widths 171 / 224 inside this 781-wide region, and the
-                  last track takes the rest (170 + the dropped fourth's 216 =
-                  386) so Refund stays on its measured stop with nothing after
-                  it. Positioning each label rather than spacing them is what
-                  makes the row exact: rendered advances are a few px narrower
-                  than Figma's text boxes, so any single gap value lands one
-                  end right and the other end wrong. */}
-              <ul className="grid grid-cols-[171fr_224fr_386fr] leading-none">
+              <ul className="flex justify-end gap-[3.4375rem] leading-none">
                 {FOOTER.legalDesktop.map((link) => (
                   <li key={link.label}>
                     {/* leading-none, so the bar is exactly its own 18 tall.
                         Left at the browser's 1.5 it stood 27, which pushed
                         both this row's centre and the footer's bottom edge 9
-                        below the design's 353.5 and 425.
-
-                        nowrap because the stops are tight: 171 of track for
-                        a label that sets ~165. A wrap there is not a small
-                        error — it doubles the row and takes the whole footer
-                        to 443. */}
+                        below the design's 353.5 and 425. nowrap: a wrap is
+                        not a small error — it doubles the row and takes the
+                        whole footer to 443. */}
                     <FooterLink
                       href={link.href}
                       className="whitespace-nowrap leading-none"

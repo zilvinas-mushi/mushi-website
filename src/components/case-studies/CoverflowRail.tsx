@@ -261,19 +261,38 @@ function centreVars(k: "d" | "p", u: (n: number) => string, c: Slot) {
 const WARM_ORDER: readonly number[] = [1, -1, 2, -2];
 
 /**
- * Gives a card's <video> its file, once, and seeks it to its poster's frame
- * as soon as it can be seeked — so the first frame drawn is the one already
- * on screen. Called from the effect that plays a card AND from inside a tap
- * or an arrow press (see go/press): a browser that only starts media on a
- * gesture needs the file in place within that gesture.
+ * Gives a card's <video> its file, once. Called from the effect that plays a
+ * card AND from inside a tap or an arrow press (see go/press): a browser that
+ * only starts media on a gesture needs the file in place within that gesture.
+ *
+ * EVERY FILM STARTS AT ITS BEGINNING (Noah 2026-10-20, "daug video prasideda
+ * ne nuo pradžios"): it used to be seeked to its poster's moment so that the
+ * first frame drawn was the picture already on screen. Now the poster is the
+ * frame's own still and the film cross-fades in from frame 0 over it.
  */
 function prime(v: HTMLVideoElement): void {
   if (v.getAttribute("src")) return;
   v.setAttribute("src", `/videos/${v.dataset.file}`);
   v.preload = "auto";
   v.load();
-  const at = Number(v.dataset.at ?? 0);
-  if (at > 0) v.addEventListener("loadedmetadata", () => { v.currentTime = at; }, { once: true });
+}
+
+/**
+ * How long the centre waits for the browser to say it can play the film
+ * through before starting it anyway. The gate's rule: shows early, never
+ * never-shows — a browser that never says so (a line throttled below the
+ * film's bitrate, a preload the device ignores) still gets its film.
+ */
+const THROUGH_WAIT_MS = 3000;
+
+/** A film paused under its poster, waiting to be able to play through (RailVideo's onPlaying). */
+type Hold = { ear: AbortController; timer: number; forced: boolean };
+function release(held: { current: Hold | null }): void {
+  const h = held.current;
+  if (!h) return;
+  window.clearTimeout(h.timer);
+  h.ear.abort();
+  held.current = null;
 }
 
 export type RailItem = {
@@ -281,8 +300,6 @@ export type RailItem = {
   phoneSrc?: string;
   alt: string;
   video?: string;
-  /** Where the film starts, in seconds: the moment its poster was cut from. */
-  at?: number;
 };
 
 /**
@@ -292,7 +309,6 @@ export type RailItem = {
  */
 function RailVideo({
   file,
-  at = 0,
   on,
   warm,
   sound,
@@ -305,8 +321,6 @@ function RailVideo({
   file: string;
   /** This card's distance from the centre, handed back with onThrough. */
   slot: number;
-  /** The poster's moment, where playback starts and returns to. */
-  at?: number;
   on: boolean;
   warm: boolean;
   sound: boolean;
@@ -321,6 +335,9 @@ function RailVideo({
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
+  // A film held under its poster until it can play through — see onPlaying.
+  const held = useRef<Hold | null>(null);
+  useEffect(() => () => release(held), []);
 
   useEffect(() => {
     const v = ref.current;
@@ -331,6 +348,7 @@ function RailVideo({
     // chain of downloads moves on past it.
     if ((on || warm) && v.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) onThrough(slot);
     if (!on) {
+      release(held);
       v.pause();
       v.muted = true;
       return;
@@ -360,7 +378,7 @@ function RailVideo({
       .catch((err: DOMException) => {
         if (err?.name !== "AbortError") onRefused();
       });
-  }, [on, warm, sound, file, at, onBlocked, onThrough, onRefused, slot]);
+  }, [on, warm, sound, file, onBlocked, onThrough, onRefused, slot]);
 
   return (
     <video
@@ -370,20 +388,76 @@ function RailVideo({
       playsInline
       preload="none"
       aria-hidden="true"
-      onPlaying={() => setPlaying(true)}
+      // THE FILM IS SHOWN ONCE IT CAN PLAY THROUGH, NOT AT ITS FIRST FRAME
+      // (Noah 2026-10-20, "dar vis sustoja kai kurie videkai"): shown the
+      // moment it had a frame, it ran straight into the download's edge on
+      // any line slower than its bitrate — a second of film, a second of
+      // frozen frame, over and over (live at 1.6 Mbit/s: waiting/playing
+      // every 1.1s). play() is still called at once, so that every browser
+      // starts fetching (iOS fetches nothing for a film nobody has asked to
+      // play); but when the first frames come and the browser does NOT yet
+      // say it has enough buffered to run (readyState 4, its own estimate
+      // from the rate it is downloading at), the film is paused back to 0
+      // under its poster, unseen, and resumed on canplaythrough. The poster
+      // stays a little longer; the film then runs. THROUGH_WAIT_MS is the
+      // ceiling, for a browser that never says so (a line below the film's
+      // bitrate, a device that will not preload): shows early, never
+      // never-shows. On a good line canplaythrough is a few hundred ms
+      // behind the first frame.
+      onPlaying={() => {
+        const v = ref.current;
+        if (!v) return;
+        // Already on screen and running again after a mid-film stall: it
+        // stays — the hold is for a film's start only. (Held on a stall it
+        // was sent back to 0: 4 Mbit/s replay, "playing t=0.0" at 18.8s.)
+        if (playing) return;
+        const h = held.current;
+        if (h?.forced || v.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+          release(held);
+          setPlaying(true);
+          return;
+        }
+        // Held, and something else (a sound toggle's play()) set it going:
+        // back under the poster until it is through.
+        if (h) {
+          v.pause();
+          v.currentTime = 0;
+          return;
+        }
+        v.pause();
+        v.currentTime = 0;
+        const resume = () =>
+          v.play().catch((err: DOMException) => {
+            if (err?.name !== "AbortError") onRefused();
+          });
+        const ear = new AbortController();
+        const timer = window.setTimeout(() => {
+          ear.abort();
+          held.current = { ear, timer, forced: true };
+          void resume();
+        }, THROUGH_WAIT_MS);
+        v.addEventListener(
+          "canplaythrough",
+          () => {
+            release(held);
+            void resume();
+          },
+          { once: true, signal: ear.signal },
+        );
+        held.current = { ear, timer, forced: false };
+      }}
       onPause={() => {
         setPlaying(false);
-        // Back to the poster's frame, so the next visit swaps in on the
-        // picture that is already there — but only once the film has faded
-        // out (400ms, globals.css): seeking while it is still showing
-        // snapped the picture to the start as the card slid away.
+        // Back to the start, so the next visit begins at the beginning —
+        // but only once the film has faded out (400ms, globals.css):
+        // seeking while it is still showing snapped the picture as the card
+        // slid away.
         const v = ref.current;
-        if (v) window.setTimeout(() => { if (v.paused) v.currentTime = at; }, 450);
+        if (v) window.setTimeout(() => { if (v.paused) v.currentTime = 0; }, 450);
       }}
       // The word that the next film in the line may start downloading.
       onCanPlayThrough={() => onThrough(slot)}
       data-file={file}
-      data-at={at || undefined}
       data-rail-film={index}
       data-playing={playing || undefined}
       className="cf-film"
@@ -425,7 +499,14 @@ export function CoverflowRail({
   const [stage, setStage] = useState(0);
   const onThrough = useCallback((d: number) => {
     const k = d === 0 ? 0 : WARM_ORDER.indexOf(d) + 1;
-    if (k >= 0) setStage((s) => Math.max(s, k + 1));
+    // ONLY THE FILM WHOSE TURN IT IS MOVES THE LINE ON. A film still
+    // downloading from before a press (the old centre, now a side card)
+    // says it is through in its own time; taken as "max", that opened the
+    // next TWO downloads at once beside the one playing (live, 2026-10-23:
+    // +1 and +2 started together 17s after a press, the centre still
+    // stalling). It is ignored now, and reports again when its turn comes
+    // (the effect re-asks a film each time it becomes warm).
+    if (k >= 0) setStage((s) => (k === s ? s + 1 : s));
   }, []);
   const go = (by: number) => {
     setStage(0);
@@ -593,7 +674,6 @@ export function CoverflowRail({
                 <>
                   <RailVideo
                     file={item.video}
-                    at={item.at}
                     on={d === 0 && live}
                     warm={live && WARM_ORDER.indexOf(d) !== -1 && WARM_ORDER.indexOf(d) < stage}
                     sound={d === 0 && sound}

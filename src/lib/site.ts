@@ -74,15 +74,17 @@ export const CALL_PATH = "/call";
 export const CALL_ADDRESS = "www.mushi.agency/call";
 
 /**
- * EVERY LINK THAT OPENS THE CALENDAR OPENS A NEW TAB (Žilvinas 2026-10-10).
- * The scheduler is another site; a reader who books should still have ours
- * behind it. Spread on any <a> whose href may be the booking URL or /call —
- * the header and phone-bar CTAs take their href as a prop, so this decides
- * from the href rather than from where the link was written, and a new CTA
- * that points at the scheduler gets it without anyone remembering to.
+ * EVERY LINK OPENS IN THE TAB IT WAS PRESSED IN (Noah 2026-10-20, "padarom,
+ * kad link'ai current page'ą pakeistų - neatidarytų new page'o"). From
+ * 2026-10-10 to 2026-10-23 the calendar links opened a new tab (Žilvinas,
+ * so that a reader who booked kept the site behind it); the helper is kept,
+ * spread on every anchor that may carry the booking URL or /call, so that
+ * decision is one line here if it comes back — the test holds every such
+ * anchor to spreading it.
  */
-export const bookingTarget = (href: string | undefined) =>
-  href === BOOKING_URL || href === CALL_PATH ? ({ target: "_blank", rel: "noopener" } as const) : {};
+// The href is read by nothing now; it stays so every call site keeps passing it.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const bookingTarget = (href: string | undefined): Record<string, never> => ({});
 
 /**
  * Anchor the booking CTAs land on until BOOKING_URL points at a real

@@ -415,15 +415,16 @@ export function ReadyToScale() {
       </h2>
 
       <div className="cs-scale-pair mt-[21px] flex flex-col items-center gap-[15px] md:mt-[2.40625rem] md:flex-row md:justify-center md:gap-[1.625rem]">
-        {/* 500+ templates → /templates with the Pick-your-plan sheet open
-            on arrival (Žilvinas 2026-10-17: "in case studies buy button
-            should redirect to templates with the buy popup open"). NOT
-            data-plan: with it the sheet opened here when the page had
-            hydrated and the link was followed when it had not, so the same
-            button did two different things ("sometimes redirects"). One
-            path now, and PlanSheet warms Stripe the moment it sees #buy, so
-            Buy is instant there too. It opened in place 2026-10-04 to
-            2026-10-17, and went to the webapp before that. */}
+        {/* 500+ templates → /templates, the page and nothing more (Noah
+            2026-10-20: the arrival with the sheet already open "tiesiog
+            load'ina endlessly ... darom gal be pop up'o atidarymo iš case
+            studies page'o"). From 2026-10-17 to 2026-10-23 it went to
+            /templates#buy, which opened the Pick-your-plan sheet on arrival
+            and built its three Stripe steps at once; #buy stays for the
+            webapp's links (PlanSheet). It opened in place 2026-10-04 to
+            2026-10-17, and went to the webapp before that. NOT data-plan:
+            with it the sheet opened here when the page had hydrated and the
+            link was followed when it had not ("sometimes redirects"). */}
         <article className={CARD}>
           <Img
             src="case-studies/scale-templates.webp"
@@ -437,7 +438,7 @@ export function ReadyToScale() {
             {templates.titleLines[1]}
           </h3>
           <a
-            href="/templates#buy"
+            href="/templates"
             // white fill / black label  ->  black fill / white label
             className={`${CARD_BUTTON} top-[calc(var(--cu)*106)] w-[calc(var(--cu)*147)] md:left-[2.75rem] bg-[linear-gradient(#fff,#fff)] text-black hover:bg-[linear-gradient(#000,#000)] hover:text-white active:bg-[linear-gradient(#000,#000)] active:text-white md:w-[12.75rem]`}
           >
@@ -459,10 +460,17 @@ export function ReadyToScale() {
                 key={item.label}
                 // The text sits in one column on every row — Figma's +49 on
                 // the phone, +78 on the desktop — so the icon lives in a slot
-                // of that width (24 / 34) and its own box inside it, at the
-                // slot's left edge. Each icon's box is Figma's for THAT
-                // breakpoint: the phone draws the headset 17 x 15, not 16
-                // square, and the tools 15.
+                // of that width and its own box inside it, at the slot's
+                // left edge. Each icon's box is Figma's for THAT breakpoint:
+                // the phone draws the headset 17 x 15, not 16 square, and
+                // the tools 15.
+                // THE SLOT IS 2 / 3 WIDER THAN THE FRAME'S (26 / 37, not
+                // 24 / 34 — Noah 2026-10-20, "icon'ų spacing'as off, check
+                // Figma - reikia biški daugiau paduot space'o"): the svg is
+                // drawn a tenth larger than its box (see below), so at the
+                // frame's own column the ink ended 6.5 before the text where
+                // the frame shows 9. The extra width gives the ink the
+                // frame's gap.
                 className="flex h-[calc(var(--cu)*16)] items-center text-[length:calc(var(--cu)*16)] font-normal leading-none text-white md:h-[1.5625rem] md:text-[1.25rem]"
                 style={
                   {
@@ -473,7 +481,7 @@ export function ReadyToScale() {
                   } as CSSProperties
                 }
               >
-                <span className="flex w-[calc(var(--cu)*24)] shrink-0 items-center md:w-[2.125rem]">
+                <span className="flex w-[calc(var(--cu)*26)] shrink-0 items-center md:w-[2.3125rem]">
                   {/* The svg is drawn to the OUTSIDE of its 2.5 stroke, so
                       the file is a tenth larger than the icon box Figma
                       reports (27.5 for a 25 box) and is sized so — by its
