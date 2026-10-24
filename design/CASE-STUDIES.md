@@ -201,7 +201,9 @@ Rail order as drawn, left to right (centre in bold):
   Axiometa Genesis Mini (image 405) — read again 2026-10-23, when the
   Sintra pick-your-plan page that used to be on the left had been taken out
   of the file. The three loose cards left of the frame (`5614:19` Trendy,
-  `5614:38` salons, `5614:26` quiz) are the rail's other three.
+  `5614:38` salons, `5614:26` quiz) are the rail's other three, and the
+  ring runs in the file's order: Trendy, salons, quiz, Modular, **home**,
+  Genesis (2026-10-24, "make this in order as well").
 - Static: Spacegoods, Bluechew, **Hey Bud**, Lucky Time, towels
 
 ## Ready To Scale?

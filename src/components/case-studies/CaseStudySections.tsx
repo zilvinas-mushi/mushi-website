@@ -362,7 +362,7 @@ export function CaseStudiesRails() {
       className="flex flex-col gap-[42px] pt-[57px] md:gap-[5.3125rem] md:pt-[8.5rem]"
     >
       <CoverflowRail kind="video" title={video.title} headingId="cs-video-heading" items={video.items} />
-      <CoverflowRail kind="landing" title={landing.title} headingId="cs-landing-heading" items={landing.items} />
+      <CoverflowRail kind="landing" title={landing.title} headingId="cs-landing-heading" items={landing.items} start={landing.start} />
       {/* 43 above this one on the phone where the other gap is 42 — the
           frame's own; the wrapper's gap is 42, this is the odd pixel. */}
       <div className="pt-px md:pt-0">

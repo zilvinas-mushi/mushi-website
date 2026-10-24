@@ -470,11 +470,14 @@ export function CoverflowRail({
   title,
   headingId,
   items,
+  start,
 }: {
   kind: "video" | "landing" | "static";
   title: string;
   headingId: string;
   items: readonly RailItem[];
+  /** The card at rest in the centre; the middle of the list unless the content says otherwise. */
+  start?: number;
 }) {
   const desktop = DESKTOP[kind];
   const phone = PHONE[kind];
@@ -483,7 +486,7 @@ export function CoverflowRail({
   const cards = spare >= 2 ? items : [...items, ...items];
   const n = cards.length;
   // The design's centre card is the middle of the supplied list.
-  const [active, setActive] = useState(Math.floor(items.length / 2));
+  const [active, setActive] = useState(start ?? Math.floor(items.length / 2));
   const touchX = useRef<number | null>(null);
   // THE FILMS ARE FETCHED ONE AT A TIME, THE PLAYING ONE FIRST (Žilvinas
   // 2026-10-17, from a phone: "the ads just sometimes gets stuck", then
