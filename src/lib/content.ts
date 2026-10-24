@@ -1563,9 +1563,13 @@ export const CASE_STUDIES_PAGE = {
         // Each icon's box as the frames draw it, [w, h] — phone (nodes
         // 4626:450 / 449 / 451) and desktop. The text column is fixed
         // (+49 / +78), so there is no per-row gap any more.
-        { icon: "icon-sparkles", label: "50+ new templates monthly", phone: [16, 16], desktop: [25, 25] },
-        { icon: "icon-headset", label: "24/7 customer support", phone: [17, 15], desktop: [28, 25] },
-        { icon: "icon-tools", label: "Editable in Canva", phone: [15, 15], desktop: [25, 25] },
+        // -v2 (Žilvinas 2026-10-24, "those 3 icons ... different in weight -
+        // it should be 2"): the file's own vectors (4548:5703 / 5702 / 5704),
+        // stroke 2, round caps, exported from the desktop app; the first cut
+        // was redrawn at 2.5. A changed file gets a new name.
+        { icon: "icon-sparkles-v2", label: "50+ new templates monthly", phone: [16, 16], desktop: [25, 25] },
+        { icon: "icon-headset-v2", label: "24/7 customer support", phone: [17, 15], desktop: [28, 25] },
+        { icon: "icon-tools-v2", label: "Editable in Canva", phone: [15, 15], desktop: [25, 25] },
       ],
     },
     agency: {
