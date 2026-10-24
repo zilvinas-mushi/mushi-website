@@ -464,13 +464,11 @@ export function ReadyToScale() {
                 // left edge. Each icon's box is Figma's for THAT breakpoint:
                 // the phone draws the headset 17 x 15, not 16 square, and
                 // the tools 15.
-                // THE SLOT IS 2 / 3 WIDER THAN THE FRAME'S (26 / 37, not
-                // 24 / 34 — Noah 2026-10-20, "icon'ų spacing'as off, check
-                // Figma - reikia biški daugiau paduot space'o"): the svg is
-                // drawn a tenth larger than its box (see below), so at the
-                // frame's own column the ink ended 6.5 before the text where
-                // the frame shows 9. The extra width gives the ink the
-                // frame's gap.
+                // The slot is the frame's own 24 / 34 again (2026-10-24):
+                // it was widened to 26 / 37 on 2026-10-20 ("icon'ų
+                // spacing'as off") when the icons were a redrawn 2.5-stroke
+                // set that filled more of the gap; the icons are the file's
+                // own now (stroke 2), so the frame's numbers are one to one.
                 className="flex h-[calc(var(--cu)*16)] items-center text-[length:calc(var(--cu)*16)] font-normal leading-none text-white md:h-[1.5625rem] md:text-[1.25rem]"
                 style={
                   {
@@ -481,14 +479,14 @@ export function ReadyToScale() {
                   } as CSSProperties
                 }
               >
-                <span className="flex w-[calc(var(--cu)*26)] shrink-0 items-center md:w-[2.3125rem]">
-                  {/* The svg is drawn to the OUTSIDE of its 2.5 stroke, so
-                      the file is a tenth larger than the icon box Figma
-                      reports (27.5 for a 25 box) and is sized so — by its
-                      width only, and it keeps its own proportions: the
-                      files carried preserveAspectRatio="none" and were
-                      being pulled to a box of another shape (Žilvinas
-                      2026-10-17, "icons now are stretched"). */}
+                <span className="flex w-[calc(var(--cu)*24)] shrink-0 items-center md:w-[2.125rem]">
+                  {/* The svg is the vector's box plus its 2 stroke (27 for
+                      a 25 box, 30 for the headset's 28), so it is sized at
+                      108% of the box — by its width only, and it keeps its
+                      own proportions: the files carried
+                      preserveAspectRatio="none" and were being pulled to a
+                      box of another shape (Žilvinas 2026-10-17, "icons now
+                      are stretched"). */}
                   <span className="grid h-[var(--ph)] w-[var(--pw)] shrink-0 place-items-center md:h-[var(--dh)] md:w-[var(--dw)]">
                     <LazyImg
                       src={`/images/case-studies/${item.icon}.svg`}
@@ -500,7 +498,7 @@ export function ReadyToScale() {
                       // card the desktop icons' ink sat 2px below the frame's
                       // (375/415/455 there, 377/417/457 here) while the text
                       // matched to the pixel; the phone matched as it was.
-                      className="h-auto w-[110%] max-w-none md:-translate-y-[2px]"
+                      className="h-auto w-[108%] max-w-none md:-translate-y-[2px]"
                     />
                   </span>
                 </span>
