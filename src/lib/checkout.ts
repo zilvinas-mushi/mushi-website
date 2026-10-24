@@ -13,6 +13,7 @@
  * Link (`PAYMENT_LINKS` in pricing.ts), so there is always a way to pay.
  */
 import { CURRENCY, PLANS, STRIPE_MODE, monthsIn, type Plan, type PlanId } from "@/lib/pricing";
+import { attribution } from "@/lib/meta-pixel";
 import { currencyOnPage, money } from "@/lib/money";
 import { APP_URL } from "@/lib/site";
 
@@ -62,7 +63,14 @@ export function checkoutSession(planId: PlanId): Promise<string> {
     // IN THE CURRENCY THE PAGE WAS PAINTED IN (money.ts): a buyer who read
     // €60 is charged €60. Dollars, the price's own currency, are the webapp's
     // default and are not named.
-    body: JSON.stringify({ plan: planFor(planId).lookupKey, ...(currencyOnPage() === CURRENCY ? {} : { currency: currencyOnPage() }) }),
+    // And what ties a purchase to the ad that brought it (meta-pixel.ts):
+    // the webapp puts it on the session, and its webhook's Purchase event
+    // carries it. Empty for a visitor who is not tracked.
+    body: JSON.stringify({
+      plan: planFor(planId).lookupKey,
+      ...(currencyOnPage() === CURRENCY ? {} : { currency: currencyOnPage() }),
+      ...attribution(),
+    }),
   }).then(async (response) => {
     if (!response.ok) throw new Error(`the webapp answered ${response.status}`);
     const { clientSecret } = (await response.json()) as { clientSecret?: string };

@@ -7,7 +7,10 @@ import { Money } from "@/components/shared/Money";
 import { TEMPLATES_PAGE } from "@/lib/content";
 import { StripePay, fetchStripeJs, preloadStripe } from "@/components/checkout/StripePay";
 import { checkoutSession, dueToday, prepareCheckoutSessions, wakeCheckout } from "@/lib/checkout";
-import { checkoutUrl, type PlanId } from "@/lib/pricing";
+import { PLANS, amountIn, checkoutUrl, type PlanId } from "@/lib/pricing";
+import { track } from "@/lib/meta-pixel";
+import { currencyOnPage } from "@/lib/money";
+import { planFor } from "@/lib/checkout";
 import Link from "next/link";
 import { VIOLET_FILL } from "@/components/shared/violetCta";
 
@@ -370,6 +373,18 @@ export function PlanSheet() {
     if (stale) pay.current = {};
     held.current = false;
     openRef.current = true;
+    // ADDTOCART (Meta, meta-pixel.ts): the sheet opening is the cart. The
+    // three plans are its items; the value is the chosen plan's.
+    {
+      const cur = currencyOnPage();
+      void track("AddToCart", {
+        content_ids: PLANS.map((p) => p.lookupKey),
+        content_type: "product",
+        value: amountIn(planFor(planRef.current), cur) / 100,
+        currency: cur,
+        num_items: 1,
+      });
+    }
     flushSync(() => {
       setHolding(false);
       setStep("plan");

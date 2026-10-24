@@ -7,8 +7,10 @@ import type {
   StripeCheckoutLoadActionsSuccess,
   StripePaymentElement,
 } from "@stripe/stripe-js";
-import { CHECKOUT_SESSION_URL, STRIPE_PUBLISHABLE_KEY, checkoutSession } from "@/lib/checkout";
-import type { PlanId } from "@/lib/pricing";
+import { CHECKOUT_SESSION_URL, STRIPE_PUBLISHABLE_KEY, checkoutSession, planFor } from "@/lib/checkout";
+import { rememberBuying, track } from "@/lib/meta-pixel";
+import { currencyOnPage } from "@/lib/money";
+import { amountIn, type PlanId } from "@/lib/pricing";
 
 /**
  * THE PAYMENT STEP'S WORKING PART (2026-10-04): Stripe's card fields, the
@@ -683,6 +685,17 @@ export function StripePay({
     }
 
     if (busy) return;
+    // INITIATECHECKOUT (Meta, meta-pixel.ts): Buy, pressed with an email —
+    // fired before anything is awaited, so that it goes whether the payment
+    // is confirmed here or on Stripe's page; and what is being bought is
+    // remembered for the Thank You page's Purchase.
+    {
+      const plan = planFor(planId);
+      const currency = currencyOnPage();
+      const bought = { content_ids: [plan.lookupKey], value: amountIn(plan, currency) / 100, currency };
+      rememberBuying(bought);
+      void track("InitiateCheckout", { ...bought, content_type: "product", num_items: 1 }, { email });
+    }
     // PRESSED BEFORE THE FIELDS WERE IN: the press is held, not refused. The
     // button shows it is working, and this carries on when the load settles
     // one way or the other (LOAD_LIMIT_MS bounds it).

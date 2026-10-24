@@ -11,8 +11,11 @@ import { readFileSync, statSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 // Built from pieces so that this file is not itself a match. No word boundary
-// in front: `MY_sk_live_…` and `%20sk_live_…` are leaks too.
-const SECRET = new RegExp(`(?:(?:sk|rk)_(?:org_)?(?:test|live)|whsec)_[A-Za-z0-9]{10,}`);
+// in front: `MY_sk_live_…` and `%20sk_live_…` are leaks too. The last
+// alternative is a Meta access token (docs/features/0003-meta-pixel): the
+// pixel id is public and in the bundle, the Conversions API token is the
+// webapp's and must never be here.
+const SECRET = new RegExp(`(?:(?:sk|rk)_(?:org_)?(?:test|live)|whsec)_[A-Za-z0-9]{10,}|\\bEAA[A-Za-z0-9]{60,}`);
 
 const BINARY = /\.(?:webp|png|jpe?g|gif|avif|ico|woff2?|ttf|otf|mp4|webm|mov|pdf|zip|gz)$/i;
 
@@ -38,6 +41,8 @@ describe("Stripe secrets", () => {
       expect(SECRET.test(`MY_${prefix}${tail}`)).toBe(true);
     }
     expect(SECRET.test(`NEXT_PUBLIC_KEY=pk_live_${tail}`)).toBe(false);
+    expect(SECRET.test(`META_CAPI_TOKEN=EAA${"x".repeat(80)}`)).toBe(true);
+    expect(SECRET.test(`META_PIXEL_ID = "1264043475248995"`)).toBe(false);
   });
 
   it("finds files to scan", () => {

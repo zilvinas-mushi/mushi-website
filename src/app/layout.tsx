@@ -3,6 +3,7 @@ import { Inter, Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { CanvasTint } from "@/components/layout/CanvasTint";
+import { MetaPixel } from "@/components/layout/MetaPixel";
 import { PaintGate } from "@/components/layout/PaintGate";
 import { PAINT_GATE_SCRIPT } from "@/lib/paint-gate-script";
 import { LOGIN_SPECULATION_RULES } from "@/lib/prerender";
@@ -262,6 +263,8 @@ export default function RootLayout({
         </div>
         <PaintGate />
         <CanvasTint />
+        {/* The Meta Pixel: armed here, loaded after the gate — src/lib/meta-pixel.ts. */}
+        <MetaPixel />
       </body>
     </html>
   );
