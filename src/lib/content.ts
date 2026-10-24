@@ -1487,8 +1487,13 @@ export const CASE_STUDIES_PAGE = {
       // product page on the right. The Sintra pricing page is gone. The
       // Modular cut is image 404's own fill (2812 x 1860), the top 1570
       // rows to the card's aspect; its phone cut is the full height, centred.
-      // Sintra home stays the centre card: floor(6 / 2) is the fourth entry,
-      // with Modular to its left and Genesis to its right, as the frame.
+      // IN THE FILE'S OWN ORDER (Žilvinas 2026-10-24, "make this in order as
+      // well"): the three loose cards sit left of the frame, Trendy / salons
+      // / quiz left to right, then the frame's Modular / home / Genesis — so
+      // that is the ring, and the rest state is still the frame's three with
+      // Sintra home in the centre (`start`, the fifth entry), Modular to its
+      // left and Genesis to its right; the first press back brings the quiz.
+      start: 4,
       items: [
         {
           src: "case-studies/landing-trendy.webp",
@@ -1499,6 +1504,11 @@ export const CASE_STUDIES_PAGE = {
           src: "case-studies/landing-sintra-salons.webp",
           phoneSrc: "case-studies/landing-sintra-salons-phone.webp",
           alt: "Sintra for beauty salons: automate social media and get new clients",
+        },
+        {
+          src: "case-studies/landing-sintra-quiz.webp",
+          phoneSrc: "case-studies/landing-sintra-quiz-phone.webp",
+          alt: "Sintra quiz: Claude is for hobbies, Sintra is for business",
         },
         {
           src: "case-studies/landing-axiometa-modular.webp",
@@ -1514,11 +1524,6 @@ export const CASE_STUDIES_PAGE = {
           src: "case-studies/landing-axiometa.webp",
           phoneSrc: "case-studies/landing-axiometa-phone.webp",
           alt: "Axiometa product page: Genesis Mini starter kit",
-        },
-        {
-          src: "case-studies/landing-sintra-quiz.webp",
-          phoneSrc: "case-studies/landing-sintra-quiz-phone.webp",
-          alt: "Sintra quiz: Claude is for hobbies, Sintra is for business",
         },
       ],
     },
