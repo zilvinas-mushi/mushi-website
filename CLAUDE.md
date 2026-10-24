@@ -208,6 +208,17 @@ price in one place only and `npm test` goes red. PRD and plan:
   scroll) because iOS scrolls it from a touch inside Stripe's frame, and
   the backdrop there is black.
 
+## Tracking
+The Meta Pixel (`src/lib/meta-pixel.ts`, PRD `docs/features/0003-meta-pixel/`)
+is the only third-party script. Its rules: it loads **after the paint gate
+has lifted and the browser is idle**, never from `<head>` or the bundle, and
+the score gate measures the page with it. Every event is fired in the browser
+AND posted to the webapp's relay with the same `event_id`; the webapp sends
+the server half (it holds the token — this site never does, and
+`tests/secrets.test.ts` scans for one). A browser that asks not to be tracked
+(GPC, DNT) or is automated gets nothing. New events go through `track()`;
+never call `fbq` directly.
+
 ## SEO is a priority
 - One <h1> per page. Semantic sectioning elements.
 - `metadata` export with absolute OG image URLs.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Logo } from "@/components/shared/Logo";
+import { PurchasePixel } from "@/components/thank-you/PurchasePixel";
 import { APP_URL, CONTACT_EMAIL } from "@/lib/site";
 
 /**
@@ -69,6 +70,7 @@ export default function ThankYouPage() {
   return (
     <main className="flex flex-1 flex-col items-center bg-[#181818] px-[15px] pt-[24px] pb-[30px] text-center md:px-0 md:pt-[2.875rem] md:pb-[10.3125rem]">
       <script dangerouslySetInnerHTML={{ __html: `${REQUIRE_SESSION};${RETURN_TO_OPENER}` }} />
+      <PurchasePixel />
       {/* The wordmark is TYPE (Logo.tsx), sized so its ink fills the frame's
           logo slot: 66 × 20 on the phone (5409:1069), 150 × 45 on the desktop
           (5507:268). */}

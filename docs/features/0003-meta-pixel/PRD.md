@@ -1,5 +1,5 @@
 ---
-status: draft
+status: testing
 created: 2026-10-24
 last-updated: 2026-10-24
 last-updated-by: Zilvinas Aleksa
@@ -77,28 +77,28 @@ events, each sent **twice** — by the browser pixel and by the Conversions API
 - **AC6** — `Purchase` for one checkout session arrives at Meta with the
   same `event_id` from both halves (webhook log + browser network log).
 
-## Open decisions (Žilvinas)
+## Decisions taken (2026-10-24, "add it there and merge")
 
-- **D1 — Schedule**: webhook (server-only, needs a Calendly plan with
-  webhooks — Standard or above) or the embed (changes how Book a Call works:
-  the calendar opens on our page instead of Calendly's). The webhook is the
-  smaller change to the site and the only one that cannot be faked.
-- **D2 — "with an email"**: the sheet's own card fields are unreachable
-  (CLAUDE.md), so Buy goes to Stripe's hosted page and the email is typed
-  there, where we cannot see it. Either `InitiateCheckout` goes without the
-  email (hashed email only on `Purchase`, from the webhook), or Stripe's
-  `customer_email` is collected on our side first. Recommendation: without.
-- **D3 — Purchase value on `/thank-you`**: the page is static and only has the
-  session id. Either the browser half carries no value (Meta takes the value
-  from the server half after dedup — it does, the server event wins), or
-  `/thank-you` asks the webapp for the session's amount. Recommendation: no
-  value in the browser half.
-- **D4 — Consent**: EU visitors (Lithuania included) need consent before a
-  Meta cookie is set. The site has no consent banner. Options: a banner;
-  or fire only with Meta's Limited Data Use / no cookies for EU; or treat
-  the dataset as US-only. This is a legal call, not a technical one.
-- **D5 — Where the CAPI token lives**: webapp env (`META_CAPI_TOKEN`), set by
-  Žilvinas through his `!` one-liners like the Resend key was.
+- **D1 Schedule** — Calendly's `invitee.created` webhook → the webapp
+  (`/api/calendly/webhook`) → CAPI. Server-only. Needs the subscription made
+  by a person (mushi-app `docs/features/0007-meta-pixel`).
+- **D2** — InitiateCheckout carries the email, hashed: the sheet's own
+  payment step has it before Stripe does.
+- **D3** — Purchase on `/thank-you` carries the value remembered from Buy in
+  the same browser (`sessionStorage`); the server half always has it.
+- **D4 Consent** — no banner. The pixel is skipped for Global Privacy Control,
+  Do Not Track and automated browsers; everyone else, EU included, is
+  tracked. **This is a legal call that stands open.**
+- **D5** — `META_CAPI_TOKEN` in the webapp's Vercel env, set by Žilvinas.
+
+## Where it lives
+
+`src/lib/meta-pixel.ts` (the loader, the events, who is not tracked),
+`layout/MetaPixel.tsx` (armed on every page), `checkout/PlanSheet.tsx`
+(AddToCart), `checkout/StripePay.tsx` (InitiateCheckout),
+`thank-you/PurchasePixel.tsx` (Purchase), `lib/checkout.ts` (the click's
+cookies onto the session). The script loads after the paint gate and an idle
+moment; `npm run pages:check` measures the page with it.
 
 ## Smoke Scenarios
 

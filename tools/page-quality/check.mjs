@@ -475,6 +475,13 @@ const base = remote ?? local.origin;
 const browser = await puppeteer.launch({
   executablePath: chromePath(),
   headless: true,
+  // NOT AN AUTOMATED BROWSER, AS FAR AS THE PAGE CAN TELL: the Meta Pixel
+  // (src/lib/meta-pixel.ts) skips a browser whose navigator.webdriver is
+  // set, so that the checkout gate and CI never count as buyers. Lighthouse
+  // has to see the page a visitor sees — the pixel's script and all — or
+  // the score here is not the PageSpeed number. --enable-automation is the
+  // flag that sets navigator.webdriver; nothing here needs it.
+  ignoreDefaultArgs: ["--enable-automation"],
   // GitHub's runners do not allow Chrome's sandbox (unprivileged user
   // namespaces are restricted there); it is this site's own pages either way.
   // --ignore-certificate-errors is for the throwaway certificate above and
