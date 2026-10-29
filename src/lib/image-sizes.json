@@ -179,9 +179,9 @@
     "w": 1264,
     "h": 706
   },
-  "case-studies/landing-trendy-phone.webp": {
+  "case-studies/landing-trendy-phone-v2.webp": {
     "w": 728,
-    "h": 1188
+    "h": 1209
   },
   "case-studies/landing-trendy.webp": {
     "w": 1264,
@@ -778,6 +778,14 @@
   "screenshot202604071536181.webp": {
     "w": 960,
     "h": 1775
+  },
+  "shared/email/wordmark-black.png": {
+    "w": 511,
+    "h": 148
+  },
+  "shared/email/wordmark.png": {
+    "w": 511,
+    "h": 148
   },
   "shared/logos/we-interiors.webp": {
     "w": 849,
