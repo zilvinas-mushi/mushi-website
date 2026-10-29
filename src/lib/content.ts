@@ -1475,14 +1475,12 @@ export const CASE_STUDIES_PAGE = {
       // Six since 2026-10-17 (Žilvinas: "add additional landing pages"):
       // the three new ones — Trendy AI News, Sintra for salons, the Sintra
       // quiz — are the Figma file's own fills (Mask groups 5614:19 / 38 /
-      // 26), cut to the card's 618 x 345 from the top. The file had no
-      // phone versions of them, so their -phone cuts were portrait crops of
-      // the same band, each centred on its headline (salons 42%, quiz 50%
-      // across) — a cropped desktop page in a phone frame (Noah 2026-10-28,
-      // "šita vieta ant mobile'o fucked"). Trendy's phone cut is now the
-      // real phone design (Žilvinas's export, 2026-10-29), fitted to the
-      // phone card's 728 x 1209 from the top; salons and quiz are still
-      // the crops until theirs are exported.
+      // 26), cut to the card's 618 x 345 from the top. Their -phone cuts
+      // were portrait crops of the same band — a cropped desktop page in a
+      // phone frame (Noah 2026-10-28, "šita vieta ant mobile'o fucked") —
+      // and are now the real phone designs (Figma image 433 for salons,
+      // Žilvinas's exports for Trendy and the quiz, 2026-10-29), each
+      // fitted to the phone card's 728 x 1209 from the top.
       // THE FRAME'S OWN THREE ARE AXIOMETA / SINTRA HOME / AXIOMETA (Noah
       // 2026-10-20, "nėra Axiometa page'o antro ... įdėjai Sintra pricing
       // page, kurio nereikia, išėmėm"): the rail in `5293:73` (image 404 /
@@ -1506,12 +1504,12 @@ export const CASE_STUDIES_PAGE = {
         },
         {
           src: "case-studies/landing-sintra-salons.webp",
-          phoneSrc: "case-studies/landing-sintra-salons-phone.webp",
+          phoneSrc: "case-studies/landing-sintra-salons-phone-v2.webp",
           alt: "Sintra for beauty salons: automate social media and get new clients",
         },
         {
           src: "case-studies/landing-sintra-quiz.webp",
-          phoneSrc: "case-studies/landing-sintra-quiz-phone.webp",
+          phoneSrc: "case-studies/landing-sintra-quiz-phone-v2.webp",
           alt: "Sintra quiz: Claude is for hobbies, Sintra is for business",
         },
         {
