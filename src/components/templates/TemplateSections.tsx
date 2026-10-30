@@ -1015,9 +1015,11 @@ function CompareValue({ v, mushi }: { v: string | boolean; mushi?: boolean }) {
             : "text-[20px] font-semibold text-[#ff5b5b] md:text-[36px]"
         }
       >
-        {/* Mushi's own price is sold in the visitor's currency; the others'
-            are what those products charge, in dollars. */}
-        {mushi && v.includes("$") ? <Money>{v}</Money> : v}
+        {/* Every price in the row follows the visitor's currency, the
+            competitors' too: "€5" against "$14" read as two currencies
+            being compared, not two prices (Žilvinas 2026-10-30, "you
+            messed up the currencies"). */}
+        {v.includes("$") ? <Money>{v}</Money> : v}
       </span>
     );
   }
