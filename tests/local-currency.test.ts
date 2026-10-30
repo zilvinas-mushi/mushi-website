@@ -100,7 +100,10 @@ describe("the page", () => {
     }
     const sections = read("src/components/templates/TemplateSections.tsx");
     expect(sections).toContain("<Money>{a.templates.figure}</Money>");
-    expect(sections).toContain('{mushi && v.includes("$") ? <Money>{v}</Money> : v}');
+    // The competitors' prices too: one currency per row, or the row reads as
+    // a currency comparison (2026-10-30).
+    expect(sections).toContain('{v.includes("$") ? <Money>{v}</Money> : v}');
+    expect(sections).not.toContain('mushi && v.includes("$")');
   });
 });
 
