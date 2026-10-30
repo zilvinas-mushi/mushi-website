@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 /**
  * THE PAINT GATE. Nothing is shown until the first screen is actually ready
@@ -93,7 +93,13 @@ export function PaintGate() {
   // re-arming for it would hide a finished screen and fade it back in.
   const first = useRef(true);
 
-  useEffect(() => {
+  // A LAYOUT effect, so the veil is up in the same frame the new route
+  // commits. An ordinary effect runs after that frame has painted, which
+  // showed the new page half-built — headline on black, hero on the wire —
+  // for a frame before the veil covered it (the header's links went
+  // client-side on 2026-10-30; before that every navigation was a page
+  // load and this effect never ran at all).
+  useLayoutEffect(() => {
     if (first.current) {
       first.current = false;
       return;

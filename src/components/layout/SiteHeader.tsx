@@ -234,8 +234,21 @@ export function SiteHeader({
               // disabled` says the same thing to a screen reader.
               <li key={item.label} className="flex">
                 {navHref(item, active ?? "/") ? (
-                  <a
-                    href={item.href ?? undefined}
+                  // A CLIENT-SIDE NAVIGATION, NOT A PAGE LOAD (Žilvinas
+                  // 2026-10-30, his boss on /templates: "the screen appears,
+                  // then the black thingie appears, covers everything, and
+                  // the screen appears again"). As a plain <a> every press
+                  // here loaded a new document, whose first paint is the
+                  // paint veil — so the page in front of the reader was
+                  // replaced by solid black for as long as the next one's
+                  // first screen took to arrive: measured 4-5s on a 1.5 Mbps
+                  // line (1 MB of HTML, a 406 KB hero, eight fonts). As a
+                  // Link the page stays on screen while the route's payload
+                  // comes, and the veil (PaintGate, at the commit) covers
+                  // only the artwork wait. No prefetch, as on the logo.
+                  <Link
+                    href={item.href!}
+                    prefetch={false}
                     aria-current={item.href === active ? "page" : undefined}
                     className={`cap-centered text-[length:calc(var(--u)*0.28)] font-semibold uppercase leading-none tracking-[0.01em] transition-colors ${
                       item.href === active
@@ -246,7 +259,7 @@ export function SiteHeader({
                     }`}
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 ) : (
                   <span
                     aria-disabled="true"

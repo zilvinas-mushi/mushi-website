@@ -593,10 +593,13 @@ export function MobileHeader({
                   </span>
                 );
               }
+              // A client-side navigation, not a page load — see the desktop
+              // bar (SiteHeader): a new document's first paint is the veil.
               return (
-                <a
+                <Link
                   key={item.label}
                   href={href}
+                  prefetch={false}
                   onClick={() => setOpen(false)}
                   aria-current={active ? "true" : undefined}
                   // 52 tall / 17px semibold, selected row on a #222 plate — the
@@ -612,7 +615,7 @@ export function MobileHeader({
                   }`}
                 >
                   {item.label}
-                </a>
+                </Link>
               );
             })}
 
