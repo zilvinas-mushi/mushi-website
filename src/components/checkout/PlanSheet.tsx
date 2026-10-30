@@ -867,9 +867,18 @@ export function PlanSheet() {
         // top leaves a band of the page above it, and on a phone that band
         // is the menu bar at 40% — a second, greyer header over the sheet's
         // own. So below md the backdrop is the page's own black and the band
-        // is simply dark; from md the page shows through, blurred, as a
+        // is simply dark; from md the page shows through, dimmed, as a
         // centred dialog wants.
-        className={`absolute inset-0 bg-black md:bg-black/60 md:backdrop-blur-[9px] ${motion} ${shown ? "opacity-100" : "opacity-0"} ${mounted ? "" : "invisible"}`}
+        // DIMMED, NOT BLURRED (2026-10-30): it was black/60 with a 9px
+        // backdrop-filter. Chrome on some Macs paints a full-screen
+        // backdrop-filter as a frame or two of solid black while it starts
+        // and stops it (a long-standing Chromium GPU bug), which is what
+        // Žilvinas's boss described on /templates: "the screen appears,
+        // then the black thingie appears, covers everything, and the screen
+        // appears again". A plain scrim composites without a filter, so
+        // there is nothing to flash; it is a shade darker to carry the
+        // separation the blur used to.
+        className={`absolute inset-0 bg-black md:bg-black/75 ${motion} ${shown ? "opacity-100" : "opacity-0"} ${mounted ? "" : "invisible"}`}
       />
       <div
         // The md: half overrides the sheet geometry wholesale — static in

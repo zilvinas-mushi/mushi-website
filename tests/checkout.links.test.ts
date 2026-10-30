@@ -147,9 +147,11 @@ describe("the plan sheet", () => {
     expect(sheet).toContain("  }, [shown]);");
     expect(sheet).not.toContain("  }, [mounted]);");
     // The band of page above the sheet is black on the phone, the page
-    // blurred through it from md ("gap from the menu and it looks odd -
-    // black colour?").
-    expect(sheet).toContain("bg-black md:bg-black/60 md:backdrop-blur-[9px]");
+    // dimmed through it from md ("gap from the menu and it looks odd -
+    // black colour?"). Dimmed and NOT blurred: a full-screen backdrop-filter
+    // is a black flash on some Macs' Chrome (2026-10-30).
+    expect(sheet).toContain("bg-black md:bg-black/75 ${motion}");
+    expect(sheet).not.toContain("backdrop-blur");
   });
 
   it("is inert and unannounced while it waits off stage", () => {
